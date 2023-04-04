@@ -1,0 +1,46 @@
+name: Doxygen
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    # The CMake configure and build commands are platform agnostic and should work equally well on Windows or Mac.
+    # You can convert this to a matrix build if you need cross-platform coverage.
+    # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
+    runs-on: ubuntu-22.04
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install deps
+      run:   |
+             sudo apt install -y cmake
+             sudo apt install -y doxygen
+
+    - name: CMake configuration
+      run:  |
+            cmake -B ${{github.workspace}}/build \
+                  -D CMAKE_C_COMPILER=/usr/bin/gcc-11 \
+                  -D CMAKE_CXX_COMPILER=/usr/bin/g++-11 \
+                  -D SBEPP_BUILD_SBEPPC=OFF \
+                  -D SBEPP_BUILD_DOCS=ON
+
+    - name: CMake build
+      run:  |
+            cmake --build ${{github.workspace}}/build \
+                  --target doc
+
+    - name: Moving Files
+      run: |
+        mv ${{github.workspace}}/build/doc/html ./doc/html
+
+    - name: Deploy to Github Pages
+      uses: peaceiris/actions-gh-pages@v3
+
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./

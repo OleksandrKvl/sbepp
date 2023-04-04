@@ -1,0 +1,9 @@
+[requires]
+fmt/9.1.0
+pugixml/1.12.1
+benchmark/1.6.2
+gtest/1.12.1
+
+[generators]
+CMakeDeps
+CMakeToolchain

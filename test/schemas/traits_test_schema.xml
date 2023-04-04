@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sbe:messageSchema xmlns:sbe="http://fixprotocol.io/2016/sbe"
+                   xmlns:xi="http://www.w3.org/2001/XInclude"
+                   package="traits_test_schema"
+                   id="1"
+                   version="10"
+                   semanticVersion="5.2"
+                   description="schema description"
+                   byteOrder="littleEndian">
+    <types>
+        <composite name="messageHeader">
+            <type name="blockLength" primitiveType="uint16"/>
+            <type name="templateId" primitiveType="uint16"/>
+            <type name="schemaId" primitiveType="uint16"/>
+            <type name="version" primitiveType="uint16"/>
+        </composite>
+
+        <composite name="groupSizeEncoding">
+            <type name="blockLength" primitiveType="uint16"/>
+            <type name="numInGroup" primitiveType="uint16"/>
+        </composite>
+
+        <composite name="customGroupSizeEncoding">
+            <type name="blockLength" primitiveType="uint16"/>
+            <type name="numInGroup" primitiveType="uint16"/>
+        </composite>
+
+        <composite name="varDataEncoding">
+            <type name="length" primitiveType="uint32"/>
+            <type name="varData" primitiveType="uint8" length="0"/>
+        </composite>
+        
+        <enum name="enum_1" encodingType="uint8"
+            description="enum description" sinceVersion="1" deprecated="10">
+            <validValue name="a" description="a description"
+                sinceVersion="1" deprecated="10">1</validValue>
+            <validValue name="b">2</validValue>
+        </enum>
+
+        <enum name="enum_2" encodingType="uint8">
+        </enum>
+
+        <composite name="composite_1">
+            <enum name="enumeration" encodingType="uint8" offset="20"/>
+        </composite>
+
+        <set name="set_1" encodingType="uint8" description="set description"
+            sinceVersion="1" deprecated="10">
+            <choice name="a" description="choice description"
+                sinceVersion="1" deprecated="10">1</choice>
+            <choice name="b">2</choice>
+        </set>
+
+        <set name="set_2" encodingType="uint8"/>
+
+        <composite name="composite_2">
+            <set name="set" encodingType="uint8" offset="20"/>
+        </composite>
+
+        <composite name="composite_3" description="composite description"
+            sinceVersion="1" deprecated="10"
+            semanticType="composite semantic type"/>
+
+        <composite name="composite_4"/>
+
+        <composite name="composite_5">
+            <composite name="composite" offset="20"/>
+        </composite>
+
+        <composite name="composite_6">
+            <ref name="ref_1" type="type_1"/>
+            <ref name="ref_2" type="enum_1"/>
+            <ref name="ref_3" type="set_1"/>
+            <ref name="ref_4" type="composite_1"/>
+        </composite>
+
+        <composite name="composite_7">
+            <type name="uint32_req" primitiveType="uint32" offset="20"/>
+        </composite>
+
+        <composite name="composite_8">
+            <type name="field_1" primitiveType="uint32"/>
+            <type name="field_2" primitiveType="uint32"/>
+            <ref name="field_3" type="uint32_req"/>
+        </composite>
+
+        <type name="str128" primitiveType="char" length="128"/>
+        <type name="uint32_req" primitiveType="uint32" presence="required"/>
+        <type name="uint32_opt" primitiveType="uint32" presence="optional"/>
+        <type name="uint32_const" primitiveType="uint32"
+            presence="constant">123</type>
+
+        <type name="type_1" primitiveType="uint32" presence="optional"
+            description="type description" sinceVersion="1" deprecated="10"
+            characterEncoding="character encoding" minValue="0" maxValue="10"
+            nullValue="11" semanticType="type semantic type" length="1"/>
+    </types>
+
+    <sbe:message name="msg_1" id="1" description="message description"
+        semanticType="message semantic type" sinceVersion="1" deprecated="10">
+        <field name="field" id="1" type="uint32"/>
+    </sbe:message>
+
+    <sbe:message name="msg_2" id="2" blockLength="10">
+        <field name="field" id="1" type="uint32"/>
+    </sbe:message>
+
+    <sbe:message name="msg_3" id="3">
+        <field name="field_1" id="1" type="uint32" description="field description"
+            sinceVersion="1" deprecated="10"/>
+        <field name="field_2" id="2" type="uint32" presence="required"/>
+        <field name="field_3" id="3" type="uint32" presence="optional"/>
+        <field name="field_4" id="4" type="uint32" presence="constant"
+            valueRef="enum_1.b"/>
+        <field name="field_5" id="5" type="uint32" offset="20"/>
+        <field name="field_6" id="6" type="set_1"/>
+        <field name="field_7" id="7" type="enum_1"/>
+        <field name="field_8" id="8" type="composite_1"/>
+        <field name="field_9" id="9" type="str128"/>
+        <field name="field_10" id="10" type="uint32_req"/>
+        <field name="field_11" id="11" type="uint32_opt"/>
+        <field name="field_12" id="12" type="uint32_const"/>
+    </sbe:message>
+
+    <sbe:message name="msg_4" id="4">
+        <group name="group_1" id="1" description="group description"
+            dimensionType="customGroupSizeEncoding" sinceVersion="1"
+            deprecated="10" semanticType="group semantic type" blockLength="10">
+        </group>
+
+        <group name="group_2" id="2">
+            <field name="field_1" id="1" type="uint32"/>
+        </group>
+    </sbe:message>
+
+    <sbe:message name="msg_5" id="5">
+        <data name="data_1" id="1" type="varDataEncoding"
+            description="data description" sinceVersion="1" deprecated="10"/>
+        <data name="data_2" id="2" type="varDataEncoding"/>
+    </sbe:message>
+
+    <sbe:message name="msg_6" id="6">
+        <field name="field_1" id="1" type="uint32"/>
+        <field name="field_2" id="2" type="uint32"/>
+        <field name="field_3" id="3" type="uint32"/>
+
+        <group name="group_1" id="4">
+            <field name="field_1" id="1" type="uint32"/>
+            <field name="field_2" id="2" type="uint32"/>
+            <field name="field_3" id="3" type="uint32"/>
+        </group>
+    </sbe:message>
+</sbe:messageSchema>

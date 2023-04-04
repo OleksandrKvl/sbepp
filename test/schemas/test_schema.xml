@@ -1,0 +1,499 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sbe:messageSchema xmlns:sbe="http://fixprotocol.io/2016/sbe"
+                   xmlns:xi="http://www.w3.org/2001/XInclude"
+                   package="test_schema"
+                   id="1"
+                   version="0"
+                   semanticVersion="5.2"
+                   description="Example base schema which can be extended."
+                   byteOrder="littleEndian">
+    <types>
+        <composite name="messageHeader">
+            <type name="blockLength" primitiveType="uint16"/>
+            <type name="templateId" primitiveType="uint16"/>
+            <type name="schemaId" primitiveType="uint16"/>
+            <type name="version" primitiveType="uint16"/>
+        </composite>
+
+        <composite name="groupSizeEncoding">
+            <type name="blockLength" primitiveType="uint16"/>
+            <type name="numInGroup" primitiveType="uint16"/>
+        </composite>
+
+        <composite name="varDataEncoding">
+            <type name="length" primitiveType="uint32"/>
+            <type name="varData" primitiveType="uint8" length="0"/>
+        </composite>
+
+        <composite name="varStrEncoding">
+            <type name="length" primitiveType="uint32"/>
+            <type name="varData" primitiveType="char" length="0"/>
+        </composite>
+
+        <type name="uint32_req" primitiveType="uint32" presence="required"
+            minValue="0" maxValue="10"/>
+        <type name="uint32_opt" primitiveType="uint32" presence="optional"
+            minValue="0" maxValue="10" nullValue="11"/>
+
+        <enum name="numbers_enum" encodingType="uint8">
+            <validValue name="One">1</validValue>
+            <validValue name="Two">2</validValue>
+        </enum>
+
+        <set name="options_set" encodingType="uint8">
+            <choice name="A">0</choice>
+            <choice name="B">2</choice>
+        </set>
+
+        <!-- different forms of constants -->
+        <!-- free-standing constants, can be used only through `ref` or `field` -->
+        <type name="num_const" primitiveType="uint32"
+            presence="constant">123</type>
+        <type name="char_const" primitiveType="char"
+            presence="constant">X</type>
+        <type name="num_const_from_enum" primitiveType="uint32"
+            presence="constant" valueRef="numbers_enum.Two"/>
+        <!-- string constant with deduced length -->
+        <type name="str_const1" primitiveType="char"
+            presence="constant">hello world</type>
+        <!-- string constant with explicitly provided length, padded by '\0' -->
+        <type name="str_const2" primitiveType="char"
+            presence="constant" length="4">hi</type>
+        <type name="str128" primitiveType="char" length="128">hi</type>
+        <type name="arr8" primitiveType="uint8" length="8"/>
+
+        <composite name="constant_refs">
+            <ref name="num_const_value" type="num_const"/>
+            <ref name="char_const_value" type="char_const"/>
+            <ref name="num_const_from_enum_value" type="num_const_from_enum"/>
+            <ref name="str_const1_value" type="str_const1"/>
+            <ref name="str_const2_value" type="str_const2"/>
+        </composite>
+
+        <composite name="constants">
+            <!-- inline constants, don't exist outside of the composite -->
+            <type name="num_const_value" primitiveType="uint32"
+                presence="constant">123</type>
+            <type name="char_const_value" primitiveType="char"
+                presence="constant">X</type>
+            <type name="num_const_from_enum_value" primitiveType="uint32"
+                presence="constant" valueRef="numbers_enum.Two"/>
+            <type name="str_const1_value" primitiveType="char"
+                presence="constant">hello world</type>
+            <type name="str_const2_value" primitiveType="char"
+                presence="constant" length="4">hi</type>
+        </composite>
+
+        <composite name="composite_a">
+            <type name="x" primitiveType="uint32"/>
+            <type name="y" primitiveType="uint32"/>
+        </composite>
+
+        <composite name="composite_b">
+            <type name="number" primitiveType="uint32"/>
+
+            <type name="array" primitiveType="char" length="128"/>
+
+            <enum name="enumeration" encodingType="uint8">
+                <validValue name="One">1</validValue>
+                <validValue name="Two">2</validValue>
+            </enum>
+
+            <set name="set" encodingType="uint8">
+                <choice name="A">0</choice>
+                <choice name="B">2</choice>
+            </set>
+
+            <composite name="composite">
+            </composite>
+        </composite>
+
+        <composite name="refs_composite">
+            <ref name="number" type="uint32_req"/>
+            <ref name="array" type="str128"/>
+            <ref name="enumeration" type="numbers_enum"/>
+            <ref name="set" type="options_set"/>
+            <ref name="composite" type="composite_a"/>
+        </composite>
+
+        <!-- default offset tests -->
+        <composite name="composite_1">
+            <ref name="first_field" type="uint32_req"/>
+            <ref name="second_field" type="uint32_req"/>
+        </composite>
+        
+        <composite name="composite_2">
+            <type name="first_field" primitiveType="uint32"/>
+            <type name="second_field" primitiveType="uint32"/>
+        </composite>
+
+        <composite name="composite_3">
+            <ref name="first_field" type="numbers_enum"/>
+            <ref name="second_field" type="numbers_enum"/>
+        </composite>
+
+        <composite name="composite_4">
+            <enum name="first_field" encodingType="uint8">
+                <validValue name="One">1</validValue>
+                <validValue name="Two">2</validValue>
+            </enum>
+            <enum name="second_field" encodingType="uint8">
+                <validValue name="One">1</validValue>
+                <validValue name="Two">2</validValue>
+            </enum>
+        </composite>
+
+        <composite name="composite_5">
+            <ref name="first_field" type="options_set"/>
+            <ref name="second_field" type="options_set"/>
+        </composite>
+
+        <composite name="composite_6">
+            <set name="first_field" encodingType="uint8">
+                <choice name="A">0</choice>
+                <choice name="B">2</choice>
+            </set>
+            <set name="second_field" encodingType="uint8">
+                <choice name="A">0</choice>
+                <choice name="B">2</choice>
+            </set>
+        </composite>
+
+        <composite name="composite_15">
+            <composite name="first_field">
+                <type name="field" primitiveType="uint32"/>
+            </composite>
+            <composite name="second_field">
+                <type name="field" primitiveType="uint32"/>
+            </composite>
+        </composite>
+
+        <composite name="composite_16">
+            <type name="first_field" primitiveType="char" length="12"/>
+            <type name="second_field" primitiveType="char" length="12"/>
+        </composite>
+
+        <composite name="composite_17">
+            <ref name="first_field" type="composite_a"/>
+            <ref name="second_field" type="composite_a"/>
+        </composite>
+
+        <composite name="composite_18">
+            <ref name="first_field" type="str128"/>
+            <ref name="second_field" type="str128"/>
+        </composite>
+
+        <!-- custom offset tests -->
+        <composite name="composite_7">
+            <type name="field" primitiveType="uint32" presence="required"
+                minValue="0" maxValue="10" offset="20"/>
+        </composite>
+
+        <composite name="composite_8">
+            <enum name="field" encodingType="uint8" offset="20">
+                <validValue name="One">1</validValue>
+                <validValue name="Two">2</validValue>
+            </enum>
+        </composite>
+
+        <composite name="composite_9">
+            <set name="field" encodingType="uint8" offset="20">
+                <choice name="A">0</choice>
+                <choice name="B">2</choice>
+            </set>
+        </composite>
+
+        <composite name="composite_10">
+            <type name="field" primitiveType="char" length="128" offset="20"/>
+        </composite>
+
+        <composite name="composite_11">
+            <composite name="field" offset="20"/>
+        </composite>
+
+        <composite name="composite_12">
+            <ref name="field" type="uint32_req" offset="20"/>
+        </composite>
+
+        <composite name="composite_13">
+            <ref name="field" type="options_set" offset="20"/>
+        </composite>
+
+        <composite name="composite_14">
+            <ref name="field" type="numbers_enum" offset="20"/>
+        </composite>
+    </types>
+
+    <sbe:message name="Msg1" id="1">
+        <!-- constants referenced by fields -->
+        <field name="num_const_value" id="1" type="num_const"/>
+        <field name="char_const_value" id="2" type="char_const"/>
+        <field name="num_const_from_enum_value" id="3"
+            type="num_const_from_enum"/>
+        <field name="str_const1_value" id="4" type="str_const1"/>
+        <field name="str_const2_value" id="5" type="str_const2"/>
+        <!-- only field can have constant with underlying enum type -->
+        <field name="enum_const_value" id="6" type="numbers_enum"
+            presence="constant" valueRef="numbers_enum.Two"/>
+    </sbe:message>
+
+    <sbe:message name="msg2" id="2">
+        <field name="number" id="1" type="uint32_req"/>
+        <field name="array" id="2" type="str128"/>
+        <field name="enumeration" id="3" type="numbers_enum"/>
+        <field name="set" id="4" type="options_set"/>
+        <field name="composite" id="5" type="composite_a"/>
+
+        <group name="group" id="6">
+            <field name="number" id="1" type="uint32_req"/>
+            <field name="array" id="2" type="str128"/>
+            <field name="enumeration" id="3" type="numbers_enum"/>
+            <field name="set" id="4" type="options_set"/>
+            <field name="composite" id="5" type="composite_a"/>
+
+            <group name="group" id="6"/>
+
+            <data name="data" id="7" type="varDataEncoding"/>
+        </group>
+
+        <data name="data" id="7" type="varDataEncoding"/>
+    </sbe:message>
+
+    <sbe:message name="msg3" id="3">
+        <group name="nested_group" id="1">
+            <field name="number" id="2" type="uint32_req"/>
+            
+            <group name="flat_group" id="3">
+                <field name="number" id="4" type="uint32_req"/>
+            </group>
+
+            <data name="data" id="5" type="varDataEncoding"/>
+        </group>
+    </sbe:message>
+
+    <!-- cursor tests -->
+    <sbe:message name="msg4" id="4">
+        <field name="number1" id="1" type="uint32_req" offset="2"/>
+        <field name="number2" id="2" type="uint32_req" offset="10"/>
+    </sbe:message>
+
+    <sbe:message name="msg5" id="5">
+        <field name="array1" id="1" type="str128" offset="2"/>
+        <field name="array2" id="2" type="str128" offset="140"/>
+    </sbe:message>
+
+    <sbe:message name="msg6" id="6">
+        <field name="enumeration1" id="1" type="numbers_enum" offset="2"/>
+        <field name="enumeration2" id="2" type="numbers_enum" offset="10"/>
+    </sbe:message>
+
+    <sbe:message name="msg7" id="7">
+        <field name="set1" id="1" type="options_set" offset="2"/>
+        <field name="set2" id="2" type="options_set" offset="10"/>
+    </sbe:message>
+
+    <sbe:message name="msg8" id="8">
+        <field name="composite1" id="1" type="composite_a" offset="2"/>
+        <field name="composite2" id="2" type="composite_a" offset="20"/>
+    </sbe:message>
+
+    <sbe:message name="msg9" id="9">
+        <field name="number" id="1" type="uint32_req" offset="2"/>
+        <group name="group1" id="3">
+            <field name="number" id="4" type="uint32_req"/>
+        </group>
+        <group name="group2" id="5">
+            <field name="number" id="6" type="uint32_req"/>
+        </group>
+    </sbe:message>
+
+    <sbe:message name="msg10" id="10">
+        <field name="number" id="1" type="uint32_req" offset="2"/>
+        <data name="data1" id="2" type="varDataEncoding"/>
+        <data name="data2" id="3" type="varDataEncoding"/>
+    </sbe:message>
+
+    <sbe:message name="msg11" id="11">
+        <group name="flat_group" id="3">
+            <field name="number" id="4" type="uint32_req"/>
+        </group> 
+        <data name="data" id="5" type="varDataEncoding"/>
+    </sbe:message>
+
+    <sbe:message name="msg12" id="12">
+        <group name="flat_group" id="3">
+        </group>
+        <data name="data" id="5" type="varDataEncoding"/>
+    </sbe:message>
+
+    <sbe:message name="msg13" id="13">
+        <field name="number" id="1" type="uint32_req" offset="10"/>
+        <field name="enumeration" id="3" type="numbers_enum" offset="20"/>
+        <field name="set" id="4" type="options_set" offset="30"/>
+        <field name="composite" id="5" type="composite_a" offset="40"/>
+        <field name="array" id="2" type="str128" offset="50"/>
+    </sbe:message>
+
+    <!-- default offset tests -->
+    <sbe:message name="msg14" id="14">
+        <field name="first_field" id="1" type="uint32_req"/>
+        <field name="second_field" id="2" type="uint32_req"/>
+
+        <group name="group" id="3">
+            <field name="first_field" id="1" type="uint32_req"/>
+            <field name="second_field" id="2" type="uint32_req"/>
+        </group>
+    </sbe:message>
+
+    <sbe:message name="msg15" id="15">
+        <field name="first_field" id="1" type="numbers_enum"/>
+        <field name="second_field" id="2" type="numbers_enum"/>
+
+        <group name="group" id="3">
+            <field name="first_field" id="1" type="numbers_enum"/>
+            <field name="second_field" id="2" type="numbers_enum"/>
+        </group>
+    </sbe:message>
+
+    <sbe:message name="msg16" id="16">
+        <field name="first_field" id="1" type="options_set"/>
+        <field name="second_field" id="2" type="options_set"/>
+
+        <group name="group" id="3">
+            <field name="first_field" id="1" type="options_set"/>
+            <field name="second_field" id="2" type="options_set"/>
+        </group>
+    </sbe:message>
+
+    <sbe:message name="msg17" id="17">
+        <field name="first_field" id="1" type="uint32"/>
+        <field name="second_field" id="2" type="uint32"/>
+
+        <group name="group" id="3">
+            <field name="first_field" id="1" type="uint32"/>
+            <field name="second_field" id="2" type="uint32"/>
+        </group>
+    </sbe:message>
+
+    <sbe:message name="msg24" id="24">
+        <field name="first_field" id="1" type="str128"/>
+        <field name="second_field" id="2" type="str128"/>
+
+        <group name="group" id="3">
+            <field name="first_field" id="1" type="str128"/>
+            <field name="second_field" id="2" type="str128"/>
+        </group>
+    </sbe:message>
+
+    <sbe:message name="msg25" id="25">
+        <field name="first_field" id="1" type="composite_a"/>
+        <field name="second_field" id="2" type="composite_a"/>
+
+        <group name="group" id="3">
+            <field name="first_field" id="1" type="composite_a"/>
+            <field name="second_field" id="2" type="composite_a"/>
+        </group>
+    </sbe:message>
+
+    <!-- custom offset tests -->
+    <sbe:message name="msg18" id="18">
+        <field name="field" id="1" type="uint32_req" offset="20"/>
+
+        <group name="group" id="3">
+            <field name="field" id="1" type="uint32_req" offset="20"/>
+        </group>
+    </sbe:message>
+
+    <sbe:message name="msg19" id="19">
+        <field name="field" id="1" type="numbers_enum" offset="20"/>
+
+        <group name="group" id="3">
+            <field name="field" id="1" type="numbers_enum" offset="20"/>
+        </group>
+    </sbe:message>
+
+    <sbe:message name="msg20" id="20">
+        <field name="field" id="1" type="options_set" offset="20"/>
+
+        <group name="group" id="3">
+            <field name="field" id="1" type="options_set" offset="20"/>
+        </group>
+    </sbe:message>
+
+    <sbe:message name="msg21" id="21">
+        <field name="field" id="1" type="uint32" offset="20"/>
+
+        <group name="group" id="3">
+            <field name="field" id="1" type="uint32" offset="20"/>
+        </group>
+    </sbe:message>
+
+    <sbe:message name="msg22" id="22">
+        <field name="field" id="1" type="str128" offset="20"/>
+
+        <group name="group" id="3">
+            <field name="field" id="1" type="str128" offset="20"/>
+        </group>
+    </sbe:message>
+
+    <sbe:message name="msg23" id="23">
+        <field name="field" id="1" type="composite_a" offset="20"/>
+
+        <group name="group" id="3">
+            <field name="field" id="1" type="composite_a" offset="20"/>
+        </group>
+    </sbe:message>
+
+    <!-- visit tests -->
+    <sbe:message name="msg26" id="26">
+        <field name="builtin" id="1" type="uint32"/>
+        <field name="number" id="2" type="uint32_req"/>
+        <field name="enumeration" id="3" type="numbers_enum"/>
+        <field name="set" id="4" type="options_set"/>
+        <field name="array" id="5" type="str128"/>
+        <field name="composite" id="8" type="composite_a"/>
+
+        <group name="group" id="6">
+            <field name="builtin" id="1" type="uint32"/>
+            <field name="number" id="2" type="uint32_req"/>
+            <field name="enumeration" id="3" type="numbers_enum"/>
+            <field name="set" id="4" type="options_set"/>
+            <field name="array" id="5" type="str128"/>
+            <field name="composite" id="8" type="composite_a"/>
+
+            <group name="group" id="6"/>
+            <data name="data" id="7" type="varDataEncoding"/>
+        </group>
+        
+        <data name="data" id="7" type="varDataEncoding"/>
+    </sbe:message>
+
+    <!-- size_bytes_checked test -->
+    <sbe:message name="msg27" id="27">
+        <field name="number" id="1" type="uint32"/>
+
+        <group name="group" id="2">
+            <field name="number" id="1" type="uint32"/>
+        </group>
+        
+        <data name="data" id="3" type="varDataEncoding"/>
+    </sbe:message>
+
+    <!-- stringification test -->
+    <sbe:message name="msg28" id="28">
+        <field name="required" id="1" type="uint32"/>
+        <field name="optional1" id="2" type="uint32_opt"/>
+        <field name="optional2" id="3" type="uint32_opt"/>
+        <field name="number" id="4" type="numbers_enum"/>
+        <field name="option" id="5" type="options_set"/>
+        <field name="string" id="6" type="str128"/>
+        <field name="array" id="7" type="arr8"/>
+
+        <group name="group" id="8">
+            <field name="number" id="1" type="uint32"/>
+        </group>
+        
+        <data name="varData" id="9" type="varDataEncoding"/>
+        <data name="varStr" id="10" type="varStrEncoding"/>
+    </sbe:message>
+</sbe:messageSchema>
