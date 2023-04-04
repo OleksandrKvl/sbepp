@@ -1,5 +1,8 @@
 name: Doxygen
 
+permissions:
+  contents: write
+
 on:
   push:
     branches:
