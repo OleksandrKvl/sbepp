@@ -1,4 +1,3 @@
-find_package(Git REQUIRED)
 find_package(fmt 9.1.0 REQUIRED)
 find_package(pugixml 1.12.1 REQUIRED)
 
@@ -11,17 +10,6 @@ set_target_properties(${target} PROPERTIES
 )
 
 set(src_dir src/sbepp/sbeppc)
-
-execute_process(
-    COMMAND ${GIT_EXECUTABLE} rev-parse HEAD
-    RESULT_VARIABLE result
-    OUTPUT_VARIABLE ${PROJECT_NAME}_GIT_HASH
-    OUTPUT_STRIP_TRAILING_WHITESPACE
-)
-
-if(result)
-    message(FATAL_ERROR "Failed to get git hash: ${result}")
-endif()
 
 configure_file(${src_dir}/build_info.cpp.in build_info.cpp @ONLY)
 

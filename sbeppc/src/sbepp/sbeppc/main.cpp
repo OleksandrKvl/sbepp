@@ -54,14 +54,7 @@ Options:
 
 [[noreturn]] void print_version_and_exit()
 {
-    fmt::print(
-        // clang-format off
-R"(sbeppc version: {}
-git hash: {}
-)",
-        // clang-format on
-        build_info::get_version(),
-        build_info::get_git_hash());
+    fmt::print("sbeppc version: {}\n", build_info::get_version());
     std::exit(0);
 }
 
