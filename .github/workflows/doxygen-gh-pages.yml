@@ -27,10 +27,10 @@ jobs:
               sudo apt install -y wget
               wget  -P ~/ "https://www.doxygen.nl/files/doxygen-1.9.6.linux.bin.tar.gz"
               tar -xzf ~/doxygen-1.9.6.linux.bin.tar.gz
+              echo "$HOME/doxygen-1.9.6/bin" >> $GITHUB_PATH
 
     - name: CMake configuration
       run:  |
-            export PATH="~/doxygen-1.9.6/bin:$PATH"
             cmake -B ${{github.workspace}}/build \
                   -D CMAKE_C_COMPILER=/usr/bin/gcc-11 \
                   -D CMAKE_CXX_COMPILER=/usr/bin/g++-11 \
