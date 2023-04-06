@@ -5,14 +5,15 @@ var indexSectionsWithContent =
   2: "s",
   3: "s",
   4: "abcdefghilmnoprstv",
-  5: "acdefgimnorstv",
+  5: "dinsv",
   6: "bcdehilmoprstv",
   7: "ef",
   8: "bclnor",
   9: "o",
   10: "s",
   11: "ct",
-  12: "beiostuv"
+  12: "beiostuv",
+  13: "s"
 };
 
 var indexSectionNames =
@@ -29,7 +30,8 @@ var indexSectionNames =
   9: "related",
   10: "defines",
   11: "groups",
-  12: "pages"
+  12: "pages",
+  13: "concepts"
 };
 
 var indexSectionLabels =
@@ -46,6 +48,7 @@ var indexSectionLabels =
   9: "Friends",
   10: "Macros",
   11: "Modules",
-  12: "Pages"
+  12: "Pages",
+  13: "Concepts"
 };
 

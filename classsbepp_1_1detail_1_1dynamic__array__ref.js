@@ -28,7 +28,7 @@ var classsbepp_1_1detail_1_1dynamic__array__ref =
     [ "operator[]", "classsbepp_1_1detail_1_1dynamic__array__ref.html#a45cda3ca15223a4fabafa0cdb27506a5", null ],
     [ "pop_back", "classsbepp_1_1detail_1_1dynamic__array__ref.html#a61607728d5839f4ed2b8e5090916e148", null ],
     [ "push_back", "classsbepp_1_1detail_1_1dynamic__array__ref.html#a34a7c75fb59e285879bd953c98c7565e", null ],
-    [ "raw", "classsbepp_1_1detail_1_1dynamic__array__ref.html#a8101c12776034dc0bd836ecb6885b579", null ],
+    [ "raw", "classsbepp_1_1detail_1_1dynamic__array__ref.html#a6e11538c6bd06b459ff444685889ef01", null ],
     [ "rbegin", "classsbepp_1_1detail_1_1dynamic__array__ref.html#acb59720cd29ea9ad42732b3e49fb7fdd", null ],
     [ "rend", "classsbepp_1_1detail_1_1dynamic__array__ref.html#a1f7852f3d0e1d562c399260497637abc", null ],
     [ "resize", "classsbepp_1_1detail_1_1dynamic__array__ref.html#a45d0b3c8fa6597bf6c3c75d9a1904c25", null ],

@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['enumeration_405',['enumeration',['../namespacesbepp.html#a4655caf42c163e92060f5a91fbe038c8',1,'sbepp']]]
+  ['size_0',['size',['../structsbepp_1_1size__bytes__checked__result.html#aac927165dbd01e54d4f83e3a9be39266',1,'sbepp::size_bytes_checked_result']]]
 ];

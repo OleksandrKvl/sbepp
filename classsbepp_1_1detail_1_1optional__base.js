@@ -8,7 +8,7 @@ var classsbepp_1_1detail_1_1optional__base =
     [ "in_range", "classsbepp_1_1detail_1_1optional__base.html#ab9eb32c4e62dbb05397486c7ac9fc445", null ],
     [ "operator bool", "classsbepp_1_1detail_1_1optional__base.html#a38fedc762cfb05bb0abf25c1abde297a", null ],
     [ "operator*", "classsbepp_1_1detail_1_1optional__base.html#ae6762b211da1f64d6c79b71dee8be69b", null ],
-    [ "operator*", "classsbepp_1_1detail_1_1optional__base.html#a1b8cb0049904bedb5e2a576b306bbd3f", null ],
+    [ "operator*", "classsbepp_1_1detail_1_1optional__base.html#aed44c71edcb9d852a154cd63f7131cdc", null ],
     [ "value", "classsbepp_1_1detail_1_1optional__base.html#a26c508ad9e9f3285170f5745112a6b0b", null ],
     [ "value_or", "classsbepp_1_1detail_1_1optional__base.html#a573de5ba1180952c1493c9e1dd071d06", null ],
     [ "operator<=>", "classsbepp_1_1detail_1_1optional__base.html#af9693d0d4a0c754e6bb111c69333dfec", null ]

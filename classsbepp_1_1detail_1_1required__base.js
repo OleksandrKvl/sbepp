@@ -5,7 +5,7 @@ var classsbepp_1_1detail_1_1required__base =
     [ "required_base", "classsbepp_1_1detail_1_1required__base.html#ae72fc28c0a16383db0c88522e0de14df", null ],
     [ "in_range", "classsbepp_1_1detail_1_1required__base.html#aa80bf5f235a4a5dfc01e606ebb883cc3", null ],
     [ "operator*", "classsbepp_1_1detail_1_1required__base.html#ac7da1724684e57848793d15a969dc11f", null ],
-    [ "operator*", "classsbepp_1_1detail_1_1required__base.html#abefc1cae256d2dfb8522d79e2519fbd5", null ],
+    [ "operator*", "classsbepp_1_1detail_1_1required__base.html#a6615a8b9c2f761fa2051244ba52dac57", null ],
     [ "value", "classsbepp_1_1detail_1_1required__base.html#a41b70ceece0da5f77cd12093da043bed", null ],
     [ "operator<=>", "classsbepp_1_1detail_1_1required__base.html#ae603655d322cdbb43304a9c3fbd25e9c", null ]
 ];

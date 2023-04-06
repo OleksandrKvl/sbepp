@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['array_5ftype_401',['array_type',['../namespacesbepp.html#a1ba7e459b78be2ffb2e447769caf6523',1,'sbepp']]]
+  ['default_5finit_0',['default_init',['../namespacesbepp.html#aa2d011e14996368bdea31360b2fa674e',1,'sbepp']]]
 ];

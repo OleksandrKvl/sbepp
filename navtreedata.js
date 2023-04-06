@@ -25,10 +25,7 @@
 var NAVTREE =
 [
   [ "sbepp", "index.html", [
-    [ "Overview", "index.html", [
-      [ "How it works", "index.html#autotoc_md0", null ],
-      [ "License", "index.html#autotoc_md1", null ]
-    ] ],
+    [ "Overview", "index.html", "index" ],
     [ "Installation", "installation.html", null ],
     [ "Using the schema compiler", "sbeppc.html", null ],
     [ "Using generated code", "usergroup0.html", [
@@ -52,6 +49,7 @@ var NAVTREE =
           [ "Enumerations", "namespacemembers_enum.html", null ]
         ] ]
       ] ],
+      [ "Concept List", "concepts.html", "concepts" ],
       [ "Class List", "annotated.html", [
         [ "Class List", "annotated.html", "annotated_dup" ],
         [ "Class Index", "classes.html", null ],
@@ -78,7 +76,8 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "annotated.html",
-"group__compiler-features.html#ga3aa8a99c944b6084926af3e0f2ac11c4"
+"classsbepp_1_1detail_1_1optional__base.html#ae6762b211da1f64d6c79b71dee8be69b",
+"namespacesbepp.html#a7d29b37dfc83150ae34eaaf94dd4ba4c"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';
