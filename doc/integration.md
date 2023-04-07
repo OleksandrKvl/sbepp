@@ -39,7 +39,7 @@ As an example, here are two common approaches:
     )
     
     # link to sbepp::sbepp
-    target_link_libraries(${test_name}
+    target_link_libraries(my_project
         PRIVATE
         sbepp::sbepp
     )
