@@ -196,7 +196,7 @@ private:
         t.impl_name = make_next_type_name();
         t.tag = make_public_tag(path, t.name);
 
-        return fmt::format("struct {}{{}};\n\n", t.impl_name);
+        return fmt::format("struct {}{{}};\n", t.impl_name);
     }
 
     std::string make_enum_value_tags(
@@ -205,7 +205,7 @@ private:
         std::string res;
         for(auto& value : e.valid_values)
         {
-            res += fmt::format("struct {}{{}};\n", value.name);
+            res += fmt::format("    struct {}{{}};\n", value.name);
             value.tag = make_public_tag(path, value.name);
         }
         return res;
@@ -220,11 +220,10 @@ private:
 
         auto res = fmt::format(
             // clang-format off
-R"(
-    struct {name}
-    {{
-        {enum_value_tags}
-    }};
+R"(struct {name}
+{{
+{enum_value_tags}
+}};
 )",
             // clang-format on
             fmt::arg("name", e.impl_name),
@@ -241,7 +240,7 @@ R"(
         std::string res;
         for(auto& choice : s.choices)
         {
-            res += fmt::format("struct {}{{}};\n", choice.name);
+            res += fmt::format("    struct {}{{}};\n", choice.name);
             choice.tag = make_public_tag(path, choice.name);
         }
 
@@ -256,11 +255,10 @@ R"(
 
         auto res = fmt::format(
             // clang-format off
-R"(
-    struct {name}
-    {{
-        {choice_tags}
-    }};
+R"(struct {name}
+{{
+{choice_tags}
+}};
 )",
             // clang-format on
             fmt::arg("name", s.impl_name),
@@ -307,11 +305,10 @@ R"(
 
         auto res = fmt::format(
             // clang-format off
-R"(
-    struct {name}
-    {{
-        {element_tags}
-    }};
+R"(struct {name}
+{{
+{element_tags}
+}};
 )",
             // clang-format on
             fmt::arg("name", c.impl_name),
@@ -409,13 +406,13 @@ R"(
             if(const auto c = try_get_composite(field.type, field.location))
             {
                 res += fmt::format(
-                    "struct {name} : {impl}{{}};\n",
+                    "    struct {name} : {impl}{{}};\n",
                     fmt::arg("name", field.name),
                     fmt::arg("impl", make_impl_path(c->impl_name)));
             }
             else
             {
-                res += fmt::format("struct {}{{}};\n", field.name);
+                res += fmt::format("    struct {}{{}};\n", field.name);
             }
         }
 
@@ -437,7 +434,7 @@ R"(
                 // clang-format off
 R"(struct {group}
 {{
-    {members}
+{members}
 }};
 )",
                 // clang-format on
@@ -445,7 +442,7 @@ R"(struct {group}
                 fmt::arg("members", make_member_tags(g.members, path)));
 
             res += fmt::format(
-                "using {} = {};\n", g.name, make_impl_path(g.impl_name));
+                "    using {} = {};\n", g.name, make_impl_path(g.impl_name));
             path.pop_back();
         }
 
@@ -461,7 +458,7 @@ R"(struct {group}
         for(auto& data : data_members)
         {
             data.tag = make_public_tag(path, data.name);
-            res += fmt::format("struct {}{{}};\n", data.name);
+            res += fmt::format("    struct {}{{}};\n", data.name);
         }
 
         return res;
@@ -490,7 +487,7 @@ R"(struct {group}
             // clang-format off
 R"(struct {name}
 {{
-    {members}
+{members}
 }};
 )",
             // clang-format on
@@ -524,7 +521,7 @@ R"(struct {name}
                     [this](const auto& enc)
                     {
                         return fmt::format(
-                            "using {} = {};\n",
+                            "    using {} = {};\n",
                             enc.name,
                             make_impl_path(enc.impl_name));
                     },
@@ -541,7 +538,9 @@ R"(struct {name}
             [this, &res](const auto& m)
             {
                 res += fmt::format(
-                    "using {} = {};\n", m.name, make_impl_path(m.impl_name));
+                    "    using {} = {};\n",
+                    m.name,
+                    make_impl_path(m.impl_name));
             });
 
         return res;
@@ -589,22 +588,21 @@ R"(struct {name}
 
         return fmt::format(
             // clang-format off
-R"(
-namespace detail
+R"(namespace detail
 {{
 namespace schema
 {{
-    {detail}
+{detail}
 
-    struct {types_struct_name}
-    {{
-        {type_aliases}
-    }};
+struct {types_struct_name}
+{{
+{type_aliases}
+}};
 
-    struct {messages_struct_name}
-    {{
-        {message_aliases}
-    }};
+struct {messages_struct_name}
+{{
+{message_aliases}
+}};
 }} // namespace schema
 }} // namespace detail
 
