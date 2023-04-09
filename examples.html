@@ -1,3 +1,4 @@
+<!-- HTML header for doxygen 1.9.6-->
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en-US">
 <head>
@@ -17,6 +18,15 @@
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="doxygen-awesome-darkmode-toggle.js"></script>
+<script type="text/javascript" src="doxygen-awesome-paragraph-link.js"></script>
+<script type="text/javascript" src="doxygen-awesome-interactive-toc.js"></script>
+<script type="text/javascript">
+    DoxygenAwesomeDarkModeToggle.init()
+    DoxygenAwesomeParagraphLink.init()
+    DoxygenAwesomeInteractiveToc.init()
+</script>
 </head>
 <body>
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
@@ -93,10 +103,10 @@ $(document).ready(function(){initNavTree('examples.html',''); initResizable(); }
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#autotoc_md29">Encoding a message using normal accessors</a></li>
-<li class="level1"><a href="#autotoc_md31">Encoding a message using cursor-based accessors</a></li>
-<li class="level1"><a href="#autotoc_md33">Decoding a message using normal accessors</a></li>
-<li class="level1"><a href="#autotoc_md35">Decoding a message using cursor-based accessors</a></li>
+<ul><li class="level1"><a href="#autotoc_md28">Encoding a message using normal accessors</a></li>
+<li class="level1"><a href="#autotoc_md30">Encoding a message using cursor-based accessors</a></li>
+<li class="level1"><a href="#autotoc_md32">Decoding a message using normal accessors</a></li>
+<li class="level1"><a href="#autotoc_md34">Decoding a message using cursor-based accessors</a></li>
 </ul>
 </div>
 <div class="textblock"><p><a class="anchor" id="md__home_runner_work_sbepp_sbepp_doc_examples"></a></p>
@@ -148,7 +158,7 @@ $(document).ready(function(){initNavTree('examples.html',''); initResizable(); }
 <div class="line">    &lt;/<span class="keywordtype">sbe:message</span>&gt;</div>
 <div class="line">&lt;/<span class="keywordtype">sbe:messageSchema</span>&gt;</div>
 </div><!-- fragment --><hr  />
-<h1><a class="anchor" id="autotoc_md29"></a>
+<h1><a class="anchor" id="autotoc_md28"></a>
 Encoding a message using normal accessors</h1>
 <div class="fragment"><div class="line"><span class="comment">// note: it&#39;s up to client to provide sufficient buffer</span></div>
 <div class="line">std::array&lt;char, 1024&gt; buf{};</div>
@@ -182,7 +192,7 @@ Encoding a message using normal accessors</h1>
 <div class="ttc" id="anamespacesbepp_html_a870241790cb5759575b9f57d654392c2"><div class="ttname"><a href="namespacesbepp.html#a870241790cb5759575b9f57d654392c2">sbepp::addressof</a></div><div class="ttdeci">constexpr auto addressof(T v) noexcept -&gt; decltype(v(detail::addressof_tag{}))</div><div class="ttdoc">Returns pointer to the underlying data referenced by a view.</div><div class="ttdef"><b>Definition:</b> sbepp.hpp:1462</div></div>
 <div class="ttc" id="anamespacesbepp_html_a9346fd507c2d3760ac40032180d1a7a6"><div class="ttname"><a href="namespacesbepp.html#a9346fd507c2d3760ac40032180d1a7a6">sbepp::size_bytes</a></div><div class="ttdeci">constexpr std::size_t size_bytes(T v) noexcept</div><div class="ttdoc">Returns the size of the underlying data represented by message/group/entry/data/composite view,...</div><div class="ttdef"><b>Definition:</b> sbepp.hpp:1423</div></div>
 </div><!-- fragment --><hr  />
-<h1><a class="anchor" id="autotoc_md31"></a>
+<h1><a class="anchor" id="autotoc_md30"></a>
 Encoding a message using cursor-based accessors</h1>
 <div class="fragment"><div class="line"><span class="comment">// note: it&#39;s up to client to provide sufficient buffer</span></div>
 <div class="line">std::array&lt;char, 1024&gt; buf{};</div>
@@ -218,7 +228,7 @@ Encoding a message using cursor-based accessors</h1>
 <div class="ttc" id="anamespacesbepp_1_1cursor__ops_html_a45f332328f49269fd0117bca732e7f36"><div class="ttname"><a href="namespacesbepp_1_1cursor__ops.html#a45f332328f49269fd0117bca732e7f36">sbepp::cursor_ops::dont_move</a></div><div class="ttdeci">constexpr detail::dont_move_cursor_wrapper&lt; Byte &gt; dont_move(cursor&lt; Byte &gt; &amp;c) noexcept</div><div class="ttdoc">Returns a wrapper which doesn't advance the cursor when it's used.</div><div class="ttdef"><b>Definition:</b> sbepp.hpp:1537</div></div>
 <div class="ttc" id="anamespacesbepp_html_a125f1fbb9faadde1515f7822a7b6420f"><div class="ttname"><a href="namespacesbepp.html#a125f1fbb9faadde1515f7822a7b6420f">sbepp::init_cursor</a></div><div class="ttdeci">constexpr cursor&lt; byte_type_t&lt; View &gt; &gt; init_cursor(View view) noexcept</div><div class="ttdoc">Initializes cursor from a message/group view with the same byte type.</div><div class="ttdef"><b>Definition:</b> sbepp.hpp:2663</div></div>
 </div><!-- fragment --><hr  />
-<h1><a class="anchor" id="autotoc_md33"></a>
+<h1><a class="anchor" id="autotoc_md32"></a>
 Decoding a message using normal accessors</h1>
 <div class="fragment"><div class="line">std::array&lt;char, 1024&gt; buf{};</div>
 <div class="line"><span class="keyword">auto</span> header = sbepp::make_const_view&lt;&gt;(buf.data(), buf.size());</div>
@@ -274,7 +284,7 @@ Decoding a message using normal accessors</h1>
 <div class="ttc" id="anamespacesbepp_html_a0d0a0af58987f30ee37fda64c15cc316"><div class="ttname"><a href="namespacesbepp.html#a0d0a0af58987f30ee37fda64c15cc316">sbepp::to_underlying</a></div><div class="ttdeci">constexpr std::underlying_type&lt; Enum &gt;::type to_underlying(Enum e) noexcept</div><div class="ttdoc">Converts an enumeration to its underlying type. Equivalent to C++23 std::to_underlying()</div><div class="ttdef"><b>Definition:</b> sbepp.hpp:2644</div></div>
 <div class="ttc" id="anamespacesbepp_html_abd9c1efb3c96d6fa71d1156811b47fa4"><div class="ttname"><a href="namespacesbepp.html#abd9c1efb3c96d6fa71d1156811b47fa4">sbepp::size_bytes_checked</a></div><div class="ttdeci">constexpr size_bytes_checked_result size_bytes_checked(View view, std::size_t size) noexcept</div><div class="ttdoc">Calculate view size with additional safety checks.</div><div class="ttdef"><b>Definition:</b> sbepp.hpp:4491</div></div>
 </div><!-- fragment --><hr  />
-<h1><a class="anchor" id="autotoc_md35"></a>
+<h1><a class="anchor" id="autotoc_md34"></a>
 Decoding a message using cursor-based accessors</h1>
 <div class="fragment"><div class="line">std::array&lt;char, 1024&gt; buf{};</div>
 <div class="line"><span class="keyword">auto</span> m = sbepp::make_const_view&lt;market::messages::msg&gt;(buf.data(), buf.size());</div>
