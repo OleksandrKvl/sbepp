@@ -5,8 +5,6 @@ In this section I'll try to gradually describe the structure of generated code.
 It's just a brief description, for detailed documentation see corresponding
 reference pages.
 
----
-
 ## Namespaces
 
 Here's the structure of generated code after [compilation](#sbeppc):
