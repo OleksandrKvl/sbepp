@@ -2,7 +2,6 @@ set(target "sbepp_sbepp")
 add_library(${target} INTERFACE)
 add_library(sbepp::sbepp ALIAS ${target})
 set_target_properties(${target} PROPERTIES
-    OUTPUT_NAME sbepp
     EXPORT_NAME sbepp
 )
 
