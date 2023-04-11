@@ -635,8 +635,17 @@ private:
 
     sbe::data parse_data_member(const pugi::xml_node root)
     {
-        // `data` doesn't have any special attributes
-        return {parse_field_member(root), {}, {}};
+        sbe::data d{};
+        d.location = locations.find(root.offset_debug());
+        d.name = get_required_name(root);
+        d.id = get_field_id(root);
+        d.description = get_description(root);
+        d.type = get_required_non_empty_string(root, "type");
+        d.added_since = get_added_since(root);
+        d.deprecated_since = get_deprecated_since(root);
+        validate_versions(d);
+
+        return d;
     }
 
     sbe::level_members get_level_members(const pugi::xml_node root)

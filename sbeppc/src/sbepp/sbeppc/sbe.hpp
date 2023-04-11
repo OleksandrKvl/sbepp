@@ -244,9 +244,18 @@ struct group
     block_length_t actual_block_length;
 };
 
-struct data : field
+struct data
 {
+    std::string name;
+    member_id_t id;
+    std::string description;
+    std::string type;
+    version_t added_since;
+    std::optional<version_t> deprecated_since;
+    source_location location;
+
     // info used for codegen
+    std::string tag;
     const sbe::type* length_type;
     std::string impl_type;
 };
