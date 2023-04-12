@@ -84,8 +84,9 @@ private:
                 {"float", "::std::numeric_limits<float>::min()"},
                 {"double", "::std::numeric_limits<double>::min()"}};
 
-        return utils::numeric_literal_to_value(t.min_value, t.type, t.location)
-            .value_or(built_in_min_values.at(t.type));
+        return utils::numeric_literal_to_value(
+                   t.min_value, t.primitive_type, t.location)
+            .value_or(built_in_min_values.at(t.primitive_type));
     }
 
     static std::string get_max_value(const sbe::type& t)
@@ -104,8 +105,9 @@ private:
                 {"float", "::std::numeric_limits<float>::max()"},
                 {"double", "::std::numeric_limits<double>::max()"}};
 
-        return utils::numeric_literal_to_value(t.max_value, t.type, t.location)
-            .value_or(built_in_max_values.at(t.type));
+        return utils::numeric_literal_to_value(
+                   t.max_value, t.primitive_type, t.location)
+            .value_or(built_in_max_values.at(t.primitive_type));
     }
 
     static std::string get_null_value(const sbe::type& t)
@@ -124,8 +126,9 @@ private:
                 {"float", "::std::numeric_limits<float>::quiet_NaN()"},
                 {"double", "::std::numeric_limits<double>::quiet_NaN()"}};
 
-        return utils::numeric_literal_to_value(t.null_value, t.type, t.location)
-            .value_or(built_in_null_values.at(t.type));
+        return utils::numeric_literal_to_value(
+                   t.null_value, t.primitive_type, t.location)
+            .value_or(built_in_null_values.at(t.primitive_type));
     }
 
     static std::string make_constant_type(const sbe::type& t)
@@ -250,7 +253,7 @@ public:
             fmt::format("::{}::detail::types::{}", schema_name, t.impl_name);
         t.public_type = t.impl_type;
         t.is_template = false;
-        t.underlying_type = utils::primitive_type_to_cpp_type(t.type);
+        t.underlying_type = utils::primitive_type_to_cpp_type(t.primitive_type);
         t.size = utils::get_underlying_size(t.underlying_type) * t.length;
 
         if(t.presence == field_presence::constant)
@@ -287,7 +290,7 @@ public:
                     "{}: encoding `{}` doesn't exist or it's not a type",
                     enc.location,
                     enc.type)
-                .type);
+                .primitive_type);
     }
 
     static std::string make_enumerators(const sbe::enumeration& e)
@@ -541,14 +544,14 @@ public:
             return value_ref_to_enum_value(*t.value_ref, t.location);
         }
 
-        if(t.type == "char")
+        if(t.primitive_type == "char")
         {
             return utils::make_char_constant(
                 *t.constant_value, t.length, t.location);
         }
 
         return *utils::numeric_literal_to_value(
-            t.constant_value, t.type, t.location);
+            t.constant_value, t.primitive_type, t.location);
     }
 
     std::vector<std::string> make_children_visit_calls(

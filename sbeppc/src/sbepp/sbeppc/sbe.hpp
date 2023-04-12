@@ -40,7 +40,7 @@ struct type
     std::optional<std::string> max_value;
     length_t length;
     std::optional<offset_t> offset;
-    std::string type;
+    std::string primitive_type;
     std::string semantic_type;
     version_t added_since;
     std::optional<version_t> deprecated_since;

@@ -128,14 +128,14 @@ private:
             return value_ref_to_enum_value(*t.value_ref, t.location);
         }
 
-        if(t.type == "char")
+        if(t.primitive_type == "char")
         {
             return utils::make_char_constant(
                 *t.constant_value, t.length, t.location);
         }
 
         return *utils::numeric_literal_to_value(
-            t.constant_value, t.type, t.location);
+            t.constant_value, t.primitive_type, t.location);
     }
 
     static std::string get_const_type(const sbe::type& t)

@@ -245,7 +245,7 @@ private:
         t.max_value = get_optional_string_attribute(root, "maxValue");
         t.length = get_type_length(root);
         t.offset = get_offset(root);
-        t.type = get_primitive_type(root);
+        t.primitive_type = get_primitive_type(root);
         t.semantic_type = get_semantic_type(root);
         t.added_since = get_added_since(root);
         t.deprecated_since = get_deprecated_since(root);
@@ -266,7 +266,7 @@ private:
                     t.name);
             }
 
-            if((t.type == "char") && root.attribute("length").empty())
+            if((t.primitive_type == "char") && root.attribute("length").empty())
             {
                 t.length = t.constant_value->size();
             }
