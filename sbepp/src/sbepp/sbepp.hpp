@@ -4188,20 +4188,54 @@ public:
     }
 
 SBEPP_BUILT_IN_IMPL(char, char, 0x20, 0x7E, 0);
-SBEPP_BUILT_IN_IMPL(int8, std::int8_t, -127, 127, -128);
-SBEPP_BUILT_IN_IMPL(uint8, std::uint8_t, 0, 254, 255);
-SBEPP_BUILT_IN_IMPL(int16, std::int16_t, -32767, 32767, -32768);
-SBEPP_BUILT_IN_IMPL(uint16, std::uint16_t, 0, 65534, 65535);
-SBEPP_BUILT_IN_IMPL(int32, std::int32_t, -2147483647, 2147483647, -2147483648);
-SBEPP_BUILT_IN_IMPL(uint32, std::uint32_t, 0, 4294967294, 4294967295);
+SBEPP_BUILT_IN_IMPL(
+    int8,
+    std::int8_t,
+    std::numeric_limits<std::int8_t>::min() + 1,
+    std::numeric_limits<std::int8_t>::max(),
+    std::numeric_limits<std::int8_t>::min());
+SBEPP_BUILT_IN_IMPL(
+    uint8,
+    std::uint8_t,
+    std::numeric_limits<std::uint8_t>::min(),
+    std::numeric_limits<std::uint8_t>::max() - 1,
+    std::numeric_limits<std::uint8_t>::max());
+SBEPP_BUILT_IN_IMPL(
+    int16,
+    std::int16_t,
+    std::numeric_limits<std::int16_t>::min() + 1,
+    std::numeric_limits<std::int16_t>::max(),
+    std::numeric_limits<std::int16_t>::min());
+SBEPP_BUILT_IN_IMPL(
+    uint16,
+    std::uint16_t,
+    std::numeric_limits<std::uint16_t>::min(),
+    std::numeric_limits<std::uint16_t>::max() - 1,
+    std::numeric_limits<std::uint16_t>::max());
+SBEPP_BUILT_IN_IMPL(
+    int32,
+    std::int32_t,
+    std::numeric_limits<std::int32_t>::min() + 1,
+    std::numeric_limits<std::int32_t>::max(),
+    std::numeric_limits<std::int32_t>::min());
+SBEPP_BUILT_IN_IMPL(
+    uint32,
+    std::uint32_t,
+    std::numeric_limits<std::uint32_t>::min(),
+    std::numeric_limits<std::uint32_t>::max() - 1,
+    std::numeric_limits<std::uint32_t>::max());
 SBEPP_BUILT_IN_IMPL(
     int64,
     std::int64_t,
-    -9223372036854775807,
-    9223372036854775807,
-    -9223372036854775807 - 1);
+    std::numeric_limits<std::int64_t>::min() + 1,
+    std::numeric_limits<std::int64_t>::max(),
+    std::numeric_limits<std::int64_t>::min());
 SBEPP_BUILT_IN_IMPL(
-    uint64, std::uint64_t, 0, 18446744073709551614UL, 18446744073709551615UL);
+    uint64,
+    std::uint64_t,
+    std::numeric_limits<std::uint64_t>::min(),
+    std::numeric_limits<std::uint64_t>::max() - 1,
+    std::numeric_limits<std::uint64_t>::max());
 SBEPP_BUILT_IN_IMPL(
     float,
     float,
