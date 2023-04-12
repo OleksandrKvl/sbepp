@@ -324,12 +324,16 @@ template<typename T, typename Format, typename... Args>
 T string_to_number_or_throw(
     const std::string_view str, const Format& format, Args&&... args)
 {
-    T value{};
-    auto res = std::from_chars(std::begin(str), std::end(str), value);
-    if(res.ec == std::errc{})
+    if(!str.empty())
     {
-        return value;
+        T value{};
+        auto res = std::from_chars(str.data(), str.data() + str.size(), value);
+        if(res.ec == std::errc{})
+        {
+            return value;
+        }
     }
+
     throw_error(format, std::forward<Args>(args)...);
 }
 
