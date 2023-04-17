@@ -102,7 +102,10 @@ $(document).ready(function(){initNavTree('installation.html',''); initResizable(
   <div class="headertitle"><div class="title">Installation </div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p><a class="anchor" id="md__home_runner_work_sbepp_sbepp_doc_installation"></a> It uses classical CMake:</p>
+<div class="textblock"><p><a class="anchor" id="md__home_runner_work_sbepp_sbepp_doc_installation"></a> </p>
+<h2><a class="anchor" id="autotoc_md2"></a>
+CMake</h2>
+<p>Use classic CMake approach:</p>
 <div class="fragment"><div class="line">mkdir build</div>
 <div class="line">cd build</div>
 <div class="line">cmake ..</div>
@@ -122,7 +125,10 @@ $(document).ready(function(){initNavTree('installation.html',''); initResizable(
 <li><code>SBEPP_BUILD_TESTS = OFF</code>, requires <code>SBEPP_DEV_MODE=ON</code>, controls whether tests should be built. If <code>ON</code>, requires <a href="https://github.com/google/googletest">googletest</a> and <a href="https://github.com/fmtlib/fmt">fmt</a></li>
 <li><code>SBEPP_BUILD_DOCS = OFF</code>, controls whether documentation should be built. If <code>ON</code> requires <a href="https://doxygen.nl/">Doxygen</a></li>
 </ul>
-<p>There's a <code>conanfile.txt</code> which can be used to simplify dependency management. </p>
+<p>There's a <code>conanfile.txt</code> which can be used to simplify dependency management.</p>
+<h2><a class="anchor" id="autotoc_md3"></a>
+Conan package</h2>
+<p>Eventually, <code>sbepp</code> package should be available in ConanCenter, at the time of writing related PR is waiting to be reviewed. </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->
