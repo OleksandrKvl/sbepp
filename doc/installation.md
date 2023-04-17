@@ -1,6 +1,8 @@
 # Installation {#installation}
 
-It uses classical CMake:
+### CMake
+
+Use classic CMake approach:
 
 ```sh
 mkdir build
@@ -35,3 +37,8 @@ requires [googletest](https://github.com/google/googletest) and
 `ON` requires [Doxygen](https://doxygen.nl/)
 
 There's a `conanfile.txt` which can be used to simplify dependency management.
+
+### Conan package
+
+Eventually, `sbepp` package should be available in ConanCenter, at the time of
+writing related PR is waiting to be reviewed.
