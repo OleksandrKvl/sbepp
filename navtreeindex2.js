@@ -1,5 +1,6 @@
 var NAVTREEINDEX2 =
 {
+"namespacesbepp.html#a5f635e69ff99f02d389ef132f9944431":[6,1,0,0,92],
 "namespacesbepp.html#a7d29b37dfc83150ae34eaaf94dd4ba4c":[6,1,0,0,80],
 "namespacesbepp.html#a822c5047d62cddfb04c5ab2148ee9391":[6,1,0,0,88],
 "namespacesbepp.html#a870241790cb5759575b9f57d654392c2":[6,1,0,0,77],
@@ -122,12 +123,12 @@ var NAVTREEINDEX2 =
 "structsbepp_1_1default__init__t.html":[6,3,0,0,7],
 "structsbepp_1_1is__enum.html":[6,1,0,0,25],
 "structsbepp_1_1is__enum.html":[6,3,0,0,24],
-"structsbepp_1_1nullopt__t.html":[6,3,0,0,26],
 "structsbepp_1_1nullopt__t.html":[6,1,0,0,27],
-"structsbepp_1_1size__bytes__checked__result.html":[6,1,0,0,31],
+"structsbepp_1_1nullopt__t.html":[6,3,0,0,26],
 "structsbepp_1_1size__bytes__checked__result.html":[6,3,0,0,30],
-"structsbepp_1_1size__bytes__checked__result.html#a9627848534794b032e8c5e53e796b83d":[6,1,0,0,31,1],
+"structsbepp_1_1size__bytes__checked__result.html":[6,1,0,0,31],
 "structsbepp_1_1size__bytes__checked__result.html#a9627848534794b032e8c5e53e796b83d":[6,3,0,0,30,1],
+"structsbepp_1_1size__bytes__checked__result.html#a9627848534794b032e8c5e53e796b83d":[6,1,0,0,31,1],
 "structsbepp_1_1size__bytes__checked__result.html#aac927165dbd01e54d4f83e3a9be39266":[6,1,0,0,31,0],
 "structsbepp_1_1size__bytes__checked__result.html#aac927165dbd01e54d4f83e3a9be39266":[6,3,0,0,30,0],
 "traits.html":[3,2],
