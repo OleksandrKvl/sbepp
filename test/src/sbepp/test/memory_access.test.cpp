@@ -42,6 +42,8 @@
 #    include <big_endian_schema/types/composite_1.hpp>
 #    include <big_endian_schema/types/composite_2.hpp>
 #    include <big_endian_schema/types/composite_3.hpp>
+#    include <big_endian_schema/types/composite_4.hpp>
+#    include <big_endian_schema/types/composite_5.hpp>
 #    include <big_endian_schema/messages/msg1.hpp>
 #endif
 
@@ -129,6 +131,7 @@ class entry_wrapper
 public:
     using base_t =
         typename sbepp::group_traits<GroupTag>::template entry_type<byte_type>;
+
     constexpr entry_wrapper(byte_type* ptr, const std::size_t size)
         : base_t{ptr, size, sbepp::group_traits<GroupTag>::block_length()}
     {
@@ -233,9 +236,27 @@ template<typename T>
 using is_numeric_type = has_value<T>;
 
 template<typename T>
-enable_if_t<is_numeric_type<T>::value, T> get_value_to_set(T /*numeric*/)
+using is_integral_type = std::integral_constant<
+    bool,
+    has_value<T>::value && std::is_integral<typename T::value_type>::value>;
+
+template<typename T>
+using is_floating_point_type = std::integral_constant<
+    bool,
+    has_value<T>::value
+        && std::is_floating_point<typename T::value_type>::value>;
+
+template<typename T>
+enable_if_t<is_integral_type<T>::value, T> get_value_to_set(T /*integral*/)
 {
     return T{123};
+}
+
+template<typename T>
+enable_if_t<is_floating_point_type<T>::value, T>
+    get_value_to_set(T /*floating*/)
+{
+    return T{123.45};
 }
 
 template<typename T>
@@ -377,7 +398,9 @@ TYPED_TEST(
 using BigEndianFieldContainers = ::testing::Types<
     big_endian_schema::types::composite_1<byte_type>,
     big_endian_schema::types::composite_2<byte_type>,
-    big_endian_schema::types::composite_3<byte_type>>;
+    big_endian_schema::types::composite_3<byte_type>,
+    big_endian_schema::types::composite_4<byte_type>,
+    big_endian_schema::types::composite_5<byte_type>>;
 
 template<typename T>
 using BigEndianTest = FieldsContainer<T>;

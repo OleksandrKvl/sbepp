@@ -363,6 +363,52 @@ constexpr typename std::make_unsigned<T>::type to_unsigned(T v) noexcept
     return static_cast<typename std::make_unsigned<T>::type>(v);
 }
 
+inline std::uint64_t to_unsigned(double v) noexcept
+{
+    std::uint64_t res{};
+    std::memcpy(&res, &v, sizeof(res));
+    return res;
+}
+
+inline std::uint32_t to_unsigned(float v) noexcept
+{
+    std::uint32_t res{};
+    std::memcpy(&res, &v, sizeof(res));
+    return res;
+}
+
+template<typename To>
+struct from_unsigned
+{
+    constexpr To
+        operator()(typename std::make_unsigned<To>::type from) const noexcept
+    {
+        return static_cast<To>(from);
+    }
+};
+
+template<>
+struct from_unsigned<double>
+{
+    double operator()(std::uint64_t from) const noexcept
+    {
+        double res{};
+        std::memcpy(&res, &from, sizeof(res));
+        return res;
+    }
+};
+
+template<>
+struct from_unsigned<float>
+{
+    float operator()(std::uint32_t from) const noexcept
+    {
+        float res{};
+        std::memcpy(&res, &from, sizeof(res));
+        return res;
+    }
+};
+
 // intrinsics detection is taken from <boost/endian/detail/intrinsic.hpp>
 #ifndef __has_builtin          // Optional of course
 #    define __has_builtin(x) 0 // Compatibility with non-clang compilers
@@ -488,7 +534,7 @@ SBEPP_CPP20_CONSTEXPR T get_primitive(const Byte* ptr)
     }
     else
     {
-        return static_cast<T>(byteswap(to_unsigned(res)));
+        return from_unsigned<T>{}(byteswap(to_unsigned(res)));
     }
 #endif
 }
@@ -511,7 +557,7 @@ SBEPP_CPP20_CONSTEXPR void set_primitive(Byte* ptr, T value)
     // why explicit `std::memcpy` call is required
     if((E != endian::native) && (sizeof(T) != 1))
     {
-        value = static_cast<T>(byteswap(to_unsigned(value)));
+        value = from_unsigned<T>{}(byteswap(to_unsigned(value)));
     }
     std::memcpy(ptr, &value, sizeof(T));
 #endif

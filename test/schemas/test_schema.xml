@@ -222,6 +222,11 @@
         <composite name="composite_14">
             <ref name="field" type="numbers_enum" offset="20"/>
         </composite>
+
+        <composite name="composite_19">
+            <type name="float_field" primitiveType="float"/>
+            <type name="double_field" primitiveType="double"/>
+        </composite>
     </types>
 
     <sbe:message name="Msg1" id="1">

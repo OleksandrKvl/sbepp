@@ -75,6 +75,7 @@ function(add_test_binary name_suffix cpp_version)
         ${src_dir}/size_bytes_checked.test.cpp
         ${src_dir}/borrowed_range.test.cpp
         ${src_dir}/stringification.test.cpp
+        ${src_dir}/float_fields.test.cpp
     )
 
     target_include_directories(${test_name}
