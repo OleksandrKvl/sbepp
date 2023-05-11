@@ -258,7 +258,8 @@ constexpr auto constexpr_test()
     message_t m;
     m = message_t{buf.data(), buf.size()};
     m = m;
-    m = std::move(m);
+    auto m2 = std::move(m);
+    (void)m2;
 
     sbepp::fill_message_header(m);
     sbepp::addressof(m);
