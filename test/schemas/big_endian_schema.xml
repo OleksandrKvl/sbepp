@@ -46,6 +46,14 @@
         <composite name="composite_3">
             <ref name="field" type="numbers_enum"/>
         </composite>
+
+        <composite name="composite_4">
+            <type name="field" primitiveType="float"/>
+        </composite>
+
+        <composite name="composite_5">
+            <type name="field" primitiveType="double"/>
+        </composite>
     </types>
 
     <sbe:message name="msg1" id="1">

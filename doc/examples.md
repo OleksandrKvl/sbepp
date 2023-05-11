@@ -132,10 +132,10 @@ send(sbepp::addressof(m), msg_size);
 ```cpp
 std::array<char, 1024> buf{};
 auto header = sbepp::make_const_view<>(buf.data(), buf.size());
-if(header.templateId()
+if(*header.templateId()
     != sbepp::message_traits<market::schema::messages::msg>::id())
 {
-    std::cerr << "unknown message id: " << header.templateId() << '\n'; 
+    std::cerr << "unknown message id: " << *header.templateId() << '\n'; 
     return;
 }
 
@@ -190,7 +190,7 @@ for(const auto entry : g)
 std::array<char, 1024> buf{};
 auto m = sbepp::make_const_view<market::messages::msg>(buf.data(), buf.size());
 // there's nothing wrong in creation of a "wrong" message view
-if(sbepp::get_header(m).templateId()
+if(*sbepp::get_header(m).templateId()
     != sbepp::message_traits<market::schema::messages::msg>::id())
 {
     std::cerr << "not a `market::messages::msg`" << '\n'; 
