@@ -40,5 +40,5 @@ There's a `conanfile.txt` which can be used to simplify dependency management.
 
 ### Conan package
 
-Eventually, `sbepp` package should be available in ConanCenter, at the time of
-writing related PR is waiting to be reviewed.
+Now available in [ConanCenter](https://conan.io/center/sbepp). Use `with_sbeppc`
+Conan option to enable/disable `sbeppc` building (defaults to `True`).
