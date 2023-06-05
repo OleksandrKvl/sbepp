@@ -1,5 +1,5 @@
 find_package(GTest REQUIRED)
-find_package(fmt 9.1.0 REQUIRED)
+find_package(fmt REQUIRED)
 include(GoogleTest)
 
 function(get_available_cpp_versions result)
