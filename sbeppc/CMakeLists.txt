@@ -1,5 +1,5 @@
-find_package(fmt 9.1.0 REQUIRED)
-find_package(pugixml 1.12.1 REQUIRED)
+find_package(fmt REQUIRED)
+find_package(pugixml REQUIRED)
 
 set(target "sbepp_sbeppc")
 add_executable(${target})
