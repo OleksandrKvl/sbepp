@@ -1519,7 +1519,7 @@ template<typename View>
 struct byte_type
 {
     //! @brief holds `View`'s byte type
-    using type = typename std::remove_pointer<decltype(addressof(
+    using type = typename std::remove_pointer<decltype(sbepp::addressof(
         std::declval<View>()))>::type;
 };
 
@@ -1647,7 +1647,7 @@ public:
             (*this)(addressof_tag{}),
             (*this)(end_ptr_tag{}),
             0,
-            size_bytes(header));
+            sbepp::size_bytes(header));
         return header;
     }
 
@@ -1666,10 +1666,9 @@ public:
 
     template<
         typename Byte2,
-        typename = ::sbepp::detail::enable_if_cursor_compatible_t<Byte, Byte2>>
-    SBEPP_CPP20_CONSTEXPR std::size_t operator()(
-        ::sbepp::detail::size_bytes_tag,
-        ::sbepp::cursor<Byte2>& c) const noexcept
+        typename = enable_if_cursor_compatible_t<Byte, Byte2>>
+    SBEPP_CPP20_CONSTEXPR std::size_t
+        operator()(size_bytes_tag, cursor<Byte2>& c) const noexcept
     {
         return c.pointer() - (*this)(addressof_tag{});
     }
@@ -1783,8 +1782,8 @@ public:
 
     SBEPP_CPP14_CONSTEXPR forward_iterator& operator++() noexcept
     {
-        SBEPP_SIZE_CHECK(ptr, end, 0, ::sbepp::size_bytes(operator*()));
-        ptr += ::sbepp::size_bytes(operator*());
+        SBEPP_SIZE_CHECK(ptr, end, 0, sbepp::size_bytes(operator*()));
+        ptr += sbepp::size_bytes(operator*());
         index++;
         return *this;
     }
@@ -2170,14 +2169,14 @@ public:
             (*this)(addressof_tag{}),
             (*this)(end_ptr_tag{}),
             0,
-            size_bytes(header));
+            sbepp::size_bytes(header));
         return header;
     }
 
     SBEPP_CPP20_CONSTEXPR std::size_t operator()(size_bytes_tag) const noexcept
     {
         auto dimension = (*this)(get_header_tag{});
-        return size_bytes(dimension)
+        return sbepp::size_bytes(dimension)
                + dimension.numInGroup().value()
                      * dimension.blockLength().value();
     }
@@ -2217,7 +2216,7 @@ public:
     {
         auto dimension = (*this)(get_header_tag{});
         return iterator{
-            (*this)(addressof_tag{}) + size_bytes(dimension),
+            (*this)(addressof_tag{}) + sbepp::size_bytes(dimension),
             dimension.blockLength().value(),
             0,
             (*this)(end_ptr_tag{})};
@@ -2266,7 +2265,7 @@ public:
 
     //! @brief Type of a cursor range. Satisfies `std::ranges::input_range`
     template<typename Byte2>
-    using cursor_range_t = ::sbepp::detail::cursor_range<
+    using cursor_range_t = detail::cursor_range<
         value_type,
         size_type,
         cursor<Byte2>,
@@ -2405,16 +2404,16 @@ public:
             (*this)(addressof_tag{}),
             (*this)(end_ptr_tag{}),
             0,
-            size_bytes(header));
+            sbepp::size_bytes(header));
         return header;
     }
 
     SBEPP_CPP20_CONSTEXPR std::size_t operator()(size_bytes_tag) const noexcept
     {
-        std::size_t size{size_bytes((*this)(get_header_tag{}))};
+        std::size_t size{sbepp::size_bytes((*this)(get_header_tag{}))};
         for(const auto entry : *this)
         {
-            size += size_bytes(entry);
+            size += sbepp::size_bytes(entry);
         }
 
         return size;
@@ -2455,7 +2454,7 @@ public:
     {
         auto dimension = (*this)(get_header_tag{});
         return iterator{
-            (*this)(addressof_tag{}) + size_bytes(dimension),
+            (*this)(addressof_tag{}) + sbepp::size_bytes(dimension),
             0,
             dimension.blockLength().value(),
             (*this)(end_ptr_tag{})};
@@ -2488,7 +2487,7 @@ public:
 
     //! @brief Type of a cursor range. Satisfies `std::ranges::input_range`
     template<typename Byte2>
-    using cursor_range_t = ::sbepp::detail::cursor_range<
+    using cursor_range_t = detail::cursor_range<
         value_type,
         size_type,
         cursor<Byte2>,
@@ -2655,8 +2654,9 @@ struct has_get_header : std::false_type
 };
 
 template<typename View>
-struct has_get_header<View, void_t<decltype(get_header(std::declval<View>()))>>
-    : std::true_type
+struct has_get_header<
+    View,
+    void_t<decltype(sbepp::get_header(std::declval<View>()))>> : std::true_type
 {
 };
 
@@ -2665,7 +2665,7 @@ template<
     typename = detail::enable_if_t<detail::has_get_header<View>::value>>
 constexpr std::size_t get_header_size(View view) noexcept
 {
-    return sbepp::size_bytes(get_header(view));
+    return sbepp::size_bytes(sbepp::get_header(view));
 }
 
 template<
@@ -2709,7 +2709,7 @@ template<typename View>
 SBEPP_CPP14_CONSTEXPR cursor<byte_type_t<View>> init_cursor(View view) noexcept
 {
     cursor<byte_type_t<View>> c;
-    c.pointer() = addressof(view) + detail::get_header_size(view);
+    c.pointer() = sbepp::addressof(view) + detail::get_header_size(view);
     return c;
 }
 
@@ -2732,7 +2732,7 @@ SBEPP_CPP14_CONSTEXPR cursor<typename std::add_const<byte_type_t<View>>::type>
     init_const_cursor(View view) noexcept
 {
     cursor<typename std::add_const<byte_type_t<View>>::type> c;
-    c.pointer() = addressof(view) + detail::get_header_size(view);
+    c.pointer() = sbepp::addressof(view) + detail::get_header_size(view);
     return c;
 }
 
@@ -3060,20 +3060,18 @@ public:
     }
 
     //! @brief Sets size to `count`, default initializes new elements
-    template<
-        typename T = void,
-        typename = detail::enable_if_writable_t<Byte, T>>
+    template<typename T = void, typename = enable_if_writable_t<Byte, T>>
     SBEPP_CPP20_CONSTEXPR void
         resize(size_type count, sbepp::default_init_t) const noexcept
     {
         // can't use `detail::set_value()` here because its size check checks
         // only `sizeof(T)`, here we need `sizeof(size_type) + count`
         SBEPP_SIZE_CHECK(
-            (*this)(detail::addressof_tag{}),
-            (*this)(detail::end_ptr_tag{}),
+            (*this)(addressof_tag{}),
+            (*this)(end_ptr_tag{}),
             0,
             sizeof(size_type) + count);
-        detail::set_primitive<E>((*this)(detail::addressof_tag{}), count);
+        set_primitive<E>((*this)(addressof_tag{}), count);
     }
 
     //! @brief Adds new element to the end
@@ -4396,8 +4394,8 @@ SBEPP_CPP14_CONSTEXPR Visitor&&
 template<typename Visitor, typename View>
 SBEPP_CPP14_CONSTEXPR Visitor&& visit(View view, Visitor&& visitor = {})
 {
-    auto c = init_cursor(view);
-    return visit(view, c, std::forward<Visitor>(visitor));
+    auto c = sbepp::init_cursor(view);
+    return sbepp::visit(view, c, std::forward<Visitor>(visitor));
 }
 
 /**
@@ -4429,8 +4427,8 @@ template<typename Visitor, typename View>
 SBEPP_CPP14_CONSTEXPR Visitor&&
     visit_children(View view, Visitor&& visitor = {})
 {
-    auto c = init_cursor(view);
-    return visit_children(view, c, std::forward<Visitor>(visitor));
+    auto c = sbepp::init_cursor(view);
+    return sbepp::visit_children(view, c, std::forward<Visitor>(visitor));
 }
 
 namespace detail
@@ -4447,8 +4445,8 @@ public:
     template<typename T, typename Cursor, typename Tag>
     SBEPP_CPP14_CONSTEXPR void on_message(T m, Cursor& c, Tag) noexcept
     {
-        const auto header = get_header(m);
-        const auto header_size = size_bytes(header);
+        const auto header = sbepp::get_header(m);
+        const auto header_size = sbepp::size_bytes(header);
         if(!validate_and_subtract(header_size))
         {
             return;
@@ -4465,8 +4463,8 @@ public:
     template<typename T, typename Cursor, typename Tag>
     SBEPP_CPP14_CONSTEXPR bool on_group(T g, Cursor& c, Tag) noexcept
     {
-        const auto header = get_header(g);
-        const auto header_size = size_bytes(header);
+        const auto header = sbepp::get_header(g);
+        const auto header_size = sbepp::size_bytes(header);
         if(!validate_and_subtract(header_size))
         {
             return true;
@@ -4474,7 +4472,7 @@ public:
 
         const auto prev_block_length =
             set_group_block_length(*header.blockLength());
-        visit_children(g, c, *this);
+        sbepp::visit_children(g, c, *this);
         set_group_block_length(prev_block_length);
 
         return !is_valid();
@@ -4488,13 +4486,13 @@ public:
             return true;
         }
 
-        return !visit_children(e, c, *this).is_valid();
+        return !sbepp::visit_children(e, c, *this).is_valid();
     }
 
     template<typename T, typename Tag>
     SBEPP_CPP14_CONSTEXPR bool on_data(T d, Tag) noexcept
     {
-        return !validate_and_subtract(size_bytes(d));
+        return !validate_and_subtract(sbepp::size_bytes(d));
     }
 
     // ignore them all because we validate `blockLength`
@@ -4571,14 +4569,14 @@ SBEPP_CPP20_CONSTEXPR size_bytes_checked_result
     size_bytes_checked(View view, std::size_t size) noexcept
 {
     // `init_cursor` skips header, we need to ensure there's enough space for it
-    if(!addressof(view) || (size < detail::get_header_size(view)))
+    if(!sbepp::addressof(view) || (size < detail::get_header_size(view)))
     {
         return {};
     }
 
     detail::size_bytes_checked_visitor visitor{size};
-    auto c = init_cursor(view);
-    visit(view, c, visitor);
+    auto c = sbepp::init_cursor(view);
+    sbepp::visit(view, c, visitor);
     if(visitor.is_valid())
     {
         return {true, size - visitor.get_size()};
