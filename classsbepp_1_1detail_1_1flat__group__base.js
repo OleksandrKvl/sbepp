@@ -1,7 +1,7 @@
 var classsbepp_1_1detail_1_1flat__group__base =
 [
     [ "cursor_iterator", "classsbepp_1_1detail_1_1flat__group__base.html#a40c3e55bf1da4101f6de8369e08e89f2", null ],
-    [ "cursor_range_t", "classsbepp_1_1detail_1_1flat__group__base.html#a6fd606b66801675d271416562055a45d", null ],
+    [ "cursor_range_t", "classsbepp_1_1detail_1_1flat__group__base.html#a8fd83090ccfa9204101b01db3aa20bab", null ],
     [ "difference_type", "classsbepp_1_1detail_1_1flat__group__base.html#adb75944a0e9c5c8ba3a0505fabcef734", null ],
     [ "iterator", "classsbepp_1_1detail_1_1flat__group__base.html#a24dc072ed2aa053cea7fa5d8f6898592", null ],
     [ "reference", "classsbepp_1_1detail_1_1flat__group__base.html#af9193142f2768c49691f7f53a0cd9880", null ],

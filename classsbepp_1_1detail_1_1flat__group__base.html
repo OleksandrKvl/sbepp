@@ -35,7 +35,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">sbepp<span id="projectnumber">&#160;1.0.1</span>
+   <div id="projectname">sbepp<span id="projectnumber">&#160;1.1.0</span>
    </div>
   </td>
  </tr>
@@ -148,14 +148,14 @@ using&#160;</td><td class="memItemRight" valign="bottom"><b>difference_type</b> 
 using&#160;</td><td class="memItemRight" valign="bottom"><b>iterator</b> = random_access_iterator&lt; Byte, Entry, typename std::decay&lt; decltype(std::declval&lt; Dimension &gt;().blockLength().value())&gt;::type, <a class="el" href="classsbepp_1_1detail_1_1flat__group__base.html#adb75944a0e9c5c8ba3a0505fabcef734">difference_type</a>, <a class="el" href="classsbepp_1_1detail_1_1flat__group__base.html#ae400d7c2364f6dce798259374841eb2e">size_type</a> &gt;</td></tr>
 <tr class="memdesc:a24dc072ed2aa053cea7fa5d8f6898592"><td class="mdescLeft">&#160;</td><td class="mdescRight">Random access iterator to <code>value_type</code>. Satisfies <code>std::random_access_iterator</code> <br /></td></tr>
 <tr class="separator:a24dc072ed2aa053cea7fa5d8f6898592"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6fd606b66801675d271416562055a45d"><td class="memTemplParams" colspan="2"><a id="a6fd606b66801675d271416562055a45d" name="a6fd606b66801675d271416562055a45d"></a>
+<tr class="memitem:a8fd83090ccfa9204101b01db3aa20bab"><td class="memTemplParams" colspan="2"><a id="a8fd83090ccfa9204101b01db3aa20bab" name="a8fd83090ccfa9204101b01db3aa20bab"></a>
 template&lt;typename Byte2 &gt; </td></tr>
-<tr class="memitem:a6fd606b66801675d271416562055a45d"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><b>cursor_range_t</b> = ::sbepp::detail::cursor_range&lt; <a class="el" href="classsbepp_1_1detail_1_1flat__group__base.html#a73d80a5fb9f0a8438ed8ea26b3826bde">value_type</a>, <a class="el" href="classsbepp_1_1detail_1_1flat__group__base.html#ae400d7c2364f6dce798259374841eb2e">size_type</a>, <a class="el" href="classsbepp_1_1cursor.html">cursor</a>&lt; Byte2 &gt;, typename std::decay&lt; decltype(std::declval&lt; Dimension &gt;().blockLength().value())&gt;::type, Byte &gt;</td></tr>
-<tr class="memdesc:a6fd606b66801675d271416562055a45d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Type of a cursor range. Satisfies <code>std::ranges::input_range</code> <br /></td></tr>
-<tr class="separator:a6fd606b66801675d271416562055a45d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8fd83090ccfa9204101b01db3aa20bab"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><b>cursor_range_t</b> = detail::cursor_range&lt; <a class="el" href="classsbepp_1_1detail_1_1flat__group__base.html#a73d80a5fb9f0a8438ed8ea26b3826bde">value_type</a>, <a class="el" href="classsbepp_1_1detail_1_1flat__group__base.html#ae400d7c2364f6dce798259374841eb2e">size_type</a>, <a class="el" href="classsbepp_1_1cursor.html">cursor</a>&lt; Byte2 &gt;, typename std::decay&lt; decltype(std::declval&lt; Dimension &gt;().blockLength().value())&gt;::type, Byte &gt;</td></tr>
+<tr class="memdesc:a8fd83090ccfa9204101b01db3aa20bab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Type of a cursor range. Satisfies <code>std::ranges::input_range</code> <br /></td></tr>
+<tr class="separator:a8fd83090ccfa9204101b01db3aa20bab"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a40c3e55bf1da4101f6de8369e08e89f2"><td class="memTemplParams" colspan="2"><a id="a40c3e55bf1da4101f6de8369e08e89f2" name="a40c3e55bf1da4101f6de8369e08e89f2"></a>
 template&lt;typename Byte2 &gt; </td></tr>
-<tr class="memitem:a40c3e55bf1da4101f6de8369e08e89f2"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><b>cursor_iterator</b> = typename <a class="el" href="classsbepp_1_1detail_1_1flat__group__base.html#a6fd606b66801675d271416562055a45d">cursor_range_t</a>&lt; Byte2 &gt;<a class="el" href="classsbepp_1_1detail_1_1flat__group__base.html#a24dc072ed2aa053cea7fa5d8f6898592">::iterator</a></td></tr>
+<tr class="memitem:a40c3e55bf1da4101f6de8369e08e89f2"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><b>cursor_iterator</b> = typename <a class="el" href="classsbepp_1_1detail_1_1flat__group__base.html#a8fd83090ccfa9204101b01db3aa20bab">cursor_range_t</a>&lt; Byte2 &gt;<a class="el" href="classsbepp_1_1detail_1_1flat__group__base.html#a24dc072ed2aa053cea7fa5d8f6898592">::iterator</a></td></tr>
 <tr class="memdesc:a40c3e55bf1da4101f6de8369e08e89f2"><td class="mdescLeft">&#160;</td><td class="mdescRight"><code>cursor_range_t::iterator</code>. Satisfies <code>std::input_iterator</code> <br /></td></tr>
 <tr class="separator:a40c3e55bf1da4101f6de8369e08e89f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -199,15 +199,15 @@ constexpr <a class="el" href="classsbepp_1_1detail_1_1flat__group__base.html#a24
 <tr class="separator:a2c73368a3be5a993f23185cd58320b11"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a86d36b6de40321f5a13bf9b15783b936"><td class="memTemplParams" colspan="2"><a id="a86d36b6de40321f5a13bf9b15783b936" name="a86d36b6de40321f5a13bf9b15783b936"></a>
 template&lt;typename Byte2 , typename  = enable_if_cursor_compatible_t&lt;Byte, Byte2&gt;&gt; </td></tr>
-<tr class="memitem:a86d36b6de40321f5a13bf9b15783b936"><td class="memTemplItemLeft" align="right" valign="top">constexpr <a class="el" href="classsbepp_1_1detail_1_1flat__group__base.html#a6fd606b66801675d271416562055a45d">cursor_range_t</a>&lt; Byte2 &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>cursor_range</b> (<a class="el" href="classsbepp_1_1cursor.html">cursor</a>&lt; Byte2 &gt; &amp;c) const noexcept</td></tr>
+<tr class="memitem:a86d36b6de40321f5a13bf9b15783b936"><td class="memTemplItemLeft" align="right" valign="top">constexpr <a class="el" href="classsbepp_1_1detail_1_1flat__group__base.html#a8fd83090ccfa9204101b01db3aa20bab">cursor_range_t</a>&lt; Byte2 &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>cursor_range</b> (<a class="el" href="classsbepp_1_1cursor.html">cursor</a>&lt; Byte2 &gt; &amp;c) const noexcept</td></tr>
 <tr class="memdesc:a86d36b6de40321f5a13bf9b15783b936"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns cursor range to all group entries. <br /></td></tr>
 <tr class="separator:a86d36b6de40321f5a13bf9b15783b936"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a58ab082a4ed58b06015ace4679d09a80"><td class="memTemplParams" colspan="2">template&lt;typename Byte2 , typename  = enable_if_cursor_compatible_t&lt;Byte, Byte2&gt;&gt; </td></tr>
-<tr class="memitem:a58ab082a4ed58b06015ace4679d09a80"><td class="memTemplItemLeft" align="right" valign="top">constexpr <a class="el" href="classsbepp_1_1detail_1_1flat__group__base.html#a6fd606b66801675d271416562055a45d">cursor_range_t</a>&lt; Byte2 &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classsbepp_1_1detail_1_1flat__group__base.html#a58ab082a4ed58b06015ace4679d09a80">cursor_subrange</a> (<a class="el" href="classsbepp_1_1cursor.html">cursor</a>&lt; Byte2 &gt; &amp;c, const <a class="el" href="classsbepp_1_1detail_1_1flat__group__base.html#ae400d7c2364f6dce798259374841eb2e">size_type</a> pos) const noexcept</td></tr>
+<tr class="memitem:a58ab082a4ed58b06015ace4679d09a80"><td class="memTemplItemLeft" align="right" valign="top">constexpr <a class="el" href="classsbepp_1_1detail_1_1flat__group__base.html#a8fd83090ccfa9204101b01db3aa20bab">cursor_range_t</a>&lt; Byte2 &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classsbepp_1_1detail_1_1flat__group__base.html#a58ab082a4ed58b06015ace4679d09a80">cursor_subrange</a> (<a class="el" href="classsbepp_1_1cursor.html">cursor</a>&lt; Byte2 &gt; &amp;c, const <a class="el" href="classsbepp_1_1detail_1_1flat__group__base.html#ae400d7c2364f6dce798259374841eb2e">size_type</a> pos) const noexcept</td></tr>
 <tr class="memdesc:a58ab082a4ed58b06015ace4679d09a80"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns cursor range to [pos; <a class="el" href="classsbepp_1_1detail_1_1flat__group__base.html#a7e1b0794803482202b68663cb180d2e6" title="Returns raw size.">size()</a>) entries.  <br /></td></tr>
 <tr class="separator:a58ab082a4ed58b06015ace4679d09a80"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae155f92736a0daf59846125bc138a0ed"><td class="memTemplParams" colspan="2">template&lt;typename Byte2 , typename  = enable_if_cursor_compatible_t&lt;Byte, Byte2&gt;&gt; </td></tr>
-<tr class="memitem:ae155f92736a0daf59846125bc138a0ed"><td class="memTemplItemLeft" align="right" valign="top">constexpr <a class="el" href="classsbepp_1_1detail_1_1flat__group__base.html#a6fd606b66801675d271416562055a45d">cursor_range_t</a>&lt; Byte2 &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classsbepp_1_1detail_1_1flat__group__base.html#ae155f92736a0daf59846125bc138a0ed">cursor_subrange</a> (<a class="el" href="classsbepp_1_1cursor.html">cursor</a>&lt; Byte2 &gt; &amp;c, const <a class="el" href="classsbepp_1_1detail_1_1flat__group__base.html#ae400d7c2364f6dce798259374841eb2e">size_type</a> pos, const <a class="el" href="classsbepp_1_1detail_1_1flat__group__base.html#ae400d7c2364f6dce798259374841eb2e">size_type</a> count) const noexcept</td></tr>
+<tr class="memitem:ae155f92736a0daf59846125bc138a0ed"><td class="memTemplItemLeft" align="right" valign="top">constexpr <a class="el" href="classsbepp_1_1detail_1_1flat__group__base.html#a8fd83090ccfa9204101b01db3aa20bab">cursor_range_t</a>&lt; Byte2 &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classsbepp_1_1detail_1_1flat__group__base.html#ae155f92736a0daf59846125bc138a0ed">cursor_subrange</a> (<a class="el" href="classsbepp_1_1cursor.html">cursor</a>&lt; Byte2 &gt; &amp;c, const <a class="el" href="classsbepp_1_1detail_1_1flat__group__base.html#ae400d7c2364f6dce798259374841eb2e">size_type</a> pos, const <a class="el" href="classsbepp_1_1detail_1_1flat__group__base.html#ae400d7c2364f6dce798259374841eb2e">size_type</a> count) const noexcept</td></tr>
 <tr class="memdesc:ae155f92736a0daf59846125bc138a0ed"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns cursor range to [pos; pos+count) entries.  <br /></td></tr>
 <tr class="separator:ae155f92736a0daf59846125bc138a0ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7fbeff07ceabcd7a3bb835920c13703c"><td class="memTemplParams" colspan="2"><a id="a7fbeff07ceabcd7a3bb835920c13703c" name="a7fbeff07ceabcd7a3bb835920c13703c"></a>
@@ -324,7 +324,7 @@ template&lt;typename Byte2 , typename  = enable_if_cursor_compatible_t&lt;Byte, 
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">constexpr <a class="el" href="classsbepp_1_1detail_1_1flat__group__base.html#a6fd606b66801675d271416562055a45d">cursor_range_t</a>&lt; Byte2 &gt; <a class="el" href="classsbepp_1_1detail_1_1flat__group__base.html">sbepp::detail::flat_group_base</a>&lt; Byte, Entry, Dimension &gt;::cursor_subrange </td>
+          <td class="memname">constexpr <a class="el" href="classsbepp_1_1detail_1_1flat__group__base.html#a8fd83090ccfa9204101b01db3aa20bab">cursor_range_t</a>&lt; Byte2 &gt; <a class="el" href="classsbepp_1_1detail_1_1flat__group__base.html">sbepp::detail::flat_group_base</a>&lt; Byte, Entry, Dimension &gt;::cursor_subrange </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="classsbepp_1_1cursor.html">cursor</a>&lt; Byte2 &gt; &amp;&#160;</td>
           <td class="paramname"><em>c</em>, </td>
@@ -367,7 +367,7 @@ template&lt;typename Byte2 , typename  = enable_if_cursor_compatible_t&lt;Byte, 
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">constexpr <a class="el" href="classsbepp_1_1detail_1_1flat__group__base.html#a6fd606b66801675d271416562055a45d">cursor_range_t</a>&lt; Byte2 &gt; <a class="el" href="classsbepp_1_1detail_1_1flat__group__base.html">sbepp::detail::flat_group_base</a>&lt; Byte, Entry, Dimension &gt;::cursor_subrange </td>
+          <td class="memname">constexpr <a class="el" href="classsbepp_1_1detail_1_1flat__group__base.html#a8fd83090ccfa9204101b01db3aa20bab">cursor_range_t</a>&lt; Byte2 &gt; <a class="el" href="classsbepp_1_1detail_1_1flat__group__base.html">sbepp::detail::flat_group_base</a>&lt; Byte, Entry, Dimension &gt;::cursor_subrange </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="classsbepp_1_1cursor.html">cursor</a>&lt; Byte2 &gt; &amp;&#160;</td>
           <td class="paramname"><em>c</em>, </td>
