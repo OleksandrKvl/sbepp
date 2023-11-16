@@ -1,5 +1,3 @@
-find_package(GTest REQUIRED)
-find_package(fmt REQUIRED)
 include(GoogleTest)
 
 function(get_available_cpp_versions result)
@@ -23,21 +21,13 @@ set(test_schemas
 )
 
 foreach(schema IN LISTS test_schemas)
-    # multi-file compilation
-    set(output_file "${CMAKE_CURRENT_BINARY_DIR}/${schema}/${schema}.hpp")
-    list(APPEND schema_output_files ${output_file})
-
-    add_custom_command(
-        OUTPUT ${output_file}
-        # actually, only `traits_test_schema2` needs explicit name
-        COMMAND $<TARGET_FILE:sbepp::sbeppc>
-            "--schema-name" "${schema}"
-            "${CMAKE_CURRENT_LIST_DIR}/schemas/${schema}.xml"
-        DEPENDS sbepp::sbeppc "${CMAKE_CURRENT_LIST_DIR}/schemas/${schema}.xml"
+    sbepp_generate(
+        SCHEMA_NAME ${schema}
+        SCHEMA_FILE ${CMAKE_CURRENT_LIST_DIR}/schemas/${schema}.xml
+        OUT_DIR ${CMAKE_CURRENT_BINARY_DIR}
+        TARGET_NAME compile_test_schemas
     )
 endforeach()
-
-add_custom_target(compile_test_schemas DEPENDS ${schema_output_files})
 
 get_available_cpp_versions(cpp_versions)
 

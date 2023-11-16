@@ -20,3 +20,25 @@ install(
     DIRECTORY src/
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
+
+install(EXPORT sbepp
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/sbepp
+    NAMESPACE sbepp::
+)
+
+write_basic_package_version_file(
+    "sbeppConfigVersion.cmake"
+    COMPATIBILITY SameMajorVersion
+)
+
+install(
+    FILES ${CMAKE_SOURCE_DIR}/cmake/sbeppConfig.cmake
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/sbepp
+    COMPONENT sbepp
+)
+
+install(
+    FILES "${PROJECT_BINARY_DIR}/sbepp/sbeppConfigVersion.cmake"
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/sbepp
+    COMPONENT sbepp
+)

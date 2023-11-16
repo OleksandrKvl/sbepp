@@ -1,18 +1,14 @@
-find_package(benchmark REQUIRED)
 
 set(schema_name "benchmark_schema")
-set(schema_file "${CMAKE_CURRENT_LIST_DIR}/${schema_name}.xml")
-set(output_file "${CMAKE_CURRENT_BINARY_DIR}/${schema_name}/${schema_name}.hpp")
 
-add_custom_command(
-    OUTPUT ${output_file}
-    COMMAND $<TARGET_FILE:sbepp::sbeppc> "${schema_file}"
-    DEPENDS sbepp::sbeppc "${schema_file}"
+sbepp_generate(
+    SCHEMA_NAME ${schema_name}
+    SCHEMA_FILE ${CMAKE_CURRENT_LIST_DIR}/${schema_name}.xml
+    OUT_DIR ${CMAKE_CURRENT_BINARY_DIR}
+    TARGET_NAME compile_benchmark_schema
 )
 
-add_custom_target(compile_benchmark_schema DEPENDS ${output_file})
-
-set(target "benchmark")
+set(target "sbepp-benchmark")
 set(src_dir "src/sbepp/benchmark")
 
 add_executable(${target})

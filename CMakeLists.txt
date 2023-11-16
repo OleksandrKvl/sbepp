@@ -9,6 +9,7 @@ include(CTest)
 include(CMakeDependentOption)
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
+include(FetchContent)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake)
 include(utils)
@@ -36,39 +37,71 @@ option(SBEPP_BUILD_DOCS "Build documentation" OFF)
 add_subdirectory(sbepp)
 
 if(SBEPP_BUILD_SBEPPC)
+    find_package(fmt QUIET)
+    if (NOT fmt_FOUND)
+        FetchContent_Declare(fmt
+          GIT_REPOSITORY https://github.com/fmtlib/fmt.git
+          GIT_TAG 10.1.1
+        )
+        FetchContent_MakeAvailable(fmt)
+    endif ()
+
+    find_package(pugixml QUIET)
+    if (NOT pugixml_FOUND)
+        FetchContent_Declare(
+          pugixml
+          GIT_REPOSITORY https://github.com/zeux/pugixml.git
+          GIT_TAG v1.14
+        )
+        FetchContent_MakeAvailable(pugixml)
+    endif()
+
     add_subdirectory(sbeppc)
 endif()
 
 if(SBEPP_BUILD_BENCHMARK)
+    find_package(benchmark QUIET)
+    if (NOT GTest_FOUND)
+        if (CMAKE_VERSION VERSION_GREATER_EQUAL "3.24.0")
+            cmake_policy(SET CMP0135 NEW)
+        endif()
+
+        FetchContent_Declare(
+          benchmark
+          URL https://github.com/google/benchmark/archive/refs/tags/v1.8.3.tar.gz
+        )
+
+        set(INSTALL_BENCHMARK OFF)
+        set(BENCHMARK_USE_BUNDLED_GTEST OFF)
+        FetchContent_MakeAvailable(benchmark)
+    endif ()
+
     add_subdirectory(benchmark)
 endif()
 
 if(SBEPP_BUILD_TESTS)
+    enable_testing()
+    message(STATUS "Tests are enabled")
+
+    find_package(GTest QUIET)
+    if (NOT GTest_FOUND)
+        if (CMAKE_VERSION VERSION_GREATER_EQUAL "3.24.0")
+            cmake_policy(SET CMP0135 NEW)
+        endif()
+
+        FetchContent_Declare(
+          googletest
+          URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.tar.gz
+        )
+
+        set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+        set(INSTALL_GTEST OFF)
+        FetchContent_MakeAvailable(googletest)
+    endif ()
+
     add_subdirectory(test)
 endif()
 
 if(SBEPP_BUILD_DOCS)
     add_subdirectory(doc)
 endif()
-
-install(EXPORT sbepp
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/sbepp
-    NAMESPACE sbepp::
-)
-
-write_basic_package_version_file(
-    "sbeppConfigVersion.cmake"
-    COMPATIBILITY SameMajorVersion
-)
-
-install(
-    FILES cmake/sbeppConfig.cmake
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/sbepp
-    COMPONENT sbepp
-)
-
-install(
-    FILES "${PROJECT_BINARY_DIR}/sbeppConfigVersion.cmake"
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/sbepp
-    COMPONENT sbepp
-)
