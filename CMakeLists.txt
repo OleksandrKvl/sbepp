@@ -5,6 +5,12 @@ project(sbepp
     LANGUAGES CXX
 )
 
+set(SBEPP_MASTER_PROJECT OFF)
+if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
+    set(SBEPP_MASTER_PROJECT ON)
+endif()
+
+
 include(CTest)
 include(CMakeDependentOption)
 include(GNUInstallDirs)
@@ -33,6 +39,7 @@ cmake_dependent_option(SBEPP_BUILD_BENCHMARK
 
 option(SBEPP_BUILD_SBEPPC "Build sbeppc schema compiler" ON)
 option(SBEPP_BUILD_DOCS "Build documentation" OFF)
+option(SBEPP_INSTALL "Provide install for the project" ON)
 
 add_subdirectory(sbepp)
 

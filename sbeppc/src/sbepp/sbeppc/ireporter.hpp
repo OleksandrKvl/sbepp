@@ -3,9 +3,9 @@
 
 #pragma once
 
-#include <fmt/core.h>
-
 #include <string_view>
+
+#include <sbepp/sbeppc/fmt_integration.hpp>
 
 namespace sbepp::sbeppc
 {
@@ -14,17 +14,39 @@ class ireporter
 public:
     virtual ~ireporter() = default;
 
-    template<typename F, typename... Args>
-    void error(const F& format, Args&&... args)
+    template<typename F,
+             typename... Args,
+             typename = std::enable_if_t<is_fmt_compile_string<F>>>
+    void error(F format, Args&&... args)
     {
         const auto msg = fmt::format(format, std::forward<Args>(args)...);
         report_error(msg);
     }
 
-    template<typename F, typename... Args>
-    void warning(const F& format, Args&&... args)
+    template<typename F,
+             typename... Args,
+             typename = std::enable_if_t<!is_fmt_compile_string<F>>>
+    void error(const F& format, Args&&... args)
+    {
+        const auto msg = fmt::format(::fmt::runtime(format), std::forward<Args>(args)...);
+        report_error(msg);
+    }
+
+    template<typename F,
+             typename... Args,
+             typename = std::enable_if_t<is_fmt_compile_string<F>>>
+    void warning(F format, Args&&... args)
     {
         const auto msg = fmt::format(format, std::forward<Args>(args)...);
+        report_warning(msg);
+    }
+
+    template<typename F,
+             typename... Args,
+             typename = std::enable_if_t<!is_fmt_compile_string<F>>>
+    void warning(const F& format, Args&&... args)
+    {
+        const auto msg = fmt::format(::fmt::runtime(format), std::forward<Args>(args)...);
         report_warning(msg);
     }
 

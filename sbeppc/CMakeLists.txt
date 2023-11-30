@@ -6,7 +6,6 @@ set_target_properties(${target} PROPERTIES
     EXPORT_NAME sbeppc
 )
 
-include(sbepp-generate)
 
 set(src_dir src/sbepp/sbeppc)
 
@@ -27,14 +26,21 @@ target_link_libraries(${target}
     pugixml::pugixml
 )
 
-sbepp_set_strict_warning_options(${target})
+if (SBEPP_MASTER_PROJECT)
+    sbepp_set_strict_warning_options(${target})
 
-install(TARGETS ${target}
-    EXPORT sbepp
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-)
+    # When used as submodule
+endif ()
 
+include(${CMAKE_CURRENT_SOURCE_DIR}/sbepp-generate.cmake)
 
-install(
-    FILES ${CMAKE_SOURCE_DIR}/cmake/sbepp-generate.cmake
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/sbepp)
+if (SBEPP_INSTALL)
+    install(TARGETS ${target}
+        EXPORT sbepp
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    )
+
+    install(
+        FILES ${CMAKE_CURRENT_SOURCE_DIR}/sbepp-generate.cmake
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/sbepp)
+endif ()
