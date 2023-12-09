@@ -128,7 +128,9 @@ SBEPP_WARNINGS_OFF();
 #endif
 
 #ifdef __has_cpp_attribute
-#    if __has_cpp_attribute(nodiscard)
+// Clang provides `nodiscard` in C++11 but then warns that it's a C++17 feature
+#    if __has_cpp_attribute(nodiscard) \
+        && !(defined(__clang__) && (__cplusplus < 201703L))
 #        define SBEPP_CPP17_NODISCARD [[nodiscard]]
 #    endif
 #endif
