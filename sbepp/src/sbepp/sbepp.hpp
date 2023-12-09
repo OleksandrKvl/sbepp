@@ -359,7 +359,7 @@ using enable_if_writable_t = enable_if_t<!std::is_const<Byte>::value, T>;
 template<typename...>
 using void_t = void;
 
-template<typename T>
+template<typename T, typename = enable_if_t<!std::is_floating_point<T>::value>>
 constexpr typename std::make_unsigned<T>::type to_unsigned(T v) noexcept
 {
     return static_cast<typename std::make_unsigned<T>::type>(v);
