@@ -28,7 +28,7 @@ target_link_libraries(${target}
     pugixml::pugixml
 )
 
-sbepp_set_strict_warning_options(${target})
+sbepp_set_strict_compiler_options(${target} WARNINGS_AS_ERRORS)
 
 install(TARGETS ${target}
     EXPORT sbepp

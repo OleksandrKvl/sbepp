@@ -97,7 +97,7 @@ function(add_test_binary name_suffix cpp_version)
         ${ARGN}
     )
 
-    sbepp_set_strict_warning_options(${test_name})
+    sbepp_set_strict_compiler_options(${test_name})
 
     gtest_discover_tests(${test_name} TEST_PREFIX "${test_name}.")
 endfunction()
