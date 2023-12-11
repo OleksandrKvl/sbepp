@@ -31,15 +31,25 @@ macro(sbepp_set_default_build_type type)
     endif()
 endmacro()
 
-function(sbepp_set_strict_warning_options target)
+function(sbepp_set_strict_compiler_options target)
     if(SBEPP_DEV_MODE)
+        set(options WARNINGS_AS_ERRORS)
+        cmake_parse_arguments(arg "${options}" "" "" ${ARGN})
+
         if((CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
             OR (CMAKE_CXX_COMPILER_ID STREQUAL "Clang"))
             target_compile_options(
-                    ${target} PRIVATE -Wall -Wextra -Wpedantic -Werror
+                ${target}
+                PRIVATE
+                -Wall -Wextra -Wpedantic
+                    $<$<BOOL:${arg_WARNINGS_AS_ERRORS}>:-Werror>
             )
         elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-            target_compile_options(${target} PRIVATE /W3 /WX)
+            target_compile_options(
+                ${target}
+                PRIVATE
+                /W3 $<$<BOOL:${arg_WARNINGS_AS_ERRORS}>:/WX>
+            )
         endif()
     endif()
 endfunction()

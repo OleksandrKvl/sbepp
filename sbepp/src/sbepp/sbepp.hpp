@@ -128,7 +128,9 @@ SBEPP_WARNINGS_OFF();
 #endif
 
 #ifdef __has_cpp_attribute
-#    if __has_cpp_attribute(nodiscard)
+// Clang provides `nodiscard` in C++11 but then warns that it's a C++17 feature
+#    if __has_cpp_attribute(nodiscard) \
+        && !(defined(__clang__) && (__cplusplus < 201703L))
 #        define SBEPP_CPP17_NODISCARD [[nodiscard]]
 #    endif
 #endif
@@ -357,7 +359,7 @@ using enable_if_writable_t = enable_if_t<!std::is_const<Byte>::value, T>;
 template<typename...>
 using void_t = void;
 
-template<typename T>
+template<typename T, typename = enable_if_t<!std::is_floating_point<T>::value>>
 constexpr typename std::make_unsigned<T>::type to_unsigned(T v) noexcept
 {
     return static_cast<typename std::make_unsigned<T>::type>(v);
