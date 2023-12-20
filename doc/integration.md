@@ -20,7 +20,7 @@ As an example, here are two common approaches:
         OUTPUT ${output_file}
         COMMAND $<TARGET_FILE:sbepp::sbeppc>
             "${CMAKE_CURRENT_LIST_DIR}/schemas/${schema}.xml"
-        DEPENDS sbepp::sbeppc "${CMAKE_CURRENT_LIST_DIR}/schemas/${schema}.xml"
+        DEPENDS "${CMAKE_CURRENT_LIST_DIR}/schemas/${schema}.xml"
     )
 
     # add a custom target which depends on the above
