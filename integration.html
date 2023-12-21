@@ -117,7 +117,7 @@ $(document).ready(function(){initNavTree('integration.html',''); initResizable()
 <div class="line">    OUTPUT ${output_file}</div>
 <div class="line">    COMMAND $&lt;TARGET_FILE:sbepp::sbeppc&gt;</div>
 <div class="line">        &quot;${CMAKE_CURRENT_LIST_DIR}/schemas/${schema}.xml&quot;</div>
-<div class="line">    DEPENDS sbepp::sbeppc &quot;${CMAKE_CURRENT_LIST_DIR}/schemas/${schema}.xml&quot;</div>
+<div class="line">    DEPENDS &quot;${CMAKE_CURRENT_LIST_DIR}/schemas/${schema}.xml&quot;</div>
 <div class="line">)</div>
 <div class="line"> </div>
 <div class="line"># add a custom target which depends on the above</div>
