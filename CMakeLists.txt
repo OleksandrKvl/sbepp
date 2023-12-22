@@ -72,3 +72,8 @@ install(
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/sbepp
     COMPONENT sbepp
 )
+
+install(
+    FILES cmake/sbeppcHelpers.cmake
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/sbepp
+)
