@@ -31,7 +31,7 @@ endmacro()
 
 # A helper that creates a custom target that compiles SBE schema using `sbeppc`.
 # 
-# Arguments:
+# Parameters:
 # 
 #   SCHEMA_FILE: the path to schema XML file
 #   TARGET_NAME: the name of generated custom target. A single target can be
@@ -133,7 +133,7 @@ endfunction()
 # A helper that creates `INTERFACE` library that compiles SBE schema using
 # `sbeppc`.
 # 
-# Arguments:
+# Parameters:
 # 
 #   SCHEMA_FILE: the path to schema XML file
 #   TARGET_NAME: the name of the generated `INTERFACE` library. A single target
