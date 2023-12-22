@@ -29,11 +29,7 @@ macro(sbepp_parse_arguments
     endif()
 endmacro()
 
-# A helper function to integrate `sbeppc` SBE schema compilation into CMake
-# project. Creates a custom target with given name that compiles SBE schema.
-
-# A helper function that creates a custom target that compiles SBE schema using
-# `sbeppc`.
+# A helper that creates a custom target that compiles SBE schema using `sbeppc`.
 # 
 # Arguments:
 # 
