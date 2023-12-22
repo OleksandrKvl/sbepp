@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['using_20the_20schema_20compiler_0',['Using the schema compiler',['../sbeppc.html',1,'']]]
+  ['primitives_0',['Stringification primitives',['../stringification.html',1,'']]],
+  ['project_1',['Integration into your project',['../integration.html',1,'']]]
 ];

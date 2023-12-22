@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['schema_20representation_0',['Schema representation',['../representation.html',1,'']]],
-  ['stringification_20primitives_1',['Stringification primitives',['../stringification.html',1,'']]]
+  ['installation_0',['Installation',['../installation.html',1,'']]],
+  ['integration_20into_20your_20project_1',['Integration into your project',['../integration.html',1,'']]],
+  ['into_20your_20project_2',['Integration into your project',['../integration.html',1,'']]]
 ];

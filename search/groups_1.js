@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['traits_20list_0',['Traits list',['../group__traits-list.html',1,'']]]
+  ['features_0',['Compiler features',['../group__compiler-features.html',1,'']]]
 ];

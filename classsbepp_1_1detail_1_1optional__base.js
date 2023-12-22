@@ -11,5 +11,11 @@ var classsbepp_1_1detail_1_1optional__base =
     [ "operator*", "classsbepp_1_1detail_1_1optional__base.html#aed44c71edcb9d852a154cd63f7131cdc", null ],
     [ "value", "classsbepp_1_1detail_1_1optional__base.html#a26c508ad9e9f3285170f5745112a6b0b", null ],
     [ "value_or", "classsbepp_1_1detail_1_1optional__base.html#a573de5ba1180952c1493c9e1dd071d06", null ],
-    [ "operator<=>", "classsbepp_1_1detail_1_1optional__base.html#af9693d0d4a0c754e6bb111c69333dfec", null ]
+    [ "operator!=", "classsbepp_1_1detail_1_1optional__base.html#a29c60222da3b2f5ca2cd966c807f448b", null ],
+    [ "operator<", "classsbepp_1_1detail_1_1optional__base.html#a0321dd26a52eedb9b06600ef8dc9501d", null ],
+    [ "operator<=", "classsbepp_1_1detail_1_1optional__base.html#a31a03308d5620d572e5745c5e4892d29", null ],
+    [ "operator<=>", "classsbepp_1_1detail_1_1optional__base.html#af9693d0d4a0c754e6bb111c69333dfec", null ],
+    [ "operator==", "classsbepp_1_1detail_1_1optional__base.html#af29c05ce41885297bf1851c281b3bcfb", null ],
+    [ "operator>", "classsbepp_1_1detail_1_1optional__base.html#ae4bd79af6b3ededa779f5995d185b947", null ],
+    [ "operator>=", "classsbepp_1_1detail_1_1optional__base.html#a5bdb6d4fd37359ab7d45624be2487053", null ]
 ];

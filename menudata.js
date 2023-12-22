@@ -34,7 +34,6 @@ var menudata={children:[
 {text:"Benchmarks",url:"benchmarks.html"},
 {text:"Examples",url:"examples.html"},
 {text:"API Reference",url:"usergroup1.html",children:[
-{text:"Modules",url:"modules.html"},
 {text:"Namespace List",url:"namespaces.html",children:[
 {text:"Namespace List",url:"namespaces.html"},
 {text:"Namespace Members",url:"namespacemembers.html",children:[
@@ -113,7 +112,7 @@ var menudata={children:[
 {text:"s",url:"functions_type.html#index_s"},
 {text:"t",url:"functions_type.html#index_t"},
 {text:"v",url:"functions_type.html#index_v"}]},
-{text:"Related Functions",url:"functions_rela.html"}]}]},
+{text:"Related Symbols",url:"functions_rela.html"}]}]},
 {text:"File List",url:"files.html",children:[
 {text:"File List",url:"files.html"},
 {text:"File Members",url:"globals.html",children:[

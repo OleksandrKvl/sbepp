@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['installation_0',['Installation',['../installation.html',1,'']]],
-  ['integration_20into_20your_20project_1',['Integration into your project',['../integration.html',1,'']]]
+  ['compiler_0',['Using the schema compiler',['../sbeppc.html',1,'']]]
 ];
