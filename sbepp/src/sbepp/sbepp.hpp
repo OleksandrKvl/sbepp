@@ -4590,8 +4590,6 @@ SBEPP_CPP20_CONSTEXPR size_bytes_checked_result
  * @brief Converts enum to string
  *
  * @param e enum to convert
- * @param only_enumerator if `false`, returns full name in form `Enum::Value`,
- *      otherwise returns only `Value`
  * @returns pointer to a null-terminated string representing an enumerator's
  *  name or `nullptr` if `e` holds unknown value
  */
