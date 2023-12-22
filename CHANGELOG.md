@@ -1,3 +1,14 @@
+# 1.2.0
+
+Add `sbeppc` CMake helpers. (Thanks to @ngrodzitski for the idea and initial
+implementation).  
+Fix `[[nodiscard]]` detection on Clang.  
+Fix `std::make_unsigned`-based SFINAE for floating-point types.  
+Use Doxygen 1.9.8 to generate documentation.  
+Update `doxygen-awesome-css`.
+
+---
+
 # 1.1.0
 
 Remove specific `fmt` and `pugixml` version requirements from `find_package`.
