@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.11)
 
 project(sbepp
-    VERSION 1.1.0
+    VERSION 1.2.0
     LANGUAGES CXX
 )
 
@@ -71,4 +71,9 @@ install(
     FILES "${PROJECT_BINARY_DIR}/sbeppConfigVersion.cmake"
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/sbepp
     COMPONENT sbepp
+)
+
+install(
+    FILES cmake/sbeppcHelpers.cmake
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/sbepp
 )

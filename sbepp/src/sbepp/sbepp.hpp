@@ -2629,22 +2629,19 @@ public:
         bits = ((bits & ~(1 << n)) | (b << n));
     }
 
-    //! @name Comparisons
-    //! @brief Compare underlying values
-    //! @{
+    //! @brief Tests if underlying values are equal
     constexpr friend bool
         operator==(const bitset_base& lhs, const bitset_base& rhs) noexcept
     {
         return *lhs == *rhs;
     }
 
+    //! @brief Tests if underlying values are not equal
     constexpr friend bool
         operator!=(const bitset_base& lhs, const bitset_base& rhs) noexcept
     {
         return *lhs != *rhs;
     }
-
-    //! @}
 
 private:
     T bits{};
@@ -3356,7 +3353,7 @@ public:
     }
 
     //! @name Comparisons
-    //! Compare underlying values
+    //! Comparisons are performed on underlying values
     //! @{
 #ifdef SBEPP_DOXYGEN
     //! @brief Available only if #SBEPP_HAS_THREE_WAY_COMPARISON == 1
@@ -3368,36 +3365,42 @@ public:
     friend auto
         operator<=>(const required_base&, const required_base&) = default;
 #else
+    //! @brief Tests if `lhs` is equal to `rhs`
     constexpr friend bool
         operator==(const required_base& lhs, const required_base& rhs) noexcept
     {
         return *lhs == *rhs;
     }
 
+    //! @brief Tests if `lhs` is not equal to `rhs`
     constexpr friend bool
         operator!=(const required_base& lhs, const required_base& rhs) noexcept
     {
         return *lhs != *rhs;
     }
 
+    //! @brief Tests if `lhs` is less than `rhs`
     constexpr friend bool
         operator<(const required_base& lhs, const required_base& rhs) noexcept
     {
         return *lhs < *rhs;
     }
 
+    //! @brief Tests if `lhs` is less than or equal to `rhs`
     constexpr friend bool
         operator<=(const required_base& lhs, const required_base& rhs) noexcept
     {
         return *lhs <= *rhs;
     }
 
+    //! @brief Tests if `lhs` is greater than `rhs`
     constexpr friend bool
         operator>(const required_base& lhs, const required_base& rhs) noexcept
     {
         return *lhs > *rhs;
     }
 
+    //! @brief Tests if `lhs` is greater than or equal to `rhs`
     constexpr friend bool
         operator>=(const required_base& lhs, const required_base& rhs) noexcept
     {
@@ -3490,6 +3493,8 @@ public:
     //!  - `lhs` is *equal to* `rhs` iff both are null
     //!  - `lhs` is *less than* `rhs` iff `rhs` is not null and `lhs` is null
     //! @{
+
+    //! @brief Tests if `lhs` is equal to `rhs`
     constexpr friend bool
         operator==(const optional_base& lhs, const optional_base& rhs) noexcept
     {
@@ -3513,30 +3518,36 @@ public:
         return lhs.has_value() <=> rhs.has_value();
     }
 #else
+
+    //! @brief Tests if `lhs` is not equal to `rhs`
     constexpr friend bool
         operator!=(const optional_base& lhs, const optional_base& rhs) noexcept
     {
         return *lhs != *rhs;
     }
 
+    //! @brief Tests if `lhs` is less than `rhs`
     constexpr friend bool
         operator<(const optional_base& lhs, const optional_base& rhs) noexcept
     {
         return rhs && (!lhs || (*lhs < *rhs));
     }
 
+    //! @brief Tests if `lhs` is less than or equal to `rhs`
     constexpr friend bool
         operator<=(const optional_base& lhs, const optional_base& rhs) noexcept
     {
         return !lhs || (rhs && (*lhs <= *rhs));
     }
 
+    //! @brief Tests if `lhs` is greater than `rhs`
     constexpr friend bool
         operator>(const optional_base& lhs, const optional_base& rhs) noexcept
     {
         return lhs && (!rhs || (*lhs > *rhs));
     }
 
+    //! @brief Tests if `lhs` is greater than or equal to `rhs`
     constexpr friend bool
         operator>=(const optional_base& lhs, const optional_base& rhs) noexcept
     {
@@ -4590,8 +4601,6 @@ SBEPP_CPP20_CONSTEXPR size_bytes_checked_result
  * @brief Converts enum to string
  *
  * @param e enum to convert
- * @param only_enumerator if `false`, returns full name in form `Enum::Value`,
- *      otherwise returns only `Value`
  * @returns pointer to a null-terminated string representing an enumerator's
  *  name or `nullptr` if `e` holds unknown value
  */

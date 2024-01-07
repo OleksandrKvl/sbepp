@@ -1,6 +1,7 @@
 find_package(GTest REQUIRED)
 find_package(fmt REQUIRED)
 include(GoogleTest)
+include(sbeppcHelpers)
 
 function(get_available_cpp_versions result)
     set(supported_versions 11 14 17 20 23)
@@ -13,7 +14,6 @@ function(get_available_cpp_versions result)
     set(${result} ${res} PARENT_SCOPE)
 endfunction()
 
-# compile test schemas
 set(test_schemas
     test_schema
     test_schema2
@@ -23,21 +23,13 @@ set(test_schemas
 )
 
 foreach(schema IN LISTS test_schemas)
-    # multi-file compilation
-    set(output_file "${CMAKE_CURRENT_BINARY_DIR}/${schema}/${schema}.hpp")
-    list(APPEND schema_output_files ${output_file})
-
-    add_custom_command(
-        OUTPUT ${output_file}
+    sbeppc_compile_schema(
+        SCHEMA_FILE "${CMAKE_CURRENT_LIST_DIR}/schemas/${schema}.xml"
         # actually, only `traits_test_schema2` needs explicit name
-        COMMAND $<TARGET_FILE:sbepp::sbeppc>
-            "--schema-name" "${schema}"
-            "${CMAKE_CURRENT_LIST_DIR}/schemas/${schema}.xml"
-        DEPENDS sbepp::sbeppc "${CMAKE_CURRENT_LIST_DIR}/schemas/${schema}.xml"
+        SCHEMA_NAME "${schema}"
+        TARGET_NAME compiled_test_schemas
     )
 endforeach()
-
-add_custom_target(compile_test_schemas DEPENDS ${schema_output_files})
 
 get_available_cpp_versions(cpp_versions)
 
@@ -47,7 +39,6 @@ function(add_test_binary name_suffix cpp_version)
     set(test_name tests_cpp_${cpp_version}_${name_suffix})
     add_executable(${test_name})
     sbepp_set_target_language_standard(${test_name} CXX ${cpp_version})
-    add_dependencies(${test_name} compile_test_schemas)
     target_sources(${test_name}
         PRIVATE
         ${src_dir}/assert_handler.cpp
@@ -81,13 +72,12 @@ function(add_test_binary name_suffix cpp_version)
 
     target_include_directories(${test_name}
         PRIVATE
-        ${CMAKE_CURRENT_BINARY_DIR}
         "src"
     )
         
     target_link_libraries(${test_name}
         PRIVATE
-        sbepp::sbepp
+        compiled_test_schemas
         GTest::gtest_main
         fmt::fmt
     )
