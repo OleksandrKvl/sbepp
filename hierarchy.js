@@ -23,37 +23,37 @@ var hierarchy =
     [ "sbepp::message_traits< T >", "classsbepp_1_1message__traits.html", null ],
     [ "sbepp::nullopt_t", "structsbepp_1_1nullopt__t.html", null ],
     [ "sbepp::detail::optional_base< T, Derived >", "classsbepp_1_1detail_1_1optional__base.html", null ],
-    [ "sbepp::detail::optional_base< char, char_t >", "classsbepp_1_1detail_1_1optional__base.html", [
+    [ "sbepp::detail::optional_base< char, char_opt_t >", "classsbepp_1_1detail_1_1optional__base.html", [
       [ "sbepp::char_opt_t", "classsbepp_1_1char__opt__t.html", null ]
     ] ],
-    [ "sbepp::detail::optional_base< double, double_t >", "classsbepp_1_1detail_1_1optional__base.html", [
+    [ "sbepp::detail::optional_base< double, double_opt_t >", "classsbepp_1_1detail_1_1optional__base.html", [
       [ "sbepp::double_opt_t", "classsbepp_1_1double__opt__t.html", null ]
     ] ],
-    [ "sbepp::detail::optional_base< float, float_t >", "classsbepp_1_1detail_1_1optional__base.html", [
+    [ "sbepp::detail::optional_base< float, float_opt_t >", "classsbepp_1_1detail_1_1optional__base.html", [
       [ "sbepp::float_opt_t", "classsbepp_1_1float__opt__t.html", null ]
     ] ],
-    [ "sbepp::detail::optional_base< std::int16_t, int16_t >", "classsbepp_1_1detail_1_1optional__base.html", [
+    [ "sbepp::detail::optional_base< std::int16_t, int16_opt_t >", "classsbepp_1_1detail_1_1optional__base.html", [
       [ "sbepp::int16_opt_t", "classsbepp_1_1int16__opt__t.html", null ]
     ] ],
-    [ "sbepp::detail::optional_base< std::int32_t, int32_t >", "classsbepp_1_1detail_1_1optional__base.html", [
+    [ "sbepp::detail::optional_base< std::int32_t, int32_opt_t >", "classsbepp_1_1detail_1_1optional__base.html", [
       [ "sbepp::int32_opt_t", "classsbepp_1_1int32__opt__t.html", null ]
     ] ],
-    [ "sbepp::detail::optional_base< std::int64_t, int64_t >", "classsbepp_1_1detail_1_1optional__base.html", [
+    [ "sbepp::detail::optional_base< std::int64_t, int64_opt_t >", "classsbepp_1_1detail_1_1optional__base.html", [
       [ "sbepp::int64_opt_t", "classsbepp_1_1int64__opt__t.html", null ]
     ] ],
-    [ "sbepp::detail::optional_base< std::int8_t, int8_t >", "classsbepp_1_1detail_1_1optional__base.html", [
+    [ "sbepp::detail::optional_base< std::int8_t, int8_opt_t >", "classsbepp_1_1detail_1_1optional__base.html", [
       [ "sbepp::int8_opt_t", "classsbepp_1_1int8__opt__t.html", null ]
     ] ],
-    [ "sbepp::detail::optional_base< std::uint16_t, uint16_t >", "classsbepp_1_1detail_1_1optional__base.html", [
+    [ "sbepp::detail::optional_base< std::uint16_t, uint16_opt_t >", "classsbepp_1_1detail_1_1optional__base.html", [
       [ "sbepp::uint16_opt_t", "classsbepp_1_1uint16__opt__t.html", null ]
     ] ],
-    [ "sbepp::detail::optional_base< std::uint32_t, uint32_t >", "classsbepp_1_1detail_1_1optional__base.html", [
+    [ "sbepp::detail::optional_base< std::uint32_t, uint32_opt_t >", "classsbepp_1_1detail_1_1optional__base.html", [
       [ "sbepp::uint32_opt_t", "classsbepp_1_1uint32__opt__t.html", null ]
     ] ],
-    [ "sbepp::detail::optional_base< std::uint64_t, uint64_t >", "classsbepp_1_1detail_1_1optional__base.html", [
+    [ "sbepp::detail::optional_base< std::uint64_t, uint64_opt_t >", "classsbepp_1_1detail_1_1optional__base.html", [
       [ "sbepp::uint64_opt_t", "classsbepp_1_1uint64__opt__t.html", null ]
     ] ],
-    [ "sbepp::detail::optional_base< std::uint8_t, uint8_t >", "classsbepp_1_1detail_1_1optional__base.html", [
+    [ "sbepp::detail::optional_base< std::uint8_t, uint8_opt_t >", "classsbepp_1_1detail_1_1optional__base.html", [
       [ "sbepp::uint8_opt_t", "classsbepp_1_1uint8__opt__t.html", null ]
     ] ],
     [ "sbepp::detail::required_base< T, Derived >", "classsbepp_1_1detail_1_1required__base.html", null ],
