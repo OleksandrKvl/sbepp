@@ -68,6 +68,7 @@ function(add_test_binary name_suffix cpp_version)
         ${src_dir}/stringification.test.cpp
         ${src_dir}/float_fields.test.cpp
         ${src_dir}/stdbyte_adl.test.cpp
+        ${src_dir}/built_in_types.test.cpp
     )
 
     target_include_directories(${test_name}
