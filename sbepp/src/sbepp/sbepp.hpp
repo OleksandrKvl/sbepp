@@ -1739,6 +1739,23 @@ private:
     BlockLengthType block_length{};
 };
 
+template<typename Entry>
+class arrow_proxy
+{
+public:
+    explicit constexpr arrow_proxy(Entry entry) noexcept : entry{entry}
+    {
+    }
+
+    constexpr const Entry* operator->() const noexcept
+    {
+        return &entry;
+    }
+
+private:
+    Entry entry;
+};
+
 template<
     typename Byte,
     typename ValueType,
@@ -1752,8 +1769,7 @@ public:
     using value_type = ValueType;
     using reference = value_type;
     using difference_type = DifferenceType;
-    // for compatibility with `std::iterator_traits`
-    using pointer = void;
+    using pointer = arrow_proxy<value_type>;
 
     forward_iterator() = default;
 
@@ -1780,6 +1796,11 @@ public:
 #else
         return {ptr, nullptr, block_length};
 #endif
+    }
+
+    constexpr pointer operator->() const noexcept
+    {
+        return pointer{operator*()};
     }
 
     SBEPP_CPP14_CONSTEXPR forward_iterator& operator++() noexcept
@@ -1831,8 +1852,7 @@ public:
     using value_type = ValueType;
     using reference = value_type;
     using difference_type = DifferenceType;
-    // for compatibility with `std::iterator_traits`
-    using pointer = void;
+    using pointer = arrow_proxy<value_type>;
 
     random_access_iterator() = default;
 
@@ -1859,6 +1879,11 @@ public:
 #else
         return {ptr, nullptr, block_length};
 #endif
+    }
+
+    constexpr pointer operator->() const noexcept
+    {
+        return pointer{operator*()};
     }
 
     SBEPP_CPP14_CONSTEXPR random_access_iterator& operator++() noexcept
@@ -2001,8 +2026,7 @@ public:
     using value_type = ValueType;
     using reference = value_type;
     using difference_type = typename std::make_signed<IndexType>::type;
-    // for compatibility with `std::iterator_traits`
-    using pointer = void;
+    using pointer = arrow_proxy<value_type>;
 
     input_iterator() = default;
 
@@ -2029,6 +2053,11 @@ public:
 #else
         return {*cursor, nullptr, block_length};
 #endif
+    }
+
+    constexpr pointer operator->() const noexcept
+    {
+        return pointer{operator*()};
     }
 
     SBEPP_CPP14_CONSTEXPR input_iterator& operator++() noexcept

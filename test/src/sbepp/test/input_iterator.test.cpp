@@ -18,8 +18,7 @@
 namespace
 {
 using byte_type = std::uint8_t;
-using group_tag =
-    test_schema::schema::messages::msg3::nested_group::flat_group;
+using group_tag = test_schema::schema::messages::msg3::nested_group::flat_group;
 using group_t = sbepp::group_traits<group_tag>::value_type<byte_type>;
 using iterator_t = group_t::cursor_iterator<byte_type>;
 
@@ -45,7 +44,9 @@ STATIC_ASSERT_V(std::is_same<iterator_t::value_type, group_t::value_type>);
 STATIC_ASSERT_V(std::is_same<iterator_t::reference, iterator_t::value_type>);
 STATIC_ASSERT_V(
     std::is_same<iterator_t::difference_type, group_t::difference_type>);
-STATIC_ASSERT_V(std::is_same<iterator_t::pointer, void>);
+STATIC_ASSERT_V(std::is_same<
+                iterator_t::pointer,
+                sbepp::detail::arrow_proxy<iterator_t::value_type>>);
 
 class InputIteratorTest : public ::testing::Test
 {
@@ -83,6 +84,24 @@ TEST_F(InputIteratorTest, DereferenceReturnsEntry)
     STATIC_ASSERT(noexcept(*range.begin()));
     STATIC_ASSERT_V(
         std::is_same<decltype(*range.begin()), iterator_t::reference>);
+}
+
+TEST_F(InputIteratorTest, CanAccessEntryMembersThroughArrow)
+{
+    auto range = g.cursor_range(c);
+    auto begin = std::begin(range);
+    auto end = std::end(range);
+    std::size_t i{};
+
+    for(; begin != end; ++begin)
+    {
+        ASSERT_EQ(begin->number(c), i);
+        i++;
+    }
+
+    STATIC_ASSERT(noexcept(begin.operator->()));
+    STATIC_ASSERT_V(
+        std::is_same<decltype(begin.operator->()), iterator_t::pointer>);
 }
 
 TEST_F(InputIteratorTest, PreIncMovesToNextEntry)
@@ -129,6 +148,7 @@ constexpr auto constexpr_test()
     it1 = it2;
 
     *it2;
+    it2.operator->();
     it2++;
     ++it2;
     (it1 == it2);
