@@ -18,8 +18,7 @@
 namespace
 {
 using byte_type = std::uint8_t;
-using group_tag =
-    test_schema::schema::messages::msg3::nested_group::flat_group;
+using group_tag = test_schema::schema::messages::msg3::nested_group::flat_group;
 using group_t = sbepp::group_traits<group_tag>::value_type<byte_type>;
 using iterator_t = group_t::iterator;
 
@@ -46,7 +45,9 @@ STATIC_ASSERT_V(std::is_same<iterator_t::value_type, group_t::value_type>);
 STATIC_ASSERT_V(std::is_same<iterator_t::reference, iterator_t::value_type>);
 STATIC_ASSERT_V(
     std::is_same<iterator_t::difference_type, group_t::difference_type>);
-STATIC_ASSERT_V(std::is_same<iterator_t::pointer, void>);
+STATIC_ASSERT_V(std::is_same<
+                iterator_t::pointer,
+                sbepp::detail::arrow_proxy<iterator_t::value_type>>);
 
 class RandomAccessIteratorTest : public ::testing::Test
 {
@@ -77,6 +78,19 @@ TEST_F(RandomAccessIteratorTest, DereferenceReturnsEntry)
 
     STATIC_ASSERT(noexcept(*it));
     STATIC_ASSERT_V(std::is_same<decltype(*it), iterator_t::reference>);
+}
+
+TEST_F(RandomAccessIteratorTest, CanAccessEntryMembersThroughArrow)
+{
+    auto it = g.begin();
+    for(std::size_t i = 0; i != g.size(); ++i, ++it)
+    {
+        ASSERT_EQ(it->number(), i);
+    }
+
+    STATIC_ASSERT(noexcept(it.operator->()));
+    STATIC_ASSERT_V(
+        std::is_same<decltype(it.operator->()), iterator_t::pointer>);
 }
 
 TEST_F(RandomAccessIteratorTest, PreIncMovesUpByBlockLength)
@@ -251,6 +265,7 @@ constexpr auto constexpr_test()
     it1 = it2;
 
     *it2;
+    it2.operator->();
     it2++;
     ++it2;
     it2--;
