@@ -198,7 +198,7 @@ Encoding</h2>
 <div class="fragment"><div class="line">std::array&lt;std::byte, 64&gt; buf;</div>
 <div class="line"><span class="keyword">auto</span> m = sbepp::make_view&lt;schema_name::messages::msg&gt;(buf.data(), buf.size());</div>
 <div class="line"><a class="code hl_function" href="namespacesbepp.html#a3b5dd3446b423149a101530f056bee64">sbepp::fill_message_header</a>(m);</div>
-<div class="ttc" id="anamespacesbepp_html_a3b5dd3446b423149a101530f056bee64"><div class="ttname"><a href="namespacesbepp.html#a3b5dd3446b423149a101530f056bee64">sbepp::fill_message_header</a></div><div class="ttdeci">constexpr auto fill_message_header(Message m) noexcept -&gt; decltype(m(detail::fill_message_header_tag{}))</div><div class="ttdoc">Fill message header.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:3579</div></div>
+<div class="ttc" id="anamespacesbepp_html_a3b5dd3446b423149a101530f056bee64"><div class="ttname"><a href="namespacesbepp.html#a3b5dd3446b423149a101530f056bee64">sbepp::fill_message_header</a></div><div class="ttdeci">constexpr auto fill_message_header(Message m) noexcept -&gt; decltype(m(detail::fill_message_header_tag{}))</div><div class="ttdoc">Fill message header.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:3608</div></div>
 </div><!-- fragment --><dl class="section note"><dt>Note</dt><dd>It's strongly recommended to fill message header as early as possible because its <code>blockLength</code> is required to correctly interpret underlying data.</dd></dl>
 <p>You can also fill it by hand using <code><a class="el" href="namespacesbepp.html#a12bbc67580e3f4bb2a0299033f01818d" title="Returns the header of a message/group.">sbepp::get_header</a></code>:</p>
 <div class="fragment"><div class="line">std::array&lt;std::byte, 64&gt; buf;</div>
@@ -226,7 +226,7 @@ Composites</h1>
 <div class="line">    <span class="comment">// handle msg1</span></div>
 <div class="line">}</div>
 <div class="ttc" id="aclasssbepp_1_1detail_1_1composite__base_html"><div class="ttname"><a href="classsbepp_1_1detail_1_1composite__base.html">sbepp::detail::composite_base</a></div><div class="ttdoc">Base class for composites.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:1631</div></div>
-<div class="ttc" id="aclasssbepp_1_1message__traits_html"><div class="ttname"><a href="classsbepp_1_1message__traits.html">sbepp::message_traits</a></div><div class="ttdoc">Provides various traits/attributes of a &lt;message&gt; element.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:3923</div></div>
+<div class="ttc" id="aclasssbepp_1_1message__traits_html"><div class="ttname"><a href="classsbepp_1_1message__traits.html">sbepp::message_traits</a></div><div class="ttdoc">Provides various traits/attributes of a &lt;message&gt; element.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:3952</div></div>
 </div><!-- fragment --><hr  />
 <h1><a class="anchor" id="groups"></a>
 Groups</h1>
@@ -252,7 +252,7 @@ Encoding</h2>
 <div class="line"><span class="comment">// change size later if you need</span></div>
 <div class="line">g.clear();</div>
 <div class="line">g.resize(1);</div>
-<div class="ttc" id="anamespacesbepp_html_a7d29b37dfc83150ae34eaaf94dd4ba4c"><div class="ttname"><a href="namespacesbepp.html#a7d29b37dfc83150ae34eaaf94dd4ba4c">sbepp::fill_group_header</a></div><div class="ttdeci">constexpr auto fill_group_header(Group g, Size num_in_group) noexcept -&gt; decltype(g(detail::fill_group_header_tag{}, num_in_group))</div><div class="ttdoc">Fill group header.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:3599</div></div>
+<div class="ttc" id="anamespacesbepp_html_a7d29b37dfc83150ae34eaaf94dd4ba4c"><div class="ttname"><a href="namespacesbepp.html#a7d29b37dfc83150ae34eaaf94dd4ba4c">sbepp::fill_group_header</a></div><div class="ttdeci">constexpr auto fill_group_header(Group g, Size num_in_group) noexcept -&gt; decltype(g(detail::fill_group_header_tag{}, num_in_group))</div><div class="ttdoc">Fill group header.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:3628</div></div>
 </div><!-- fragment --><dl class="section note"><dt>Note</dt><dd>As for <a class="el" href="representation.html#encoding-message">message header</a>, group header has to be filled as early as possible because its <code>numInGroup</code> and <code>blockLength</code> are used to correctly interpret the underlying data.</dd></dl>
 <h2><a class="anchor" id="autotoc_md19"></a>
 Group entries</h2>
@@ -326,7 +326,7 @@ Sets</h1>
 <div class="line">    constexpr <span class="keywordtype">bool</span> B() const noexcept;</div>
 <div class="line">    bitset&amp; B(const <span class="keywordtype">bool</span> v) noexcept;</div>
 <div class="line">};</div>
-<div class="ttc" id="aclasssbepp_1_1detail_1_1bitset__base_html"><div class="ttname"><a href="classsbepp_1_1detail_1_1bitset__base.html">sbepp::detail::bitset_base</a></div><div class="ttdoc">Base class for bitsets.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:2598</div></div>
+<div class="ttc" id="aclasssbepp_1_1detail_1_1bitset__base_html"><div class="ttname"><a href="classsbepp_1_1detail_1_1bitset__base.html">sbepp::detail::bitset_base</a></div><div class="ttdoc">Base class for bitsets.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:2627</div></div>
 </div><!-- fragment --><dl class="section warning"><dt>Warning</dt><dd>It's important to remember that sets have value semantics to avoid such mistakes:</dd></dl>
 <div class="fragment"><div class="line"><span class="comment">// writing a message</span></div>
 <div class="line">schema_name::messages::msg&lt;char&gt; m; <span class="comment">// initialize somehow</span></div>
@@ -466,7 +466,7 @@ Cursor-based accessors</h1>
 <div class="line"> </div>
 <div class="line">m.data1(c);</div>
 <div class="line">m.data2(c);</div>
-<div class="ttc" id="anamespacesbepp_html_a125f1fbb9faadde1515f7822a7b6420f"><div class="ttname"><a href="namespacesbepp.html#a125f1fbb9faadde1515f7822a7b6420f">sbepp::init_cursor</a></div><div class="ttdeci">constexpr cursor&lt; byte_type_t&lt; View &gt; &gt; init_cursor(View view) noexcept</div><div class="ttdoc">Initializes cursor from a message/group view with the same byte type.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:2708</div></div>
+<div class="ttc" id="anamespacesbepp_html_a125f1fbb9faadde1515f7822a7b6420f"><div class="ttname"><a href="namespacesbepp.html#a125f1fbb9faadde1515f7822a7b6420f">sbepp::init_cursor</a></div><div class="ttdeci">constexpr cursor&lt; byte_type_t&lt; View &gt; &gt; init_cursor(View view) noexcept</div><div class="ttdoc">Initializes cursor from a message/group view with the same byte type.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:2737</div></div>
 </div><!-- fragment --><p>Note that you need to use <code>cursor_range()</code> to iterate over group entries. That's because now each entry is created from the cursor.</p>
 <p>Here's how compiler will see it (simplified of course):</p>
 <div class="fragment"><div class="line"><span class="keywordtype">char</span>* ptr = msg_start;</div>

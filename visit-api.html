@@ -149,7 +149,7 @@ $(document).ready(function(){initNavTree('visit-api.html',''); initResizable(); 
 <div class="line"> </div>
 <div class="line"><span class="keyword">auto</span> m = sbepp::make_view&lt;msg_type&gt;(buf.data(), buf.size());</div>
 <div class="line">sbepp::visit&lt;my_visitor&gt;(m);</div>
-<div class="ttc" id="anamespacesbepp_html_a9c371f6621d1fa02aafb01a54af20893"><div class="ttname"><a href="namespacesbepp.html#a9c371f6621d1fa02aafb01a54af20893">sbepp::visit_children</a></div><div class="ttdeci">constexpr Visitor &amp;&amp; visit_children(View view, Cursor &amp;c, Visitor &amp;&amp;visitor={})</div><div class="ttdoc">Visit view's children using provided cursor.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:4425</div></div>
+<div class="ttc" id="anamespacesbepp_html_a9c371f6621d1fa02aafb01a54af20893"><div class="ttname"><a href="namespacesbepp.html#a9c371f6621d1fa02aafb01a54af20893">sbepp::visit_children</a></div><div class="ttdeci">constexpr Visitor &amp;&amp; visit_children(View view, Cursor &amp;c, Visitor &amp;&amp;visitor={})</div><div class="ttdoc">Visit view's children using provided cursor.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:4454</div></div>
 </div><!-- fragment --><p>Without that <code><a class="el" href="namespacesbepp.html#a9c371f6621d1fa02aafb01a54af20893" title="Visit view&#39;s children using provided cursor.">sbepp::visit_children</a></code>, only <code>on_message</code> will be called. <br  />
  Note that visitation can also be started from any group/entry/composite, not only from message.</p>
 <p>See <a class="el" href="stringification.html">Stringification primitives</a> section for an example how to build your own <code>to_string()</code>-like function using Visit API. </p>
