@@ -131,7 +131,9 @@ send(sbepp::addressof(m), msg_size);
 
 ```cpp
 std::array<char, 1024> buf{};
-auto header = sbepp::make_const_view<>(buf.data(), buf.size());
+auto header = sbepp::make_const_view<
+    sbepp::schema_traits<market::schema>::header_type>(
+        buf.data(), buf.size());
 if(*header.templateId()
     != sbepp::message_traits<market::schema::messages::msg>::id())
 {
@@ -230,3 +232,38 @@ for(const auto entry : g.cursor_range(c))
 auto d = m.data(c);
 std::cout.write(d.data(), d.size());
 ```
+
+---
+
+## Decoding message header
+
+There are couple of ways to decode message header from an incoming data.
+
+1. Using `sbepp::schema_traits::header_type` to get header type:
+
+    ```cpp
+    // `make_view` works as well
+    auto header = sbepp::make_const_view<
+        sbepp::schema_traits<market::schema>::header_type>(
+            buf.data(), buf.size());
+    ```
+
+2. Using hardcoded header type(`messageHeader` here):
+
+    ```cpp
+    auto header = sbepp::make_const_view<market::types::messageHeader>(
+        buf.data(), buf.size());
+    ```
+
+3. And finally, when one knows for sure what schema they're working with, it's
+legal to create any message view from that schema and use `sbepp::get_header()`
+to get the header. This works because header is the same for all messages within
+the schema. Of course access anything beyond the header still requires message
+type check.
+
+    ```cpp
+    // works even if `buf` represents a different message from `market` schema
+    auto m = sbepp::make_const_view<market::messages::msg>(
+        buf.data(), buf.size());
+    auto header = sbepp::get_header(m);
+    ```
