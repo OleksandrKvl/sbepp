@@ -107,6 +107,7 @@ $(document).ready(function(){initNavTree('examples.html',''); initResizable(); }
 <li class="level1"><a href="#autotoc_md36">Encoding a message using cursor-based accessors</a></li>
 <li class="level1"><a href="#autotoc_md38">Decoding a message using normal accessors</a></li>
 <li class="level1"><a href="#autotoc_md40">Decoding a message using cursor-based accessors</a></li>
+<li class="level1"><a href="#autotoc_md42">Decoding message header</a></li>
 </ul>
 </div>
 <div class="textblock"><p>This pages shows some simple examples, most of things they demostrate are also shown on other pages.</p>
@@ -230,9 +231,11 @@ Encoding a message using cursor-based accessors</h1>
 <h1><a class="anchor" id="autotoc_md38"></a>
 Decoding a message using normal accessors</h1>
 <div class="fragment"><div class="line">std::array&lt;char, 1024&gt; buf{};</div>
-<div class="line"><span class="keyword">auto</span> header = sbepp::make_const_view&lt;&gt;(buf.data(), buf.size());</div>
+<div class="line"><span class="keyword">auto</span> header = <a class="code hl_function" href="namespacesbepp.html#ae29503045a371b895af63f6ac6e0f3b9">sbepp::make_const_view</a>&lt;</div>
+<div class="line">    <a class="code hl_typedef" href="classsbepp_1_1schema__traits.html#a9a53b31c788e848ac09e89fa4d2bf7c0">sbepp::schema_traits&lt;market::schema&gt;::header_type</a>&gt;(</div>
+<div class="line">        buf.data(), buf.size());</div>
 <div class="line"><span class="keywordflow">if</span>(*header.templateId()</div>
-<div class="line">    != <a class="code hl_class" href="classsbepp_1_1message__traits.html">sbepp::message_traits&lt;market::schema::messages::msg&gt;::id</a>())</div>
+<div class="line">    != <a class="code hl_function" href="classsbepp_1_1message__traits.html#ac3fc3e5864d0733a719073dcc7b4996d">sbepp::message_traits&lt;market::schema::messages::msg&gt;::id</a>())</div>
 <div class="line">{</div>
 <div class="line">    std::cerr &lt;&lt; <span class="stringliteral">&quot;unknown message id: &quot;</span> &lt;&lt; *header.templateId() &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>; </div>
 <div class="line">    <span class="keywordflow">return</span>;</div>
@@ -279,9 +282,11 @@ Decoding a message using normal accessors</h1>
 <div class="line">{</div>
 <div class="line">    std::cout &lt;&lt; *entry.field() &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
 <div class="line">}</div>
-<div class="ttc" id="aclasssbepp_1_1message__traits_html"><div class="ttname"><a href="classsbepp_1_1message__traits.html">sbepp::message_traits</a></div><div class="ttdoc">Provides various traits/attributes of a &lt;message&gt; element.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:3952</div></div>
+<div class="ttc" id="aclasssbepp_1_1message__traits_html_ac3fc3e5864d0733a719073dcc7b4996d"><div class="ttname"><a href="classsbepp_1_1message__traits.html#ac3fc3e5864d0733a719073dcc7b4996d">sbepp::message_traits::id</a></div><div class="ttdeci">static constexpr message_id_t id() noexcept</div><div class="ttdoc">Returns id attribute.</div></div>
+<div class="ttc" id="aclasssbepp_1_1schema__traits_html_a9a53b31c788e848ac09e89fa4d2bf7c0"><div class="ttname"><a href="classsbepp_1_1schema__traits.html#a9a53b31c788e848ac09e89fa4d2bf7c0">sbepp::schema_traits::header_type</a></div><div class="ttdeci">HeaderComposite&lt; Byte &gt; header_type</div><div class="ttdoc">Message header composite type.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:3754</div></div>
 <div class="ttc" id="anamespacesbepp_html_a0d0a0af58987f30ee37fda64c15cc316"><div class="ttname"><a href="namespacesbepp.html#a0d0a0af58987f30ee37fda64c15cc316">sbepp::to_underlying</a></div><div class="ttdeci">constexpr std::underlying_type&lt; Enum &gt;::type to_underlying(Enum e) noexcept</div><div class="ttdoc">Converts an enumeration to its underlying type. Equivalent to C++23 std::to_underlying()</div><div class="ttdef"><b>Definition</b> sbepp.hpp:2718</div></div>
 <div class="ttc" id="anamespacesbepp_html_abd9c1efb3c96d6fa71d1156811b47fa4"><div class="ttname"><a href="namespacesbepp.html#abd9c1efb3c96d6fa71d1156811b47fa4">sbepp::size_bytes_checked</a></div><div class="ttdeci">constexpr size_bytes_checked_result size_bytes_checked(View view, std::size_t size) noexcept</div><div class="ttdoc">Calculate view size with additional safety checks.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:4611</div></div>
+<div class="ttc" id="anamespacesbepp_html_ae29503045a371b895af63f6ac6e0f3b9"><div class="ttname"><a href="namespacesbepp.html#ae29503045a371b895af63f6ac6e0f3b9">sbepp::make_const_view</a></div><div class="ttdeci">constexpr View&lt; typename std::add_const&lt; Byte &gt;::type &gt; make_const_view(Byte *ptr, const std::size_t size) noexcept</div><div class="ttdoc">Construct read-only view from memory buffer.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:4383</div></div>
 </div><!-- fragment --><hr  />
 <h1><a class="anchor" id="autotoc_md40"></a>
 Decoding a message using cursor-based accessors</h1>
@@ -327,8 +332,31 @@ Decoding a message using cursor-based accessors</h1>
 <div class="line"> </div>
 <div class="line"><span class="keyword">auto</span> d = m.data(c);</div>
 <div class="line">std::cout.write(d.data(), d.size());</div>
+<div class="ttc" id="aclasssbepp_1_1message__traits_html"><div class="ttname"><a href="classsbepp_1_1message__traits.html">sbepp::message_traits</a></div><div class="ttdoc">Provides various traits/attributes of a &lt;message&gt; element.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:3952</div></div>
 <div class="ttc" id="anamespacesbepp_html_a12bbc67580e3f4bb2a0299033f01818d"><div class="ttname"><a href="namespacesbepp.html#a12bbc67580e3f4bb2a0299033f01818d">sbepp::get_header</a></div><div class="ttdeci">constexpr auto get_header(T v) noexcept -&gt; decltype(v(detail::get_header_tag{}))</div><div class="ttdoc">Returns the header of a message/group.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:1498</div></div>
-</div><!-- fragment --> </div></div><!-- contents -->
+</div><!-- fragment --><hr  />
+<h1><a class="anchor" id="autotoc_md42"></a>
+Decoding message header</h1>
+<p>There are couple of ways to decode message header from an incoming data.</p>
+<ol type="1">
+<li><p class="startli">Using <code><a class="el" href="classsbepp_1_1schema__traits.html#a9a53b31c788e848ac09e89fa4d2bf7c0" title="Message header composite type.">sbepp::schema_traits::header_type</a></code> to get header type:</p>
+<div class="fragment"><div class="line"><span class="comment">// `make_view` works as well</span></div>
+<div class="line"><span class="keyword">auto</span> header = <a class="code hl_function" href="namespacesbepp.html#ae29503045a371b895af63f6ac6e0f3b9">sbepp::make_const_view</a>&lt;</div>
+<div class="line">    <a class="code hl_typedef" href="classsbepp_1_1schema__traits.html#a9a53b31c788e848ac09e89fa4d2bf7c0">sbepp::schema_traits&lt;market::schema&gt;::header_type</a>&gt;(</div>
+<div class="line">        buf.data(), buf.size());</div>
+</div><!-- fragment --></li>
+<li><p class="startli">Using hardcoded header type(<code>messageHeader</code> here):</p>
+<div class="fragment"><div class="line"><span class="keyword">auto</span> header = sbepp::make_const_view&lt;market::types::messageHeader&gt;(</div>
+<div class="line">    buf.data(), buf.size());</div>
+</div><!-- fragment --></li>
+<li><p class="startli">And finally, when one knows for sure what schema they're working with, it's legal to create any message view from that schema and use <code><a class="el" href="namespacesbepp.html#a12bbc67580e3f4bb2a0299033f01818d" title="Returns the header of a message/group.">sbepp::get_header()</a></code> to get the header. This works because header is the same for all messages within the schema. Of course access anything beyond the header still requires message type check.</p>
+<div class="fragment"><div class="line"><span class="comment">// works even if `buf` represents a different message from `market` schema</span></div>
+<div class="line"><span class="keyword">auto</span> m = sbepp::make_const_view&lt;market::messages::msg&gt;(</div>
+<div class="line">    buf.data(), buf.size());</div>
+<div class="line"><span class="keyword">auto</span> header = <a class="code hl_function" href="namespacesbepp.html#a12bbc67580e3f4bb2a0299033f01818d">sbepp::get_header</a>(m);</div>
+</div><!-- fragment --> </li>
+</ol>
+</div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->
 <!-- start footer part -->
