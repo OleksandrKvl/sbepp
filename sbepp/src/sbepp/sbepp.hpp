@@ -2991,8 +2991,9 @@ public:
 
     //! @brief Access the first element
     //! @pre `!empty()`
-    constexpr reference front() const noexcept
+    SBEPP_CPP14_CONSTEXPR reference front() const noexcept
     {
+        SBEPP_ASSERT(!empty());
         return *data();
     }
 
@@ -3000,14 +3001,19 @@ public:
     //! @pre `!empty()`
     SBEPP_CPP20_CONSTEXPR reference back() const noexcept
     {
+        SBEPP_ASSERT(!empty());
         return *(data() + size() - 1);
     }
 
-    //! @brief Direct access to the underlying array
-    //! @pre `!empty()`
+    /**
+     * @brief Direct access to the underlying array
+     *
+     *  The pointer is such that range `[data(), data() + size())` is always a
+     *  valid range, even if the container is empty (`data()` is not
+     *  dereferenceable in that case).
+     */
     SBEPP_CPP14_CONSTEXPR pointer data() const noexcept
     {
-        SBEPP_ASSERT(!empty());
         return data_checked();
     }
 

@@ -313,11 +313,14 @@ TEST_F(DynamicArrayRefTest, DataReturnsPointerToFirstElement)
     STATIC_ASSERT(noexcept(a.data()));
 }
 
-TEST_F(DynamicArrayRefDeathTest, DataTerminatesIfEmpty)
+TEST_F(DynamicArrayRefTest, DataReturnsPointerAfterLengthIfEmpty)
 {
+    a.clear();
     ASSERT_TRUE(a.empty());
 
-    ASSERT_DEATH({ a.data(); }, ".*");
+    ASSERT_EQ(
+        reinterpret_cast<byte_type*>(a.data()),
+        sbepp::addressof(a) + sizeof(sbe_length_type));
 }
 
 TEST_F(DynamicArrayRefTest, SubscriptReturnsReferenceToElement)
