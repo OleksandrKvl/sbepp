@@ -354,13 +354,15 @@ TYPED_TEST(
 
 TEST(SizeBytesTest, SizeBytesReturnsSizeOfAllFields)
 {
-    // use composite_11 to test with custom offsets?
     std::array<char, 256> buf{};
-    test_schema::types::composite_a<char> c{buf.data(), buf.size()};
+    composite_t c{buf.data(), buf.size()};
     const auto total_fields_size = sizeof(c.x()) + sizeof(c.y());
 
     ASSERT_EQ(sbepp::size_bytes(c), total_fields_size);
     STATIC_ASSERT(noexcept(sbepp::size_bytes(c)));
+
+    // constexpr test
+    STATIC_ASSERT(sbepp::size_bytes(composite_t{}) == total_fields_size);
 }
 
 TEST(SizeBytesTest, SizeBytesTakesCustomOffsetsIntoAccount)

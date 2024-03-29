@@ -737,7 +737,7 @@ public:
 
 {accessors}
 
-    SBEPP_CPP20_CONSTEXPR std::size_t
+    constexpr std::size_t
         operator()(::sbepp::detail::size_bytes_tag) const noexcept
     {{
         return {size};
