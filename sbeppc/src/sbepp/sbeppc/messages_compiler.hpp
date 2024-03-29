@@ -460,8 +460,8 @@ public:
     {size_bytes_impl}
 
     template<typename Visitor, typename Cursor>
-    SBEPP_CPP14_CONSTEXPR bool operator()(
-        ::sbepp::detail::visit_tag, Visitor& v, Cursor& c)
+    constexpr bool operator()(
+        ::sbepp::detail::visit_tag, Visitor& v, Cursor& c) const
     {{
         return v.template on_entry(*this, c);
     }}
@@ -626,8 +626,8 @@ public:
     {header_filler}
 
     template<typename Visitor, typename Cursor>
-    SBEPP_CPP14_CONSTEXPR bool operator()(
-        ::sbepp::detail::visit_tag, Visitor& v, Cursor& c)
+    constexpr bool operator()(
+        ::sbepp::detail::visit_tag, Visitor& v, Cursor& c) const
     {{
         return v.template on_group(*this, c, "{public_name}");
     }}
@@ -1755,11 +1755,9 @@ R"(
             // clang-format off
 R"(
     template<typename Visitor, typename Cursor>
-    SBEPP_CPP14_CONSTEXPR bool operator()(
-        ::sbepp::detail::visit_children_tag, Visitor& v, Cursor& c)
+    constexpr bool operator()(
+        ::sbepp::detail::visit_children_tag, Visitor& v, Cursor& c) const
     {{
-        (void)v;
-        (void)c;
         return {member_visitors};
     }}
 )",
@@ -1791,6 +1789,8 @@ R"(
             is_flat_level(m.members), get_last_member(m.members), header.size);
         const auto visit_children_impl = make_visit_children(m.members);
 
+        // it's not possible to make `operator()(visit_tag)` `constexpr` because
+        // C++11 doesn't allow such function to return `void`
         const auto implementation = fmt::format(
             // clang-format off
 R"(
