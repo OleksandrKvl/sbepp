@@ -631,10 +631,9 @@ public:
             // clang-format off
 R"(
     template<typename Visitor, typename Cursor>
-    SBEPP_CPP14_CONSTEXPR bool operator()(
-        ::sbepp::detail::visit_children_tag, Visitor& v, Cursor&)
+    constexpr bool operator()(
+        ::sbepp::detail::visit_children_tag, Visitor& v, Cursor&) const
     {{
-        (void)v;
         return {children_visitors};
     }}
 )",
@@ -737,15 +736,15 @@ public:
 
 {accessors}
 
-    SBEPP_CPP20_CONSTEXPR std::size_t
+    constexpr std::size_t
         operator()(::sbepp::detail::size_bytes_tag) const noexcept
     {{
         return {size};
     }}
 
     template<typename Visitor, typename Cursor>
-    SBEPP_CPP14_CONSTEXPR bool operator()(
-        ::sbepp::detail::visit_tag, Visitor& v, Cursor&)
+    constexpr bool operator()(
+        ::sbepp::detail::visit_tag, Visitor& v, Cursor&) const
     {{
         return v.template on_composite(*this, {tag}{{}});
     }}
