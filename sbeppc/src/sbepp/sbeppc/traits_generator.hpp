@@ -13,6 +13,8 @@
 #include <fmt/core.h>
 
 #include <string>
+#include <iterator>
+#include <vector>
 
 namespace sbepp::sbeppc
 {
@@ -93,7 +95,7 @@ public:
 
     std::string make_message_traits(const sbe::message& m) const
     {
-        return make_message_root_traits(m) + make_level_traits(m.members);
+        return make_level_traits(m.members) + make_message_root_traits(m);
     }
 
     std::string make_type_traits(const sbe::encoding& enc) const
@@ -107,6 +109,22 @@ public:
     }
 
 private:
+    struct group_size_bytes_info
+    {
+        std::vector<std::string> param_names;
+        std::vector<std::string> param_types;
+        bool has_data_members;
+    };
+
+    struct level_size_bytes_info
+    {
+        std::vector<std::string> param_names;
+        std::vector<std::string> param_types;
+        // does not include trailing `total_data_size` term
+        std::vector<std::string> sum_terms;
+        bool has_data_members;
+    };
+
     const sbe::message_schema* schema;
     const type_manager* types;
 
@@ -617,7 +635,254 @@ public:
             fmt::arg("deprecated_impl", make_deprecated(r.deprecated_since)));
     }
 
-    static std::string make_message_root_traits(const sbe::message& m)
+    std::string get_num_in_group_underlying_type(const sbe::group& g) const
+    {
+        const auto& header = types->get_as_or_throw<sbe::composite>(
+            g.dimension_type,
+            "{}: encoding `{}` doesn't exist or it's not a composite");
+
+        const auto t = std::get_if<sbe::type>(
+            utils::find_composite_element(header, "numInGroup"));
+        if(t)
+        {
+            return t->underlying_type;
+        }
+
+        throw_error(
+            "{}: `numInGroup` is not found or it's not a type",
+            header.location);
+    }
+
+    static bool
+        vector_contains(const std::vector<std::string>& v, const std::string& s)
+    {
+        return (std::find(std::begin(v), std::end(v), s) != std::end(v));
+    }
+
+    static std::string make_unique_param_name(
+        std::string desired_name,
+        const std::vector<std::string>& existing_names1,
+        const std::vector<std::string>& existing_names2,
+        const std::size_t level_depth)
+    {
+        // names on the same level are always unique but it's not guaranteed for
+        // names from different levels (which are concatenated to create group
+        // size parameter name). By adding `_<depth>` suffix we ensure that
+        // there will be no two identical parameter names because each level has
+        // unique suffix which is used only in case of conflicts.
+        if(vector_contains(existing_names1, desired_name)
+           || vector_contains(existing_names2, desired_name))
+        {
+            return fmt::format("{}_{}", desired_name, level_depth);
+        }
+
+        return desired_name;
+    }
+
+    void get_group_size_bytes_info_impl(
+        const sbe::group& g,
+        const std::vector<std::string>& existing_names,
+        std::vector<std::string>& path,
+        group_size_bytes_info& info) const
+    {
+        path.push_back(g.name);
+
+        info.param_names.push_back(make_unique_param_name(
+            fmt::format("{}_num_in_group", fmt::join(path, "_")),
+            existing_names,
+            info.param_names,
+            path.size() - 1));
+        info.param_types.push_back(get_num_in_group_underlying_type(g));
+
+        for(const auto& nested_group : g.members.groups)
+        {
+            get_group_size_bytes_info_impl(
+                nested_group, existing_names, path, info);
+        }
+
+        info.has_data_members |= !g.members.data.empty();
+        path.pop_back();
+    }
+
+    group_size_bytes_info get_group_size_bytes_info(
+        const sbe::group& g,
+        const std::vector<std::string>& existing_names,
+        std::vector<std::string>& path) const
+    {
+        group_size_bytes_info info{};
+        get_group_size_bytes_info_impl(g, existing_names, path, info);
+
+        return info;
+    }
+
+    static std::string
+        make_group_size_bytes_args(const group_size_bytes_info& info)
+    {
+        auto args = fmt::format("{}", fmt::join(info.param_names, ", "));
+        if(info.has_data_members)
+        {
+            if(args.empty())
+            {
+                args = "0";
+            }
+            else
+            {
+                args += ", 0";
+            }
+        }
+
+        return args;
+    }
+
+    static void append_vector(
+        std::vector<std::string>& to, std::vector<std::string> from)
+    {
+        to.insert(
+            std::end(to),
+            std::make_move_iterator(std::begin(from)),
+            std::make_move_iterator(std::end(from)));
+    }
+
+    level_size_bytes_info
+        get_level_size_bytes_info(const sbe::level_members& members) const
+    {
+        level_size_bytes_info info{};
+        std::vector<std::string> path;
+
+        for(const auto& g : members.groups)
+        {
+            auto group_info =
+                get_group_size_bytes_info(g, info.param_names, path);
+
+            info.has_data_members |= group_info.has_data_members;
+
+            info.sum_terms.push_back(fmt::format(
+                "::sbepp::group_traits<{tag}>::size_bytes({args})",
+                fmt::arg("tag", g.tag),
+                fmt::arg("args", make_group_size_bytes_args(group_info))));
+            append_vector(info.param_names, std::move(group_info.param_names));
+            append_vector(info.param_types, std::move(group_info.param_types));
+        }
+
+        for(const auto& d : members.data)
+        {
+            info.has_data_members = true;
+            info.sum_terms.push_back(
+                fmt::format("::sbepp::data_traits<{}>::size_bytes(0)", d.tag));
+        }
+
+        return info;
+    }
+
+    static std::string make_size_bytes_params(const level_size_bytes_info& info)
+    {
+        std::string params;
+        bool is_first_param{true};
+
+        for(std::size_t i = 0; i != info.param_types.size(); i++)
+        {
+            if(is_first_param)
+            {
+                is_first_param = false;
+            }
+            else
+            {
+                params += ", ";
+            }
+
+            params += fmt::format(
+                "const {} {}", info.param_types[i], info.param_names[i]);
+        }
+
+        if(info.has_data_members)
+        {
+            if(!is_first_param)
+            {
+                params += ", ";
+            }
+            params += "const ::std::size_t total_data_size";
+        }
+
+        return params;
+    }
+
+    std::string make_group_size_bytes_params(
+        const sbe::group& g, const level_size_bytes_info& info) const
+    {
+        auto params = fmt::format(
+            "const {} num_in_group", get_num_in_group_underlying_type(g));
+        const auto optional_params = make_size_bytes_params(info);
+
+        if(!optional_params.empty())
+        {
+            params += ", ";
+            params += optional_params;
+        }
+
+        return params;
+    }
+
+    std::string make_group_size_bytes(const sbe::group& g) const
+    {
+        auto info = get_level_size_bytes_info(g.members);
+
+        if(!info.sum_terms.empty())
+        {
+            // adding empty string just to have `+` prefix when it's joined
+            info.sum_terms.emplace(std::begin(info.sum_terms), "");
+        }
+
+        auto body_size = fmt::format(
+            "num_in_group * (block_length() {})",
+            fmt::join(info.sum_terms, "\n+ "));
+
+        if(info.has_data_members)
+        {
+            body_size += "\n+ total_data_size";
+        }
+
+        return fmt::format(
+            // clang-format off
+R"(static constexpr ::std::size_t size_bytes({params}) noexcept
+    {{
+        return ::sbepp::composite_traits<dimension_type_tag>::size_bytes()
+            + {body_size};
+    }}
+)",
+            // clang-format on
+            fmt::arg("params", make_group_size_bytes_params(g, info)),
+            fmt::arg("body_size", body_size));
+    }
+
+    std::string make_message_size_bytes(const sbe::message& m) const
+    {
+        auto info = get_level_size_bytes_info(m.members);
+        if(info.has_data_members)
+        {
+            info.sum_terms.emplace_back("total_data_size");
+        }
+
+        if(!info.sum_terms.empty())
+        {
+            // adding empty string just to have `+` prefix when it's joined
+            info.sum_terms.emplace(std::begin(info.sum_terms), "");
+        }
+
+        return fmt::format(
+            // clang-format off
+R"(static constexpr ::std::size_t size_bytes({params}) noexcept
+    {{
+        return ::sbepp::composite_traits<
+            ::sbepp::schema_traits<schema_tag>::header_type_tag>::size_bytes()
+        + block_length() {sum_terms};
+    }}
+)",
+            // clang-format on
+            fmt::arg("params", make_size_bytes_params(info)),
+            fmt::arg("sum_terms", fmt::join(info.sum_terms, "\n+ ")));
+    }
+
+    std::string make_message_root_traits(const sbe::message& m) const
     {
         return fmt::format(
             // clang-format off
@@ -658,6 +923,8 @@ public:
 
     {deprecated_impl}
     {value_type}
+    {schema_tag}
+    {size_bytes_impl}
 }};
 )",
             // clang-format on
@@ -671,7 +938,11 @@ public:
             fmt::arg(
                 "value_type",
                 utils::make_alias_template("value_type", m.public_type)),
-            fmt::arg("deprecated_impl", make_deprecated(m.deprecated_since)));
+            fmt::arg("deprecated_impl", make_deprecated(m.deprecated_since)),
+            fmt::arg("size_bytes_impl", make_message_size_bytes(m)),
+            fmt::arg(
+                "schema_tag",
+                utils::make_type_alias("schema_tag", schema->tag)));
     }
 
     static std::string make_field_value_type(const sbe::field& f)
@@ -771,6 +1042,8 @@ public:
         return fmt::format(
             // clang-format off
 R"(
+{level_traits}
+
 template<>
 class group_traits<{tag}>
 {{
@@ -810,9 +1083,8 @@ public:
     {dimension_type}
     {dimension_type_tag}
     {entry_type}
+    {size_bytes_impl}
 }};
-
-{level_traits}
 )",
             // clang-format on
             fmt::arg("tag", g.tag),
@@ -837,7 +1109,8 @@ public:
                 "entry_type",
                 utils::make_alias_template("entry_type", g.entry_impl_type)),
             fmt::arg("level_traits", make_level_traits(g.members)),
-            fmt::arg("deprecated_impl", make_deprecated(g.deprecated_since)));
+            fmt::arg("deprecated_impl", make_deprecated(g.deprecated_since)),
+            fmt::arg("size_bytes_impl", make_group_size_bytes(g)));
     }
 
     static std::string make_traits(const sbe::data& d)
@@ -875,6 +1148,12 @@ public:
 
     {length_type}
     {length_type_tag}
+
+    static constexpr ::std::size_t size_bytes(
+        const length_type::value_type size) noexcept
+    {{
+        return sizeof(size) + size;
+    }}
 }};
 )",
             // clang-format on

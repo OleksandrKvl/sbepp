@@ -3979,6 +3979,85 @@ public:
      */
     template<typename Byte>
     using value_type = MessageType<Byte>;
+    //! @brief Schema tag
+    using schema_tag = SchemaTag;
+
+    /**
+     * @brief Returns number of bytes required to represent the message in given
+     *  configuration
+     *
+     * @param ... parameter list depends on the message structure
+     * @return size in bytes
+     *
+     * Parameter list is built as follows:
+     * - for each `<group>` within the message, in a top-to-bottom order, there
+     * will be a parameter in form of `NumInGroupType
+     * <group_path>_num_in_group[_<n>]` where `<group_path>` is built like
+     * `<parent_group_path>_<child_group_name>`. Optional `_<n>` part is added
+     * to disambiguate names that otherwise would be the same. This parameter
+     * represents the total number of group entries (even if they are spread
+     * across multiple enclosing group entries).
+     * - if there exists a `<data>` member on any level within the message,
+     * there will be additional `std::size_t total_data_size` parameter at the
+     * end of parameter list, representing the total payload size from all
+     * the `<data>` elements within the message.
+     *
+     * Here's the example with different cases:
+     * ```xml
+     * <!-- size_bytes() -->
+     * <sbe:message>
+     *     <!-- only fields... -->
+     * </sbe:message>
+     *
+     * <!-- size_bytes(std::uint32_t group_num_in_group) -->
+     * <sbe:message>
+     *     <group name="group">
+     *         <!-- only fields... -->
+     *     </group>
+     * </sbe:message>
+     *
+     * <!-- size_bytes(
+     *         std::uint32_t group_1_num_in_group,
+     *         std::uint32_t group_2_num_in_group) -->
+     * <sbe:message>
+     *     <group name="group_1">
+     *         <!-- only fields... -->
+     *     </group>
+     *     <group name="group_2">
+     *         <!-- only fields... -->
+     *     </group>
+     * </sbe:message>
+     *
+     * <!-- size_bytes(
+     *         std::uint32_t group_1_num_in_group,
+     *         std::uint32_t group_1_group_2_num_in_group,
+     *         std::uint32_t group_3_num_in_group) -->
+     * <sbe:message>
+     *     <group name="group_1">
+     *         <group name="group_2">
+     *             <!-- only fields... -->
+     *         </group>
+     *     </group>
+     *     <group name="group_3">
+     *         <!-- only fields... -->
+     *     </group>
+     * </sbe:message>
+     *
+     * <!-- size_bytes(
+     *     std::uint32_t group_num_in_group,
+     *     std::size_t total_data_size) -->
+     * <sbe:message>
+     *     <group name="group">
+     *         <data name="data_1"/>
+     *     </group>
+     *     <data name="data_2"/>
+     * </sbe:message>
+     * ```
+     *
+     * @warning This function provides correct results only for the current
+     *  schema version.
+     */
+    static constexpr std::size_t size_bytes(...) noexcept;
 };
 #endif
 
@@ -4085,6 +4164,19 @@ public:
      */
     template<typename Byte>
     using entry_type = EntryType<Byte>;
+    /**
+     * @brief Returns number of bytes required to represent the group in given
+     *  configuration
+     *
+     * @param num_in_group number of entries in the group
+     * @param ... parameter list depends on the group structure
+     * @return size in bytes
+     *
+     * Check `message_traits::size_bytes()` to see how trailing parameter list
+     * is built.
+     */
+    static constexpr std::size_t
+        size_bytes(const NumInGroupType num_in_group, ...) noexcept;
 };
 #endif
 
@@ -4092,7 +4184,7 @@ public:
  * @brief Provides various traits/attributes of a `<data>` element.
  *
  * For example:
- * `sbepp::group_traits<message_tag::data_name>::since_version();`
+ * `sbepp::data_traits<message_tag::data_name>::since_version();`
  *
  * @tparam T data tag
  */
@@ -4126,6 +4218,14 @@ public:
     using length_type = LengthType;
     //! @brief `length_type` tag
     using length_type_tag = LengthTypeTag;
+    /**
+     * @brief Returns number of bytes required to represent `<data>` in memory
+     *
+     * @param size payload size
+     * @return total size in bytes (including `<data>` header)
+     */
+    static constexpr std::size_t
+        size_bytes(const length_type::value_type size) noexcept;
 };
 #endif
 /** @} */

@@ -150,4 +150,106 @@
             <field name="field_3" id="3" type="uint32"/>
         </group>
     </sbe:message>
+
+    <!-- size_bytes tests -->
+    <sbe:message name="msg_7" id="7">
+    </sbe:message>
+
+    <sbe:message name="msg_8" id="8">
+        <field name="field" id="1" type="uint32"/>
+    </sbe:message>
+
+    <sbe:message name="msg_9" id="9">
+        <data name="data_1" id="1" type="varDataEncoding"/>
+        <data name="data_2" id="2" type="varDataEncoding"/>
+    </sbe:message>
+
+    <sbe:message name="msg_10" id="10">
+        <field name="field" id="1" type="uint32"/>
+
+        <group name="group_1" id="2">
+            <field name="field" id="3" type="uint32"/>
+        </group>
+        <group name="group_2" id="4"/>
+    </sbe:message>
+
+    <sbe:message name="msg_11" id="11">
+        <field name="field" id="1" type="uint32"/>
+
+        <group name="group" id="2">
+            <field name="field" id="3" type="uint32"/>
+        </group>
+
+        <data name="data" id="4" type="varDataEncoding"/>
+    </sbe:message>
+
+    <sbe:message name="msg_12" id="12">
+        <field name="field" id="1" type="uint32"/>
+
+        <group name="group_1" id="2">
+            <field name="field" id="3" type="uint32"/>
+        </group>
+        <group name="group_2" id="4">
+            <field name="field" id="5" type="uint32"/>
+        </group>
+    </sbe:message>
+
+    <sbe:message name="msg_13" id="13">
+        <field name="field" id="1" type="uint32"/>
+
+        <group name="group_1" id="2">
+            <field name="field" id="3" type="uint32"/>
+
+            <group name="group_2" id="4">
+                <field name="field" id="5" type="uint32"/>
+            </group>
+        </group>
+    </sbe:message>
+
+    <sbe:message name="msg_14" id="14">
+        <field name="field" id="1" type="uint32"/>
+
+        <group name="group_1" id="2">
+            <field name="field" id="3" type="uint32"/>
+
+            <group name="group_2" id="4">
+                <field name="field" id="5" type="uint32"/>
+                <data name="data" id="6" type="varDataEncoding"/>
+            </group>
+        </group>
+    </sbe:message>
+
+    <sbe:message name="msg_15" id="15">
+        <field name="field" id="1" type="uint32"/>
+
+        <group name="group_1" id="2">
+            <field name="field" id="3" type="uint32"/>
+
+            <group name="group_2" id="4">
+                <field name="field" id="5" type="uint32"/>
+                <data name="data" id="6" type="varDataEncoding"/>
+            </group>
+
+            <data name="data" id="7" type="varDataEncoding"/>
+        </group>
+
+        <data name="data" id="7" type="varDataEncoding"/>
+    </sbe:message>
+
+    <sbe:message name="msg_16" id="16">
+        <group name="group_1" id="2">
+            <group name="group_2" id="4"/>
+        </group>
+
+        <group name="group_1_group_2" id="2"/>
+
+        <group name="group_3" id="2">
+            <group name="group_1_group_2" id="2"/>
+
+            <group name="group_1" id="2">
+                <group name="group_2" id="4"/>
+                <data name="data" id="7" type="varDataEncoding"/>
+            </group>
+        </group>
+    </sbe:message>
 </sbe:messageSchema>
