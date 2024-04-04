@@ -36,7 +36,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">sbepp<span id="projectnumber">&#160;1.2.0</span>
+   <div id="projectname">sbepp<span id="projectnumber">&#160;1.3.0</span>
    </div>
   </td>
  </tr>
@@ -117,6 +117,10 @@ Public Types</h2></td></tr>
 <tr class="memitem:adc2fc3fc714037828f2bd6d95c6b8923"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="#adc2fc3fc714037828f2bd6d95c6b8923">value_type</a> = MessageType&lt;Byte&gt;</td></tr>
 <tr class="memdesc:adc2fc3fc714037828f2bd6d95c6b8923"><td class="mdescLeft">&#160;</td><td class="mdescRight">Representation type.  <br /></td></tr>
 <tr class="separator:adc2fc3fc714037828f2bd6d95c6b8923"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a823e30f08d988fb6ac0b3e9730d8aa93" id="r_a823e30f08d988fb6ac0b3e9730d8aa93"><td class="memItemLeft" align="right" valign="top"><a id="a823e30f08d988fb6ac0b3e9730d8aa93" name="a823e30f08d988fb6ac0b3e9730d8aa93"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>schema_tag</b> = SchemaTag</td></tr>
+<tr class="memdesc:a823e30f08d988fb6ac0b3e9730d8aa93"><td class="mdescLeft">&#160;</td><td class="mdescRight">Schema tag. <br /></td></tr>
+<tr class="separator:a823e30f08d988fb6ac0b3e9730d8aa93"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
@@ -148,6 +152,9 @@ static constexpr <a class="el" href="namespacesbepp.html#a97309329a3ef93149d698a
 static constexpr <a class="el" href="namespacesbepp.html#a97309329a3ef93149d698a0c5a9da6ba">version_t</a>&#160;</td><td class="memItemRight" valign="bottom"><b>deprecated</b> () noexcept</td></tr>
 <tr class="memdesc:ad833e335b4743321663e7048411b5523"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns <code>deprecated</code> attribute. Available only if provided in schema. <br /></td></tr>
 <tr class="separator:ad833e335b4743321663e7048411b5523"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a211cee40215d5b7e153047320536cd6c" id="r_a211cee40215d5b7e153047320536cd6c"><td class="memItemLeft" align="right" valign="top">static constexpr std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a211cee40215d5b7e153047320536cd6c">size_bytes</a> (...) noexcept</td></tr>
+<tr class="memdesc:a211cee40215d5b7e153047320536cd6c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns number of bytes required to represent the message in given configuration.  <br /></td></tr>
+<tr class="separator:a211cee40215d5b7e153047320536cd6c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><div class="compoundTemplParams">template&lt;typename T&gt;<br />
@@ -183,6 +190,96 @@ template&lt;typename Byte &gt; </div>
   </table>
   </dd>
 </dl>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
+<a id="a211cee40215d5b7e153047320536cd6c" name="a211cee40215d5b7e153047320536cd6c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a211cee40215d5b7e153047320536cd6c">&#9670;&#160;</a></span>size_bytes()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static constexpr std::size_t <a class="el" href="classsbepp_1_1message__traits.html">sbepp::message_traits</a>&lt; T &gt;::size_bytes </td>
+          <td>(</td>
+          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>...</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">constexpr</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns number of bytes required to represent the message in given configuration. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">...</td><td>parameter list depends on the message structure </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>size in bytes</dd></dl>
+<p>Parameter list is built as follows:</p><ul>
+<li>for each <code>&lt;group&gt;</code> within the message, in a top-to-bottom order, there will be a parameter in form of <code>NumInGroupType &lt;group_path&gt;_num_in_group[_&lt;n&gt;]</code> where <code>&lt;group_path&gt;</code> is built like <code>&lt;parent_group_path&gt;_&lt;child_group_name&gt;</code>. Optional <code>_&lt;n&gt;</code> part is added to disambiguate names that otherwise would be the same. This parameter represents the total number of group entries (even if they are spread across multiple enclosing group entries).</li>
+<li>if there exists a <code>&lt;data&gt;</code> member on any level within the message, there will be additional <code>std::size_t total_data_size</code> parameter at the end of parameter list, representing the total payload size from all the <code>&lt;data&gt;</code> elements within the message.</li>
+</ul>
+<p>Here's the example with different cases: </p><div class="fragment"><div class="line"><span class="comment">&lt;!-- size_bytes() --&gt;</span></div>
+<div class="line">&lt;<span class="keywordtype">sbe:message</span>&gt;</div>
+<div class="line">    <span class="comment">&lt;!-- only fields... --&gt;</span></div>
+<div class="line">&lt;/<span class="keywordtype">sbe:message</span>&gt;</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">&lt;!-- size_bytes(std::uint32_t group_num_in_group) --&gt;</span></div>
+<div class="line">&lt;<span class="keywordtype">sbe:message</span>&gt;</div>
+<div class="line">    &lt;<span class="keywordtype">group</span> <span class="keyword">name</span>=<span class="stringliteral">&quot;group&quot;</span>&gt;</div>
+<div class="line">        <span class="comment">&lt;!-- only fields... --&gt;</span></div>
+<div class="line">    &lt;/<span class="keywordtype">group</span>&gt;</div>
+<div class="line">&lt;/<span class="keywordtype">sbe:message</span>&gt;</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">&lt;!-- size_bytes(</span></div>
+<div class="line"><span class="comment">        std::uint32_t group_1_num_in_group,</span></div>
+<div class="line"><span class="comment">        std::uint32_t group_2_num_in_group) --&gt;</span></div>
+<div class="line">&lt;<span class="keywordtype">sbe:message</span>&gt;</div>
+<div class="line">    &lt;<span class="keywordtype">group</span> <span class="keyword">name</span>=<span class="stringliteral">&quot;group_1&quot;</span>&gt;</div>
+<div class="line">        <span class="comment">&lt;!-- only fields... --&gt;</span></div>
+<div class="line">    &lt;/<span class="keywordtype">group</span>&gt;</div>
+<div class="line">    &lt;<span class="keywordtype">group</span> <span class="keyword">name</span>=<span class="stringliteral">&quot;group_2&quot;</span>&gt;</div>
+<div class="line">        <span class="comment">&lt;!-- only fields... --&gt;</span></div>
+<div class="line">    &lt;/<span class="keywordtype">group</span>&gt;</div>
+<div class="line">&lt;/<span class="keywordtype">sbe:message</span>&gt;</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">&lt;!-- size_bytes(</span></div>
+<div class="line"><span class="comment">        std::uint32_t group_1_num_in_group,</span></div>
+<div class="line"><span class="comment">        std::uint32_t group_1_group_2_num_in_group,</span></div>
+<div class="line"><span class="comment">        std::uint32_t group_3_num_in_group) --&gt;</span></div>
+<div class="line">&lt;<span class="keywordtype">sbe:message</span>&gt;</div>
+<div class="line">    &lt;<span class="keywordtype">group</span> <span class="keyword">name</span>=<span class="stringliteral">&quot;group_1&quot;</span>&gt;</div>
+<div class="line">        &lt;<span class="keywordtype">group</span> <span class="keyword">name</span>=<span class="stringliteral">&quot;group_2&quot;</span>&gt;</div>
+<div class="line">            <span class="comment">&lt;!-- only fields... --&gt;</span></div>
+<div class="line">        &lt;/<span class="keywordtype">group</span>&gt;</div>
+<div class="line">    &lt;/<span class="keywordtype">group</span>&gt;</div>
+<div class="line">    &lt;<span class="keywordtype">group</span> <span class="keyword">name</span>=<span class="stringliteral">&quot;group_3&quot;</span>&gt;</div>
+<div class="line">        <span class="comment">&lt;!-- only fields... --&gt;</span></div>
+<div class="line">    &lt;/<span class="keywordtype">group</span>&gt;</div>
+<div class="line">&lt;/<span class="keywordtype">sbe:message</span>&gt;</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">&lt;!-- size_bytes(</span></div>
+<div class="line"><span class="comment">    std::uint32_t group_num_in_group,</span></div>
+<div class="line"><span class="comment">    std::size_t total_data_size) --&gt;</span></div>
+<div class="line">&lt;<span class="keywordtype">sbe:message</span>&gt;</div>
+<div class="line">    &lt;<span class="keywordtype">group</span> <span class="keyword">name</span>=<span class="stringliteral">&quot;group&quot;</span>&gt;</div>
+<div class="line">        &lt;<span class="keywordtype">data</span> <span class="keyword">name</span>=<span class="stringliteral">&quot;data_1&quot;</span>/&gt;</div>
+<div class="line">    &lt;/<span class="keywordtype">group</span>&gt;</div>
+<div class="line">    &lt;<span class="keywordtype">data</span> <span class="keyword">name</span>=<span class="stringliteral">&quot;data_2&quot;</span>/&gt;</div>
+<div class="line">&lt;/<span class="keywordtype">sbe:message</span>&gt;</div>
+</div><!-- fragment --><dl class="section warning"><dt>Warning</dt><dd>This function provides correct results only for the current schema version. </dd></dl>
 
 </div>
 </div>
