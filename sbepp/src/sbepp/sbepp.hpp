@@ -4054,6 +4054,8 @@ public:
      * </sbe:message>
      * ```
      *
+     * For usage example, see @ref example-size-bytes.
+     *
      * @warning This function provides correct results only for the current
      *  schema version.
      */
