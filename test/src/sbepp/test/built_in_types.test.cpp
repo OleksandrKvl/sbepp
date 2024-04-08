@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2023, Oleksandr Koval
 
+#include <sbepp/test/utils.hpp>
 #include <sbepp/sbepp.hpp>
 
 #include <gtest/gtest.h>
@@ -125,6 +126,22 @@ using FloatingPointOptionalBuiltInTypes = ::testing::Types<
     type_pair<sbepp::float_opt_t, float>,
     type_pair<sbepp::double_opt_t, double>>;
 
+using AllBuiltInTypes = ::testing::Types<
+    type_pair<sbepp::char_t, char>,
+    type_pair<sbepp::int8_t, std::int8_t>,
+    type_pair<sbepp::int16_t, std::int16_t>,
+    type_pair<sbepp::int32_t, std::int32_t>,
+    type_pair<sbepp::int64_t, std::int64_t>,
+    type_pair<sbepp::float_t, float>,
+    type_pair<sbepp::double_t, double>,
+    type_pair<sbepp::char_opt_t, char>,
+    type_pair<sbepp::int8_opt_t, std::int8_t>,
+    type_pair<sbepp::int16_opt_t, std::int16_t>,
+    type_pair<sbepp::int32_opt_t, std::int32_t>,
+    type_pair<sbepp::int64_opt_t, std::int64_t>,
+    type_pair<sbepp::float_opt_t, float>,
+    type_pair<sbepp::double_opt_t, double>>;
+
 template<typename T>
 using RequiredBuiltInTypesTest = type_storage<T>;
 
@@ -134,10 +151,14 @@ using OptionalBuiltInTypesTest = type_storage<T>;
 template<typename T>
 using FloatingPointOptionalBuiltInTypesTest = type_storage<T>;
 
+template<typename T>
+using AllBuiltInTypesTest = type_storage<T>;
+
 TYPED_TEST_SUITE(RequiredBuiltInTypesTest, RequiredBuiltInTypes);
 TYPED_TEST_SUITE(OptionalBuiltInTypesTest, OptionalBuiltInTypes);
 TYPED_TEST_SUITE(
     FloatingPointOptionalBuiltInTypesTest, FloatingPointOptionalBuiltInTypes);
+TYPED_TEST_SUITE(AllBuiltInTypesTest, AllBuiltInTypes);
 
 TYPED_TEST(RequiredBuiltInTypesTest, ProvidesCorrectMinMaxValues)
 {
@@ -194,5 +215,12 @@ TYPED_TEST(
         sbepp::type_traits<built_in_t>::max_value(),
         built_in_limits<underlying_t>::max());
     ASSERT_TRUE(std::isnan(sbepp::type_traits<built_in_t>::null_value()));
+}
+
+TYPED_TEST(AllBuiltInTypesTest, ValueTypeSameAsTagType)
+{
+    using built_in_t = typename TestFixture::type_pair::built_in_t;
+
+    IS_SAME_TYPE(built_in_t, sbepp::traits_tag_t<built_in_t>);
 }
 } // namespace

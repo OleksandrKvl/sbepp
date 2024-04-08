@@ -146,12 +146,14 @@ private:
             return fmt::format(
                 // clang-format off
 R"(
-using {type_name} = ::sbepp::detail::static_array_ref<const char, {element_type}, {length}>;
+using {type_name} = ::sbepp::detail::static_array_ref<
+    const char, {element_type}, {length}, {tag}>;
 )",
                 // clang-format on
                 fmt::arg("type_name", t.impl_name),
                 fmt::arg("element_type", t.underlying_type),
-                fmt::arg("length", t.length));
+                fmt::arg("length", t.length),
+                fmt::arg("tag", t.tag));
         }
         else
         {
@@ -169,12 +171,13 @@ using {type_name} = ::sbepp::detail::static_array_ref<const char, {element_type}
 R"(
 template<typename Byte>
 using {type_name} = ::sbepp::detail::static_array_ref<
-    Byte, {element_type}, {length}>;
+    Byte, {element_type}, {length}, {tag}>;
 )",
             // clang-format on
             fmt::arg("type_name", t.impl_name),
             fmt::arg("element_type", t.underlying_type),
-            fmt::arg("length", t.length));
+            fmt::arg("length", t.length),
+            fmt::arg("tag", t.tag));
     }
 
     static std::string make_required_type(const sbe::type& t)

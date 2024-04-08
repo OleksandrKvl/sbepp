@@ -25,6 +25,7 @@
 #    include <traits_test_schema/types/composite_7.hpp>
 #    include <traits_test_schema/types/composite_8.hpp>
 #    include <traits_test_schema/types/str128.hpp>
+#    include <traits_test_schema/types/str_const.hpp>
 #    include <traits_test_schema/types/uint32_req.hpp>
 #    include <traits_test_schema/types/uint32_opt.hpp>
 #    include <traits_test_schema/types/uint32_const.hpp>
@@ -1078,6 +1079,43 @@ TEST(MessageTraitsTest, SizeBytesEqualToSbeppSizeBytes)
     }
 
     ASSERT_EQ(predicted_size, sbepp::size_bytes(m));
+}
+
+using TemplatedValueTypeTags = ::testing::Types<
+    traits_test_schema::schema::messages::msg_1,
+    traits_test_schema::schema::messages::msg_4::group_1,
+    traits_test_schema::schema::types::messageHeader,
+    traits_test_schema::schema::types::str128>;
+
+using SimpleValueTypeTags = ::testing::Types<
+    traits_test_schema::schema::types::enum_1,
+    traits_test_schema::schema::types::set_1,
+    traits_test_schema::schema::types::str_const,
+    traits_test_schema::schema::types::uint32_opt>;
+
+template<typename T>
+using TemplatedValueTypeTraitsTagTest = TraitsContainer<T>;
+template<typename T>
+using SimpleValueTypeTraitsTagTest = TraitsContainer<T>;
+
+TYPED_TEST_SUITE(TemplatedValueTypeTraitsTagTest, TemplatedValueTypeTags);
+TYPED_TEST_SUITE(SimpleValueTypeTraitsTagTest, SimpleValueTypeTags);
+
+TYPED_TEST(TemplatedValueTypeTraitsTagTest, ProvidesCorrectTraitsTag)
+{
+    using tag = typename TestFixture::tag;
+    using representation_type =
+        typename TestFixture::traits::template value_type<char>;
+
+    IS_SAME_TYPE(sbepp::traits_tag_t<representation_type>, tag);
+}
+
+TYPED_TEST(SimpleValueTypeTraitsTagTest, ProvidesCorrectTraitsTag)
+{
+    using tag = typename TestFixture::tag;
+    using representation_type = typename TestFixture::traits::value_type;
+
+    IS_SAME_TYPE(sbepp::traits_tag_t<representation_type>, tag);
 }
 
 namespace constexpr_tests
