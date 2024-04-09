@@ -126,7 +126,7 @@ struct sbepp::traits_tag&lt; ValueType &gt;</div><p>Maps representation type to 
   </table>
   </dd>
 </dl>
-<p>Can be used to avoid typing both representation and tag types explicitly in code. Available for messages, groups and all schema types. Not available for <code>&lt;data&gt;</code> members.</p>
+<p>Can be used to avoid typing both representation and tag types explicitly in code. Available for messages, groups and all schema types except numeric constants. Not available for <code>&lt;data&gt;</code> members.</p>
 <p>Example: </p><div class="fragment"><div class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> Message&gt;</div>
 <div class="line"><span class="keywordtype">void</span> send_message(Message m){</div>
 <div class="line">    <span class="keyword">constexpr</span> <span class="keyword">auto</span> msg_name = <a class="code hl_class" href="classsbepp_1_1message__traits.html">sbepp::message_traits</a>&lt;</div>
