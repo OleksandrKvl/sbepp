@@ -749,8 +749,8 @@ public:
             {
                 params += ", ";
             }
-            params +=
-                fmt::format("const {} {}", param_types[i], param_names[i]);
+            params += fmt::format(
+                "\n        const {} {}", param_types[i], param_names[i]);
         }
 
         return params;
