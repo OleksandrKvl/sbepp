@@ -4254,6 +4254,8 @@ public:
  *     send_data(sbepp::addressof(m), sbepp::size_bytes(m));
  * }
  * ```
+ *
+ * @see `sbepp::traits_tag_t`
  */
 template<typename ValueType>
 struct traits_tag;

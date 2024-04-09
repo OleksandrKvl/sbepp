@@ -83,3 +83,5 @@ auto null_value = sbepp::type_traits<schema_name::schema::types::optional>::null
 ```
 
 For the list of available traits see @ref traits-list.
+
+@see `sbepp::traits_tag`
