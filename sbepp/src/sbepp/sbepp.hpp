@@ -4249,7 +4249,7 @@ public:
  * template<typename Message>
  * void send_message(Message m){
  *     constexpr auto msg_name = sbepp::message_traits<
- *         sbepp::traits_tag_t<msg_t>>::name();
+ *         sbepp::traits_tag_t<Message>>::name();
  *     log("sending `{}` message", msg_name);
  *     send_data(sbepp::addressof(m), sbepp::size_bytes(m));
  * }
