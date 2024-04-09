@@ -250,6 +250,8 @@ public:
     {deprecated_impl}
     {value_type}
 }};
+
+{traits_tag}
 )",
             // clang-format on
             fmt::arg("tag", t.tag),
@@ -267,7 +269,8 @@ public:
             fmt::arg("value_type", make_value_type(t)),
             fmt::arg("min_max_null_values", make_min_max_null_values(t)),
             fmt::arg("character_encoding", t.character_encoding.value_or("")),
-            fmt::arg("deprecated_impl", make_deprecated(t.deprecated_since)));
+            fmt::arg("deprecated_impl", make_deprecated(t.deprecated_since)),
+            fmt::arg("traits_tag", make_traits_tag(t)));
     }
 
     static std::string make_enum_traits(const sbe::enumeration& e)
@@ -300,6 +303,8 @@ public:
     {deprecated_impl}
     {value_type}
 }};
+
+{traits_tag}
 )",
             // clang-format on
             fmt::arg("tag", e.tag),
@@ -314,7 +319,8 @@ public:
             fmt::arg(
                 "value_type",
                 utils::make_type_alias("value_type", e.public_type)),
-            fmt::arg("deprecated_impl", make_deprecated(e.deprecated_since)));
+            fmt::arg("deprecated_impl", make_deprecated(e.deprecated_since)),
+            fmt::arg("traits_tag", make_traits_tag(e.public_type, e.tag)));
     }
 
     static std::string make_enum_value_traits(const sbe::enumeration& e)
@@ -401,6 +407,8 @@ public:
     {deprecated_impl}
     {value_type}
 }};
+
+{traits_tag}
 )",
             // clang-format on
             fmt::arg("tag", s.tag),
@@ -415,7 +423,8 @@ public:
             fmt::arg(
                 "value_type",
                 utils::make_type_alias("value_type", s.public_type)),
-            fmt::arg("deprecated_impl", make_deprecated(s.deprecated_since)));
+            fmt::arg("deprecated_impl", make_deprecated(s.deprecated_since)),
+            fmt::arg("traits_tag", make_traits_tag(s.public_type, s.tag)));
     }
 
     static std::string make_set_choice_traits(const sbe::set& s)
@@ -511,6 +520,8 @@ public:
         return {size};
     }}
 }};
+
+{traits_tag}
 )",
             // clang-format on
             fmt::arg("tag", c.tag),
@@ -524,7 +535,9 @@ public:
                 "value_type",
                 utils::make_alias_template("value_type", c.public_type)),
             fmt::arg("size", c.size),
-            fmt::arg("deprecated_impl", make_deprecated(c.deprecated_since)));
+            fmt::arg("deprecated_impl", make_deprecated(c.deprecated_since)),
+            fmt::arg(
+                "traits_tag", make_templated_traits_tag(c.public_type, c.tag)));
     }
 
     std::string make_traits(const sbe::composite& c) const
@@ -914,6 +927,51 @@ R"(static constexpr ::std::size_t size_bytes({params}) noexcept
             fmt::arg("sum_terms", fmt::join(sum_terms, "\n+ ")));
     }
 
+    static std::string make_traits_tag(const sbe::type& t)
+    {
+        // `traits_tag` specialization for array types exists in sbepp.hpp. For
+        // numeric constants we don't generate this mapping because they are
+        // represented using raw types
+        if(!t.is_template && (t.presence != field_presence::constant))
+        {
+            return make_traits_tag(t.public_type, t.tag);
+        }
+
+        return "";
+    }
+
+    static std::string make_templated_traits_tag(
+        const std::string_view type, const std::string_view tag)
+    {
+        return fmt::format(
+            // clang-format off
+R"(template<typename Byte>
+struct traits_tag<{type}<Byte>>
+{{
+    using type = {tag};
+}};
+)",
+            // clang-format on
+            fmt::arg("type", type),
+            fmt::arg("tag", tag));
+    }
+
+    static std::string
+        make_traits_tag(const std::string_view type, const std::string_view tag)
+    {
+        return fmt::format(
+            // clang-format off
+R"(template<>
+struct traits_tag<{type}>
+{{
+    using type = {tag};
+}};
+)",
+            // clang-format on
+            fmt::arg("type", type),
+            fmt::arg("tag", tag));
+    }
+
     std::string make_message_root_traits(const sbe::message& m) const
     {
         return fmt::format(
@@ -958,6 +1016,8 @@ public:
     {schema_tag}
     {size_bytes_impl}
 }};
+
+{traits_tag}
 )",
             // clang-format on
             fmt::arg("tag", m.tag),
@@ -974,7 +1034,9 @@ public:
             fmt::arg("size_bytes_impl", make_message_size_bytes(m)),
             fmt::arg(
                 "schema_tag",
-                utils::make_type_alias("schema_tag", schema->tag)));
+                utils::make_type_alias("schema_tag", schema->tag)),
+            fmt::arg(
+                "traits_tag", make_templated_traits_tag(m.public_type, m.tag)));
     }
 
     static std::string make_field_value_type(const sbe::field& f)
@@ -1117,6 +1179,8 @@ public:
     {entry_type}
     {size_bytes_impl}
 }};
+
+{traits_tag}
 )",
             // clang-format on
             fmt::arg("tag", g.tag),
@@ -1142,7 +1206,9 @@ public:
                 utils::make_alias_template("entry_type", g.entry_impl_type)),
             fmt::arg("level_traits", make_level_traits(g.members)),
             fmt::arg("deprecated_impl", make_deprecated(g.deprecated_since)),
-            fmt::arg("size_bytes_impl", make_group_size_bytes(g)));
+            fmt::arg("size_bytes_impl", make_group_size_bytes(g)),
+            fmt::arg(
+                "traits_tag", make_templated_traits_tag(g.impl_type, g.tag)));
     }
 
     static std::string make_traits(const sbe::data& d)

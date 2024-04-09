@@ -2803,7 +2803,8 @@ using apply_cv_qualifiers_t = typename copy_cv_qualifiers<From, To>::type;
 //! @tparam Byte byte type
 //! @tparam Value array element type from schema
 //! @tparam N array length
-template<typename Byte, typename Value, std::size_t N>
+//! @tparam Tag type tag
+template<typename Byte, typename Value, std::size_t N, typename Tag>
 class static_array_ref : public detail::byte_range<Byte>
 {
 public:
@@ -2824,6 +2825,8 @@ public:
     using iterator = pointer;
     //! @brief reverse iterator type
     using reverse_iterator = std::reverse_iterator<iterator>;
+    //! @brief type tag
+    using tag = Tag;
 
     using detail::byte_range<Byte>::byte_range;
     using detail::byte_range<Byte>::operator();
@@ -2909,20 +2912,20 @@ public:
     }
 
     /**
-     * @brief Returns `static_array_ref<Byte, Byte, N>`.
+     * @brief Returns `static_array_ref<Byte, Byte, N, Tag>`.
      *
      * Useful in constexpr context to modify an array which has different `Byte`
      * and `Value` types. Example:
      * ```cpp
-     * static_array_ref<std::byte, char, 1> a1;
+     * static_array_ref<std::byte, char, 1, some_tag> a1;
      * a1[0] = 'a';    // error: cannot convert `char` to `std::byte`
      * a1.raw()[0] = std::byte{'a'};   // OK
      * ```
      */
-    constexpr static_array_ref<Byte, detail::remove_cv_t<Byte>, N>
+    constexpr static_array_ref<Byte, detail::remove_cv_t<Byte>, N, Tag>
         raw() const noexcept
     {
-        return static_array_ref<Byte, detail::remove_cv_t<Byte>, N>{
+        return static_array_ref<Byte, detail::remove_cv_t<Byte>, N, Tag>{
             (*this)(detail::addressof_tag{}), (*this)(detail::end_ptr_tag{})};
     }
 };
@@ -4232,153 +4235,209 @@ public:
 #endif
 /** @} */
 
+/**
+ * @brief Maps representation type to its tag.
+ *
+ * @tparam ValueType representation type
+ *
+ * Can be used to avoid typing both representation and tag types explicitly in
+ * code. Available for messages, groups and all schema types except numeric
+ * constants. Not available for `<data>` members.
+ *
+ * Example:
+ * ```cpp
+ * template<typename Message>
+ * void send_message(Message m){
+ *     constexpr auto msg_name = sbepp::message_traits<
+ *         sbepp::traits_tag_t<Message>>::name();
+ *     log("sending `{}` message", msg_name);
+ *     send_data(sbepp::addressof(m), sbepp::size_bytes(m));
+ * }
+ * ```
+ *
+ * @see `sbepp::traits_tag_t`
+ */
+template<typename ValueType>
+struct traits_tag;
+
+#ifdef SBEPP_DOXYGEN
+template<typename ValueType>
+struct traits_tag
+{
+    //! @brief Tag to access `ValueType`'s traits
+    using type = Tag;
+};
+#endif
+
+//! @brief Shorthand for `sbepp::traits_tag<T>::type`
+template<typename ValueType>
+using traits_tag_t = typename traits_tag<ValueType>::type;
+
+template<typename Byte, typename Value, std::size_t N, typename Tag>
+struct traits_tag<detail::static_array_ref<Byte, Value, N, Tag>>
+{
+    using type = Tag;
+};
+
 // NOLINTNEXTLINE: macro is required here
-#define SBEPP_BUILT_IN_IMPL(NAME, TYPE, MIN, MAX, NULL)                   \
-    /** @brief Built-in `NAME` required type */                           \
-    /** Also works as a tag for its traits */                             \
-    class NAME##_t : public detail::required_base<TYPE, NAME##_t>         \
-    {                                                                     \
-    public:                                                               \
-        using detail::required_base<TYPE, NAME##_t>::required_base;       \
-                                                                          \
-        /** @brief Returns `minValue` attribute */                        \
-        static constexpr value_type min_value() noexcept                  \
-        {                                                                 \
-            return {MIN};                                                 \
-        }                                                                 \
-                                                                          \
-        /** @brief Returns `maxValue` attribute */                        \
-        static constexpr value_type max_value() noexcept                  \
-        {                                                                 \
-            return {MAX};                                                 \
-        }                                                                 \
-    };                                                                    \
-                                                                          \
-    /** @brief Built-in `NAME` optional type */                           \
-    /** Also works as a tag for its traits */                             \
-    class NAME##_opt_t : public detail::optional_base<TYPE, NAME##_opt_t> \
-    {                                                                     \
-    public:                                                               \
-        using detail::optional_base<TYPE, NAME##_opt_t>::optional_base;   \
-                                                                          \
-        /** @brief Returns `minValue` attribute */                        \
-        static constexpr value_type min_value() noexcept                  \
-        {                                                                 \
-            return {MIN};                                                 \
-        }                                                                 \
-                                                                          \
-        /** @brief Returns `maxValue` attribute */                        \
-        static constexpr value_type max_value() noexcept                  \
-        {                                                                 \
-            return {MAX};                                                 \
-        }                                                                 \
-                                                                          \
-        /** @brief Returns `nullValue` attribute */                       \
-        static constexpr value_type null_value() noexcept                 \
-        {                                                                 \
-            return {NULL};                                                \
-        }                                                                 \
-    };                                                                    \
-                                                                          \
-    template<>                                                            \
-    class type_traits<NAME##_t>                                           \
-    {                                                                     \
-    public:                                                               \
-        static constexpr const char* name() noexcept                      \
-        {                                                                 \
-            return #NAME;                                                 \
-        }                                                                 \
-                                                                          \
-        static constexpr const char* description() noexcept               \
-        {                                                                 \
-            return "";                                                    \
-        }                                                                 \
-                                                                          \
-        static constexpr field_presence presence() noexcept               \
-        {                                                                 \
-            return field_presence::required;                              \
-        }                                                                 \
-                                                                          \
-        static constexpr TYPE min_value() noexcept                        \
-        {                                                                 \
-            return NAME##_t::min_value();                                 \
-        }                                                                 \
-                                                                          \
-        static constexpr TYPE max_value() noexcept                        \
-        {                                                                 \
-            return NAME##_t::max_value();                                 \
-        }                                                                 \
-                                                                          \
-        static constexpr length_t length() noexcept                       \
-        {                                                                 \
-            return 1;                                                     \
-        }                                                                 \
-                                                                          \
-        static constexpr const char* semantic_type() noexcept             \
-        {                                                                 \
-            return "";                                                    \
-        }                                                                 \
-                                                                          \
-        static constexpr version_t since_version() noexcept               \
-        {                                                                 \
-            return 0;                                                     \
-        }                                                                 \
-                                                                          \
-        using value_type = NAME##_t;                                      \
-        using primitive_type = value_type::value_type;                    \
-    };                                                                    \
-                                                                          \
-    template<>                                                            \
-    class type_traits<NAME##_opt_t>                                       \
-    {                                                                     \
-    public:                                                               \
-        static constexpr const char* name() noexcept                      \
-        {                                                                 \
-            return #NAME;                                                 \
-        }                                                                 \
-                                                                          \
-        static constexpr const char* description() noexcept               \
-        {                                                                 \
-            return "";                                                    \
-        }                                                                 \
-                                                                          \
-        static constexpr field_presence presence() noexcept               \
-        {                                                                 \
-            return field_presence::optional;                              \
-        }                                                                 \
-                                                                          \
-        static constexpr TYPE min_value() noexcept                        \
-        {                                                                 \
-            return NAME##_opt_t::min_value();                             \
-        }                                                                 \
-                                                                          \
-        static constexpr TYPE max_value() noexcept                        \
-        {                                                                 \
-            return NAME##_opt_t::max_value();                             \
-        }                                                                 \
-                                                                          \
-        static constexpr TYPE null_value() noexcept                       \
-        {                                                                 \
-            return NAME##_opt_t::null_value();                            \
-        }                                                                 \
-                                                                          \
-        static constexpr length_t length() noexcept                       \
-        {                                                                 \
-            return 1;                                                     \
-        }                                                                 \
-                                                                          \
-        static constexpr const char* semantic_type() noexcept             \
-        {                                                                 \
-            return "";                                                    \
-        }                                                                 \
-                                                                          \
-        static constexpr version_t since_version() noexcept               \
-        {                                                                 \
-            return 0;                                                     \
-        }                                                                 \
-                                                                          \
-        using value_type = NAME##_opt_t;                                  \
-        using primitive_type = value_type::value_type;                    \
+#define SBEPP_BUILT_IN_IMPL(NAME, TYPE, MIN, MAX, NULL)                     \
+    /** @brief Built-in `NAME` required type */                             \
+    /** Also works as a tag for its traits */                               \
+    class NAME##_t : public detail::required_base<TYPE, NAME##_t>           \
+    {                                                                       \
+    public:                                                                 \
+        using detail::required_base<TYPE, NAME##_t>::required_base;         \
+                                                                            \
+        /** @brief Returns `minValue` attribute */                          \
+        static constexpr value_type min_value() noexcept                    \
+        {                                                                   \
+            return {MIN};                                                   \
+        }                                                                   \
+                                                                            \
+        /** @brief Returns `maxValue` attribute */                          \
+        static constexpr value_type max_value() noexcept                    \
+        {                                                                   \
+            return {MAX};                                                   \
+        }                                                                   \
+    };                                                                      \
+                                                                            \
+    /** @brief Built-in `NAME` optional type */ /** Also works as a tag for \
+                                                   its traits */            \
+    class NAME##_opt_t : public detail::optional_base<TYPE, NAME##_opt_t>   \
+    {                                                                       \
+    public:                                                                 \
+        using detail::optional_base<TYPE, NAME##_opt_t>::optional_base;     \
+                                                                            \
+        /** @brief Returns `minValue` attribute */                          \
+        static constexpr value_type min_value() noexcept                    \
+        {                                                                   \
+            return {MIN};                                                   \
+        }                                                                   \
+                                                                            \
+        /** @brief Returns `maxValue` attribute */                          \
+        static constexpr value_type max_value() noexcept                    \
+        {                                                                   \
+            return {MAX};                                                   \
+        }                                                                   \
+                                                                            \
+        /** @brief Returns `nullValue` attribute */                         \
+        static constexpr value_type null_value() noexcept                   \
+        {                                                                   \
+            return {NULL};                                                  \
+        }                                                                   \
+    };                                                                      \
+                                                                            \
+    template<>                                                              \
+    class type_traits<NAME##_t>                                             \
+    {                                                                       \
+    public:                                                                 \
+        static constexpr const char* name() noexcept                        \
+        {                                                                   \
+            return #NAME;                                                   \
+        }                                                                   \
+                                                                            \
+        static constexpr const char* description() noexcept                 \
+        {                                                                   \
+            return "";                                                      \
+        }                                                                   \
+                                                                            \
+        static constexpr field_presence presence() noexcept                 \
+        {                                                                   \
+            return field_presence::required;                                \
+        }                                                                   \
+                                                                            \
+        static constexpr TYPE min_value() noexcept                          \
+        {                                                                   \
+            return NAME##_t::min_value();                                   \
+        }                                                                   \
+                                                                            \
+        static constexpr TYPE max_value() noexcept                          \
+        {                                                                   \
+            return NAME##_t::max_value();                                   \
+        }                                                                   \
+                                                                            \
+        static constexpr length_t length() noexcept                         \
+        {                                                                   \
+            return 1;                                                       \
+        }                                                                   \
+                                                                            \
+        static constexpr const char* semantic_type() noexcept               \
+        {                                                                   \
+            return "";                                                      \
+        }                                                                   \
+                                                                            \
+        static constexpr version_t since_version() noexcept                 \
+        {                                                                   \
+            return 0;                                                       \
+        }                                                                   \
+                                                                            \
+        using value_type = NAME##_t;                                        \
+        using primitive_type = value_type::value_type;                      \
+    };                                                                      \
+                                                                            \
+    template<>                                                              \
+    struct traits_tag<NAME##_t>                                             \
+    {                                                                       \
+        using type = NAME##_t;                                              \
+    };                                                                      \
+                                                                            \
+    template<>                                                              \
+    class type_traits<NAME##_opt_t>                                         \
+    {                                                                       \
+    public:                                                                 \
+        static constexpr const char* name() noexcept                        \
+        {                                                                   \
+            return #NAME;                                                   \
+        }                                                                   \
+                                                                            \
+        static constexpr const char* description() noexcept                 \
+        {                                                                   \
+            return "";                                                      \
+        }                                                                   \
+                                                                            \
+        static constexpr field_presence presence() noexcept                 \
+        {                                                                   \
+            return field_presence::optional;                                \
+        }                                                                   \
+                                                                            \
+        static constexpr TYPE min_value() noexcept                          \
+        {                                                                   \
+            return NAME##_opt_t::min_value();                               \
+        }                                                                   \
+                                                                            \
+        static constexpr TYPE max_value() noexcept                          \
+        {                                                                   \
+            return NAME##_opt_t::max_value();                               \
+        }                                                                   \
+                                                                            \
+        static constexpr TYPE null_value() noexcept                         \
+        {                                                                   \
+            return NAME##_opt_t::null_value();                              \
+        }                                                                   \
+                                                                            \
+        static constexpr length_t length() noexcept                         \
+        {                                                                   \
+            return 1;                                                       \
+        }                                                                   \
+                                                                            \
+        static constexpr const char* semantic_type() noexcept               \
+        {                                                                   \
+            return "";                                                      \
+        }                                                                   \
+                                                                            \
+        static constexpr version_t since_version() noexcept                 \
+        {                                                                   \
+            return 0;                                                       \
+        }                                                                   \
+                                                                            \
+        using value_type = NAME##_opt_t;                                    \
+        using primitive_type = value_type::value_type;                      \
+    };                                                                      \
+                                                                            \
+    template<>                                                              \
+    struct traits_tag<NAME##_opt_t>                                         \
+    {                                                                       \
+        using type = NAME##_opt_t;                                          \
     }
 
 SBEPP_BUILT_IN_IMPL(char, char, 0x20, 0x7E, 0);
@@ -4770,8 +4829,9 @@ struct is_array_type_impl
 {
     static constexpr std::false_type test(...);
 
-    template<typename T1, typename T2, std::size_t N>
-    static constexpr std::true_type test(detail::static_array_ref<T1, T2, N>*);
+    template<typename T1, typename T2, std::size_t N, typename T3>
+    static constexpr std::true_type
+        test(detail::static_array_ref<T1, T2, N, T3>*);
 
     using type = decltype(test(std::declval<Derived*>()));
 };
@@ -4972,9 +5032,9 @@ concept data = is_data_v<T>;
 
 #if SBEPP_HAS_RANGES && SBEPP_HAS_CONCEPTS
 
-template<typename Byte, typename Value, std::size_t N>
+template<typename Byte, typename Value, std::size_t N, typename Tag>
 inline constexpr bool std::ranges::enable_borrowed_range<
-    sbepp::detail::static_array_ref<Byte, Value, N>> = true;
+    sbepp::detail::static_array_ref<Byte, Value, N, Tag>> = true;
 
 template<typename Byte, typename Value, typename Length, sbepp::endian E>
 inline constexpr bool std::ranges::enable_borrowed_range<

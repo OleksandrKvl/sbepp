@@ -85,6 +85,8 @@
         </composite>
 
         <type name="str128" primitiveType="char" length="128"/>
+        <type name="str_const" primitiveType="char"
+            presence="constant">hello world</type>
         <type name="uint32_req" primitiveType="uint32" presence="required"/>
         <type name="uint32_opt" primitiveType="uint32" presence="optional"/>
         <type name="uint32_const" primitiveType="uint32"

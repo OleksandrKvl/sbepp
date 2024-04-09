@@ -4,7 +4,6 @@
 #include <sbepp/sbepp.hpp>
 #include <sbepp/test/utils.hpp>
 
-#include "gtest/gtest.h"
 #include <gtest/gtest.h>
 
 #include <iterator>
@@ -12,8 +11,13 @@
 
 namespace
 {
+struct test_tag
+{
+};
+
 template<typename Byte, typename Value, std::size_t N>
-using static_array_ref = sbepp::detail::static_array_ref<Byte, Value, N>;
+using static_array_ref =
+    sbepp::detail::static_array_ref<Byte, Value, N, test_tag>;
 
 constexpr auto g_array_size = 128;
 using value_type = char;
@@ -38,6 +42,7 @@ STATIC_ASSERT_V(std::is_same<
                 std::reverse_iterator<const_array_t::pointer>>);
 STATIC_ASSERT(sbepp::is_array_type<array_t>::value);
 STATIC_ASSERT(sbepp::is_type<array_t>::value);
+IS_SAME_TYPE(array_t::tag, test_tag);
 
 #if SBEPP_HAS_INLINE_VARS
 STATIC_ASSERT(sbepp::is_array_type_v<array_t>);

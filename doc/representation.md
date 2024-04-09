@@ -5,6 +5,35 @@ In this section I'll try to gradually describe the structure of generated code.
 It's just a brief description, for detailed documentation see corresponding
 reference pages.
 
+## Representation types vs. traits
+
+For each schema compiled by `sbeppc`, there will be two main sources of
+information:
+- representation types, responsible for the actual SBE data
+    encoding/decoding and proper representation of schema entities. Except
+    constants, all the information they provide comes from binary data. These
+    are described in more details below on this page.
+- [traits](#traits), in combination with tags, they provide access to
+    static/meta schema properties that, unlike representation types, always
+    come from precomputed values obtained from schema XML.
+
+Sometimes, traits and representation types have functionality with common names,
+but it's very different in nature. For example,
+`sbepp::message_traits<msg_tag>::size_bytes()` returns precomputed value based
+on message structure from the XML, and hence guaranteed to be valid only for
+the current schema version. On the other hand, `sbepp::size_bytes(msg)`
+calculates message size based on the message buffer and the values it holds, it
+returns valid value even for newer schema versions because message
+representation type correctly handles schema extension.
+
+It's possible to get a representation type from a tag using `value_type` member
+of the traits (e.g. `sbepp::message_traits<msg_tag>::value_type`), and
+vice versa, to get a tag from a representation type using `sbepp::traits_tag_t`.
+These helpers can be used to avoid explicit mentioning of both tag and
+representation types at the same time by deducing one from another.
+
+---
+
 ## Namespaces
 
 Here's the structure of generated code after [compilation](#sbeppc):
