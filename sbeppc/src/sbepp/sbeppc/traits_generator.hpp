@@ -1181,7 +1181,6 @@ public:
 }};
 
 {traits_tag}
-{level_traits}
 )",
             // clang-format on
             fmt::arg("tag", g.tag),
