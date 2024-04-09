@@ -267,3 +267,50 @@ type check.
         buf.data(), buf.size());
     auto header = sbepp::get_header(m);
     ```
+
+---
+
+## Estimating buffer size to encode a message {#example-size-bytes}
+
+It is possible to estimate how much memory is required to represent encoded
+message using `sbepp::message_traits::size_bytes()`. To do this, one needs to
+know message structure details, the number of entries for each group and the
+total size of `<data>` element(s) payload. Here's how it can be done at
+compile-time:
+
+```cpp
+// specify max parameters
+constexpr auto max_group_entries = 5;
+constexpr auto max_data_size = 256;
+
+constexpr auto max_msg_size = sbepp::message_traits<
+    market::schema::messages:msg>::size_bytes(
+        max_group_entries, max_data_size);
+
+std::array<char, max_msg_size> buf{};
+
+auto m = sbepp::make_view<market::messages::msg>(buf.data(), buf.size());
+// encode message as usual but be sure not to exceed `max_group_entries` and
+// `max_data_size`
+```
+
+or at run-time:
+
+```cpp
+void make_msg(
+    const std::vector<std::uint32_t>& group_entries,
+    const std::vector<std::uint8_t>& data_payload)
+{
+    // calculate buffer size required to store `group_entries` in `msg::group`
+    // and `data_payload` in `msg::data`
+    const auto msg_size = sbepp::message_traits<
+        market::schema::messages:msg>::size_bytes(
+            group_entries.size(), max_data_size.size());
+
+    std::vector<char> buf;
+    buf.resize(msg_size);
+
+    auto m = sbepp::make_view<market::messages::msg>(buf.data(), buf.size());
+    // encode message as usual...
+}
+```

@@ -35,6 +35,16 @@
 #    include <traits_test_schema/messages/msg_4.hpp>
 #    include <traits_test_schema/messages/msg_5.hpp>
 #    include <traits_test_schema/messages/msg_6.hpp>
+#    include <traits_test_schema/messages/msg_7.hpp>
+#    include <traits_test_schema/messages/msg_8.hpp>
+#    include <traits_test_schema/messages/msg_9.hpp>
+#    include <traits_test_schema/messages/msg_10.hpp>
+#    include <traits_test_schema/messages/msg_11.hpp>
+#    include <traits_test_schema/messages/msg_12.hpp>
+#    include <traits_test_schema/messages/msg_13.hpp>
+#    include <traits_test_schema/messages/msg_14.hpp>
+#    include <traits_test_schema/messages/msg_15.hpp>
+#    include <traits_test_schema/messages/msg_16.hpp>
 
 #    include <traits_test_schema2/schema/schema.hpp>
 #endif
@@ -442,6 +452,7 @@ TEST(MessageTraitsTest, ProvidesTheSameValuesAsSchemaXml)
     ASSERT_EQ(traits::semantic_type(), "message semantic type");
     IS_SAME_TYPE(
         traits::value_type<char>, traits_test_schema::messages::msg_1<char>);
+    IS_SAME_TYPE(traits::schema_tag, traits_test_schema::schema);
     IS_NOEXCEPT(traits::name());
     IS_NOEXCEPT(traits::description());
     IS_NOEXCEPT(traits::id());
@@ -743,6 +754,330 @@ TYPED_TEST(DefaultOffsetTraitTest, ProvidesCorrectOffsetForConsecutiveFields)
     ASSERT_EQ(
         field_3_traits::offset(),
         field_2_traits::offset() + sizeof(typename field_2_traits::value_type));
+}
+
+TEST(DataTraitsTest, SizeBytesReturnsSumOfSizeOfLengthTypeAndGivenSize)
+{
+    using tag = traits_test_schema::schema::messages::msg_9::data_1;
+    using traits = sbepp::data_traits<tag>;
+    constexpr auto data_size = 2;
+
+    STATIC_ASSERT(
+        traits::size_bytes(data_size)
+        == sizeof(traits::length_type) + data_size);
+    IS_NOEXCEPT(traits::size_bytes(data_size));
+}
+
+TEST(GroupTraitsTest, EmptyGroupSizeIsHeaderSize)
+{
+    using tag = traits_test_schema::schema::messages::msg_10::group_2;
+    using traits = sbepp::group_traits<tag>;
+    constexpr auto group_size = 2;
+    STATIC_ASSERT(traits::block_length() == 0);
+
+    STATIC_ASSERT(
+        traits::size_bytes(group_size)
+        == sbepp::composite_traits<traits::dimension_type_tag>::size_bytes());
+    // group size doesn't matter because group has no fields
+    STATIC_ASSERT(
+        traits::size_bytes(group_size) == traits::size_bytes(group_size + 1));
+    IS_NOEXCEPT(traits::size_bytes(group_size));
+}
+
+TEST(GroupTraitsTest, FlatGroupSizeIsHeaderAndBlockLengthBySize)
+{
+    using tag = traits_test_schema::schema::messages::msg_10::group_1;
+    using traits = sbepp::group_traits<tag>;
+    constexpr auto group_size = 2;
+    STATIC_ASSERT(traits::block_length() != 0);
+    constexpr auto valid_size =
+        sbepp::composite_traits<traits::dimension_type_tag>::size_bytes()
+        + group_size * traits::block_length();
+
+    STATIC_ASSERT(traits::size_bytes(group_size) == valid_size);
+    IS_NOEXCEPT(traits::size_bytes(group_size));
+}
+
+TEST(GroupTraitsTest, GroupWithDataSizeBytesHasTotalDataSizeParameter)
+{
+    using tag = traits_test_schema::schema::messages::msg_14::group_1::group_2;
+    using traits = sbepp::group_traits<tag>;
+    constexpr auto group_size = 2;
+    constexpr auto total_data_size = 10;
+    constexpr auto valid_size =
+        sbepp::composite_traits<traits::dimension_type_tag>::size_bytes()
+        + group_size
+              * (traits::block_length()
+                 + sbepp::data_traits<tag::data>::size_bytes(0))
+        + total_data_size;
+
+    STATIC_ASSERT(
+        traits::size_bytes(group_size, total_data_size) == valid_size);
+    IS_NOEXCEPT(traits::size_bytes(group_size, total_data_size));
+}
+
+TEST(GroupTraitsTest, NestedGroupSizeBytesHasSizeParameterForEachGroup)
+{
+    using tag = traits_test_schema::schema::messages::msg_14::group_1;
+    using traits = sbepp::group_traits<tag>;
+    constexpr auto root_group_size = 2;
+    constexpr auto child_group_size = 3;
+    constexpr auto total_data_size = 10;
+    constexpr auto valid_size =
+        sbepp::composite_traits<traits::dimension_type_tag>::size_bytes()
+        + root_group_size
+              * (traits::block_length()
+                 + sbepp::composite_traits<sbepp::group_traits<
+                     tag::group_2>::dimension_type_tag>::size_bytes())
+        + child_group_size
+              * (sbepp::group_traits<tag::group_2>::block_length()
+                 + sbepp::data_traits<tag::group_2::data>::size_bytes(0))
+        + total_data_size;
+
+    STATIC_ASSERT(
+        traits::size_bytes(root_group_size, child_group_size, total_data_size)
+        == valid_size);
+    IS_NOEXCEPT(
+        traits::size_bytes(root_group_size, child_group_size, total_data_size));
+}
+
+TEST(MessageTraitsTest, EmptyMessageSizeIsHeaderSize)
+{
+    using tag = traits_test_schema::schema::messages::msg_7;
+    using traits = sbepp::message_traits<tag>;
+    STATIC_ASSERT(traits::block_length() == 0);
+    constexpr auto valid_size = sbepp::composite_traits<sbepp::schema_traits<
+        traits::schema_tag>::header_type_tag>::size_bytes();
+
+    STATIC_ASSERT(traits::size_bytes() == valid_size);
+    IS_NOEXCEPT(traits::size_bytes());
+}
+
+TEST(MessageTraitsTest, FlatMessageSizeIsHeaderSizeAndBlockLength)
+{
+    using tag = traits_test_schema::schema::messages::msg_8;
+    using traits = sbepp::message_traits<tag>;
+    STATIC_ASSERT(traits::block_length() != 0);
+    constexpr auto valid_size =
+        sbepp::composite_traits<sbepp::schema_traits<
+            traits::schema_tag>::header_type_tag>::size_bytes()
+        + traits::block_length();
+
+    STATIC_ASSERT(traits::size_bytes() == valid_size);
+    IS_NOEXCEPT(traits::size_bytes());
+}
+
+TEST(MessageTraitsTest, MessageWithDataSizeBytesHasTotalSizeBytesParameter)
+{
+    using tag = traits_test_schema::schema::messages::msg_9;
+    using traits = sbepp::message_traits<tag>;
+    constexpr auto data_1_size = 7;
+    constexpr auto data_2_size = 27;
+    constexpr auto total_data_size = data_1_size + data_2_size;
+    constexpr auto valid_size =
+        sbepp::composite_traits<sbepp::schema_traits<
+            traits::schema_tag>::header_type_tag>::size_bytes()
+        + traits::block_length()
+        + sbepp::data_traits<tag::data_1>::size_bytes(data_1_size)
+        + sbepp::data_traits<tag::data_2>::size_bytes(data_2_size);
+
+    STATIC_ASSERT(traits::size_bytes(total_data_size) == valid_size);
+    IS_NOEXCEPT(traits::size_bytes(total_data_size));
+}
+
+TEST(MessageTraitsTest, HasSizeParameterForEachGroupFromTopToBottom1)
+{
+    using tag = traits_test_schema::schema::messages::msg_10;
+    using traits = sbepp::message_traits<tag>;
+    constexpr auto group_1_size = 2;
+    constexpr auto group_2_size = 3;
+    constexpr auto valid_size =
+        sbepp::composite_traits<sbepp::schema_traits<
+            traits::schema_tag>::header_type_tag>::size_bytes()
+        + traits::block_length()
+        + sbepp::group_traits<tag::group_1>::size_bytes(group_1_size)
+        + sbepp::group_traits<tag::group_2>::size_bytes(group_2_size);
+
+    STATIC_ASSERT(traits::size_bytes(group_1_size, group_2_size) == valid_size);
+    IS_NOEXCEPT(traits::size_bytes(group_1_size, group_2_size));
+}
+
+TEST(MessageTraitsTest, HasSizeParameterForEachGroupFromTopToBottom2)
+{
+    using tag = traits_test_schema::schema::messages::msg_12;
+    using traits = sbepp::message_traits<tag>;
+    constexpr auto group_1_size = 2;
+    constexpr auto group_2_size = 3;
+    constexpr auto valid_size =
+        sbepp::composite_traits<sbepp::schema_traits<
+            traits::schema_tag>::header_type_tag>::size_bytes()
+        + traits::block_length()
+        + sbepp::group_traits<tag::group_1>::size_bytes(group_1_size)
+        + sbepp::group_traits<tag::group_2>::size_bytes(group_2_size);
+
+    STATIC_ASSERT(traits::size_bytes(group_1_size, group_2_size) == valid_size);
+    IS_NOEXCEPT(traits::size_bytes(group_1_size, group_2_size));
+}
+
+TEST(MessageTraitsTest, HasTrailingTotalDataSizeParameterIfHasDataAtAnyLevel1)
+{
+    using tag = traits_test_schema::schema::messages::msg_11;
+    using traits = sbepp::message_traits<tag>;
+    constexpr auto total_data_size = 10;
+    constexpr auto group_size = 4;
+    constexpr auto valid_size =
+        sbepp::composite_traits<sbepp::schema_traits<
+            traits::schema_tag>::header_type_tag>::size_bytes()
+        + traits::block_length()
+        + sbepp::group_traits<tag::group>::size_bytes(group_size)
+        + sbepp::data_traits<tag::data>::size_bytes(total_data_size);
+
+    STATIC_ASSERT(
+        traits::size_bytes(group_size, total_data_size) == valid_size);
+    IS_NOEXCEPT(traits::size_bytes(group_size, total_data_size));
+}
+
+TEST(MessageTraitsTest, HasSizeParameterForEachGroupFromTopToBottom3)
+{
+    using tag = traits_test_schema::schema::messages::msg_13;
+    using traits = sbepp::message_traits<tag>;
+    constexpr auto group_1_size = 2;
+    constexpr auto group_1_group_2_size = 3;
+    constexpr auto valid_size =
+        sbepp::composite_traits<sbepp::schema_traits<
+            traits::schema_tag>::header_type_tag>::size_bytes()
+        + traits::block_length()
+        + sbepp::group_traits<tag::group_1>::size_bytes(
+            group_1_size, group_1_group_2_size);
+
+    STATIC_ASSERT(
+        traits::size_bytes(group_1_size, group_1_group_2_size) == valid_size);
+    IS_NOEXCEPT(traits::size_bytes(group_1_size, group_1_group_2_size));
+}
+
+TEST(MessageTraitsTest, HasTrailingTotalDataSizeParameterIfHasDataAtAnyLevel2)
+{
+    using tag = traits_test_schema::schema::messages::msg_14;
+    using traits = sbepp::message_traits<tag>;
+    constexpr auto total_data_size = 10;
+    constexpr auto group_1_size = 2;
+    constexpr auto group_1_group_2_size = 3;
+    constexpr auto valid_size =
+        sbepp::composite_traits<sbepp::schema_traits<
+            traits::schema_tag>::header_type_tag>::size_bytes()
+        + traits::block_length()
+        + sbepp::group_traits<tag::group_1>::size_bytes(
+            group_1_size, group_1_group_2_size, total_data_size);
+
+    STATIC_ASSERT(
+        traits::size_bytes(group_1_size, group_1_group_2_size, total_data_size)
+        == valid_size);
+    IS_NOEXCEPT(traits::size_bytes(
+        group_1_size, group_1_group_2_size, total_data_size));
+}
+
+TEST(MessageTraitsTest, HasTrailingTotalDataSizeParameterIfHasDataAtAnyLevel3)
+{
+    using tag = traits_test_schema::schema::messages::msg_15;
+    using traits = sbepp::message_traits<tag>;
+    constexpr auto group_1_group_2_data_size = 3;
+    constexpr auto group_1_data_size = 6;
+    constexpr auto msg_data_size = 10;
+    constexpr auto total_data_size =
+        group_1_group_2_data_size + group_1_data_size + msg_data_size;
+    constexpr auto group_1_size = 2;
+    constexpr auto group_1_group_2_size = 3;
+    constexpr auto valid_size =
+        sbepp::composite_traits<sbepp::schema_traits<
+            traits::schema_tag>::header_type_tag>::size_bytes()
+        + traits::block_length()
+        + sbepp::group_traits<tag::group_1>::size_bytes(
+            group_1_size,
+            group_1_group_2_size,
+            group_1_group_2_data_size + group_1_data_size)
+        + sbepp::data_traits<tag::data>::size_bytes(msg_data_size);
+
+    STATIC_ASSERT(
+        traits::size_bytes(group_1_size, group_1_group_2_size, total_data_size)
+        == valid_size);
+    IS_NOEXCEPT(traits::size_bytes(
+        group_1_size, group_1_group_2_size, total_data_size));
+}
+
+TEST(MessageTraitsTest, AddsLevelDepthSuffixToAmbiguousSizeBytesParameters)
+{
+    // here, we mostly test that code compiles, without adding the `_<depth>`
+    // suffix, `size_bytes` would have multiple parameters with the same name
+    // and compilation error
+    using tag = traits_test_schema::schema::messages::msg_16;
+    using traits = sbepp::message_traits<tag>;
+    constexpr auto group_1_size = 1;
+    constexpr auto group_1_group_2_size = 2;
+    constexpr auto group_1_group_2_size_0 = 3;
+    constexpr auto group_3_size = 4;
+    constexpr auto group_3_group_1_group_2_size = 5;
+    constexpr auto group_3_group_1_size = 6;
+    constexpr auto group_3_group_1_group_2_size_2 = 7;
+    constexpr auto group_3_group_1_data_size = 9;
+    constexpr auto total_data_size = group_3_group_1_data_size;
+
+    constexpr auto valid_size =
+        sbepp::composite_traits<sbepp::schema_traits<
+            traits::schema_tag>::header_type_tag>::size_bytes()
+        + traits::block_length()
+        + sbepp::group_traits<tag::group_1>::size_bytes(
+            group_1_size, group_1_group_2_size)
+        + sbepp::group_traits<tag::group_1_group_2>::size_bytes(
+            group_1_group_2_size)
+        + sbepp::group_traits<tag::group_3>::size_bytes(
+            group_3_size,
+            group_3_group_1_group_2_size,
+            group_3_group_1_size,
+            group_3_group_1_group_2_size_2,
+            group_3_group_1_data_size);
+
+    STATIC_ASSERT(
+        traits::size_bytes(
+            group_1_size,
+            group_1_group_2_size,
+            group_1_group_2_size_0,
+            group_3_size,
+            group_3_group_1_group_2_size,
+            group_3_group_1_size,
+            group_3_group_1_group_2_size_2,
+            total_data_size)
+        == valid_size);
+}
+
+TEST(MessageTraitsTest, SizeBytesEqualToSbeppSizeBytes)
+{
+    using tag = traits_test_schema::schema::messages::msg_14;
+    using traits = sbepp::message_traits<tag>;
+    constexpr auto total_data_size = 16;
+    constexpr auto group_1_size = 2;
+    constexpr auto group_1_group_2_size = 4;
+    constexpr auto predicted_size =
+        traits::size_bytes(group_1_size, group_1_group_2_size, total_data_size);
+    std::array<char, predicted_size> buf{};
+
+    auto m = sbepp::make_view<traits::value_type>(buf.data(), buf.size());
+    sbepp::fill_message_header(m);
+    auto g1 = m.group_1();
+    sbepp::fill_group_header(g1, group_1_size);
+    for(auto entry1 : g1)
+    {
+        auto g2 = entry1.group_2();
+        // 2 `group_2` entries in each `group_1` entry
+        sbepp::fill_group_header(g2, group_1_group_2_size / g1.size());
+        for(auto entry2 : g2)
+        {
+            auto d = entry2.data();
+            // 4 bytes of payload for each `data`
+            d.resize(total_data_size / group_1_group_2_size);
+        }
+    }
+
+    ASSERT_EQ(predicted_size, sbepp::size_bytes(m));
 }
 
 namespace constexpr_tests

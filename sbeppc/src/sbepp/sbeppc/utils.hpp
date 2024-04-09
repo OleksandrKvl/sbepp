@@ -523,4 +523,23 @@ inline std::optional<std::string> numeric_literal_to_value(
 
     return utils::to_integer_literal(*value, location);
 }
+
+inline const sbe::composite_element*
+    find_composite_element(const sbe::composite& c, const std::string_view name)
+{
+    const auto search = std::find_if(
+        std::begin(c.elements),
+        std::end(c.elements),
+        [name](const auto& element)
+        {
+            return utils::get_encoding_name(element) == name;
+        });
+
+    if(search != std::end(c.elements))
+    {
+        return &*search;
+    }
+
+    return {};
+}
 } // namespace sbepp::sbeppc::utils

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2023, Oleksandr Koval
+
 #include <sbepp/sbepp.hpp>
 
 #include <gtest/gtest.h>

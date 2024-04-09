@@ -348,29 +348,10 @@ R"(
         return {};
     }
 
-    static const sbe::composite_element* find_composite_element(
-        const sbe::composite& c, const std::string_view name)
-    {
-        const auto search = std::find_if(
-            std::begin(c.elements),
-            std::end(c.elements),
-            [name](const auto& element)
-            {
-                return utils::get_encoding_name(element) == name;
-            });
-
-        if(search != std::end(c.elements))
-        {
-            return &*search;
-        }
-
-        return {};
-    }
-
     static std::string_view get_block_length_type(const sbe::composite& c)
     {
-        const auto t =
-            std::get_if<sbe::type>(find_composite_element(c, "blockLength"));
+        const auto t = std::get_if<sbe::type>(
+            utils::find_composite_element(c, "blockLength"));
         if(t)
         {
             return t->underlying_type;
@@ -504,8 +485,8 @@ public:
 
     static std::string_view get_num_in_group_type(const sbe::composite& c)
     {
-        const auto t =
-            std::get_if<sbe::type>(find_composite_element(c, "numInGroup"));
+        const auto t = std::get_if<sbe::type>(
+            utils::find_composite_element(c, "numInGroup"));
         if(t)
         {
             return t->impl_type;
@@ -699,7 +680,7 @@ R"(
         dependencies.emplace(c.name);
 
         const auto t =
-            std::get_if<sbe::type>(find_composite_element(c, "length"));
+            std::get_if<sbe::type>(utils::find_composite_element(c, "length"));
         if(t)
         {
             return *t;
@@ -717,7 +698,7 @@ R"(
             d.type);
 
         const auto t =
-            std::get_if<sbe::type>(find_composite_element(c, "varData"));
+            std::get_if<sbe::type>(utils::find_composite_element(c, "varData"));
         if(t)
         {
             return t->underlying_type;
@@ -1588,12 +1569,12 @@ R"(
 
     static bool has_num_groups(const sbe::composite& c)
     {
-        return find_composite_element(c, "numGroups");
+        return utils::find_composite_element(c, "numGroups");
     }
 
     static bool has_num_var_data_fields(const sbe::composite& c)
     {
-        return find_composite_element(c, "numVarDataFields");
+        return utils::find_composite_element(c, "numVarDataFields");
     }
 
     static std::string make_num_groups_setter(
