@@ -8,7 +8,7 @@ var hierarchy =
       [ "sbepp::detail::flat_group_base< Byte, Entry, Dimension >", "classsbepp_1_1detail_1_1flat__group__base.html", null ],
       [ "sbepp::detail::message_base< Byte, Header >", "classsbepp_1_1detail_1_1message__base.html", null ],
       [ "sbepp::detail::nested_group_base< Byte, Entry, Dimension >", "classsbepp_1_1detail_1_1nested__group__base.html", null ],
-      [ "sbepp::detail::static_array_ref< Byte, Value, N >", "classsbepp_1_1detail_1_1static__array__ref.html", null ]
+      [ "sbepp::detail::static_array_ref< Byte, Value, N, Tag >", "classsbepp_1_1detail_1_1static__array__ref.html", null ]
     ] ],
     [ "sbepp::byte_type< View >", "structsbepp_1_1byte__type.html", null ],
     [ "sbepp::composite_traits< T >", "classsbepp_1_1composite__traits.html", null ],
@@ -94,5 +94,6 @@ var hierarchy =
     [ "sbepp::set_choice_traits< T >", "classsbepp_1_1set__choice__traits.html", null ],
     [ "sbepp::set_traits< T >", "classsbepp_1_1set__traits.html", null ],
     [ "sbepp::size_bytes_checked_result", "structsbepp_1_1size__bytes__checked__result.html", null ],
+    [ "sbepp::traits_tag< ValueType >", "structsbepp_1_1traits__tag.html", null ],
     [ "sbepp::type_traits< T >", "classsbepp_1_1type__traits.html", null ]
 ];

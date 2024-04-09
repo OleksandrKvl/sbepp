@@ -37,6 +37,7 @@ var namespacesbepp =
     [ "set_choice_traits", "classsbepp_1_1set__choice__traits.html", null ],
     [ "set_traits", "classsbepp_1_1set__traits.html", "classsbepp_1_1set__traits" ],
     [ "size_bytes_checked_result", "structsbepp_1_1size__bytes__checked__result.html", "structsbepp_1_1size__bytes__checked__result" ],
+    [ "traits_tag", "structsbepp_1_1traits__tag.html", "structsbepp_1_1traits__tag" ],
     [ "type_traits", "classsbepp_1_1type__traits.html", "classsbepp_1_1type__traits" ],
     [ "uint16_opt_t", "classsbepp_1_1uint16__opt__t.html", null ],
     [ "uint16_t", "classsbepp_1_1uint16__t.html", null ],
@@ -79,6 +80,7 @@ var namespacesbepp =
     [ "message_id_t", "namespacesbepp.html#a8f0e0669b7e7f7c4b3849a0418225cb6", null ],
     [ "offset_t", "namespacesbepp.html#a8dafc5b7c26483f5e998bb7a4e87b406", null ],
     [ "schema_id_t", "namespacesbepp.html#ad770bcda6122b136d640fadfb0242062", null ],
+    [ "traits_tag_t", "namespacesbepp.html#a0ddc0b9ce9e876a0ac772b4d1af64b4b", null ],
     [ "version_t", "namespacesbepp.html#a97309329a3ef93149d698a0c5a9da6ba", null ],
     [ "endian", "namespacesbepp.html#af318e06df8931dd69380221b420caec5", [
       [ "little", "namespacesbepp.html#af318e06df8931dd69380221b420caec5aaae6635e044ac56046b2893a529b5114", null ],

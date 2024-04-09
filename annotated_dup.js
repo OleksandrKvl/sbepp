@@ -44,6 +44,7 @@ var annotated_dup =
       [ "set_choice_traits", "classsbepp_1_1set__choice__traits.html", null ],
       [ "set_traits", "classsbepp_1_1set__traits.html", "classsbepp_1_1set__traits" ],
       [ "size_bytes_checked_result", "structsbepp_1_1size__bytes__checked__result.html", "structsbepp_1_1size__bytes__checked__result" ],
+      [ "traits_tag", "structsbepp_1_1traits__tag.html", "structsbepp_1_1traits__tag" ],
       [ "type_traits", "classsbepp_1_1type__traits.html", "classsbepp_1_1type__traits" ],
       [ "uint16_opt_t", "classsbepp_1_1uint16__opt__t.html", null ],
       [ "uint16_t", "classsbepp_1_1uint16__t.html", null ],

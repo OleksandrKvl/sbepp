@@ -160,14 +160,15 @@ Tags</h1>
 <div class="line"><span class="keyword">auto</span> max_char = <a class="code hl_function" href="classsbepp_1_1type__traits.html#abaa2f6f791cf5177511fb9e43c2d2fad">sbepp::type_traits&lt;sbepp::char_t&gt;::max_value</a>();</div>
 <div class="ttc" id="aclasssbepp_1_1type__traits_html_abaa2f6f791cf5177511fb9e43c2d2fad"><div class="ttname"><a href="classsbepp_1_1type__traits.html#abaa2f6f791cf5177511fb9e43c2d2fad">sbepp::type_traits::max_value</a></div><div class="ttdeci">static constexpr primitive_type max_value() noexcept</div><div class="ttdoc">Returns maxValue. Available only if length() == 1 and presence() != field_presence::constant</div></div>
 </div><!-- fragment --><hr  />
-<h1><a class="anchor" id="autotoc_md32"></a>
+<h1><a class="anchor" id="autotoc_md36"></a>
 Using traits</h1>
 <p>Similar to <code>std::numeric_limits</code>, <code>sbepp</code> traits are accessed like <code>trait_name&lt;Tag&gt;::value()</code>:</p>
 <div class="fragment"><div class="line"><span class="keyword">auto</span> schema_version = <a class="code hl_function" href="classsbepp_1_1schema__traits.html#a34fc19d3d1d2837bbdf4804d722d8cf5">sbepp::schema_traits&lt;schema_name::schema&gt;::version</a>();</div>
 <div class="line"><span class="keyword">auto</span> null_value = <a class="code hl_function" href="classsbepp_1_1type__traits.html#ad1bc58f7d4f84fe7cb2d69383e9aa12d">sbepp::type_traits&lt;schema_name::schema::types::optional&gt;::null_value</a>();</div>
 <div class="ttc" id="aclasssbepp_1_1schema__traits_html_a34fc19d3d1d2837bbdf4804d722d8cf5"><div class="ttname"><a href="classsbepp_1_1schema__traits.html#a34fc19d3d1d2837bbdf4804d722d8cf5">sbepp::schema_traits::version</a></div><div class="ttdeci">static constexpr version_t version() noexcept</div><div class="ttdoc">Returns version attribute.</div></div>
 <div class="ttc" id="aclasssbepp_1_1type__traits_html_ad1bc58f7d4f84fe7cb2d69383e9aa12d"><div class="ttname"><a href="classsbepp_1_1type__traits.html#ad1bc58f7d4f84fe7cb2d69383e9aa12d">sbepp::type_traits::null_value</a></div><div class="ttdeci">static constexpr primitive_type null_value() noexcept</div><div class="ttdoc">Returns nullValue. Available only if length() == 1 and presence() == field_presence::optional</div></div>
-</div><!-- fragment --><p>For the list of available traits see <a class="el" href="group__traits-list.html">Traits list</a>. </p>
+</div><!-- fragment --><p>For the list of available traits see <a class="el" href="group__traits-list.html">Traits list</a>.</p>
+<dl class="section see"><dt>See also</dt><dd><code><a class="el" href="structsbepp_1_1traits__tag.html" title="Maps representation type to its tag.">sbepp::traits_tag</a></code> </dd></dl>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->

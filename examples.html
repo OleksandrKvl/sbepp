@@ -104,11 +104,11 @@ $(function(){initNavTree('examples.html',''); initResizable(); });
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#autotoc_md34">Encoding a message using normal accessors</a></li>
-<li class="level1"><a href="#autotoc_md36">Encoding a message using cursor-based accessors</a></li>
-<li class="level1"><a href="#autotoc_md38">Decoding a message using normal accessors</a></li>
-<li class="level1"><a href="#autotoc_md40">Decoding a message using cursor-based accessors</a></li>
-<li class="level1"><a href="#autotoc_md42">Decoding message header</a></li>
+<ul><li class="level1"><a href="#autotoc_md38">Encoding a message using normal accessors</a></li>
+<li class="level1"><a href="#autotoc_md40">Encoding a message using cursor-based accessors</a></li>
+<li class="level1"><a href="#autotoc_md42">Decoding a message using normal accessors</a></li>
+<li class="level1"><a href="#autotoc_md44">Decoding a message using cursor-based accessors</a></li>
+<li class="level1"><a href="#autotoc_md46">Decoding message header</a></li>
 <li class="level1"><a href="#example-size-bytes">Estimating buffer size to encode a message</a></li>
 </ul>
 </div>
@@ -161,7 +161,7 @@ $(function(){initNavTree('examples.html',''); initResizable(); });
 <div class="line">    &lt;/<span class="keywordtype">sbe:message</span>&gt;</div>
 <div class="line">&lt;/<span class="keywordtype">sbe:messageSchema</span>&gt;</div>
 </div><!-- fragment --><hr  />
-<h1><a class="anchor" id="autotoc_md34"></a>
+<h1><a class="anchor" id="autotoc_md38"></a>
 Encoding a message using normal accessors</h1>
 <div class="fragment"><div class="line"><span class="comment">// note: it&#39;s up to client to provide sufficient buffer</span></div>
 <div class="line">std::array&lt;char, 1024&gt; buf{};</div>
@@ -190,12 +190,12 @@ Encoding a message using normal accessors</h1>
 <div class="line"><span class="comment">// note: size_bytes is O(1) in this case because group is flat</span></div>
 <div class="line"><span class="keyword">const</span> <span class="keyword">auto</span> msg_size = <a class="code hl_function" href="namespacesbepp.html#a9346fd507c2d3760ac40032180d1a7a6">sbepp::size_bytes</a>(m);</div>
 <div class="line">send(<a class="code hl_function" href="namespacesbepp.html#a870241790cb5759575b9f57d654392c2">sbepp::addressof</a>(m), msg_size);</div>
-<div class="ttc" id="anamespacesbepp_html_a3b5dd3446b423149a101530f056bee64"><div class="ttname"><a href="namespacesbepp.html#a3b5dd3446b423149a101530f056bee64">sbepp::fill_message_header</a></div><div class="ttdeci">constexpr auto fill_message_header(Message m) noexcept -&gt; decltype(m(detail::fill_message_header_tag{}))</div><div class="ttdoc">Fill message header.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:3614</div></div>
-<div class="ttc" id="anamespacesbepp_html_a7d29b37dfc83150ae34eaaf94dd4ba4c"><div class="ttname"><a href="namespacesbepp.html#a7d29b37dfc83150ae34eaaf94dd4ba4c">sbepp::fill_group_header</a></div><div class="ttdeci">constexpr auto fill_group_header(Group g, Size num_in_group) noexcept -&gt; decltype(g(detail::fill_group_header_tag{}, num_in_group))</div><div class="ttdoc">Fill group header.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:3634</div></div>
+<div class="ttc" id="anamespacesbepp_html_a3b5dd3446b423149a101530f056bee64"><div class="ttname"><a href="namespacesbepp.html#a3b5dd3446b423149a101530f056bee64">sbepp::fill_message_header</a></div><div class="ttdeci">constexpr auto fill_message_header(Message m) noexcept -&gt; decltype(m(detail::fill_message_header_tag{}))</div><div class="ttdoc">Fill message header.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:3617</div></div>
+<div class="ttc" id="anamespacesbepp_html_a7d29b37dfc83150ae34eaaf94dd4ba4c"><div class="ttname"><a href="namespacesbepp.html#a7d29b37dfc83150ae34eaaf94dd4ba4c">sbepp::fill_group_header</a></div><div class="ttdeci">constexpr auto fill_group_header(Group g, Size num_in_group) noexcept -&gt; decltype(g(detail::fill_group_header_tag{}, num_in_group))</div><div class="ttdoc">Fill group header.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:3637</div></div>
 <div class="ttc" id="anamespacesbepp_html_a870241790cb5759575b9f57d654392c2"><div class="ttname"><a href="namespacesbepp.html#a870241790cb5759575b9f57d654392c2">sbepp::addressof</a></div><div class="ttdeci">constexpr auto addressof(T v) noexcept -&gt; decltype(v(detail::addressof_tag{}))</div><div class="ttdoc">Returns pointer to the underlying data referenced by a view.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:1510</div></div>
 <div class="ttc" id="anamespacesbepp_html_a9346fd507c2d3760ac40032180d1a7a6"><div class="ttname"><a href="namespacesbepp.html#a9346fd507c2d3760ac40032180d1a7a6">sbepp::size_bytes</a></div><div class="ttdeci">constexpr std::size_t size_bytes(T v) noexcept</div><div class="ttdoc">Returns the size of the underlying data represented by message/group/entry/data/composite view,...</div><div class="ttdef"><b>Definition</b> sbepp.hpp:1471</div></div>
 </div><!-- fragment --><hr  />
-<h1><a class="anchor" id="autotoc_md36"></a>
+<h1><a class="anchor" id="autotoc_md40"></a>
 Encoding a message using cursor-based accessors</h1>
 <div class="fragment"><div class="line"><span class="comment">// note: it&#39;s up to client to provide sufficient buffer</span></div>
 <div class="line">std::array&lt;char, 1024&gt; buf{};</div>
@@ -231,7 +231,7 @@ Encoding a message using cursor-based accessors</h1>
 <div class="ttc" id="anamespacesbepp_1_1cursor__ops_html_a45f332328f49269fd0117bca732e7f36"><div class="ttname"><a href="namespacesbepp_1_1cursor__ops.html#a45f332328f49269fd0117bca732e7f36">sbepp::cursor_ops::dont_move</a></div><div class="ttdeci">constexpr detail::dont_move_cursor_wrapper&lt; Byte &gt; dont_move(cursor&lt; Byte &gt; &amp;c) noexcept</div><div class="ttdoc">Returns a wrapper which doesn't advance the cursor when it's used.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:1585</div></div>
 <div class="ttc" id="anamespacesbepp_html_a125f1fbb9faadde1515f7822a7b6420f"><div class="ttname"><a href="namespacesbepp.html#a125f1fbb9faadde1515f7822a7b6420f">sbepp::init_cursor</a></div><div class="ttdeci">constexpr cursor&lt; byte_type_t&lt; View &gt; &gt; init_cursor(View view) noexcept</div><div class="ttdoc">Initializes cursor from a message/group view with the same byte type.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:2737</div></div>
 </div><!-- fragment --><hr  />
-<h1><a class="anchor" id="autotoc_md38"></a>
+<h1><a class="anchor" id="autotoc_md42"></a>
 Decoding a message using normal accessors</h1>
 <div class="fragment"><div class="line">std::array&lt;char, 1024&gt; buf{};</div>
 <div class="line"><span class="keyword">auto</span> header = <a class="code hl_function" href="namespacesbepp.html#ae29503045a371b895af63f6ac6e0f3b9">sbepp::make_const_view</a>&lt;</div>
@@ -286,12 +286,12 @@ Decoding a message using normal accessors</h1>
 <div class="line">    std::cout &lt;&lt; *entry.field() &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
 <div class="line">}</div>
 <div class="ttc" id="aclasssbepp_1_1message__traits_html_ac3fc3e5864d0733a719073dcc7b4996d"><div class="ttname"><a href="classsbepp_1_1message__traits.html#ac3fc3e5864d0733a719073dcc7b4996d">sbepp::message_traits::id</a></div><div class="ttdeci">static constexpr message_id_t id() noexcept</div><div class="ttdoc">Returns id attribute.</div></div>
-<div class="ttc" id="aclasssbepp_1_1schema__traits_html_a9a53b31c788e848ac09e89fa4d2bf7c0"><div class="ttname"><a href="classsbepp_1_1schema__traits.html#a9a53b31c788e848ac09e89fa4d2bf7c0">sbepp::schema_traits::header_type</a></div><div class="ttdeci">HeaderComposite&lt; Byte &gt; header_type</div><div class="ttdoc">Message header composite type.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:3760</div></div>
+<div class="ttc" id="aclasssbepp_1_1schema__traits_html_a9a53b31c788e848ac09e89fa4d2bf7c0"><div class="ttname"><a href="classsbepp_1_1schema__traits.html#a9a53b31c788e848ac09e89fa4d2bf7c0">sbepp::schema_traits::header_type</a></div><div class="ttdeci">HeaderComposite&lt; Byte &gt; header_type</div><div class="ttdoc">Message header composite type.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:3763</div></div>
 <div class="ttc" id="anamespacesbepp_html_a0d0a0af58987f30ee37fda64c15cc316"><div class="ttname"><a href="namespacesbepp.html#a0d0a0af58987f30ee37fda64c15cc316">sbepp::to_underlying</a></div><div class="ttdeci">constexpr std::underlying_type&lt; Enum &gt;::type to_underlying(Enum e) noexcept</div><div class="ttdoc">Converts an enumeration to its underlying type. Equivalent to C++23 std::to_underlying()</div><div class="ttdef"><b>Definition</b> sbepp.hpp:2718</div></div>
-<div class="ttc" id="anamespacesbepp_html_abd9c1efb3c96d6fa71d1156811b47fa4"><div class="ttname"><a href="namespacesbepp.html#abd9c1efb3c96d6fa71d1156811b47fa4">sbepp::size_bytes_checked</a></div><div class="ttdeci">constexpr size_bytes_checked_result size_bytes_checked(View view, std::size_t size) noexcept</div><div class="ttdoc">Calculate view size with additional safety checks.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:4719</div></div>
-<div class="ttc" id="anamespacesbepp_html_ae29503045a371b895af63f6ac6e0f3b9"><div class="ttname"><a href="namespacesbepp.html#ae29503045a371b895af63f6ac6e0f3b9">sbepp::make_const_view</a></div><div class="ttdeci">constexpr View&lt; typename std::add_const&lt; Byte &gt;::type &gt; make_const_view(Byte *ptr, const std::size_t size) noexcept</div><div class="ttdoc">Construct read-only view from memory buffer.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:4491</div></div>
+<div class="ttc" id="anamespacesbepp_html_abd9c1efb3c96d6fa71d1156811b47fa4"><div class="ttname"><a href="namespacesbepp.html#abd9c1efb3c96d6fa71d1156811b47fa4">sbepp::size_bytes_checked</a></div><div class="ttdeci">constexpr size_bytes_checked_result size_bytes_checked(View view, std::size_t size) noexcept</div><div class="ttdoc">Calculate view size with additional safety checks.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:4777</div></div>
+<div class="ttc" id="anamespacesbepp_html_ae29503045a371b895af63f6ac6e0f3b9"><div class="ttname"><a href="namespacesbepp.html#ae29503045a371b895af63f6ac6e0f3b9">sbepp::make_const_view</a></div><div class="ttdeci">constexpr View&lt; typename std::add_const&lt; Byte &gt;::type &gt; make_const_view(Byte *ptr, const std::size_t size) noexcept</div><div class="ttdoc">Construct read-only view from memory buffer.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:4549</div></div>
 </div><!-- fragment --><hr  />
-<h1><a class="anchor" id="autotoc_md40"></a>
+<h1><a class="anchor" id="autotoc_md44"></a>
 Decoding a message using cursor-based accessors</h1>
 <div class="fragment"><div class="line">std::array&lt;char, 1024&gt; buf{};</div>
 <div class="line"><span class="keyword">auto</span> m = sbepp::make_const_view&lt;market::messages::msg&gt;(buf.data(), buf.size());</div>
@@ -335,10 +335,10 @@ Decoding a message using cursor-based accessors</h1>
 <div class="line"> </div>
 <div class="line"><span class="keyword">auto</span> d = m.data(c);</div>
 <div class="line">std::cout.write(d.data(), d.size());</div>
-<div class="ttc" id="aclasssbepp_1_1message__traits_html"><div class="ttname"><a href="classsbepp_1_1message__traits.html">sbepp::message_traits</a></div><div class="ttdoc">Provides various traits/attributes of a &lt;message&gt; element.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:3958</div></div>
+<div class="ttc" id="aclasssbepp_1_1message__traits_html"><div class="ttname"><a href="classsbepp_1_1message__traits.html">sbepp::message_traits</a></div><div class="ttdoc">Provides various traits/attributes of a &lt;message&gt; element.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:3961</div></div>
 <div class="ttc" id="anamespacesbepp_html_a12bbc67580e3f4bb2a0299033f01818d"><div class="ttname"><a href="namespacesbepp.html#a12bbc67580e3f4bb2a0299033f01818d">sbepp::get_header</a></div><div class="ttdeci">constexpr auto get_header(T v) noexcept -&gt; decltype(v(detail::get_header_tag{}))</div><div class="ttdoc">Returns the header of a message/group.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:1498</div></div>
 </div><!-- fragment --><hr  />
-<h1><a class="anchor" id="autotoc_md42"></a>
+<h1><a class="anchor" id="autotoc_md46"></a>
 Decoding message header</h1>
 <p>There are couple of ways to decode message header from an incoming data.</p>
 <ol type="1">

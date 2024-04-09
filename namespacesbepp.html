@@ -216,6 +216,9 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structsbepp_1_1size__bytes__checked__result.html">size_bytes_checked_result</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Result type of <code>size_bytes_checked</code>  <a href="structsbepp_1_1size__bytes__checked__result.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structsbepp_1_1traits__tag.html">traits_tag</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Maps representation type to its tag.  <a href="structsbepp_1_1traits__tag.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsbepp_1_1type__traits.html">type_traits</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Provides various traits and attributes of a <code>&lt;type&gt;</code> element.  <a href="classsbepp_1_1type__traits.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -325,6 +328,11 @@ template&lt;typename View &gt; </td></tr>
 <tr class="memitem:a62faab2402f172fb1d0dde766f51b3d7"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><b>byte_type_t</b> = typename <a class="el" href="structsbepp_1_1byte__type.html">byte_type</a>&lt;View&gt;::type</td></tr>
 <tr class="memdesc:a62faab2402f172fb1d0dde766f51b3d7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Shortcut for <code><a class="el" href="structsbepp_1_1byte__type.html" title="Trait to get view&#39;s byte type.">byte_type</a>&lt;T&gt;::type</code> <br /></td></tr>
 <tr class="separator:a62faab2402f172fb1d0dde766f51b3d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0ddc0b9ce9e876a0ac772b4d1af64b4b" id="r_a0ddc0b9ce9e876a0ac772b4d1af64b4b"><td class="memTemplParams" colspan="2"><a id="a0ddc0b9ce9e876a0ac772b4d1af64b4b" name="a0ddc0b9ce9e876a0ac772b4d1af64b4b"></a>
+template&lt;typename ValueType &gt; </td></tr>
+<tr class="memitem:a0ddc0b9ce9e876a0ac772b4d1af64b4b"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><b>traits_tag_t</b> = typename <a class="el" href="structsbepp_1_1traits__tag.html">traits_tag</a>&lt;ValueType&gt;::type</td></tr>
+<tr class="memdesc:a0ddc0b9ce9e876a0ac772b4d1af64b4b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Shorthand for <code><a class="el" href="structsbepp_1_1traits__tag.html" title="Maps representation type to its tag.">sbepp::traits_tag</a>&lt;T&gt;::type</code> <br /></td></tr>
+<tr class="separator:a0ddc0b9ce9e876a0ac772b4d1af64b4b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af543fe4e16fb809febcbeb4f8888bdae" id="r_af543fe4e16fb809febcbeb4f8888bdae"><td class="memTemplParams" colspan="2"><a id="af543fe4e16fb809febcbeb4f8888bdae" name="af543fe4e16fb809febcbeb4f8888bdae"></a>
 template&lt;typename T &gt; </td></tr>
 <tr class="memitem:af543fe4e16fb809febcbeb4f8888bdae"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><b>is_array_type</b> = typename detail::is_array_type_impl&lt;T&gt;::type</td></tr>

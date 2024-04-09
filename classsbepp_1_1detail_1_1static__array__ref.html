@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.10.0"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>sbepp: sbepp::detail::static_array_ref&lt; Byte, Value, N &gt; Class Template Reference</title>
+<title>sbepp: sbepp::detail::static_array_ref&lt; Byte, Value, N, Tag &gt; Class Template Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -105,7 +105,7 @@ $(function(){initNavTree('classsbepp_1_1detail_1_1static__array__ref.html',''); 
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="classsbepp_1_1detail_1_1static__array__ref-members.html">List of all members</a>  </div>
-  <div class="headertitle"><div class="title">sbepp::detail::static_array_ref&lt; Byte, Value, N &gt; Class Template Reference</div></div>
+  <div class="headertitle"><div class="title">sbepp::detail::static_array_ref&lt; Byte, Value, N, Tag &gt; Class Template Reference</div></div>
 </div><!--header-->
 <div class="contents">
 
@@ -114,86 +114,90 @@ $(function(){initNavTree('classsbepp_1_1detail_1_1static__array__ref.html',''); 
 
 <p><code>#include &lt;<a class="el" href="sbepp_8hpp_source.html">sbepp.hpp</a>&gt;</code></p>
 <div class="dynheader">
-Inheritance diagram for sbepp::detail::static_array_ref&lt; Byte, Value, N &gt;:</div>
+Inheritance diagram for sbepp::detail::static_array_ref&lt; Byte, Value, N, Tag &gt;:</div>
 <div class="dyncontent">
  <div class="center">
-  <img src="classsbepp_1_1detail_1_1static__array__ref.png" usemap="#sbepp::detail::static_5Farray_5Fref_3C_20Byte_2C_20Value_2C_20N_20_3E_map" alt=""/>
-  <map id="sbepp::detail::static_5Farray_5Fref_3C_20Byte_2C_20Value_2C_20N_20_3E_map" name="sbepp::detail::static_5Farray_5Fref_3C_20Byte_2C_20Value_2C_20N_20_3E_map">
-<area href="classsbepp_1_1detail_1_1byte__range.html" title="Base class for all reference semantics types." alt="sbepp::detail::byte_range&lt; Byte &gt;" shape="rect" coords="0,0,287,24"/>
+  <img src="classsbepp_1_1detail_1_1static__array__ref.png" usemap="#sbepp::detail::static_5Farray_5Fref_3C_20Byte_2C_20Value_2C_20N_2C_20Tag_20_3E_map" alt=""/>
+  <map id="sbepp::detail::static_5Farray_5Fref_3C_20Byte_2C_20Value_2C_20N_2C_20Tag_20_3E_map" name="sbepp::detail::static_5Farray_5Fref_3C_20Byte_2C_20Value_2C_20N_2C_20Tag_20_3E_map">
+<area href="classsbepp_1_1detail_1_1byte__range.html" title="Base class for all reference semantics types." alt="sbepp::detail::byte_range&lt; Byte &gt;" shape="rect" coords="0,0,317,24"/>
   </map>
 </div></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-types" name="pub-types"></a>
 Public Types</h2></td></tr>
-<tr class="memitem:a0c4eb9107f320a5e39289e6717d9c553" id="r_a0c4eb9107f320a5e39289e6717d9c553"><td class="memItemLeft" align="right" valign="top"><a id="a0c4eb9107f320a5e39289e6717d9c553" name="a0c4eb9107f320a5e39289e6717d9c553"></a>
+<tr class="memitem:a176748034417a904822fca0e9b7b9de5" id="r_a176748034417a904822fca0e9b7b9de5"><td class="memItemLeft" align="right" valign="top"><a id="a176748034417a904822fca0e9b7b9de5" name="a176748034417a904822fca0e9b7b9de5"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><b>element_type</b> = detail::apply_cv_qualifiers_t&lt;Byte, Value&gt;</td></tr>
-<tr class="memdesc:a0c4eb9107f320a5e39289e6717d9c553"><td class="mdescLeft">&#160;</td><td class="mdescRight">final element type. <code>value_type</code> with the same cv-qualifiers as <code>Byte</code> <br /></td></tr>
-<tr class="separator:a0c4eb9107f320a5e39289e6717d9c553"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab36ec99c22c39e1565d71bce6387bd94" id="r_ab36ec99c22c39e1565d71bce6387bd94"><td class="memItemLeft" align="right" valign="top"><a id="ab36ec99c22c39e1565d71bce6387bd94" name="ab36ec99c22c39e1565d71bce6387bd94"></a>
+<tr class="memdesc:a176748034417a904822fca0e9b7b9de5"><td class="mdescLeft">&#160;</td><td class="mdescRight">final element type. <code>value_type</code> with the same cv-qualifiers as <code>Byte</code> <br /></td></tr>
+<tr class="separator:a176748034417a904822fca0e9b7b9de5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8e1cca220f7deac75b4f752714360f0a" id="r_a8e1cca220f7deac75b4f752714360f0a"><td class="memItemLeft" align="right" valign="top"><a id="a8e1cca220f7deac75b4f752714360f0a" name="a8e1cca220f7deac75b4f752714360f0a"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><b>value_type</b> = Value</td></tr>
-<tr class="memdesc:ab36ec99c22c39e1565d71bce6387bd94"><td class="mdescLeft">&#160;</td><td class="mdescRight">same as <code>Value</code> <br /></td></tr>
-<tr class="separator:ab36ec99c22c39e1565d71bce6387bd94"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acc26cc4360f5fe4dcc14ae6ccac88b42" id="r_acc26cc4360f5fe4dcc14ae6ccac88b42"><td class="memItemLeft" align="right" valign="top"><a id="acc26cc4360f5fe4dcc14ae6ccac88b42" name="acc26cc4360f5fe4dcc14ae6ccac88b42"></a>
+<tr class="memdesc:a8e1cca220f7deac75b4f752714360f0a"><td class="mdescLeft">&#160;</td><td class="mdescRight">same as <code>Value</code> <br /></td></tr>
+<tr class="separator:a8e1cca220f7deac75b4f752714360f0a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abb383b2485f0056dc2da7c7abfe25348" id="r_abb383b2485f0056dc2da7c7abfe25348"><td class="memItemLeft" align="right" valign="top"><a id="abb383b2485f0056dc2da7c7abfe25348" name="abb383b2485f0056dc2da7c7abfe25348"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><b>size_type</b> = std::size_t</td></tr>
-<tr class="memdesc:acc26cc4360f5fe4dcc14ae6ccac88b42"><td class="mdescLeft">&#160;</td><td class="mdescRight"><code>std::size_t</code> <br /></td></tr>
-<tr class="separator:acc26cc4360f5fe4dcc14ae6ccac88b42"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a05ee36304e716ad38a778ae627f8a197" id="r_a05ee36304e716ad38a778ae627f8a197"><td class="memItemLeft" align="right" valign="top"><a id="a05ee36304e716ad38a778ae627f8a197" name="a05ee36304e716ad38a778ae627f8a197"></a>
+<tr class="memdesc:abb383b2485f0056dc2da7c7abfe25348"><td class="mdescLeft">&#160;</td><td class="mdescRight"><code>std::size_t</code> <br /></td></tr>
+<tr class="separator:abb383b2485f0056dc2da7c7abfe25348"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae897b6ab0cd2f673d57b625c34734a74" id="r_ae897b6ab0cd2f673d57b625c34734a74"><td class="memItemLeft" align="right" valign="top"><a id="ae897b6ab0cd2f673d57b625c34734a74" name="ae897b6ab0cd2f673d57b625c34734a74"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><b>difference_type</b> = std::ptrdiff_t</td></tr>
-<tr class="memdesc:a05ee36304e716ad38a778ae627f8a197"><td class="mdescLeft">&#160;</td><td class="mdescRight"><code>std::ptrdiff_t</code> <br /></td></tr>
-<tr class="separator:a05ee36304e716ad38a778ae627f8a197"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab078a242c1192969c122360bfd57fe07" id="r_ab078a242c1192969c122360bfd57fe07"><td class="memItemLeft" align="right" valign="top"><a id="ab078a242c1192969c122360bfd57fe07" name="ab078a242c1192969c122360bfd57fe07"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><b>reference</b> = <a class="el" href="#a0c4eb9107f320a5e39289e6717d9c553">element_type</a>&amp;</td></tr>
-<tr class="memdesc:ab078a242c1192969c122360bfd57fe07"><td class="mdescLeft">&#160;</td><td class="mdescRight">element reference type <br /></td></tr>
-<tr class="separator:ab078a242c1192969c122360bfd57fe07"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afa18801e896cd5718de12d46792f20bf" id="r_afa18801e896cd5718de12d46792f20bf"><td class="memItemLeft" align="right" valign="top"><a id="afa18801e896cd5718de12d46792f20bf" name="afa18801e896cd5718de12d46792f20bf"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><b>pointer</b> = <a class="el" href="#a0c4eb9107f320a5e39289e6717d9c553">element_type</a>*</td></tr>
-<tr class="memdesc:afa18801e896cd5718de12d46792f20bf"><td class="mdescLeft">&#160;</td><td class="mdescRight">element pointer type <br /></td></tr>
-<tr class="separator:afa18801e896cd5718de12d46792f20bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac4b9da1b6bcdc670e2e2149193f829d8" id="r_ac4b9da1b6bcdc670e2e2149193f829d8"><td class="memItemLeft" align="right" valign="top"><a id="ac4b9da1b6bcdc670e2e2149193f829d8" name="ac4b9da1b6bcdc670e2e2149193f829d8"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><b>iterator</b> = <a class="el" href="#afa18801e896cd5718de12d46792f20bf">pointer</a></td></tr>
-<tr class="memdesc:ac4b9da1b6bcdc670e2e2149193f829d8"><td class="mdescLeft">&#160;</td><td class="mdescRight">iterator type. Satisfies <code>std::random_access_iterator</code> <br /></td></tr>
-<tr class="separator:ac4b9da1b6bcdc670e2e2149193f829d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab815908fb0380f7002a1b26e4808b606" id="r_ab815908fb0380f7002a1b26e4808b606"><td class="memItemLeft" align="right" valign="top"><a id="ab815908fb0380f7002a1b26e4808b606" name="ab815908fb0380f7002a1b26e4808b606"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><b>reverse_iterator</b> = std::reverse_iterator&lt;<a class="el" href="#ac4b9da1b6bcdc670e2e2149193f829d8">iterator</a>&gt;</td></tr>
-<tr class="memdesc:ab815908fb0380f7002a1b26e4808b606"><td class="mdescLeft">&#160;</td><td class="mdescRight">reverse iterator type <br /></td></tr>
-<tr class="separator:ab815908fb0380f7002a1b26e4808b606"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memdesc:ae897b6ab0cd2f673d57b625c34734a74"><td class="mdescLeft">&#160;</td><td class="mdescRight"><code>std::ptrdiff_t</code> <br /></td></tr>
+<tr class="separator:ae897b6ab0cd2f673d57b625c34734a74"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a69e247ae253fa7eabf6e4ab9a172f868" id="r_a69e247ae253fa7eabf6e4ab9a172f868"><td class="memItemLeft" align="right" valign="top"><a id="a69e247ae253fa7eabf6e4ab9a172f868" name="a69e247ae253fa7eabf6e4ab9a172f868"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>reference</b> = <a class="el" href="#a176748034417a904822fca0e9b7b9de5">element_type</a>&amp;</td></tr>
+<tr class="memdesc:a69e247ae253fa7eabf6e4ab9a172f868"><td class="mdescLeft">&#160;</td><td class="mdescRight">element reference type <br /></td></tr>
+<tr class="separator:a69e247ae253fa7eabf6e4ab9a172f868"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa775677cb577b70b84b0f401ad3c1563" id="r_aa775677cb577b70b84b0f401ad3c1563"><td class="memItemLeft" align="right" valign="top"><a id="aa775677cb577b70b84b0f401ad3c1563" name="aa775677cb577b70b84b0f401ad3c1563"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>pointer</b> = <a class="el" href="#a176748034417a904822fca0e9b7b9de5">element_type</a>*</td></tr>
+<tr class="memdesc:aa775677cb577b70b84b0f401ad3c1563"><td class="mdescLeft">&#160;</td><td class="mdescRight">element pointer type <br /></td></tr>
+<tr class="separator:aa775677cb577b70b84b0f401ad3c1563"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0577190cd9886056a8512fde116c3bd8" id="r_a0577190cd9886056a8512fde116c3bd8"><td class="memItemLeft" align="right" valign="top"><a id="a0577190cd9886056a8512fde116c3bd8" name="a0577190cd9886056a8512fde116c3bd8"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>iterator</b> = <a class="el" href="#aa775677cb577b70b84b0f401ad3c1563">pointer</a></td></tr>
+<tr class="memdesc:a0577190cd9886056a8512fde116c3bd8"><td class="mdescLeft">&#160;</td><td class="mdescRight">iterator type. Satisfies <code>std::random_access_iterator</code> <br /></td></tr>
+<tr class="separator:a0577190cd9886056a8512fde116c3bd8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7a19d2f6a6b3b2256275e7aa13eb5cd0" id="r_a7a19d2f6a6b3b2256275e7aa13eb5cd0"><td class="memItemLeft" align="right" valign="top"><a id="a7a19d2f6a6b3b2256275e7aa13eb5cd0" name="a7a19d2f6a6b3b2256275e7aa13eb5cd0"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>reverse_iterator</b> = std::reverse_iterator&lt;<a class="el" href="#a0577190cd9886056a8512fde116c3bd8">iterator</a>&gt;</td></tr>
+<tr class="memdesc:a7a19d2f6a6b3b2256275e7aa13eb5cd0"><td class="mdescLeft">&#160;</td><td class="mdescRight">reverse iterator type <br /></td></tr>
+<tr class="separator:a7a19d2f6a6b3b2256275e7aa13eb5cd0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8f35529c37c4d55f3a28a73996dfcf68" id="r_a8f35529c37c4d55f3a28a73996dfcf68"><td class="memItemLeft" align="right" valign="top"><a id="a8f35529c37c4d55f3a28a73996dfcf68" name="a8f35529c37c4d55f3a28a73996dfcf68"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>tag</b> = Tag</td></tr>
+<tr class="memdesc:a8f35529c37c4d55f3a28a73996dfcf68"><td class="mdescLeft">&#160;</td><td class="mdescRight">type tag <br /></td></tr>
+<tr class="separator:a8f35529c37c4d55f3a28a73996dfcf68"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a3d21ab0cb09cf37c41b03e346121a5f3" id="r_a3d21ab0cb09cf37c41b03e346121a5f3"><td class="memItemLeft" align="right" valign="top">constexpr <a class="el" href="#ab078a242c1192969c122360bfd57fe07">reference</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3d21ab0cb09cf37c41b03e346121a5f3">operator[]</a> (<a class="el" href="#acc26cc4360f5fe4dcc14ae6ccac88b42">size_type</a> pos) const noexcept</td></tr>
-<tr class="memdesc:a3d21ab0cb09cf37c41b03e346121a5f3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Access element at <code>pos</code>  <br /></td></tr>
-<tr class="separator:a3d21ab0cb09cf37c41b03e346121a5f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af7e985d2c277891bfc9ddd3c539af559" id="r_af7e985d2c277891bfc9ddd3c539af559"><td class="memItemLeft" align="right" valign="top"><a id="af7e985d2c277891bfc9ddd3c539af559" name="af7e985d2c277891bfc9ddd3c539af559"></a>
-constexpr <a class="el" href="#ab078a242c1192969c122360bfd57fe07">reference</a>&#160;</td><td class="memItemRight" valign="bottom"><b>front</b> () const noexcept</td></tr>
-<tr class="memdesc:af7e985d2c277891bfc9ddd3c539af559"><td class="mdescLeft">&#160;</td><td class="mdescRight">Access the first element. <br /></td></tr>
-<tr class="separator:af7e985d2c277891bfc9ddd3c539af559"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8113f1ab02fc1d5a994ea204d0e764c1" id="r_a8113f1ab02fc1d5a994ea204d0e764c1"><td class="memItemLeft" align="right" valign="top"><a id="a8113f1ab02fc1d5a994ea204d0e764c1" name="a8113f1ab02fc1d5a994ea204d0e764c1"></a>
-constexpr <a class="el" href="#ab078a242c1192969c122360bfd57fe07">reference</a>&#160;</td><td class="memItemRight" valign="bottom"><b>back</b> () const noexcept</td></tr>
-<tr class="memdesc:a8113f1ab02fc1d5a994ea204d0e764c1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Access the last element. <br /></td></tr>
-<tr class="separator:a8113f1ab02fc1d5a994ea204d0e764c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af78104e40864252093be87e5e2aa64eb" id="r_af78104e40864252093be87e5e2aa64eb"><td class="memItemLeft" align="right" valign="top"><a id="af78104e40864252093be87e5e2aa64eb" name="af78104e40864252093be87e5e2aa64eb"></a>
-constexpr <a class="el" href="#afa18801e896cd5718de12d46792f20bf">pointer</a>&#160;</td><td class="memItemRight" valign="bottom"><b>data</b> () const noexcept</td></tr>
-<tr class="memdesc:af78104e40864252093be87e5e2aa64eb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Direct access to the underlying array. <br /></td></tr>
-<tr class="separator:af78104e40864252093be87e5e2aa64eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a670d55aedec4edaabd46434409e0b4de" id="r_a670d55aedec4edaabd46434409e0b4de"><td class="memItemLeft" align="right" valign="top"><a id="a670d55aedec4edaabd46434409e0b4de" name="a670d55aedec4edaabd46434409e0b4de"></a>
-constexpr <a class="el" href="#ac4b9da1b6bcdc670e2e2149193f829d8">iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><b>begin</b> () const noexcept</td></tr>
-<tr class="memdesc:a670d55aedec4edaabd46434409e0b4de"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns an iterator to the beginning. <br /></td></tr>
-<tr class="separator:a670d55aedec4edaabd46434409e0b4de"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a066131d405b72a8e66ee2bd4013897c1" id="r_a066131d405b72a8e66ee2bd4013897c1"><td class="memItemLeft" align="right" valign="top"><a id="a066131d405b72a8e66ee2bd4013897c1" name="a066131d405b72a8e66ee2bd4013897c1"></a>
-constexpr <a class="el" href="#ac4b9da1b6bcdc670e2e2149193f829d8">iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><b>end</b> () const noexcept</td></tr>
-<tr class="memdesc:a066131d405b72a8e66ee2bd4013897c1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns an iterator to the end. <br /></td></tr>
-<tr class="separator:a066131d405b72a8e66ee2bd4013897c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab3b36c1f7b0f6caae4392493afd628e5" id="r_ab3b36c1f7b0f6caae4392493afd628e5"><td class="memItemLeft" align="right" valign="top"><a id="ab3b36c1f7b0f6caae4392493afd628e5" name="ab3b36c1f7b0f6caae4392493afd628e5"></a>
-constexpr <a class="el" href="#ab815908fb0380f7002a1b26e4808b606">reverse_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><b>rbegin</b> () const noexcept</td></tr>
-<tr class="memdesc:ab3b36c1f7b0f6caae4392493afd628e5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a reverse iterator to the beginning. <br /></td></tr>
-<tr class="separator:ab3b36c1f7b0f6caae4392493afd628e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a42b1701988dcb029beac99a93cd3cc27" id="r_a42b1701988dcb029beac99a93cd3cc27"><td class="memItemLeft" align="right" valign="top"><a id="a42b1701988dcb029beac99a93cd3cc27" name="a42b1701988dcb029beac99a93cd3cc27"></a>
-constexpr <a class="el" href="#ab815908fb0380f7002a1b26e4808b606">reverse_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><b>rend</b> () const noexcept</td></tr>
-<tr class="memdesc:a42b1701988dcb029beac99a93cd3cc27"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a reverse iterator to the end. <br /></td></tr>
-<tr class="separator:a42b1701988dcb029beac99a93cd3cc27"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a853220c0a5412fd84acfc53af812158a" id="r_a853220c0a5412fd84acfc53af812158a"><td class="memItemLeft" align="right" valign="top">constexpr <a class="el" href="classsbepp_1_1detail_1_1static__array__ref.html">static_array_ref</a>&lt; Byte, detail::remove_cv_t&lt; Byte &gt;, N &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a853220c0a5412fd84acfc53af812158a">raw</a> () const noexcept</td></tr>
-<tr class="memdesc:a853220c0a5412fd84acfc53af812158a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns <code><a class="el" href="classsbepp_1_1detail_1_1static__array__ref.html" title="Represents reference to fixed-size array.">static_array_ref</a>&lt;Byte, Byte, N&gt;</code>.  <br /></td></tr>
-<tr class="separator:a853220c0a5412fd84acfc53af812158a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1ae586c96a448c07cf689c25b19fd029" id="r_a1ae586c96a448c07cf689c25b19fd029"><td class="memItemLeft" align="right" valign="top">constexpr <a class="el" href="#a69e247ae253fa7eabf6e4ab9a172f868">reference</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1ae586c96a448c07cf689c25b19fd029">operator[]</a> (<a class="el" href="#abb383b2485f0056dc2da7c7abfe25348">size_type</a> pos) const noexcept</td></tr>
+<tr class="memdesc:a1ae586c96a448c07cf689c25b19fd029"><td class="mdescLeft">&#160;</td><td class="mdescRight">Access element at <code>pos</code>  <br /></td></tr>
+<tr class="separator:a1ae586c96a448c07cf689c25b19fd029"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a286579c340a4b1e83aa172c8663ea4e4" id="r_a286579c340a4b1e83aa172c8663ea4e4"><td class="memItemLeft" align="right" valign="top"><a id="a286579c340a4b1e83aa172c8663ea4e4" name="a286579c340a4b1e83aa172c8663ea4e4"></a>
+constexpr <a class="el" href="#a69e247ae253fa7eabf6e4ab9a172f868">reference</a>&#160;</td><td class="memItemRight" valign="bottom"><b>front</b> () const noexcept</td></tr>
+<tr class="memdesc:a286579c340a4b1e83aa172c8663ea4e4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Access the first element. <br /></td></tr>
+<tr class="separator:a286579c340a4b1e83aa172c8663ea4e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8161979b4c364af8280eab33295a846d" id="r_a8161979b4c364af8280eab33295a846d"><td class="memItemLeft" align="right" valign="top"><a id="a8161979b4c364af8280eab33295a846d" name="a8161979b4c364af8280eab33295a846d"></a>
+constexpr <a class="el" href="#a69e247ae253fa7eabf6e4ab9a172f868">reference</a>&#160;</td><td class="memItemRight" valign="bottom"><b>back</b> () const noexcept</td></tr>
+<tr class="memdesc:a8161979b4c364af8280eab33295a846d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Access the last element. <br /></td></tr>
+<tr class="separator:a8161979b4c364af8280eab33295a846d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aee2ad1343a3cb7125a0f709823d49ce2" id="r_aee2ad1343a3cb7125a0f709823d49ce2"><td class="memItemLeft" align="right" valign="top"><a id="aee2ad1343a3cb7125a0f709823d49ce2" name="aee2ad1343a3cb7125a0f709823d49ce2"></a>
+constexpr <a class="el" href="#aa775677cb577b70b84b0f401ad3c1563">pointer</a>&#160;</td><td class="memItemRight" valign="bottom"><b>data</b> () const noexcept</td></tr>
+<tr class="memdesc:aee2ad1343a3cb7125a0f709823d49ce2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Direct access to the underlying array. <br /></td></tr>
+<tr class="separator:aee2ad1343a3cb7125a0f709823d49ce2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a52cfd8c882748794a264f46b0e0c713d" id="r_a52cfd8c882748794a264f46b0e0c713d"><td class="memItemLeft" align="right" valign="top"><a id="a52cfd8c882748794a264f46b0e0c713d" name="a52cfd8c882748794a264f46b0e0c713d"></a>
+constexpr <a class="el" href="#a0577190cd9886056a8512fde116c3bd8">iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><b>begin</b> () const noexcept</td></tr>
+<tr class="memdesc:a52cfd8c882748794a264f46b0e0c713d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns an iterator to the beginning. <br /></td></tr>
+<tr class="separator:a52cfd8c882748794a264f46b0e0c713d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abebb90c516c364c907bb12866c63d204" id="r_abebb90c516c364c907bb12866c63d204"><td class="memItemLeft" align="right" valign="top"><a id="abebb90c516c364c907bb12866c63d204" name="abebb90c516c364c907bb12866c63d204"></a>
+constexpr <a class="el" href="#a0577190cd9886056a8512fde116c3bd8">iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><b>end</b> () const noexcept</td></tr>
+<tr class="memdesc:abebb90c516c364c907bb12866c63d204"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns an iterator to the end. <br /></td></tr>
+<tr class="separator:abebb90c516c364c907bb12866c63d204"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:addc12c2bc16cb23b01600c3e57d35ac4" id="r_addc12c2bc16cb23b01600c3e57d35ac4"><td class="memItemLeft" align="right" valign="top"><a id="addc12c2bc16cb23b01600c3e57d35ac4" name="addc12c2bc16cb23b01600c3e57d35ac4"></a>
+constexpr <a class="el" href="#a7a19d2f6a6b3b2256275e7aa13eb5cd0">reverse_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><b>rbegin</b> () const noexcept</td></tr>
+<tr class="memdesc:addc12c2bc16cb23b01600c3e57d35ac4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a reverse iterator to the beginning. <br /></td></tr>
+<tr class="separator:addc12c2bc16cb23b01600c3e57d35ac4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a08129031f89bb2966ed9c9bac94cd12c" id="r_a08129031f89bb2966ed9c9bac94cd12c"><td class="memItemLeft" align="right" valign="top"><a id="a08129031f89bb2966ed9c9bac94cd12c" name="a08129031f89bb2966ed9c9bac94cd12c"></a>
+constexpr <a class="el" href="#a7a19d2f6a6b3b2256275e7aa13eb5cd0">reverse_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><b>rend</b> () const noexcept</td></tr>
+<tr class="memdesc:a08129031f89bb2966ed9c9bac94cd12c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a reverse iterator to the end. <br /></td></tr>
+<tr class="separator:a08129031f89bb2966ed9c9bac94cd12c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5dd21b7f6ea885f1a707ee3da056be14" id="r_a5dd21b7f6ea885f1a707ee3da056be14"><td class="memItemLeft" align="right" valign="top">constexpr <a class="el" href="classsbepp_1_1detail_1_1static__array__ref.html">static_array_ref</a>&lt; Byte, detail::remove_cv_t&lt; Byte &gt;, N, Tag &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5dd21b7f6ea885f1a707ee3da056be14">raw</a> () const noexcept</td></tr>
+<tr class="memdesc:a5dd21b7f6ea885f1a707ee3da056be14"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns <code><a class="el" href="classsbepp_1_1detail_1_1static__array__ref.html" title="Represents reference to fixed-size array.">static_array_ref</a>&lt;Byte, Byte, N, Tag&gt;</code>.  <br /></td></tr>
+<tr class="separator:a5dd21b7f6ea885f1a707ee3da056be14"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classsbepp_1_1detail_1_1byte__range"><td colspan="2" onclick="javascript:dynsection.toggleInherit('pub_methods_classsbepp_1_1detail_1_1byte__range')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classsbepp_1_1detail_1_1byte__range.html">sbepp::detail::byte_range&lt; Byte &gt;</a></td></tr>
 <tr class="memitem:a7c71293de61b7e01d5f7ca29d72e394a inherit pub_methods_classsbepp_1_1detail_1_1byte__range" id="r_a7c71293de61b7e01d5f7ca29d72e394a"><td class="memItemLeft" align="right" valign="top">
 &#160;</td><td class="memItemRight" valign="bottom"><b>byte_range</b> ()=default</td></tr>
@@ -215,46 +219,47 @@ template&lt;typename Byte2 , typename  = enable_if_convertible_t&lt;Byte2, Byte&
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:a75c91858c7606d12423b9a76528dd8b8" id="r_a75c91858c7606d12423b9a76528dd8b8"><td class="memItemLeft" align="right" valign="top"><a id="a75c91858c7606d12423b9a76528dd8b8" name="a75c91858c7606d12423b9a76528dd8b8"></a>
+<tr class="memitem:a0d37b6688d547bb416e0d69b21062b11" id="r_a0d37b6688d547bb416e0d69b21062b11"><td class="memItemLeft" align="right" valign="top"><a id="a0d37b6688d547bb416e0d69b21062b11" name="a0d37b6688d547bb416e0d69b21062b11"></a>
 static constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><b>empty</b> () noexcept</td></tr>
-<tr class="memdesc:a75c91858c7606d12423b9a76528dd8b8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if <code><a class="el" href="#a1ea445c3c436fb1733ba06675f4c0d19" title="Returns N">size()</a> != 0</code> <br /></td></tr>
-<tr class="separator:a75c91858c7606d12423b9a76528dd8b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1ea445c3c436fb1733ba06675f4c0d19" id="r_a1ea445c3c436fb1733ba06675f4c0d19"><td class="memItemLeft" align="right" valign="top"><a id="a1ea445c3c436fb1733ba06675f4c0d19" name="a1ea445c3c436fb1733ba06675f4c0d19"></a>
-static constexpr <a class="el" href="#acc26cc4360f5fe4dcc14ae6ccac88b42">size_type</a>&#160;</td><td class="memItemRight" valign="bottom"><b>size</b> () noexcept</td></tr>
-<tr class="memdesc:a1ea445c3c436fb1733ba06675f4c0d19"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns <code>N</code> <br /></td></tr>
-<tr class="separator:a1ea445c3c436fb1733ba06675f4c0d19"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a51cbb097521a347c253d5228a0f2aa95" id="r_a51cbb097521a347c253d5228a0f2aa95"><td class="memItemLeft" align="right" valign="top"><a id="a51cbb097521a347c253d5228a0f2aa95" name="a51cbb097521a347c253d5228a0f2aa95"></a>
-static constexpr <a class="el" href="#acc26cc4360f5fe4dcc14ae6ccac88b42">size_type</a>&#160;</td><td class="memItemRight" valign="bottom"><b>max_size</b> () noexcept</td></tr>
-<tr class="memdesc:a51cbb097521a347c253d5228a0f2aa95"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns <code><a class="el" href="#a1ea445c3c436fb1733ba06675f4c0d19" title="Returns N">size()</a></code> <br /></td></tr>
-<tr class="separator:a51cbb097521a347c253d5228a0f2aa95"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memdesc:a0d37b6688d547bb416e0d69b21062b11"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if <code><a class="el" href="#a5d2d9f298405582da167e8648a981857" title="Returns N">size()</a> != 0</code> <br /></td></tr>
+<tr class="separator:a0d37b6688d547bb416e0d69b21062b11"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5d2d9f298405582da167e8648a981857" id="r_a5d2d9f298405582da167e8648a981857"><td class="memItemLeft" align="right" valign="top"><a id="a5d2d9f298405582da167e8648a981857" name="a5d2d9f298405582da167e8648a981857"></a>
+static constexpr <a class="el" href="#abb383b2485f0056dc2da7c7abfe25348">size_type</a>&#160;</td><td class="memItemRight" valign="bottom"><b>size</b> () noexcept</td></tr>
+<tr class="memdesc:a5d2d9f298405582da167e8648a981857"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns <code>N</code> <br /></td></tr>
+<tr class="separator:a5d2d9f298405582da167e8648a981857"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae31484884a0b32d4a1f8a2fca7e75565" id="r_ae31484884a0b32d4a1f8a2fca7e75565"><td class="memItemLeft" align="right" valign="top"><a id="ae31484884a0b32d4a1f8a2fca7e75565" name="ae31484884a0b32d4a1f8a2fca7e75565"></a>
+static constexpr <a class="el" href="#abb383b2485f0056dc2da7c7abfe25348">size_type</a>&#160;</td><td class="memItemRight" valign="bottom"><b>max_size</b> () noexcept</td></tr>
+<tr class="memdesc:ae31484884a0b32d4a1f8a2fca7e75565"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns <code><a class="el" href="#a5d2d9f298405582da167e8648a981857" title="Returns N">size()</a></code> <br /></td></tr>
+<tr class="separator:ae31484884a0b32d4a1f8a2fca7e75565"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><div class="compoundTemplParams">template&lt;typename Byte, typename Value, std::size_t N&gt;<br />
-class sbepp::detail::static_array_ref&lt; Byte, Value, N &gt;</div><p>Represents reference to fixed-size array. </p>
+<div class="textblock"><div class="compoundTemplParams">template&lt;typename Byte, typename Value, std::size_t N, typename Tag&gt;<br />
+class sbepp::detail::static_array_ref&lt; Byte, Value, N, Tag &gt;</div><p>Represents reference to fixed-size array. </p>
 <p>The general precondition for most functions is that current buffer should be able to hold all elements </p><dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">Byte</td><td>byte type </td></tr>
     <tr><td class="paramname">Value</td><td>array element type from schema </td></tr>
     <tr><td class="paramname">N</td><td>array length </td></tr>
+    <tr><td class="paramname">Tag</td><td>type tag </td></tr>
   </table>
   </dd>
 </dl>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a id="a3d21ab0cb09cf37c41b03e346121a5f3" name="a3d21ab0cb09cf37c41b03e346121a5f3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3d21ab0cb09cf37c41b03e346121a5f3">&#9670;&#160;</a></span>operator[]()</h2>
+<a id="a1ae586c96a448c07cf689c25b19fd029" name="a1ae586c96a448c07cf689c25b19fd029"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1ae586c96a448c07cf689c25b19fd029">&#9670;&#160;</a></span>operator[]()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Byte , typename Value , std::size_t N&gt; </div>
+template&lt;typename Byte , typename Value , std::size_t N, typename Tag &gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">constexpr <a class="el" href="#ab078a242c1192969c122360bfd57fe07">reference</a> <a class="el" href="classsbepp_1_1detail_1_1static__array__ref.html">sbepp::detail::static_array_ref</a>&lt; Byte, Value, N &gt;::operator[] </td>
+          <td class="memname">constexpr <a class="el" href="#a69e247ae253fa7eabf6e4ab9a172f868">reference</a> <a class="el" href="classsbepp_1_1detail_1_1static__array__ref.html">sbepp::detail::static_array_ref</a>&lt; Byte, Value, N, Tag &gt;::operator[] </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="#acc26cc4360f5fe4dcc14ae6ccac88b42">size_type</a></td>          <td class="paramname"><span class="paramname"><em>pos</em></span></td><td>)</td>
+          <td class="paramtype"><a class="el" href="#abb383b2485f0056dc2da7c7abfe25348">size_type</a></td>          <td class="paramname"><span class="paramname"><em>pos</em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
@@ -266,23 +271,23 @@ template&lt;typename Byte , typename Value , std::size_t N&gt; </div>
 </div><div class="memdoc">
 
 <p>Access element at <code>pos</code> </p>
-<dl class="section pre"><dt>Precondition</dt><dd><code>pos &lt; <a class="el" href="#a1ea445c3c436fb1733ba06675f4c0d19" title="Returns N">size()</a></code> </dd></dl>
+<dl class="section pre"><dt>Precondition</dt><dd><code>pos &lt; <a class="el" href="#a5d2d9f298405582da167e8648a981857" title="Returns N">size()</a></code> </dd></dl>
 
 </div>
 </div>
-<a id="a853220c0a5412fd84acfc53af812158a" name="a853220c0a5412fd84acfc53af812158a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a853220c0a5412fd84acfc53af812158a">&#9670;&#160;</a></span>raw()</h2>
+<a id="a5dd21b7f6ea885f1a707ee3da056be14" name="a5dd21b7f6ea885f1a707ee3da056be14"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5dd21b7f6ea885f1a707ee3da056be14">&#9670;&#160;</a></span>raw()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Byte , typename Value , std::size_t N&gt; </div>
+template&lt;typename Byte , typename Value , std::size_t N, typename Tag &gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">constexpr <a class="el" href="classsbepp_1_1detail_1_1static__array__ref.html">static_array_ref</a>&lt; Byte, detail::remove_cv_t&lt; Byte &gt;, N &gt; <a class="el" href="classsbepp_1_1detail_1_1static__array__ref.html">sbepp::detail::static_array_ref</a>&lt; Byte, Value, N &gt;::raw </td>
+          <td class="memname">constexpr <a class="el" href="classsbepp_1_1detail_1_1static__array__ref.html">static_array_ref</a>&lt; Byte, detail::remove_cv_t&lt; Byte &gt;, N, Tag &gt; <a class="el" href="classsbepp_1_1detail_1_1static__array__ref.html">sbepp::detail::static_array_ref</a>&lt; Byte, Value, N, Tag &gt;::raw </td>
           <td>(</td>
           <td class="paramname"><span class="paramname"></span></td><td>)</td>
           <td> const</td>
@@ -295,12 +300,12 @@ template&lt;typename Byte , typename Value , std::size_t N&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Returns <code><a class="el" href="classsbepp_1_1detail_1_1static__array__ref.html" title="Represents reference to fixed-size array.">static_array_ref</a>&lt;Byte, Byte, N&gt;</code>. </p>
-<p>Useful in constexpr context to modify an array which has different <code>Byte</code> and <code>Value</code> types. Example: </p><div class="fragment"><div class="line"><a class="code hl_class" href="classsbepp_1_1detail_1_1static__array__ref.html">static_array_ref&lt;std::byte, char, 1&gt;</a> a1;</div>
+<p>Returns <code><a class="el" href="classsbepp_1_1detail_1_1static__array__ref.html" title="Represents reference to fixed-size array.">static_array_ref</a>&lt;Byte, Byte, N, Tag&gt;</code>. </p>
+<p>Useful in constexpr context to modify an array which has different <code>Byte</code> and <code>Value</code> types. Example: </p><div class="fragment"><div class="line"><a class="code hl_class" href="classsbepp_1_1detail_1_1static__array__ref.html">static_array_ref&lt;std::byte, char, 1, some_tag&gt;</a> a1;</div>
 <div class="line">a1[0] = <span class="charliteral">&#39;a&#39;</span>;    <span class="comment">// error: cannot convert `char` to `std::byte`</span></div>
-<div class="line">a1.<a class="code hl_function" href="#a853220c0a5412fd84acfc53af812158a">raw</a>()[0] = std::byte{<span class="charliteral">&#39;a&#39;</span>};   <span class="comment">// OK</span></div>
-<div class="ttc" id="aclasssbepp_1_1detail_1_1static__array__ref_html"><div class="ttname"><a href="classsbepp_1_1detail_1_1static__array__ref.html">sbepp::detail::static_array_ref</a></div><div class="ttdoc">Represents reference to fixed-size array.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:2808</div></div>
-<div class="ttc" id="aclasssbepp_1_1detail_1_1static__array__ref_html_a853220c0a5412fd84acfc53af812158a"><div class="ttname"><a href="#a853220c0a5412fd84acfc53af812158a">sbepp::detail::static_array_ref::raw</a></div><div class="ttdeci">constexpr static_array_ref&lt; Byte, detail::remove_cv_t&lt; Byte &gt;, N &gt; raw() const noexcept</div><div class="ttdoc">Returns static_array_ref&lt;Byte, Byte, N&gt;.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:2923</div></div>
+<div class="line">a1.<a class="code hl_function" href="#a5dd21b7f6ea885f1a707ee3da056be14">raw</a>()[0] = std::byte{<span class="charliteral">&#39;a&#39;</span>};   <span class="comment">// OK</span></div>
+<div class="ttc" id="aclasssbepp_1_1detail_1_1static__array__ref_html"><div class="ttname"><a href="classsbepp_1_1detail_1_1static__array__ref.html">sbepp::detail::static_array_ref</a></div><div class="ttdoc">Represents reference to fixed-size array.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:2809</div></div>
+<div class="ttc" id="aclasssbepp_1_1detail_1_1static__array__ref_html_a5dd21b7f6ea885f1a707ee3da056be14"><div class="ttname"><a href="#a5dd21b7f6ea885f1a707ee3da056be14">sbepp::detail::static_array_ref::raw</a></div><div class="ttdeci">constexpr static_array_ref&lt; Byte, detail::remove_cv_t&lt; Byte &gt;, N, Tag &gt; raw() const noexcept</div><div class="ttdoc">Returns static_array_ref&lt;Byte, Byte, N, Tag&gt;.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:2926</div></div>
 </div><!-- fragment --> 
 </div>
 </div>
