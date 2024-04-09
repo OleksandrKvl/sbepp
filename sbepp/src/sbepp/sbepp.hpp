@@ -4241,8 +4241,8 @@ public:
  * @tparam ValueType representation type
  *
  * Can be used to avoid typing both representation and tag types explicitly in
- * code. Available for messages, groups and all schema types. Not available for
- * `<data>` members.
+ * code. Available for messages, groups and all schema types except numeric
+ * constants. Not available for `<data>` members.
  *
  * Example:
  * ```cpp
