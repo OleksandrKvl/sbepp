@@ -26,9 +26,9 @@ public:
     template<typename T, typename Cursor, typename Tag>
     void on_message(T m, Cursor& c, Tag)
     {
-        append("message: {}\n", sbepp::message_traits<Tag>::name());
+        append_line("message: {}", sbepp::message_traits<Tag>::name());
         sbepp::visit(sbepp::get_header(m), *this);
-        append("content: \n");
+        append_line("content: ");
         indentation++;
         sbepp::visit_children(m, c, *this);
         indentation--;
@@ -37,7 +37,7 @@ public:
     template<typename T, typename Cursor, typename Tag>
     bool on_group(T g, Cursor& c, Tag)
     {
-        append("{}:\n", sbepp::group_traits<Tag>::name());
+        append_line("{}:", sbepp::group_traits<Tag>::name());
         indentation++;
         sbepp::visit_children(g, c, *this);
         indentation--;
@@ -48,7 +48,7 @@ public:
     template<typename T, typename Cursor>
     bool on_entry(T entry, Cursor& c)
     {
-        append("entry:\n");
+        append_line("entry:");
         indentation++;
         sbepp::visit_children(entry, c, *this);
         indentation--;
@@ -98,6 +98,31 @@ public:
         return {};
     }
 
+    template<typename Tag>
+    void on_enum_value(auto /*e*/, Tag)
+    {
+        append("{}\n", sbepp::enum_value_traits<Tag>::name());
+    }
+
+    void on_enum_value(auto e, sbepp::unknown_enum_value_tag)
+    {
+        append("unknown({})\n", sbepp::to_underlying(e));
+    }
+
+    template<typename Tag>
+    void on_set_choice(const bool value, Tag)
+    {
+        if(value)
+        {
+            if(!is_first_choice)
+            {
+                append(", ");
+            }
+            is_first_choice = false;
+            append("{}", sbepp::set_choice_traits<Tag>::name());
+        }
+    }
+
     const std::string& str() const
     {
         return res;
@@ -106,29 +131,42 @@ public:
 private:
     std::string res;
     std::size_t indentation{};
+    bool is_first_choice{};
+
+    void indent()
+    {
+        fmt::format_to(std::back_inserter(res), "{:{}}", "", indentation * 4);
+    }
 
     template<typename... Args>
     void append(fmt::format_string<Args...> fmt, Args&&... args)
     {
-        fmt::format_to(std::back_inserter(res), "{:{}}", "", indentation * 4);
         fmt::format_to(
             std::back_inserter(res), fmt, std::forward<Args>(args)...);
     }
 
+    template<typename... Args>
+    void append_line(fmt::format_string<Args...> fmt, Args&&... args)
+    {
+        indent();
+        append(fmt, std::forward<Args>(args)...);
+        res.push_back('\n');
+    }
+
     void on_encoding(sbepp::required_type auto t, const char* name)
     {
-        append("{}: {}\n", name, *t);
+        append_line("{}: {}", name, *t);
     }
 
     void on_encoding(sbepp::optional_type auto t, const char* name)
     {
         if(t)
         {
-            append("{}: {}\n", name, *t);
+            append_line("{}: {}", name, *t);
         }
         else
         {
-            append("{}: null\n", name);
+            append_line("{}: null", name);
         }
     }
 
@@ -144,52 +182,34 @@ private:
         {
             // output char arrays as C-strings. Keep in mind that they are not
             // required to be null-terminated so pass size explicitly
-            append("{}: {:.{}}\n", name, a.data(), a.size());
+            append_line("{}: {:.{}}", name, a.data(), a.size());
         }
         else
         {
             // use standard range-formatter
-            append("{}: {}\n", name, a);
+            append_line("{}: {}", name, a);
         }
     }
 
     void on_encoding(sbepp::enumeration auto e, const char* name)
     {
-        const auto as_string = sbepp::enum_to_string(e);
-        if(as_string)
-        {
-            append("{}: {}\n", name, as_string);
-        }
-        else
-        {
-            append("{}: unknown({})\n", name, sbepp::to_underlying(e));
-        }
+        indent();
+        append("{}: ", name);
+        sbepp::visit(e, *this);
     }
 
     void on_encoding(sbepp::set auto s, const char* name)
     {
-        std::size_t n{};
-        std::array<const char*, 64> choices{};
-        sbepp::visit_set(
-            s,
-            [&n, &choices](const auto value, const auto name)
-            {
-                if(value)
-                {
-                    choices[n] = name;
-                    n++;
-                }
-            });
-
-        append(
-            "{}: ({})\n",
-            name,
-            fmt::join(choices.begin(), choices.begin() + n, ", "));
+        indent();
+        append("{}: (", name);
+        is_first_choice = true;
+        sbepp::visit(s, *this);
+        append(")\n");
     }
 
     void on_encoding(sbepp::composite auto c, const char* name)
     {
-        append("{}:\n", name);
+        append_line("{}:", name);
         indentation++;
         sbepp::visit_children(c, *this);
         indentation--;

@@ -63,6 +63,49 @@ TEST(EnumTest, EnumToStringReturnsNullptrIfValueIsUnknown)
     ASSERT_EQ(sbepp::enum_to_string(e), nullptr);
 }
 
+template<enum_t Enumerator, typename ValidTag>
+class enum_test_visitor
+{
+public:
+    void on_enum_value(enum_t value, ValidTag)
+    {
+        valid = (value == Enumerator);
+    }
+
+    template<typename WrongTag>
+    void on_enum_value(enum_t /*value*/, WrongTag)
+    {
+        valid = false;
+    }
+
+    bool is_valid() const
+    {
+        return valid;
+    }
+
+private:
+    bool valid{};
+};
+
+TEST(EnumTest, EnumVisitorIsCalledWithCorrectValueAndTag)
+{
+    const auto visitor = sbepp::visit<enum_test_visitor<
+        enum_t::One,
+        test_schema::schema::types::numbers_enum::One>>(enum_t::One);
+
+    ASSERT_TRUE(visitor.is_valid());
+}
+
+TEST(EnumTest, EnumVisitorIsCalledWithUnknownTagForUnknownValue)
+{
+    constexpr auto unknown_value = static_cast<enum_t>(4);
+    const auto visitor = sbepp::visit<
+        enum_test_visitor<unknown_value, sbepp::unknown_enum_value_tag>>(
+        unknown_value);
+
+    ASSERT_TRUE(visitor.is_valid());
+}
+
 #if SBEPP_HAS_CONSTEXPR_ACCESSORS
 constexpr auto underlying = sbepp::to_underlying(enum_t::One);
 #endif
