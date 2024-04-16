@@ -4974,14 +4974,15 @@ namespace detail
 class enum_to_string_visitor
 {
 public:
-    template<typename Tag>
-    SBEPP_CPP14_CONSTEXPR void on_enum_value(auto /*e*/, Tag) noexcept
+    template<typename Enum, typename Tag>
+    SBEPP_CPP14_CONSTEXPR void on_enum_value(Enum /*e*/, Tag) noexcept
     {
         name_value = sbepp::enum_value_traits<Tag>::name();
     }
 
+    template<typename Enum>
     SBEPP_CPP14_CONSTEXPR void
-        on_enum_value(auto /*e*/, sbepp::unknown_enum_value_tag) noexcept
+        on_enum_value(Enum /*e*/, sbepp::unknown_enum_value_tag) noexcept
     {
         name_value = nullptr;
     }
