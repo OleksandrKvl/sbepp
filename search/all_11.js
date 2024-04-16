@@ -8,8 +8,9 @@ var searchData=
   ['uint64_5ft_5',['uint64_t',['../classsbepp_1_1uint64__t.html',1,'sbepp']]],
   ['uint8_5fopt_5ft_6',['uint8_opt_t',['../classsbepp_1_1uint8__opt__t.html',1,'sbepp']]],
   ['uint8_5ft_7',['uint8_t',['../classsbepp_1_1uint8__t.html',1,'sbepp']]],
-  ['using_20cursor_20based_20accessors_8',['Using cursor based accessors',['../examples.html#autotoc_md44',1,'Decoding a message using cursor-based accessors'],['../examples.html#autotoc_md40',1,'Encoding a message using cursor-based accessors']]],
-  ['using_20normal_20accessors_9',['Using normal accessors',['../examples.html#autotoc_md42',1,'Decoding a message using normal accessors'],['../examples.html#autotoc_md38',1,'Encoding a message using normal accessors']]],
-  ['using_20the_20schema_20compiler_10',['Using the schema compiler',['../sbeppc.html',1,'']]],
-  ['using_20traits_11',['Using traits',['../traits.html#autotoc_md36',1,'']]]
+  ['unknown_5fenum_5fvalue_5ftag_8',['unknown_enum_value_tag',['../structsbepp_1_1unknown__enum__value__tag.html',1,'sbepp']]],
+  ['using_20cursor_20based_20accessors_9',['Using cursor based accessors',['../examples.html#autotoc_md50',1,'Decoding a message using cursor-based accessors'],['../examples.html#autotoc_md46',1,'Encoding a message using cursor-based accessors']]],
+  ['using_20normal_20accessors_10',['Using normal accessors',['../examples.html#autotoc_md48',1,'Decoding a message using normal accessors'],['../examples.html#autotoc_md44',1,'Encoding a message using normal accessors']]],
+  ['using_20the_20schema_20compiler_11',['Using the schema compiler',['../sbeppc.html',1,'']]],
+  ['using_20traits_12',['Using traits',['../traits.html#autotoc_md36',1,'']]]
 ];

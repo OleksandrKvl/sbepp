@@ -95,5 +95,6 @@ var hierarchy =
     [ "sbepp::set_traits< T >", "classsbepp_1_1set__traits.html", null ],
     [ "sbepp::size_bytes_checked_result", "structsbepp_1_1size__bytes__checked__result.html", null ],
     [ "sbepp::traits_tag< ValueType >", "structsbepp_1_1traits__tag.html", null ],
-    [ "sbepp::type_traits< T >", "classsbepp_1_1type__traits.html", null ]
+    [ "sbepp::type_traits< T >", "classsbepp_1_1type__traits.html", null ],
+    [ "sbepp::unknown_enum_value_tag", "structsbepp_1_1unknown__enum__value__tag.html", null ]
 ];

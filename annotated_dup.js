@@ -53,6 +53,7 @@ var annotated_dup =
       [ "uint64_opt_t", "classsbepp_1_1uint64__opt__t.html", null ],
       [ "uint64_t", "classsbepp_1_1uint64__t.html", null ],
       [ "uint8_opt_t", "classsbepp_1_1uint8__opt__t.html", null ],
-      [ "uint8_t", "classsbepp_1_1uint8__t.html", null ]
+      [ "uint8_t", "classsbepp_1_1uint8__t.html", null ],
+      [ "unknown_enum_value_tag", "structsbepp_1_1unknown__enum__value__tag.html", null ]
     ] ]
 ];

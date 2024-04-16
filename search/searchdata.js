@@ -12,7 +12,7 @@ var indexSectionsWithContent =
   9: "o",
   10: "s",
   11: "cflt",
-  12: "abceioprstuvy",
+  12: "abcdeiloprstuvy",
   13: "s"
 };
 

@@ -5,6 +5,7 @@ var searchData=
   ['length_5ftype_2',['length_type',['../classsbepp_1_1data__traits.html#ae824aeb50b8ac3b1676a32169271fb6c',1,'sbepp::data_traits']]],
   ['length_5ftype_5ftag_3',['length_type_tag',['../classsbepp_1_1data__traits.html#aa86bdd1a0f628c740434a75a07ec73f7',1,'sbepp::data_traits']]],
   ['license_4',['License',['../index.html#autotoc_md2',1,'']]],
-  ['list_5',['Traits list',['../group__traits-list.html',1,'']]],
-  ['little_6',['little',['../namespacesbepp.html#af318e06df8931dd69380221b420caec5aaae6635e044ac56046b2893a529b5114',1,'sbepp']]]
+  ['list_5',['Deprecated List',['../deprecated.html',1,'']]],
+  ['list_6',['Traits list',['../group__traits-list.html',1,'']]],
+  ['little_7',['little',['../namespacesbepp.html#af318e06df8931dd69380221b420caec5aaae6635e044ac56046b2893a529b5114',1,'sbepp']]]
 ];

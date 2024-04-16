@@ -246,6 +246,9 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsbepp_1_1uint8__t.html">uint8_t</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Built-in <code>uint8</code> required type.  <a href="classsbepp_1_1uint8__t.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structsbepp_1_1unknown__enum__value__tag.html">unknown_enum_value_tag</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tag for unknown enum values.  <a href="structsbepp_1_1unknown__enum__value__tag.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="concepts" name="concepts"></a>
 Concepts</h2></td></tr>
@@ -388,6 +391,11 @@ template&lt;typename T &gt; </td></tr>
 <tr class="memitem:a18ca877253ba8214e9fd1ab0dcafe691"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><b>is_group</b></td></tr>
 <tr class="memdesc:a18ca877253ba8214e9fd1ab0dcafe691"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if <code>T</code> is a group of any kind. <br /></td></tr>
 <tr class="separator:a18ca877253ba8214e9fd1ab0dcafe691"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad66e5b64108fc65682c621ac8c5a471b" id="r_ad66e5b64108fc65682c621ac8c5a471b"><td class="memTemplParams" colspan="2"><a id="ad66e5b64108fc65682c621ac8c5a471b" name="ad66e5b64108fc65682c621ac8c5a471b"></a>
+template&lt;typename T &gt; </td></tr>
+<tr class="memitem:ad66e5b64108fc65682c621ac8c5a471b"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><b>is_group_entry</b> = detail::is_base_of_tmp&lt;<a class="el" href="classsbepp_1_1detail_1_1entry__base.html">detail::entry_base</a>, T&gt;</td></tr>
+<tr class="memdesc:ad66e5b64108fc65682c621ac8c5a471b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if <code>T</code> is a group entry. <br /></td></tr>
+<tr class="separator:ad66e5b64108fc65682c621ac8c5a471b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5b8bb415061e959eb3a73e76af382e49" id="r_a5b8bb415061e959eb3a73e76af382e49"><td class="memTemplParams" colspan="2"><a id="a5b8bb415061e959eb3a73e76af382e49" name="a5b8bb415061e959eb3a73e76af382e49"></a>
 template&lt;typename T &gt; </td></tr>
 <tr class="memitem:a5b8bb415061e959eb3a73e76af382e49"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><b>is_data</b> = typename detail::is_data_impl&lt;T&gt;::type</td></tr>
@@ -458,34 +466,42 @@ Functions</h2></td></tr>
 <tr class="memitem:ae29503045a371b895af63f6ac6e0f3b9"><td class="memTemplItemLeft" align="right" valign="top">constexpr View&lt; typename std::add_const&lt; Byte &gt;::type &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="#ae29503045a371b895af63f6ac6e0f3b9">make_const_view</a> (Byte *ptr, const std::size_t size) noexcept</td></tr>
 <tr class="memdesc:ae29503045a371b895af63f6ac6e0f3b9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct read-only view from memory buffer.  <br /></td></tr>
 <tr class="separator:ae29503045a371b895af63f6ac6e0f3b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a452b507754d1b62636506cd620c6e0ee" id="r_a452b507754d1b62636506cd620c6e0ee"><td class="memTemplParams" colspan="2">template&lt;typename Visitor , typename View , typename Cursor &gt; </td></tr>
-<tr class="memitem:a452b507754d1b62636506cd620c6e0ee"><td class="memTemplItemLeft" align="right" valign="top">constexpr Visitor &amp;&amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="#a452b507754d1b62636506cd620c6e0ee">visit</a> (View view, Cursor &amp;c, Visitor &amp;&amp;visitor={})</td></tr>
-<tr class="memdesc:a452b507754d1b62636506cd620c6e0ee"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visit a view using given cursor.  <br /></td></tr>
-<tr class="separator:a452b507754d1b62636506cd620c6e0ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5f635e69ff99f02d389ef132f9944431" id="r_a5f635e69ff99f02d389ef132f9944431"><td class="memTemplParams" colspan="2">template&lt;typename Visitor , typename View &gt; </td></tr>
-<tr class="memitem:a5f635e69ff99f02d389ef132f9944431"><td class="memTemplItemLeft" align="right" valign="top">constexpr Visitor &amp;&amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="#a5f635e69ff99f02d389ef132f9944431">visit</a> (View view, Visitor &amp;&amp;visitor={})</td></tr>
-<tr class="memdesc:a5f635e69ff99f02d389ef132f9944431"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visits a view.  <br /></td></tr>
-<tr class="separator:a5f635e69ff99f02d389ef132f9944431"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9c371f6621d1fa02aafb01a54af20893" id="r_a9c371f6621d1fa02aafb01a54af20893"><td class="memTemplParams" colspan="2">template&lt;typename Visitor , typename View , typename Cursor &gt; </td></tr>
-<tr class="memitem:a9c371f6621d1fa02aafb01a54af20893"><td class="memTemplItemLeft" align="right" valign="top">constexpr Visitor &amp;&amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="#a9c371f6621d1fa02aafb01a54af20893">visit_children</a> (View view, Cursor &amp;c, Visitor &amp;&amp;visitor={})</td></tr>
-<tr class="memdesc:a9c371f6621d1fa02aafb01a54af20893"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visit view's children using provided cursor.  <br /></td></tr>
-<tr class="separator:a9c371f6621d1fa02aafb01a54af20893"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac53170212e6eb4c81abe21185c0c9253" id="r_ac53170212e6eb4c81abe21185c0c9253"><td class="memTemplParams" colspan="2">template&lt;typename Visitor , typename View &gt; </td></tr>
-<tr class="memitem:ac53170212e6eb4c81abe21185c0c9253"><td class="memTemplItemLeft" align="right" valign="top">constexpr Visitor &amp;&amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="#ac53170212e6eb4c81abe21185c0c9253">visit_children</a> (View view, Visitor &amp;&amp;visitor={})</td></tr>
-<tr class="memdesc:ac53170212e6eb4c81abe21185c0c9253"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visit view's children.  <br /></td></tr>
-<tr class="separator:ac53170212e6eb4c81abe21185c0c9253"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abd9c1efb3c96d6fa71d1156811b47fa4" id="r_abd9c1efb3c96d6fa71d1156811b47fa4"><td class="memTemplParams" colspan="2">template&lt;typename View &gt; </td></tr>
-<tr class="memitem:abd9c1efb3c96d6fa71d1156811b47fa4"><td class="memTemplItemLeft" align="right" valign="top">constexpr <a class="el" href="structsbepp_1_1size__bytes__checked__result.html">size_bytes_checked_result</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="#abd9c1efb3c96d6fa71d1156811b47fa4">size_bytes_checked</a> (View view, std::size_t size) noexcept</td></tr>
-<tr class="memdesc:abd9c1efb3c96d6fa71d1156811b47fa4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate <code>view</code> size with additional safety checks.  <br /></td></tr>
-<tr class="separator:abd9c1efb3c96d6fa71d1156811b47fa4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af79a2128bc8bd1ef5df29511c9e81f6f" id="r_af79a2128bc8bd1ef5df29511c9e81f6f"><td class="memTemplParams" colspan="2">template&lt;typename E &gt; </td></tr>
-<tr class="memitem:af79a2128bc8bd1ef5df29511c9e81f6f"><td class="memTemplItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="#af79a2128bc8bd1ef5df29511c9e81f6f">enum_to_string</a> (const E e) noexcept -&gt; decltype(tag_invoke(detail::enum_to_str_tag{}, e))</td></tr>
-<tr class="memdesc:af79a2128bc8bd1ef5df29511c9e81f6f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts enum to string.  <br /></td></tr>
-<tr class="separator:af79a2128bc8bd1ef5df29511c9e81f6f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a47c1cd81154bc5c56524604f74d52d27" id="r_a47c1cd81154bc5c56524604f74d52d27"><td class="memTemplParams" colspan="2">template&lt;typename Visitor , typename View , typename Cursor , typename  = detail::enable_if_t&lt;detail::is_visitable_view&lt;View&gt;::value&gt;&gt; </td></tr>
+<tr class="memitem:a47c1cd81154bc5c56524604f74d52d27"><td class="memTemplItemLeft" align="right" valign="top">constexpr Visitor &amp;&amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="#a47c1cd81154bc5c56524604f74d52d27">visit</a> (View view, Cursor &amp;c, Visitor &amp;&amp;visitor={})</td></tr>
+<tr class="memdesc:a47c1cd81154bc5c56524604f74d52d27"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visit a view using given cursor.  <br /></td></tr>
+<tr class="separator:a47c1cd81154bc5c56524604f74d52d27"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a79950b0d08ddf3eafafb25a5693a6e2a" id="r_a79950b0d08ddf3eafafb25a5693a6e2a"><td class="memTemplParams" colspan="2">template&lt;typename Visitor , typename View , typename  = detail::enable_if_t&lt;detail::is_visitable_view&lt;View&gt;::value&gt;&gt; </td></tr>
+<tr class="memitem:a79950b0d08ddf3eafafb25a5693a6e2a"><td class="memTemplItemLeft" align="right" valign="top">constexpr Visitor &amp;&amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="#a79950b0d08ddf3eafafb25a5693a6e2a">visit</a> (View view, Visitor &amp;&amp;visitor={})</td></tr>
+<tr class="memdesc:a79950b0d08ddf3eafafb25a5693a6e2a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visits a view.  <br /></td></tr>
+<tr class="separator:a79950b0d08ddf3eafafb25a5693a6e2a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3dafbabb41e8a71abde1535551de2c6d" id="r_a3dafbabb41e8a71abde1535551de2c6d"><td class="memTemplParams" colspan="2">template&lt;typename Visitor , typename Set &gt; </td></tr>
+<tr class="memitem:a3dafbabb41e8a71abde1535551de2c6d"><td class="memTemplItemLeft" align="right" valign="top">constexpr Visitor &amp;&amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="#a3dafbabb41e8a71abde1535551de2c6d">visit</a> (Set s, Visitor &amp;&amp;visitor={})</td></tr>
+<tr class="memdesc:a3dafbabb41e8a71abde1535551de2c6d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visits set choices.  <br /></td></tr>
+<tr class="separator:a3dafbabb41e8a71abde1535551de2c6d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abf05c2c5e3e81c441cce4db02c0c642b" id="r_abf05c2c5e3e81c441cce4db02c0c642b"><td class="memTemplParams" colspan="2">template&lt;typename Visitor , typename Enum &gt; </td></tr>
+<tr class="memitem:abf05c2c5e3e81c441cce4db02c0c642b"><td class="memTemplItemLeft" align="right" valign="top">constexpr Visitor &amp;&amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="#abf05c2c5e3e81c441cce4db02c0c642b">visit</a> (Enum e, Visitor &amp;&amp;visitor={})</td></tr>
+<tr class="memdesc:abf05c2c5e3e81c441cce4db02c0c642b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visits enum value.  <br /></td></tr>
+<tr class="separator:abf05c2c5e3e81c441cce4db02c0c642b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a23abc2b6b892aea5b2b7f6dde6c24e69" id="r_a23abc2b6b892aea5b2b7f6dde6c24e69"><td class="memTemplParams" colspan="2">template&lt;typename Visitor , typename View , typename Cursor , typename  = detail::enable_if_t&lt;detail::is_visitable_view&lt;View&gt;::value&gt;&gt; </td></tr>
+<tr class="memitem:a23abc2b6b892aea5b2b7f6dde6c24e69"><td class="memTemplItemLeft" align="right" valign="top">constexpr Visitor &amp;&amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="#a23abc2b6b892aea5b2b7f6dde6c24e69">visit_children</a> (View view, Cursor &amp;c, Visitor &amp;&amp;visitor={})</td></tr>
+<tr class="memdesc:a23abc2b6b892aea5b2b7f6dde6c24e69"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visit view's children using provided cursor.  <br /></td></tr>
+<tr class="separator:a23abc2b6b892aea5b2b7f6dde6c24e69"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a306622dcac701f3c76abd3ea7c2902b6" id="r_a306622dcac701f3c76abd3ea7c2902b6"><td class="memTemplParams" colspan="2">template&lt;typename Visitor , typename View , typename  = detail::enable_if_t&lt;detail::is_visitable_view&lt;View&gt;::value&gt;&gt; </td></tr>
+<tr class="memitem:a306622dcac701f3c76abd3ea7c2902b6"><td class="memTemplItemLeft" align="right" valign="top">constexpr Visitor &amp;&amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="#a306622dcac701f3c76abd3ea7c2902b6">visit_children</a> (View view, Visitor &amp;&amp;visitor={})</td></tr>
+<tr class="memdesc:a306622dcac701f3c76abd3ea7c2902b6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visit view's children.  <br /></td></tr>
+<tr class="separator:a306622dcac701f3c76abd3ea7c2902b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6b2d51af3f026b165fa40fe1d7ab19db" id="r_a6b2d51af3f026b165fa40fe1d7ab19db"><td class="memTemplParams" colspan="2">template&lt;typename E , typename  = detail::enable_if_t&lt;is_enum&lt;E&gt;::value&gt;&gt; </td></tr>
+<tr class="memitem:a6b2d51af3f026b165fa40fe1d7ab19db"><td class="memTemplItemLeft" align="right" valign="top">constexpr const char *&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="#a6b2d51af3f026b165fa40fe1d7ab19db">enum_to_string</a> (const E e) noexcept</td></tr>
+<tr class="memdesc:a6b2d51af3f026b165fa40fe1d7ab19db"><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts enum to string.  <br /></td></tr>
+<tr class="separator:a6b2d51af3f026b165fa40fe1d7ab19db"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa253364a4276b55c0a157aefaa185c37" id="r_aa253364a4276b55c0a157aefaa185c37"><td class="memTemplParams" colspan="2">template&lt;typename Set , typename Visitor &gt; </td></tr>
 <tr class="memitem:aa253364a4276b55c0a157aefaa185c37"><td class="memTemplItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="#aa253364a4276b55c0a157aefaa185c37">visit_set</a> (const Set s, Visitor &amp;&amp;visitor) noexcept -&gt; decltype(s(detail::visit_set_tag{}, std::forward&lt; Visitor &gt;(visitor)))</td></tr>
 <tr class="memdesc:aa253364a4276b55c0a157aefaa185c37"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visits set choices in order of their declaration.  <br /></td></tr>
 <tr class="separator:aa253364a4276b55c0a157aefaa185c37"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abd9c1efb3c96d6fa71d1156811b47fa4" id="r_abd9c1efb3c96d6fa71d1156811b47fa4"><td class="memTemplParams" colspan="2">template&lt;typename View &gt; </td></tr>
+<tr class="memitem:abd9c1efb3c96d6fa71d1156811b47fa4"><td class="memTemplItemLeft" align="right" valign="top">constexpr <a class="el" href="structsbepp_1_1size__bytes__checked__result.html">size_bytes_checked_result</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="#abd9c1efb3c96d6fa71d1156811b47fa4">size_bytes_checked</a> (View view, std::size_t size) noexcept</td></tr>
+<tr class="memdesc:abd9c1efb3c96d6fa71d1156811b47fa4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate <code>view</code> size with additional safety checks.  <br /></td></tr>
+<tr class="separator:abd9c1efb3c96d6fa71d1156811b47fa4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
@@ -708,23 +724,22 @@ template&lt;typename T &gt; </div>
 
 </div>
 </div>
-<a id="af79a2128bc8bd1ef5df29511c9e81f6f" name="af79a2128bc8bd1ef5df29511c9e81f6f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af79a2128bc8bd1ef5df29511c9e81f6f">&#9670;&#160;</a></span>enum_to_string()</h2>
+<a id="a6b2d51af3f026b165fa40fe1d7ab19db" name="a6b2d51af3f026b165fa40fe1d7ab19db"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6b2d51af3f026b165fa40fe1d7ab19db">&#9670;&#160;</a></span>enum_to_string()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename E &gt; </div>
+template&lt;typename E , typename  = detail::enable_if_t&lt;is_enum&lt;E&gt;::value&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">constexpr auto sbepp::enum_to_string </td>
+          <td class="memname">constexpr const char * sbepp::enum_to_string </td>
           <td>(</td>
           <td class="paramtype">const E</td>          <td class="paramname"><span class="paramname"><em>e</em></span></td><td>)</td>
-          <td> -&gt; decltype(tag_invoke(detail::enum_to_str_tag{}, e))
-</td>
+          <td></td>
         </tr>
       </table>
   </td>
@@ -741,7 +756,8 @@ template&lt;typename E &gt; </div>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>pointer to a null-terminated string representing an enumerator's name or <code>nullptr</code> if <code>e</code> holds unknown value </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>pointer to a null-terminated string representing an enumerator's name or <code>nullptr</code> if <code>e</code> holds unknown value</dd></dl>
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000001">Deprecated</a></b></dt><dd>Deprecated in favor of <code><a class="el" href="#a47c1cd81154bc5c56524604f74d52d27" title="Visit a view using given cursor.">sbepp::visit</a></code>, will be removed in the next major update. </dd></dl>
 
 </div>
 </div>
@@ -905,7 +921,7 @@ template&lt;typename View &gt; </div>
 <div class="line"><span class="keyword">auto</span> c = <a class="code hl_function" href="#a399a5ac768befed2dc73396364eaa0c3">sbepp::init_const_cursor</a>(m);</div>
 <div class="line"><span class="keyword">auto</span> value = m.field(c);</div>
 <div class="line">m.field(1, c);   <span class="comment">// error: cursor has const-qualified byte type</span></div>
-<div class="ttc" id="anamespacesbepp_html_a399a5ac768befed2dc73396364eaa0c3"><div class="ttname"><a href="#a399a5ac768befed2dc73396364eaa0c3">sbepp::init_const_cursor</a></div><div class="ttdeci">constexpr cursor&lt; typename std::add_const&lt; byte_type_t&lt; View &gt; &gt;::type &gt; init_const_cursor(View view) noexcept</div><div class="ttdoc">Initializes cursor from a message/group view with const byte type.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:2760</div></div>
+<div class="ttc" id="anamespacesbepp_html_a399a5ac768befed2dc73396364eaa0c3"><div class="ttname"><a href="#a399a5ac768befed2dc73396364eaa0c3">sbepp::init_const_cursor</a></div><div class="ttdeci">constexpr cursor&lt; typename std::add_const&lt; byte_type_t&lt; View &gt; &gt;::type &gt; init_const_cursor(View view) noexcept</div><div class="ttdoc">Initializes cursor from a message/group view with const byte type.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:2776</div></div>
 </div><!-- fragment --><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">view</td><td>message or group view </td></tr>
@@ -945,7 +961,7 @@ template&lt;typename View &gt; </div>
 <p>Example: </p><div class="fragment"><div class="line">schema::messages::msg1&lt;char&gt; {ptr, size};</div>
 <div class="line"><span class="keyword">auto</span> c = <a class="code hl_function" href="#a125f1fbb9faadde1515f7822a7b6420f">sbepp::init_cursor</a>(m);</div>
 <div class="line"><span class="keyword">auto</span> value = m.field(c);</div>
-<div class="ttc" id="anamespacesbepp_html_a125f1fbb9faadde1515f7822a7b6420f"><div class="ttname"><a href="#a125f1fbb9faadde1515f7822a7b6420f">sbepp::init_cursor</a></div><div class="ttdeci">constexpr cursor&lt; byte_type_t&lt; View &gt; &gt; init_cursor(View view) noexcept</div><div class="ttdoc">Initializes cursor from a message/group view with the same byte type.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:2737</div></div>
+<div class="ttc" id="anamespacesbepp_html_a125f1fbb9faadde1515f7822a7b6420f"><div class="ttname"><a href="#a125f1fbb9faadde1515f7822a7b6420f">sbepp::init_cursor</a></div><div class="ttdeci">constexpr cursor&lt; byte_type_t&lt; View &gt; &gt; init_cursor(View view) noexcept</div><div class="ttdoc">Initializes cursor from a message/group view with the same byte type.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:2753</div></div>
 </div><!-- fragment --><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">view</td><td>message or group view </td></tr>
@@ -1214,13 +1230,111 @@ template&lt;typename Enum &gt; </div>
 
 </div>
 </div>
-<a id="a452b507754d1b62636506cd620c6e0ee" name="a452b507754d1b62636506cd620c6e0ee"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a452b507754d1b62636506cd620c6e0ee">&#9670;&#160;</a></span>visit() <span class="overload">[1/2]</span></h2>
+<a id="abf05c2c5e3e81c441cce4db02c0c642b" name="abf05c2c5e3e81c441cce4db02c0c642b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abf05c2c5e3e81c441cce4db02c0c642b">&#9670;&#160;</a></span>visit() <span class="overload">[1/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Visitor , typename View , typename Cursor &gt; </div>
+template&lt;typename Visitor , typename Enum &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">constexpr Visitor &amp;&amp; sbepp::visit </td>
+          <td>(</td>
+          <td class="paramtype">Enum</td>          <td class="paramname"><span class="paramname"><em>e</em>, </span></td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Visitor &amp;&amp;</td>          <td class="paramname"><span class="paramname"><em>visitor</em><span class="paramdefsep"> = </span><span class="paramdefval">{}</span></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">constexpr</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Visits enum value. </p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">Visitor</td><td>visitor type </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">e</td><td>enum value to visit </td></tr>
+    <tr><td class="paramname">visitor</td><td>visitor instance, must have <code>on_enum_value</code> member function with the signature equivalent to <code>void on_enum_value(Enum, EnumValueTag)</code> </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>forwarded reference to <code>visitor</code></dd></dl>
+<p>If <code>e</code> is one of <code>validValue</code>-s from schema, calls <code>visitor.on_enum_value(e, EnumValueTag{})</code> where <code>EnumValueTag</code> is a matched value's tag that can be passed to <code><a class="el" href="classsbepp_1_1enum__value__traits.html" title="Provides various traits/attributes of a &lt;validValue&gt; element.">enum_value_traits</a></code>. Otherwise, calls <code>visitor.on_enum_value(e, <a class="el" href="structsbepp_1_1unknown__enum__value__tag.html" title="Tag for unknown enum values.">sbepp::unknown_enum_value_tag</a>{})</code>.</p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="visit-api.html">Visit API</a> </dd></dl>
+
+</div>
+</div>
+<a id="a3dafbabb41e8a71abde1535551de2c6d" name="a3dafbabb41e8a71abde1535551de2c6d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3dafbabb41e8a71abde1535551de2c6d">&#9670;&#160;</a></span>visit() <span class="overload">[2/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Visitor , typename Set &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">constexpr Visitor &amp;&amp; sbepp::visit </td>
+          <td>(</td>
+          <td class="paramtype">Set</td>          <td class="paramname"><span class="paramname"><em>s</em>, </span></td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Visitor &amp;&amp;</td>          <td class="paramname"><span class="paramname"><em>visitor</em><span class="paramdefsep"> = </span><span class="paramdefval">{}</span></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">constexpr</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Visits set choices. </p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">Visitor</td><td>visitor type </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">s</td><td>set to visit </td></tr>
+    <tr><td class="paramname">visitor</td><td>visitor instance, must have <code>on_set_choice</code> member function with the signature equivalent to <code>void on_set_choice(bool, ChoiceTag)</code>. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>forwarded reference to <code>visitor</code></dd></dl>
+<p>Visits set choices in order of their schema declaration. For each choice calls <code>visitor.on_set_choice(choice_value, ChoiceTag{})</code>, where <code>choice_value</code> is the <code>bool</code> value of a choice and <code>ChoiceTag</code> is its tag that can be passed to <code><a class="el" href="classsbepp_1_1set__choice__traits.html" title="Provides various traits/attributes of a &lt;choice&gt; element.">set_choice_traits</a></code>.</p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="visit-api.html">Visit API</a> </dd></dl>
+
+</div>
+</div>
+<a id="a47c1cd81154bc5c56524604f74d52d27" name="a47c1cd81154bc5c56524604f74d52d27"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a47c1cd81154bc5c56524604f74d52d27">&#9670;&#160;</a></span>visit() <span class="overload">[3/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Visitor , typename View , typename Cursor , typename  = detail::enable_if_t&lt;detail::is_visitable_view&lt;View&gt;::value&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -1257,23 +1371,24 @@ template&lt;typename Visitor , typename View , typename Cursor &gt; </div>
 </dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">view</td><td>view to visit </td></tr>
-    <tr><td class="paramname">c</td><td>cursor </td></tr>
+    <tr><td class="paramname">view</td><td>message, group, entry or composite view </td></tr>
+    <tr><td class="paramname">c</td><td>cursor, passed as is to <code>visitor</code> </td></tr>
     <tr><td class="paramname">visitor</td><td>visitor </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>forwarded reference to <code>visitor</code> </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>forwarded reference to <code>visitor</code></dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="visit-api.html">Visit API</a> </dd></dl>
 
 </div>
 </div>
-<a id="a5f635e69ff99f02d389ef132f9944431" name="a5f635e69ff99f02d389ef132f9944431"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5f635e69ff99f02d389ef132f9944431">&#9670;&#160;</a></span>visit() <span class="overload">[2/2]</span></h2>
+<a id="a79950b0d08ddf3eafafb25a5693a6e2a" name="a79950b0d08ddf3eafafb25a5693a6e2a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a79950b0d08ddf3eafafb25a5693a6e2a">&#9670;&#160;</a></span>visit() <span class="overload">[4/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Visitor , typename View &gt; </div>
+template&lt;typename Visitor , typename View , typename  = detail::enable_if_t&lt;detail::is_visitable_view&lt;View&gt;::value&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -1299,28 +1414,29 @@ template&lt;typename Visitor , typename View &gt; </div>
 <p>Visits a view. </p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">Visitor</td><td>visitor </td></tr>
+    <tr><td class="paramname">Visitor</td><td>visitor type </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">view</td><td>view to visit </td></tr>
+    <tr><td class="paramname">view</td><td>message, group, entry or composite view </td></tr>
     <tr><td class="paramname">visitor</td><td>visitor </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>forwarded reference to <code>visitor</code> </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>forwarded reference to <code>visitor</code></dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="visit-api.html">Visit API</a> </dd></dl>
 
 </div>
 </div>
-<a id="a9c371f6621d1fa02aafb01a54af20893" name="a9c371f6621d1fa02aafb01a54af20893"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9c371f6621d1fa02aafb01a54af20893">&#9670;&#160;</a></span>visit_children() <span class="overload">[1/2]</span></h2>
+<a id="a23abc2b6b892aea5b2b7f6dde6c24e69" name="a23abc2b6b892aea5b2b7f6dde6c24e69"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a23abc2b6b892aea5b2b7f6dde6c24e69">&#9670;&#160;</a></span>visit_children() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Visitor , typename View , typename Cursor &gt; </div>
+template&lt;typename Visitor , typename View , typename Cursor , typename  = detail::enable_if_t&lt;detail::is_visitable_view&lt;View&gt;::value&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -1357,23 +1473,24 @@ template&lt;typename Visitor , typename View , typename Cursor &gt; </div>
 </dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">view</td><td>view to visit </td></tr>
-    <tr><td class="paramname">c</td><td>cursor </td></tr>
+    <tr><td class="paramname">view</td><td>message, group, entry or composite view </td></tr>
+    <tr><td class="paramname">c</td><td>cursor, ignored for composites, otherwise must point to the first <code>view</code>'s child </td></tr>
     <tr><td class="paramname">visitor</td><td>visitor </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>forwarded reference to <code>visitor</code> </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>forwarded reference to <code>visitor</code></dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="visit-api.html">Visit API</a> </dd></dl>
 
 </div>
 </div>
-<a id="ac53170212e6eb4c81abe21185c0c9253" name="ac53170212e6eb4c81abe21185c0c9253"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac53170212e6eb4c81abe21185c0c9253">&#9670;&#160;</a></span>visit_children() <span class="overload">[2/2]</span></h2>
+<a id="a306622dcac701f3c76abd3ea7c2902b6" name="a306622dcac701f3c76abd3ea7c2902b6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a306622dcac701f3c76abd3ea7c2902b6">&#9670;&#160;</a></span>visit_children() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Visitor , typename View &gt; </div>
+template&lt;typename Visitor , typename View , typename  = detail::enable_if_t&lt;detail::is_visitable_view&lt;View&gt;::value&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -1405,12 +1522,13 @@ template&lt;typename Visitor , typename View &gt; </div>
 </dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">view</td><td>view to visit </td></tr>
+    <tr><td class="paramname">view</td><td>message, group, entry or composite view </td></tr>
     <tr><td class="paramname">visitor</td><td>visitor </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>forwarded reference to <code>visitor</code> </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>forwarded reference to <code>visitor</code></dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="visit-api.html">Visit API</a> </dd></dl>
 
 </div>
 </div>
@@ -1452,7 +1570,8 @@ template&lt;typename Set , typename Visitor &gt; </div>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>forwarded reference to <code>visitor</code> </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>forwarded reference to <code>visitor</code></dd></dl>
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000002">Deprecated</a></b></dt><dd>Deprecated in favor of <code><a class="el" href="#a47c1cd81154bc5c56524604f74d52d27" title="Visit a view using given cursor.">sbepp::visit</a></code>, will be removed in the next major update. </dd></dl>
 
 </div>
 </div>
