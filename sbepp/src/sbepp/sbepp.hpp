@@ -133,9 +133,25 @@ SBEPP_WARNINGS_OFF();
         && !(defined(__clang__) && (__cplusplus < 201703L))
 #        define SBEPP_CPP17_NODISCARD [[nodiscard]]
 #    endif
+
+#    if __has_cpp_attribute(deprecated) \
+        && !(defined(__clang__) && (__cplusplus < 201402L))
+#        define SBEPP_DEPRECATED [[deprecated]]
+#    endif
 #endif
+
 #ifndef SBEPP_CPP17_NODISCARD
 #    define SBEPP_CPP17_NODISCARD
+#endif
+
+#ifndef SBEPP_DEPRECATED
+#    if defined(__GNUC__) || defined(__clang__)
+#        define SBEPP_DEPRECATED __attribute__((deprecated))
+#    elif defined(_MSC_VER)
+#        define SBEPP_DEPRECATED __declspec(deprecated)
+#    else
+#        define SBEPP_DEPRECATED
+#    endif
 #endif
 
 //! @brief `1` if constexpr accessors are supported, `0` otherwise
@@ -4552,6 +4568,16 @@ constexpr View<typename std::add_const<Byte>::type>
     return {ptr, size};
 }
 
+/**
+ * @brief Tag for unknown enum values
+ *
+ * Passed to `on_enum_value` callback by `sbepp::visit()` for unknown enum
+ * values. `sbepp::enum_value_traits` is not defined for it.
+ */
+struct unknown_enum_value_tag
+{
+};
+
 namespace detail
 {
 // taken from https://stackoverflow.com/a/34672753
@@ -4575,16 +4601,244 @@ concept derived_from_tmp = is_base_of_tmp<Base, Derived>::value;
 #endif
 } // namespace detail
 
+namespace detail
+{
+template<typename Derived>
+struct is_array_type_impl
+{
+    static constexpr std::false_type test(...);
+
+    template<typename T1, typename T2, std::size_t N, typename T3>
+    static constexpr std::true_type
+        test(detail::static_array_ref<T1, T2, N, T3>*);
+
+    using type = decltype(test(std::declval<Derived*>()));
+};
+} // namespace detail
+
+//! @brief Checks is `T` is an array type
+template<typename T>
+using is_array_type = typename detail::is_array_type_impl<T>::type;
+
+//! @brief Checks if `T` is a non-array required type
+template<typename T>
+using is_required_type = detail::is_base_of_tmp<detail::required_base, T>;
+
+//! @brief Checks if `T` is a non-array optional type
+template<typename T>
+using is_optional_type = detail::is_base_of_tmp<detail::optional_base, T>;
+
+//! @brief Checks if `T` is a non-array type
+template<typename T>
+using is_non_array_type = std::integral_constant<
+    bool,
+    is_required_type<T>::value || is_optional_type<T>::value>;
+
+//! @brief Checks if `T` is a type of any kind
+template<typename T>
+using is_type = std::integral_constant<
+    bool,
+    is_required_type<T>::value || is_optional_type<T>::value
+        || is_array_type<T>::value>;
+
+//! @brief Checks if `T` is an enumeration
+template<typename T, typename = void>
+struct is_enum : std::false_type
+{
+};
+
+template<typename T>
+struct is_enum<
+    T,
+    detail::void_t<decltype(tag_invoke(
+        std::declval<detail::visit_tag>(),
+        std::declval<T>(),
+        std::declval<int&>()))>> : std::true_type
+{
+};
+
+//! @brief Checks if `T` is a set
+template<typename T>
+using is_set = detail::is_base_of_tmp<detail::bitset_base, T>;
+
+//! @brief Checks if `T` is a composite
+template<typename T>
+using is_composite = detail::is_base_of_tmp<detail::composite_base, T>;
+
+//! @brief Checks if `T` is a message
+template<typename T>
+using is_message = detail::is_base_of_tmp<detail::message_base, T>;
+
+//! @brief Checks if `T` is a flat group
+template<typename T>
+using is_flat_group = detail::is_base_of_tmp<detail::flat_group_base, T>;
+
+//! @brief Checks if `T` is a nested group
+template<typename T>
+using is_nested_group = detail::is_base_of_tmp<detail::nested_group_base, T>;
+
+//! @brief Checks if `T` is a group of any kind
+template<typename T>
+using is_group = std::integral_constant<
+    bool,
+    is_flat_group<T>::value || is_nested_group<T>::value>;
+
+//! @brief Checks if `T` is a group entry
+template<typename T>
+using is_group_entry = detail::is_base_of_tmp<detail::entry_base, T>;
+
+namespace detail
+{
+template<typename Derived>
+struct is_data_impl
+{
+    static constexpr std::false_type test(...);
+
+    template<typename T1, typename T2, typename T3, endian E>
+    static constexpr std::true_type
+        test(detail::dynamic_array_ref<T1, T2, T3, E>*);
+
+    using type = decltype(test(std::declval<Derived*>()));
+};
+} // namespace detail
+
+//! @brief Checks if `T` is a data
+template<typename T>
+using is_data = typename detail::is_data_impl<T>::type;
+
+#if SBEPP_HAS_INLINE_VARS
+//! @brief Shorthand for `sbepp::is_array_type<T>::value`
+template<typename T>
+inline constexpr auto is_array_type_v = is_array_type<T>::value;
+
+//! @brief Shorthand for `sbepp::is_required_type<T>::value`
+template<typename T>
+inline constexpr auto is_required_type_v = is_required_type<T>::value;
+
+//! @brief Shorthand for `sbepp::is_optional_type<T>::value`
+template<typename T>
+inline constexpr auto is_optional_type_v = is_optional_type<T>::value;
+
+//! @brief Shorthand for `sbepp::is_non_array_type<T>::value`
+template<typename T>
+inline constexpr auto is_non_array_type_v = is_non_array_type<T>::value;
+
+//! @brief Shorthand for `sbepp::is_type<T>::value`
+template<typename T>
+inline constexpr auto is_type_v = is_type<T>::value;
+
+//! @brief Shorthand for `sbepp::is_enum<T>::value`
+template<typename T>
+inline constexpr auto is_enum_v = is_enum<T>::value;
+
+//! @brief Shorthand for `sbepp::is_set<T>::value`
+template<typename T>
+inline constexpr auto is_set_v = is_set<T>::value;
+
+//! @brief Shorthand for `sbepp::is_composite<T>::value`
+template<typename T>
+inline constexpr auto is_composite_v = is_composite<T>::value;
+
+//! @brief Shorthand for `sbepp::is_message<T>::value`
+template<typename T>
+inline constexpr auto is_message_v = is_message<T>::value;
+
+//! @brief Shorthand for `sbepp::is_flat_group<T>::value`
+template<typename T>
+inline constexpr auto is_flat_group_v = is_flat_group<T>::value;
+
+//! @brief Shorthand for `sbepp::is_nested_group<T>::value`
+template<typename T>
+inline constexpr auto is_nested_group_v = is_nested_group<T>::value;
+
+//! @brief Shorthand for `sbepp::is_group<T>::value`
+template<typename T>
+inline constexpr auto is_group_v = is_group<T>::value;
+
+//! @brief Shorthand for `sbepp::is_data<T>::value`
+template<typename T>
+inline constexpr auto is_data_v = is_data<T>::value;
+#endif
+
+#if SBEPP_HAS_CONCEPTS
+//! @brief Concept for `sbepp::is_array_type<T>::value`
+template<typename T>
+concept array_type = is_array_type_v<T>;
+
+//! @brief Concept for `sbepp::is_required_type<T>::value`
+template<typename T>
+concept required_type = is_required_type_v<T>;
+
+//! @brief Concept for `sbepp::is_optional_type<T>::value`
+template<typename T>
+concept optional_type = is_optional_type_v<T>;
+
+//! @brief Concept for `sbepp::is_non_array_type<T>::value`
+template<typename T>
+concept non_array_type = is_non_array_type_v<T>;
+
+//! @brief Concept for `sbepp::is_type<T>::value`
+template<typename T>
+concept type = is_type_v<T>;
+
+//! @brief Concept for `sbepp::is_enum<T>::value`
+template<typename T>
+concept enumeration = is_enum_v<T>;
+
+//! @brief Concept for `sbepp::is_set<T>::value`
+template<typename T>
+concept set = is_set_v<T>;
+
+//! @brief Concept for `sbepp::is_composite<T>::value`
+template<typename T>
+concept composite = is_composite_v<T>;
+
+//! @brief Concept for `sbepp::is_message<T>::value`
+template<typename T>
+concept message = is_message_v<T>;
+
+//! @brief Concept for `sbepp::is_flat_group<T>::value`
+template<typename T>
+concept flat_group = is_flat_group_v<T>;
+
+//! @brief Concept for `sbepp::is_nested_group<T>::value`
+template<typename T>
+concept nested_group = is_nested_group_v<T>;
+
+//! @brief Concept for `sbepp::is_group<T>::value`
+template<typename T>
+concept group = is_group_v<T>;
+
+//! @brief Concept for `sbepp::is_data<T>::value`
+template<typename T>
+concept data = is_data_v<T>;
+#endif
+
+namespace detail
+{
+template<typename T>
+using is_visitable_view = std::integral_constant<
+    bool,
+    is_message<T>::value || is_group<T>::value || is_group_entry<T>::value
+        || is_composite<T>::value>;
+}
+
 /**
  * @brief Visit a view using given cursor
  *
  * @tparam Visitor visitor type
- * @param view view to visit
- * @param c cursor
+ * @param view message, group, entry or composite view
+ * @param c cursor, passed as is to `visitor`
  * @param visitor visitor
  * @return forwarded reference to `visitor`
+ *
+ * @see @ref visit-api
  */
-template<typename Visitor, typename View, typename Cursor>
+template<
+    typename Visitor,
+    typename View,
+    typename Cursor,
+    typename = detail::enable_if_t<detail::is_visitable_view<View>::value>>
 SBEPP_CPP14_CONSTEXPR Visitor&&
     visit(View view, Cursor& c, Visitor&& visitor = {})
 {
@@ -4595,28 +4849,98 @@ SBEPP_CPP14_CONSTEXPR Visitor&&
 /**
  * @brief Visits a view
  *
- * @tparam Visitor visitor
- * @param view view to visit
+ * @tparam Visitor visitor type
+ * @param view message, group, entry or composite view
  * @param visitor visitor
  * @return forwarded reference to `visitor`
+ *
+ * @see @ref visit-api
  */
-template<typename Visitor, typename View>
+template<
+    typename Visitor,
+    typename View,
+    typename = detail::enable_if_t<detail::is_visitable_view<View>::value>>
 SBEPP_CPP14_CONSTEXPR Visitor&& visit(View view, Visitor&& visitor = {})
 {
     auto c = sbepp::init_cursor(view);
     return sbepp::visit(view, c, std::forward<Visitor>(visitor));
 }
 
+#ifndef SBEPP_DOXYGEN
+template<typename Visitor, typename Set>
+SBEPP_CPP14_CONSTEXPR detail::enable_if_t<is_set<Set>::value, Visitor&&>
+    visit(Set s, Visitor&& visitor = {})
+{
+    s(detail::visit_tag{}, visitor);
+    return std::forward<Visitor>(visitor);
+}
+
+template<typename Visitor, typename Enum>
+SBEPP_CPP14_CONSTEXPR detail::enable_if_t<is_enum<Enum>::value, Visitor&&>
+    visit(Enum e, Visitor&& visitor = {})
+{
+    tag_invoke(detail::visit_tag{}, e, visitor);
+    return std::forward<Visitor>(visitor);
+}
+
+#else
+
+/**
+ * @brief Visits set choices
+ *
+ * @tparam Visitor visitor type
+ * @param s set to visit
+ * @param visitor visitor instance, must have `on_set_choice` member function
+ *  with the signature equivalent to `void on_set_choice(bool, ChoiceTag)`.
+ * @return forwarded reference to `visitor`
+ *
+ * Visits set choices in order of their schema declaration. For each choice
+ * calls `visitor.on_set_choice(choice_value, ChoiceTag{})`, where
+ * `choice_value` is the `bool` value of a choice and `ChoiceTag` is its tag
+ * that can be passed to `set_choice_traits`.
+ *
+ * @see @ref visit-api
+ */
+template<typename Visitor, typename Set>
+SBEPP_CPP14_CONSTEXPR Visitor&& visit(Set s, Visitor&& visitor = {});
+
+/**
+ * @brief Visits enum value
+ *
+ * @tparam Visitor visitor type
+ * @param e enum value to visit
+ * @param visitor visitor instance, must have `on_enum_value` member function
+ *  with the signature equivalent to `void on_enum_value(Enum, EnumValueTag)`
+ * @return forwarded reference to `visitor`
+ *
+ * If `e` is one of `validValue`-s from schema, calls
+ * `visitor.on_enum_value(e, EnumValueTag{})` where `EnumValueTag` is a matched
+ * value's tag that can be passed to `enum_value_traits`. Otherwise, calls
+ * `visitor.on_enum_value(e, sbepp::unknown_enum_value_tag{})`.
+ *
+ * @see @ref visit-api
+ */
+template<typename Visitor, typename Enum>
+SBEPP_CPP14_CONSTEXPR Visitor&& visit(Enum e, Visitor&& visitor = {});
+#endif
+
 /**
  * @brief Visit view's children using provided cursor
  *
  * @tparam Visitor visitor type
- * @param view view to visit
- * @param c cursor
+ * @param view message, group, entry or composite view
+ * @param c cursor, ignored for composites, otherwise must point to the first
+ *  `view`'s child
  * @param visitor visitor
  * @return forwarded reference to `visitor`
+ *
+ * @see @ref visit-api
  */
-template<typename Visitor, typename View, typename Cursor>
+template<
+    typename Visitor,
+    typename View,
+    typename Cursor,
+    typename = detail::enable_if_t<detail::is_visitable_view<View>::value>>
 SBEPP_CPP14_CONSTEXPR Visitor&&
     visit_children(View view, Cursor& c, Visitor&& visitor = {})
 {
@@ -4628,16 +4952,83 @@ SBEPP_CPP14_CONSTEXPR Visitor&&
  * @brief Visit view's children
  *
  * @tparam Visitor visitor type
- * @param view view to visit
+ * @param view message, group, entry or composite view
  * @param visitor visitor
  * @return forwarded reference to `visitor`
+ *
+ * @see @ref visit-api
  */
-template<typename Visitor, typename View>
+template<
+    typename Visitor,
+    typename View,
+    typename = detail::enable_if_t<detail::is_visitable_view<View>::value>>
 SBEPP_CPP14_CONSTEXPR Visitor&&
     visit_children(View view, Visitor&& visitor = {})
 {
     auto c = sbepp::init_cursor(view);
     return sbepp::visit_children(view, c, std::forward<Visitor>(visitor));
+}
+
+namespace detail
+{
+class enum_to_string_visitor
+{
+public:
+    template<typename Tag>
+    SBEPP_CPP14_CONSTEXPR void on_enum_value(auto /*e*/, Tag) noexcept
+    {
+        name_value = sbepp::enum_value_traits<Tag>::name();
+    }
+
+    SBEPP_CPP14_CONSTEXPR void
+        on_enum_value(auto /*e*/, sbepp::unknown_enum_value_tag) noexcept
+    {
+        name_value = nullptr;
+    }
+
+    constexpr const char* name() const noexcept
+    {
+        return name_value;
+    }
+
+private:
+    const char* name_value;
+};
+} // namespace detail
+
+/**
+ * @brief Converts enum to string
+ *
+ * @param e enum to convert
+ * @returns pointer to a null-terminated string representing an enumerator's
+ *  name or `nullptr` if `e` holds unknown value
+ *
+ * @deprecated Deprecated in favor of `sbepp::visit`, will be removed in the
+ * next major update.
+ */
+template<typename E, typename = detail::enable_if_t<is_enum<E>::value>>
+SBEPP_DEPRECATED constexpr const char* enum_to_string(const E e) noexcept
+{
+    return visit<detail::enum_to_string_visitor>(e).name();
+}
+
+/**
+ * @brief Visits set choices in order of their declaration
+ *
+ * @param s set to visit
+ * @param visitor visitor. Must have signature
+ *      `void (bool choice_value, const char* choice_name)`
+ * @return forwarded reference to `visitor`
+ *
+ * @deprecated Deprecated in favor of `sbepp::visit`, will be removed in the
+ * next major update.
+ */
+template<typename Set, typename Visitor>
+SBEPP_DEPRECATED constexpr auto
+    visit_set(const Set s, Visitor&& visitor) noexcept
+    -> decltype(s(detail::visit_set_tag{}, std::forward<Visitor>(visitor)))
+{
+    return s(detail::visit_set_tag{}, std::forward<Visitor>(visitor));
 }
 
 namespace detail
@@ -4792,242 +5183,6 @@ SBEPP_CPP20_CONSTEXPR size_bytes_checked_result
     }
     return {};
 }
-
-/**
- * @brief Converts enum to string
- *
- * @param e enum to convert
- * @returns pointer to a null-terminated string representing an enumerator's
- *  name or `nullptr` if `e` holds unknown value
- */
-template<typename E>
-constexpr auto enum_to_string(const E e) noexcept
-    -> decltype(tag_invoke(detail::enum_to_str_tag{}, e))
-{
-    return tag_invoke(detail::enum_to_str_tag{}, e);
-}
-
-/**
- * @brief Visits set choices in order of their declaration
- *
- * @param s set to visit
- * @param visitor visitor. Must have signature
- *      `void (bool choice_value, const char* choice_name)`
- * @return forwarded reference to `visitor`
- */
-template<typename Set, typename Visitor>
-constexpr auto visit_set(const Set s, Visitor&& visitor) noexcept
-    -> decltype(s(detail::visit_set_tag{}, std::forward<Visitor>(visitor)))
-{
-    return s(detail::visit_set_tag{}, std::forward<Visitor>(visitor));
-}
-
-namespace detail
-{
-template<typename Derived>
-struct is_array_type_impl
-{
-    static constexpr std::false_type test(...);
-
-    template<typename T1, typename T2, std::size_t N, typename T3>
-    static constexpr std::true_type
-        test(detail::static_array_ref<T1, T2, N, T3>*);
-
-    using type = decltype(test(std::declval<Derived*>()));
-};
-} // namespace detail
-
-//! @brief Checks is `T` is an array type
-template<typename T>
-using is_array_type = typename detail::is_array_type_impl<T>::type;
-
-//! @brief Checks if `T` is a non-array required type
-template<typename T>
-using is_required_type = detail::is_base_of_tmp<detail::required_base, T>;
-
-//! @brief Checks if `T` is a non-array optional type
-template<typename T>
-using is_optional_type = detail::is_base_of_tmp<detail::optional_base, T>;
-
-//! @brief Checks if `T` is a non-array type
-template<typename T>
-using is_non_array_type = std::integral_constant<
-    bool,
-    is_required_type<T>::value || is_optional_type<T>::value>;
-
-//! @brief Checks if `T` is a type of any kind
-template<typename T>
-using is_type = std::integral_constant<
-    bool,
-    is_required_type<T>::value || is_optional_type<T>::value
-        || is_array_type<T>::value>;
-
-//! @brief Checks if `T` is an enumeration
-template<typename T, typename = void>
-struct is_enum : std::false_type
-{
-};
-
-template<typename T>
-struct is_enum<
-    T,
-    detail::void_t<decltype(sbepp::enum_to_string(std::declval<T>()))>>
-    : std::true_type
-{
-};
-
-//! @brief Checks if `T` is a set
-template<typename T>
-using is_set = detail::is_base_of_tmp<detail::bitset_base, T>;
-
-//! @brief Checks if `T` is a composite
-template<typename T>
-using is_composite = detail::is_base_of_tmp<detail::composite_base, T>;
-
-//! @brief Checks if `T` is a message
-template<typename T>
-using is_message = detail::is_base_of_tmp<detail::message_base, T>;
-
-//! @brief Checks if `T` is a flat group
-template<typename T>
-using is_flat_group = detail::is_base_of_tmp<detail::flat_group_base, T>;
-
-//! @brief Checks if `T` is a nested group
-template<typename T>
-using is_nested_group = detail::is_base_of_tmp<detail::nested_group_base, T>;
-
-//! @brief Checks if `T` is a group of any kind
-template<typename T>
-using is_group = std::integral_constant<
-    bool,
-    is_flat_group<T>::value || is_nested_group<T>::value>;
-
-namespace detail
-{
-template<typename Derived>
-struct is_data_impl
-{
-    static constexpr std::false_type test(...);
-
-    template<typename T1, typename T2, typename T3, endian E>
-    static constexpr std::true_type
-        test(detail::dynamic_array_ref<T1, T2, T3, E>*);
-
-    using type = decltype(test(std::declval<Derived*>()));
-};
-} // namespace detail
-
-//! @brief Checks if `T` is a data
-template<typename T>
-using is_data = typename detail::is_data_impl<T>::type;
-
-#if SBEPP_HAS_INLINE_VARS
-//! @brief Shorthand for `sbepp::is_array_type<T>::value`
-template<typename T>
-inline constexpr auto is_array_type_v = is_array_type<T>::value;
-
-//! @brief Shorthand for `sbepp::is_required_type<T>::value`
-template<typename T>
-inline constexpr auto is_required_type_v = is_required_type<T>::value;
-
-//! @brief Shorthand for `sbepp::is_optional_type<T>::value`
-template<typename T>
-inline constexpr auto is_optional_type_v = is_optional_type<T>::value;
-
-//! @brief Shorthand for `sbepp::is_non_array_type<T>::value`
-template<typename T>
-inline constexpr auto is_non_array_type_v = is_non_array_type<T>::value;
-
-//! @brief Shorthand for `sbepp::is_type<T>::value`
-template<typename T>
-inline constexpr auto is_type_v = is_type<T>::value;
-
-//! @brief Shorthand for `sbepp::is_enum<T>::value`
-template<typename T>
-inline constexpr auto is_enum_v = is_enum<T>::value;
-
-//! @brief Shorthand for `sbepp::is_set<T>::value`
-template<typename T>
-inline constexpr auto is_set_v = is_set<T>::value;
-
-//! @brief Shorthand for `sbepp::is_composite<T>::value`
-template<typename T>
-inline constexpr auto is_composite_v = is_composite<T>::value;
-
-//! @brief Shorthand for `sbepp::is_message<T>::value`
-template<typename T>
-inline constexpr auto is_message_v = is_message<T>::value;
-
-//! @brief Shorthand for `sbepp::is_flat_group<T>::value`
-template<typename T>
-inline constexpr auto is_flat_group_v = is_flat_group<T>::value;
-
-//! @brief Shorthand for `sbepp::is_nested_group<T>::value`
-template<typename T>
-inline constexpr auto is_nested_group_v = is_nested_group<T>::value;
-
-//! @brief Shorthand for `sbepp::is_group<T>::value`
-template<typename T>
-inline constexpr auto is_group_v = is_group<T>::value;
-
-//! @brief Shorthand for `sbepp::is_data<T>::value`
-template<typename T>
-inline constexpr auto is_data_v = is_data<T>::value;
-#endif
-
-#if SBEPP_HAS_CONCEPTS
-//! @brief Concept for `sbepp::is_array_type<T>::value`
-template<typename T>
-concept array_type = is_array_type_v<T>;
-
-//! @brief Concept for `sbepp::is_required_type<T>::value`
-template<typename T>
-concept required_type = is_required_type_v<T>;
-
-//! @brief Concept for `sbepp::is_optional_type<T>::value`
-template<typename T>
-concept optional_type = is_optional_type_v<T>;
-
-//! @brief Concept for `sbepp::is_non_array_type<T>::value`
-template<typename T>
-concept non_array_type = is_non_array_type_v<T>;
-
-//! @brief Concept for `sbepp::is_type<T>::value`
-template<typename T>
-concept type = is_type_v<T>;
-
-//! @brief Concept for `sbepp::is_enum<T>::value`
-template<typename T>
-concept enumeration = is_enum_v<T>;
-
-//! @brief Concept for `sbepp::is_set<T>::value`
-template<typename T>
-concept set = is_set_v<T>;
-
-//! @brief Concept for `sbepp::is_composite<T>::value`
-template<typename T>
-concept composite = is_composite_v<T>;
-
-//! @brief Concept for `sbepp::is_message<T>::value`
-template<typename T>
-concept message = is_message_v<T>;
-
-//! @brief Concept for `sbepp::is_flat_group<T>::value`
-template<typename T>
-concept flat_group = is_flat_group_v<T>;
-
-//! @brief Concept for `sbepp::is_nested_group<T>::value`
-template<typename T>
-concept nested_group = is_nested_group_v<T>;
-
-//! @brief Concept for `sbepp::is_group<T>::value`
-template<typename T>
-concept group = is_group_v<T>;
-
-//! @brief Concept for `sbepp::is_data<T>::value`
-template<typename T>
-concept data = is_data_v<T>;
-#endif
 } // namespace sbepp
 
 #if SBEPP_HAS_RANGES && SBEPP_HAS_CONCEPTS

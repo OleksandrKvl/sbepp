@@ -2404,7 +2404,8 @@ PREDEFINED             = SBEPP_DOXYGEN \
                          SBEPP_HAS_INLINE_VARS=1 \
                          SBEPP_HAS_CONCEPTS=1 \
                          SBEPP_CPP17_INLINE_VAR=inline \
-                         "SBEPP_CPP17_NODISCARD=[[nodiscard]]"
+                         "SBEPP_CPP17_NODISCARD=[[nodiscard]]"\
+                         SBEPP_DEPRECATED
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this
 # tag can be used to specify a list of macro names that should be expanded. The

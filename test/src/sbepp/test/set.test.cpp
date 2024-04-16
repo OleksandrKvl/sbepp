@@ -172,6 +172,50 @@ TEST(SetTest, VisitSetVisitsChoices)
         });
 }
 
+// tests that `A == true` and `B == false`
+class options_set_visitor
+{
+public:
+    void on_set_choice(bool value, test_schema::schema::types::options_set::A)
+    {
+        valid &= ((choice_index == 0) && (value == true));
+        choice_index++;
+    }
+
+    void on_set_choice(bool value, test_schema::schema::types::options_set::B)
+    {
+        valid &= ((choice_index == 1) && (value == false));
+        choice_index++;
+    }
+
+    template<typename Tag>
+    void on_set_choice(bool /*value*/, Tag)
+    {
+        // should not be called
+        valid = false;
+    }
+
+    bool is_valid() const
+    {
+        return valid && (choice_index == 2);
+    }
+
+private:
+    bool valid{true};
+    std::size_t choice_index{};
+};
+
+TEST(SetTest, VisitSetVisitsChoices2)
+{
+    set_t s{};
+    s.A(true);
+    s.B(false);
+
+    auto visitor = sbepp::visit<options_set_visitor>(s);
+
+    ASSERT_TRUE(visitor.is_valid());
+}
+
 #if SBEPP_HAS_CONSTEXPR_ACCESSORS
 constexpr set_t constexpr_test()
 {

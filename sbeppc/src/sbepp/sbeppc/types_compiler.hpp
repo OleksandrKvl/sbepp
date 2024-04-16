@@ -322,42 +322,41 @@ public:
         return fmt::format("{}", fmt::join(enumerators, ",\n"));
     }
 
-    static std::string make_enum_to_string(sbe::enumeration& e)
+    static std::string make_enum_visit_impl(const sbe::enumeration& e)
     {
-        std::string switch_cases;
+        std::vector<std::string> switch_cases;
+        switch_cases.reserve(e.valid_values.size());
+
         for(const auto& valid_value : e.valid_values)
         {
-            switch_cases.append(fmt::format(
+            switch_cases.push_back(fmt::format(
                 // clang-format off
-R"(
-    case {enum_type}::{enumerator}:
-        return "{enumerator}";
-)",
+R"(case {enum_type}::{enumerator}:
+        visitor.on_enum_value(e, {tag}{{}});
+        break;)",
                 // clang-format on
                 fmt::arg("enum_type", e.impl_name),
-                fmt::arg("enum_name", e.name),
-                fmt::arg("enumerator", valid_value.name)));
+                fmt::arg("enumerator", valid_value.name),
+                fmt::arg("tag", valid_value.tag)));
         }
 
         return fmt::format(
             // clang-format off
-R"(
-inline SBEPP_CPP14_CONSTEXPR const char*
-    tag_invoke(
-        ::sbepp::detail::enum_to_str_tag,
-        {enum} e) noexcept
+R"(template<typename Visitor>
+SBEPP_CPP14_CONSTEXPR void tag_invoke(
+    ::sbepp::detail::visit_tag, {enum} e, Visitor& visitor) noexcept
 {{
     switch(e)
     {{
     {switch_cases}
     default:
-        return nullptr;
+        visitor.on_enum_value(e, ::sbepp::unknown_enum_value_tag{{}});
     }}
 }}
 )",
             // clang-format on
             fmt::arg("enum", e.impl_name),
-            fmt::arg("switch_cases", switch_cases));
+            fmt::arg("switch_cases", fmt::join(switch_cases, "\n    ")));
     }
 
     std::string compile_encoding(sbe::enumeration& e)
@@ -378,13 +377,13 @@ enum class {name} : {type}
 {enumerators}
 }};
 
-{enum_to_string_impl}
+{enum_visit_impl}
 )",
             // clang-format on
             fmt::arg("name", e.impl_name),
             fmt::arg("type", e.underlying_type),
             fmt::arg("enumerators", enumerators),
-            fmt::arg("enum_to_string_impl", make_enum_to_string(e)));
+            fmt::arg("enum_visit_impl", make_enum_visit_impl(e)));
     }
 
     static bool is_unsigned(const std::string_view type)
@@ -434,33 +433,57 @@ R"(
         return res;
     }
 
-    static std::string make_visit_set_impl(sbe::set& s)
+    static std::string make_visit_set_impl(const sbe::set& s)
     {
-        std::string choice_visitors;
+        std::vector<std::string> visitors;
+        visitors.reserve(s.choices.size());
+
         for(const auto& choice : s.choices)
         {
-            choice_visitors.append(fmt::format(
-                // clang-format off
-R"(
-    visitor(this->{choice_name}(), "{choice_name}");)",
-                // clang-format on
-                fmt::arg("set_name", s.name),
+            visitors.push_back(fmt::format(
+                "visitor(this->{choice_name}(), \"{choice_name}\");",
                 fmt::arg("choice_name", choice.name)));
+        }
+
+        return fmt::format(
+            // clang-format off
+R"(template<typename Visitor>
+SBEPP_CPP14_CONSTEXPR Visitor&& operator()(
+    ::sbepp::detail::visit_set_tag, Visitor&& visitor) const noexcept
+{{
+    {visitors}
+    return std::forward<Visitor>(visitor);
+}}
+)",
+            // clang-format on
+            fmt::arg("visitors", fmt::join(visitors, "\n    ")));
+    }
+
+    static std::string make_visit_set_impl2(const sbe::set& s)
+    {
+        std::vector<std::string> visitors;
+        visitors.reserve(s.choices.size());
+
+        for(const auto& choice : s.choices)
+        {
+            visitors.push_back(fmt::format(
+                "visitor.on_set_choice(this->{choice_name}(), {tag}{{}});",
+                fmt::arg("choice_name", choice.name),
+                fmt::arg("tag", choice.tag)));
         }
 
         return fmt::format(
             // clang-format off
 R"(
 template<typename Visitor>
-SBEPP_CPP14_CONSTEXPR Visitor&& operator()(
-    ::sbepp::detail::visit_set_tag, Visitor&& visitor) const noexcept
+SBEPP_CPP14_CONSTEXPR void operator()(
+    ::sbepp::detail::visit_tag, Visitor& visitor) const noexcept
 {{
-    {choice_visitors}
-    return std::forward<Visitor>(visitor);
+    {visitors}
 }}
 )",
             // clang-format on
-            fmt::arg("choice_visitors", choice_visitors));
+            fmt::arg("visitors", fmt::join(visitors, "\n    ")));
     }
 
     std::string compile_encoding(sbe::set& s)
@@ -487,13 +510,15 @@ public:
 
     {accessors}
     {visit_set_impl}
+    {visit_set_impl2}
 }};
 )",
             // clang-format on
             fmt::arg("name", s.impl_name),
             fmt::arg("type", s.underlying_type),
             fmt::arg("accessors", make_set_accessors(s)),
-            fmt::arg("visit_set_impl", make_visit_set_impl(s)));
+            fmt::arg("visit_set_impl", make_visit_set_impl(s)),
+            fmt::arg("visit_set_impl2", make_visit_set_impl2(s)));
     }
 
     static std::string get_const_impl_type(const sbe::encoding& enc)
