@@ -4357,209 +4357,210 @@ $(function(){initNavTree('sbepp_8hpp_source.html',''); initResizable(); });
 <div class="line"><a id="l04974" name="l04974"></a><span class="lineno"> 4974</span><span class="keyword">class </span>enum_to_string_visitor</div>
 <div class="line"><a id="l04975" name="l04975"></a><span class="lineno"> 4975</span>{</div>
 <div class="line"><a id="l04976" name="l04976"></a><span class="lineno"> 4976</span><span class="keyword">public</span>:</div>
-<div class="line"><a id="l04977" name="l04977"></a><span class="lineno"> 4977</span>    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Tag&gt;</div>
-<div class="line"><a id="l04978" name="l04978"></a><span class="lineno"> 4978</span>    SBEPP_CPP14_CONSTEXPR <span class="keywordtype">void</span> on_enum_value(<span class="keyword">auto</span> <span class="comment">/*e*/</span>, Tag) <span class="keyword">noexcept</span></div>
+<div class="line"><a id="l04977" name="l04977"></a><span class="lineno"> 4977</span>    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Enum, <span class="keyword">typename</span> Tag&gt;</div>
+<div class="line"><a id="l04978" name="l04978"></a><span class="lineno"> 4978</span>    SBEPP_CPP14_CONSTEXPR <span class="keywordtype">void</span> on_enum_value(Enum <span class="comment">/*e*/</span>, Tag) <span class="keyword">noexcept</span></div>
 <div class="line"><a id="l04979" name="l04979"></a><span class="lineno"> 4979</span>    {</div>
 <div class="line"><a id="l04980" name="l04980"></a><span class="lineno"> 4980</span>        name_value = <a class="code hl_function" href="classsbepp_1_1enum__value__traits.html#aba278e3f1b4302ff7635f7f62e8dbe69">sbepp::enum_value_traits&lt;Tag&gt;::name</a>();</div>
 <div class="line"><a id="l04981" name="l04981"></a><span class="lineno"> 4981</span>    }</div>
 <div class="line"><a id="l04982" name="l04982"></a><span class="lineno"> 4982</span> </div>
-<div class="line"><a id="l04983" name="l04983"></a><span class="lineno"> 4983</span>    SBEPP_CPP14_CONSTEXPR <span class="keywordtype">void</span></div>
-<div class="line"><a id="l04984" name="l04984"></a><span class="lineno"> 4984</span>        on_enum_value(<span class="keyword">auto</span> <span class="comment">/*e*/</span>, <a class="code hl_struct" href="structsbepp_1_1unknown__enum__value__tag.html">sbepp::unknown_enum_value_tag</a>) <span class="keyword">noexcept</span></div>
-<div class="line"><a id="l04985" name="l04985"></a><span class="lineno"> 4985</span>    {</div>
-<div class="line"><a id="l04986" name="l04986"></a><span class="lineno"> 4986</span>        name_value = <span class="keyword">nullptr</span>;</div>
-<div class="line"><a id="l04987" name="l04987"></a><span class="lineno"> 4987</span>    }</div>
-<div class="line"><a id="l04988" name="l04988"></a><span class="lineno"> 4988</span> </div>
-<div class="line"><a id="l04989" name="l04989"></a><span class="lineno"> 4989</span>    <span class="keyword">constexpr</span> <span class="keyword">const</span> <span class="keywordtype">char</span>* name() const noexcept</div>
-<div class="line"><a id="l04990" name="l04990"></a><span class="lineno"> 4990</span>    {</div>
-<div class="line"><a id="l04991" name="l04991"></a><span class="lineno"> 4991</span>        <span class="keywordflow">return</span> name_value;</div>
-<div class="line"><a id="l04992" name="l04992"></a><span class="lineno"> 4992</span>    }</div>
-<div class="line"><a id="l04993" name="l04993"></a><span class="lineno"> 4993</span> </div>
-<div class="line"><a id="l04994" name="l04994"></a><span class="lineno"> 4994</span><span class="keyword">private</span>:</div>
-<div class="line"><a id="l04995" name="l04995"></a><span class="lineno"> 4995</span>    <span class="keyword">const</span> <span class="keywordtype">char</span>* name_value;</div>
-<div class="line"><a id="l04996" name="l04996"></a><span class="lineno"> 4996</span>};</div>
-<div class="line"><a id="l04997" name="l04997"></a><span class="lineno"> 4997</span>} <span class="comment">// namespace detail</span></div>
-<div class="line"><a id="l04998" name="l04998"></a><span class="lineno"> 4998</span> </div>
-<div class="foldopen" id="foldopen05009" data-start="{" data-end="}">
-<div class="line"><a id="l05009" name="l05009"></a><span class="lineno"><a class="line" href="namespacesbepp.html#a6b2d51af3f026b165fa40fe1d7ab19db"> 5009</a></span>template&lt;typename E, typename = detail::enable_if_t&lt;is_enum&lt;E&gt;::value&gt;&gt;</div>
-<div class="line"><a id="l05010" name="l05010"></a><span class="lineno"> 5010</span>SBEPP_DEPRECATED <span class="keyword">constexpr</span> <span class="keyword">const</span> <span class="keywordtype">char</span>* <a class="code hl_function" href="namespacesbepp.html#a6b2d51af3f026b165fa40fe1d7ab19db">enum_to_string</a>(<span class="keyword">const</span> E e) <span class="keyword">noexcept</span></div>
-<div class="line"><a id="l05011" name="l05011"></a><span class="lineno"> 5011</span>{</div>
-<div class="line"><a id="l05012" name="l05012"></a><span class="lineno"> 5012</span>    <span class="keywordflow">return</span> visit&lt;detail::enum_to_string_visitor&gt;(e).name();</div>
+<div class="line"><a id="l04983" name="l04983"></a><span class="lineno"> 4983</span>    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Enum&gt;</div>
+<div class="line"><a id="l04984" name="l04984"></a><span class="lineno"> 4984</span>    SBEPP_CPP14_CONSTEXPR <span class="keywordtype">void</span></div>
+<div class="line"><a id="l04985" name="l04985"></a><span class="lineno"> 4985</span>        on_enum_value(Enum <span class="comment">/*e*/</span>, <a class="code hl_struct" href="structsbepp_1_1unknown__enum__value__tag.html">sbepp::unknown_enum_value_tag</a>) <span class="keyword">noexcept</span></div>
+<div class="line"><a id="l04986" name="l04986"></a><span class="lineno"> 4986</span>    {</div>
+<div class="line"><a id="l04987" name="l04987"></a><span class="lineno"> 4987</span>        name_value = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a id="l04988" name="l04988"></a><span class="lineno"> 4988</span>    }</div>
+<div class="line"><a id="l04989" name="l04989"></a><span class="lineno"> 4989</span> </div>
+<div class="line"><a id="l04990" name="l04990"></a><span class="lineno"> 4990</span>    <span class="keyword">constexpr</span> <span class="keyword">const</span> <span class="keywordtype">char</span>* name() const noexcept</div>
+<div class="line"><a id="l04991" name="l04991"></a><span class="lineno"> 4991</span>    {</div>
+<div class="line"><a id="l04992" name="l04992"></a><span class="lineno"> 4992</span>        <span class="keywordflow">return</span> name_value;</div>
+<div class="line"><a id="l04993" name="l04993"></a><span class="lineno"> 4993</span>    }</div>
+<div class="line"><a id="l04994" name="l04994"></a><span class="lineno"> 4994</span> </div>
+<div class="line"><a id="l04995" name="l04995"></a><span class="lineno"> 4995</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l04996" name="l04996"></a><span class="lineno"> 4996</span>    <span class="keyword">const</span> <span class="keywordtype">char</span>* name_value;</div>
+<div class="line"><a id="l04997" name="l04997"></a><span class="lineno"> 4997</span>};</div>
+<div class="line"><a id="l04998" name="l04998"></a><span class="lineno"> 4998</span>} <span class="comment">// namespace detail</span></div>
+<div class="line"><a id="l04999" name="l04999"></a><span class="lineno"> 4999</span> </div>
+<div class="foldopen" id="foldopen05010" data-start="{" data-end="}">
+<div class="line"><a id="l05010" name="l05010"></a><span class="lineno"><a class="line" href="namespacesbepp.html#a6b2d51af3f026b165fa40fe1d7ab19db"> 5010</a></span>template&lt;typename E, typename = detail::enable_if_t&lt;is_enum&lt;E&gt;::value&gt;&gt;</div>
+<div class="line"><a id="l05011" name="l05011"></a><span class="lineno"> 5011</span>SBEPP_DEPRECATED <span class="keyword">constexpr</span> <span class="keyword">const</span> <span class="keywordtype">char</span>* <a class="code hl_function" href="namespacesbepp.html#a6b2d51af3f026b165fa40fe1d7ab19db">enum_to_string</a>(<span class="keyword">const</span> E e) <span class="keyword">noexcept</span></div>
+<div class="line"><a id="l05012" name="l05012"></a><span class="lineno"> 5012</span>{</div>
+<div class="line"><a id="l05013" name="l05013"></a><span class="lineno"> 5013</span>    <span class="keywordflow">return</span> visit&lt;detail::enum_to_string_visitor&gt;(e).name();</div>
 </div>
-<div class="line"><a id="l05013" name="l05013"></a><span class="lineno"> 5013</span>}</div>
-<div class="line"><a id="l05014" name="l05014"></a><span class="lineno"> 5014</span> </div>
-<div class="line"><a id="l05026" name="l05026"></a><span class="lineno"> 5026</span><span class="keyword">template</span>&lt;<span class="keyword">typename</span> Set, <span class="keyword">typename</span> Visitor&gt;</div>
-<div class="foldopen" id="foldopen05027" data-start="{" data-end="}">
-<div class="line"><a id="l05027" name="l05027"></a><span class="lineno"><a class="line" href="namespacesbepp.html#aa253364a4276b55c0a157aefaa185c37"> 5027</a></span>SBEPP_DEPRECATED <span class="keyword">constexpr</span> <span class="keyword">auto</span></div>
-<div class="line"><a id="l05028" name="l05028"></a><span class="lineno"> 5028</span>    <a class="code hl_function" href="namespacesbepp.html#aa253364a4276b55c0a157aefaa185c37">visit_set</a>(<span class="keyword">const</span> Set s, Visitor&amp;&amp; visitor) <span class="keyword">noexcept</span></div>
-<div class="line"><a id="l05029" name="l05029"></a><span class="lineno"> 5029</span>    -&gt; <span class="keyword">decltype</span>(s(detail::visit_set_tag{}, std::forward&lt;Visitor&gt;(visitor)))</div>
-<div class="line"><a id="l05030" name="l05030"></a><span class="lineno"> 5030</span>{</div>
-<div class="line"><a id="l05031" name="l05031"></a><span class="lineno"> 5031</span>    <span class="keywordflow">return</span> s(detail::visit_set_tag{}, std::forward&lt;Visitor&gt;(visitor));</div>
+<div class="line"><a id="l05014" name="l05014"></a><span class="lineno"> 5014</span>}</div>
+<div class="line"><a id="l05015" name="l05015"></a><span class="lineno"> 5015</span> </div>
+<div class="line"><a id="l05027" name="l05027"></a><span class="lineno"> 5027</span><span class="keyword">template</span>&lt;<span class="keyword">typename</span> Set, <span class="keyword">typename</span> Visitor&gt;</div>
+<div class="foldopen" id="foldopen05028" data-start="{" data-end="}">
+<div class="line"><a id="l05028" name="l05028"></a><span class="lineno"><a class="line" href="namespacesbepp.html#aa253364a4276b55c0a157aefaa185c37"> 5028</a></span>SBEPP_DEPRECATED <span class="keyword">constexpr</span> <span class="keyword">auto</span></div>
+<div class="line"><a id="l05029" name="l05029"></a><span class="lineno"> 5029</span>    <a class="code hl_function" href="namespacesbepp.html#aa253364a4276b55c0a157aefaa185c37">visit_set</a>(<span class="keyword">const</span> Set s, Visitor&amp;&amp; visitor) <span class="keyword">noexcept</span></div>
+<div class="line"><a id="l05030" name="l05030"></a><span class="lineno"> 5030</span>    -&gt; <span class="keyword">decltype</span>(s(detail::visit_set_tag{}, std::forward&lt;Visitor&gt;(visitor)))</div>
+<div class="line"><a id="l05031" name="l05031"></a><span class="lineno"> 5031</span>{</div>
+<div class="line"><a id="l05032" name="l05032"></a><span class="lineno"> 5032</span>    <span class="keywordflow">return</span> s(detail::visit_set_tag{}, std::forward&lt;Visitor&gt;(visitor));</div>
 </div>
-<div class="line"><a id="l05032" name="l05032"></a><span class="lineno"> 5032</span>}</div>
-<div class="line"><a id="l05033" name="l05033"></a><span class="lineno"> 5033</span> </div>
-<div class="line"><a id="l05034" name="l05034"></a><span class="lineno"> 5034</span><span class="keyword">namespace </span>detail</div>
-<div class="line"><a id="l05035" name="l05035"></a><span class="lineno"> 5035</span>{</div>
-<div class="line"><a id="l05036" name="l05036"></a><span class="lineno"> 5036</span><span class="keyword">class </span>size_bytes_checked_visitor</div>
-<div class="line"><a id="l05037" name="l05037"></a><span class="lineno"> 5037</span>{</div>
-<div class="line"><a id="l05038" name="l05038"></a><span class="lineno"> 5038</span><span class="keyword">public</span>:</div>
-<div class="line"><a id="l05039" name="l05039"></a><span class="lineno"> 5039</span>    <span class="keyword">constexpr</span> <span class="keyword">explicit</span> size_bytes_checked_visitor(</div>
-<div class="line"><a id="l05040" name="l05040"></a><span class="lineno"> 5040</span>        <span class="keyword">const</span> std::size_t size) noexcept</div>
-<div class="line"><a id="l05041" name="l05041"></a><span class="lineno"> 5041</span>        : size{size}</div>
-<div class="line"><a id="l05042" name="l05042"></a><span class="lineno"> 5042</span>    {</div>
-<div class="line"><a id="l05043" name="l05043"></a><span class="lineno"> 5043</span>    }</div>
-<div class="line"><a id="l05044" name="l05044"></a><span class="lineno"> 5044</span> </div>
-<div class="line"><a id="l05045" name="l05045"></a><span class="lineno"> 5045</span>    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T, <span class="keyword">typename</span> Cursor, <span class="keyword">typename</span> Tag&gt;</div>
-<div class="line"><a id="l05046" name="l05046"></a><span class="lineno"> 5046</span>    SBEPP_CPP14_CONSTEXPR <span class="keywordtype">void</span> on_message(T m, Cursor&amp; c, Tag) <span class="keyword">noexcept</span></div>
-<div class="line"><a id="l05047" name="l05047"></a><span class="lineno"> 5047</span>    {</div>
-<div class="line"><a id="l05048" name="l05048"></a><span class="lineno"> 5048</span>        <span class="keyword">const</span> <span class="keyword">auto</span> header = <a class="code hl_function" href="namespacesbepp.html#a12bbc67580e3f4bb2a0299033f01818d">sbepp::get_header</a>(m);</div>
-<div class="line"><a id="l05049" name="l05049"></a><span class="lineno"> 5049</span>        <span class="keyword">const</span> <span class="keyword">auto</span> header_size = <a class="code hl_function" href="namespacesbepp.html#a9346fd507c2d3760ac40032180d1a7a6">sbepp::size_bytes</a>(header);</div>
-<div class="line"><a id="l05050" name="l05050"></a><span class="lineno"> 5050</span>        <span class="keywordflow">if</span>(!validate_and_subtract(header_size))</div>
-<div class="line"><a id="l05051" name="l05051"></a><span class="lineno"> 5051</span>        {</div>
-<div class="line"><a id="l05052" name="l05052"></a><span class="lineno"> 5052</span>            <span class="keywordflow">return</span>;</div>
-<div class="line"><a id="l05053" name="l05053"></a><span class="lineno"> 5053</span>        }</div>
-<div class="line"><a id="l05054" name="l05054"></a><span class="lineno"> 5054</span> </div>
-<div class="line"><a id="l05055" name="l05055"></a><span class="lineno"> 5055</span>        <span class="keywordflow">if</span>(!validate_and_subtract(*header.blockLength()))</div>
-<div class="line"><a id="l05056" name="l05056"></a><span class="lineno"> 5056</span>        {</div>
-<div class="line"><a id="l05057" name="l05057"></a><span class="lineno"> 5057</span>            <span class="keywordflow">return</span>;</div>
-<div class="line"><a id="l05058" name="l05058"></a><span class="lineno"> 5058</span>        }</div>
-<div class="line"><a id="l05059" name="l05059"></a><span class="lineno"> 5059</span> </div>
-<div class="line"><a id="l05060" name="l05060"></a><span class="lineno"> 5060</span>        <a class="code hl_function" href="namespacesbepp.html#a23abc2b6b892aea5b2b7f6dde6c24e69">sbepp::visit_children</a>(m, c, *<span class="keyword">this</span>);</div>
-<div class="line"><a id="l05061" name="l05061"></a><span class="lineno"> 5061</span>    }</div>
-<div class="line"><a id="l05062" name="l05062"></a><span class="lineno"> 5062</span> </div>
-<div class="line"><a id="l05063" name="l05063"></a><span class="lineno"> 5063</span>    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T, <span class="keyword">typename</span> Cursor, <span class="keyword">typename</span> Tag&gt;</div>
-<div class="line"><a id="l05064" name="l05064"></a><span class="lineno"> 5064</span>    SBEPP_CPP14_CONSTEXPR <span class="keywordtype">bool</span> on_group(T g, Cursor&amp; c, Tag) <span class="keyword">noexcept</span></div>
-<div class="line"><a id="l05065" name="l05065"></a><span class="lineno"> 5065</span>    {</div>
-<div class="line"><a id="l05066" name="l05066"></a><span class="lineno"> 5066</span>        <span class="keyword">const</span> <span class="keyword">auto</span> header = <a class="code hl_function" href="namespacesbepp.html#a12bbc67580e3f4bb2a0299033f01818d">sbepp::get_header</a>(g);</div>
-<div class="line"><a id="l05067" name="l05067"></a><span class="lineno"> 5067</span>        <span class="keyword">const</span> <span class="keyword">auto</span> header_size = <a class="code hl_function" href="namespacesbepp.html#a9346fd507c2d3760ac40032180d1a7a6">sbepp::size_bytes</a>(header);</div>
-<div class="line"><a id="l05068" name="l05068"></a><span class="lineno"> 5068</span>        <span class="keywordflow">if</span>(!validate_and_subtract(header_size))</div>
-<div class="line"><a id="l05069" name="l05069"></a><span class="lineno"> 5069</span>        {</div>
-<div class="line"><a id="l05070" name="l05070"></a><span class="lineno"> 5070</span>            <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a id="l05071" name="l05071"></a><span class="lineno"> 5071</span>        }</div>
-<div class="line"><a id="l05072" name="l05072"></a><span class="lineno"> 5072</span> </div>
-<div class="line"><a id="l05073" name="l05073"></a><span class="lineno"> 5073</span>        <span class="keyword">const</span> <span class="keyword">auto</span> prev_block_length =</div>
-<div class="line"><a id="l05074" name="l05074"></a><span class="lineno"> 5074</span>            set_group_block_length(*header.blockLength());</div>
-<div class="line"><a id="l05075" name="l05075"></a><span class="lineno"> 5075</span>        <a class="code hl_function" href="namespacesbepp.html#a23abc2b6b892aea5b2b7f6dde6c24e69">sbepp::visit_children</a>(g, c, *<span class="keyword">this</span>);</div>
-<div class="line"><a id="l05076" name="l05076"></a><span class="lineno"> 5076</span>        set_group_block_length(prev_block_length);</div>
-<div class="line"><a id="l05077" name="l05077"></a><span class="lineno"> 5077</span> </div>
-<div class="line"><a id="l05078" name="l05078"></a><span class="lineno"> 5078</span>        <span class="keywordflow">return</span> !is_valid();</div>
-<div class="line"><a id="l05079" name="l05079"></a><span class="lineno"> 5079</span>    }</div>
-<div class="line"><a id="l05080" name="l05080"></a><span class="lineno"> 5080</span> </div>
-<div class="line"><a id="l05081" name="l05081"></a><span class="lineno"> 5081</span>    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T, <span class="keyword">typename</span> Cursor&gt;</div>
-<div class="line"><a id="l05082" name="l05082"></a><span class="lineno"> 5082</span>    SBEPP_CPP14_CONSTEXPR <span class="keywordtype">bool</span> on_entry(T e, Cursor&amp; c) <span class="keyword">noexcept</span></div>
-<div class="line"><a id="l05083" name="l05083"></a><span class="lineno"> 5083</span>    {</div>
-<div class="line"><a id="l05084" name="l05084"></a><span class="lineno"> 5084</span>        <span class="keywordflow">if</span>(!validate_and_subtract(group_block_length))</div>
-<div class="line"><a id="l05085" name="l05085"></a><span class="lineno"> 5085</span>        {</div>
-<div class="line"><a id="l05086" name="l05086"></a><span class="lineno"> 5086</span>            <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a id="l05087" name="l05087"></a><span class="lineno"> 5087</span>        }</div>
-<div class="line"><a id="l05088" name="l05088"></a><span class="lineno"> 5088</span> </div>
-<div class="line"><a id="l05089" name="l05089"></a><span class="lineno"> 5089</span>        <span class="keywordflow">return</span> !<a class="code hl_function" href="namespacesbepp.html#a23abc2b6b892aea5b2b7f6dde6c24e69">sbepp::visit_children</a>(e, c, *<span class="keyword">this</span>).is_valid();</div>
-<div class="line"><a id="l05090" name="l05090"></a><span class="lineno"> 5090</span>    }</div>
-<div class="line"><a id="l05091" name="l05091"></a><span class="lineno"> 5091</span> </div>
-<div class="line"><a id="l05092" name="l05092"></a><span class="lineno"> 5092</span>    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T, <span class="keyword">typename</span> Tag&gt;</div>
-<div class="line"><a id="l05093" name="l05093"></a><span class="lineno"> 5093</span>    SBEPP_CPP14_CONSTEXPR <span class="keywordtype">bool</span> on_data(T d, Tag) <span class="keyword">noexcept</span></div>
-<div class="line"><a id="l05094" name="l05094"></a><span class="lineno"> 5094</span>    {</div>
-<div class="line"><a id="l05095" name="l05095"></a><span class="lineno"> 5095</span>        <span class="keywordflow">return</span> !validate_and_subtract(<a class="code hl_function" href="namespacesbepp.html#a9346fd507c2d3760ac40032180d1a7a6">sbepp::size_bytes</a>(d));</div>
-<div class="line"><a id="l05096" name="l05096"></a><span class="lineno"> 5096</span>    }</div>
-<div class="line"><a id="l05097" name="l05097"></a><span class="lineno"> 5097</span> </div>
-<div class="line"><a id="l05098" name="l05098"></a><span class="lineno"> 5098</span>    <span class="comment">// ignore them all because we validate `blockLength`</span></div>
-<div class="line"><a id="l05099" name="l05099"></a><span class="lineno"> 5099</span>    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T, <span class="keyword">typename</span> Tag&gt;</div>
-<div class="line"><a id="l05100" name="l05100"></a><span class="lineno"> 5100</span>    <span class="keyword">constexpr</span> <span class="keywordtype">bool</span> on_field(T, Tag) <span class="keyword">const</span> <span class="keyword">noexcept</span></div>
-<div class="line"><a id="l05101" name="l05101"></a><span class="lineno"> 5101</span>    {</div>
-<div class="line"><a id="l05102" name="l05102"></a><span class="lineno"> 5102</span>        <span class="keywordflow">return</span> {};</div>
-<div class="line"><a id="l05103" name="l05103"></a><span class="lineno"> 5103</span>    }</div>
-<div class="line"><a id="l05104" name="l05104"></a><span class="lineno"> 5104</span> </div>
-<div class="line"><a id="l05105" name="l05105"></a><span class="lineno"> 5105</span>    <span class="keyword">constexpr</span> <span class="keywordtype">bool</span> is_valid() const noexcept</div>
-<div class="line"><a id="l05106" name="l05106"></a><span class="lineno"> 5106</span>    {</div>
-<div class="line"><a id="l05107" name="l05107"></a><span class="lineno"> 5107</span>        <span class="keywordflow">return</span> valid;</div>
-<div class="line"><a id="l05108" name="l05108"></a><span class="lineno"> 5108</span>    }</div>
-<div class="line"><a id="l05109" name="l05109"></a><span class="lineno"> 5109</span> </div>
-<div class="line"><a id="l05110" name="l05110"></a><span class="lineno"> 5110</span>    <span class="comment">// returns previous value</span></div>
-<div class="line"><a id="l05111" name="l05111"></a><span class="lineno"> 5111</span>    SBEPP_CPP14_CONSTEXPR std::size_t</div>
-<div class="line"><a id="l05112" name="l05112"></a><span class="lineno"> 5112</span>        set_group_block_length(<span class="keyword">const</span> std::size_t block_length) <span class="keyword">noexcept</span></div>
-<div class="line"><a id="l05113" name="l05113"></a><span class="lineno"> 5113</span>    {</div>
-<div class="line"><a id="l05114" name="l05114"></a><span class="lineno"> 5114</span>        <span class="keyword">auto</span> prev = group_block_length;</div>
-<div class="line"><a id="l05115" name="l05115"></a><span class="lineno"> 5115</span>        group_block_length = block_length;</div>
-<div class="line"><a id="l05116" name="l05116"></a><span class="lineno"> 5116</span>        <span class="keywordflow">return</span> prev;</div>
-<div class="line"><a id="l05117" name="l05117"></a><span class="lineno"> 5117</span>    }</div>
-<div class="line"><a id="l05118" name="l05118"></a><span class="lineno"> 5118</span> </div>
-<div class="line"><a id="l05119" name="l05119"></a><span class="lineno"> 5119</span>    <span class="keyword">constexpr</span> std::size_t get_size() const noexcept</div>
-<div class="line"><a id="l05120" name="l05120"></a><span class="lineno"> 5120</span>    {</div>
-<div class="line"><a id="l05121" name="l05121"></a><span class="lineno"> 5121</span>        <span class="keywordflow">return</span> size;</div>
-<div class="line"><a id="l05122" name="l05122"></a><span class="lineno"> 5122</span>    }</div>
-<div class="line"><a id="l05123" name="l05123"></a><span class="lineno"> 5123</span> </div>
-<div class="line"><a id="l05124" name="l05124"></a><span class="lineno"> 5124</span><span class="keyword">private</span>:</div>
-<div class="line"><a id="l05125" name="l05125"></a><span class="lineno"> 5125</span>    std::size_t size;</div>
-<div class="line"><a id="l05126" name="l05126"></a><span class="lineno"> 5126</span>    <span class="keywordtype">bool</span> valid{<span class="keyword">true</span>};</div>
-<div class="line"><a id="l05127" name="l05127"></a><span class="lineno"> 5127</span>    <span class="comment">// current group&#39;s blockLength, used to validate entry</span></div>
-<div class="line"><a id="l05128" name="l05128"></a><span class="lineno"> 5128</span>    std::size_t group_block_length{};</div>
-<div class="line"><a id="l05129" name="l05129"></a><span class="lineno"> 5129</span> </div>
-<div class="line"><a id="l05130" name="l05130"></a><span class="lineno"> 5130</span>    SBEPP_CPP14_CONSTEXPR <span class="keywordtype">bool</span></div>
-<div class="line"><a id="l05131" name="l05131"></a><span class="lineno"> 5131</span>        validate_and_subtract(<span class="keyword">const</span> std::size_t n) <span class="keyword">noexcept</span></div>
-<div class="line"><a id="l05132" name="l05132"></a><span class="lineno"> 5132</span>    {</div>
-<div class="line"><a id="l05133" name="l05133"></a><span class="lineno"> 5133</span>        <span class="keywordflow">if</span>(size &lt; n)</div>
-<div class="line"><a id="l05134" name="l05134"></a><span class="lineno"> 5134</span>        {</div>
-<div class="line"><a id="l05135" name="l05135"></a><span class="lineno"> 5135</span>            valid = <span class="keyword">false</span>;</div>
-<div class="line"><a id="l05136" name="l05136"></a><span class="lineno"> 5136</span>        }</div>
-<div class="line"><a id="l05137" name="l05137"></a><span class="lineno"> 5137</span>        <span class="keywordflow">else</span></div>
-<div class="line"><a id="l05138" name="l05138"></a><span class="lineno"> 5138</span>        {</div>
-<div class="line"><a id="l05139" name="l05139"></a><span class="lineno"> 5139</span>            size -= n;</div>
-<div class="line"><a id="l05140" name="l05140"></a><span class="lineno"> 5140</span>        }</div>
-<div class="line"><a id="l05141" name="l05141"></a><span class="lineno"> 5141</span> </div>
-<div class="line"><a id="l05142" name="l05142"></a><span class="lineno"> 5142</span>        <span class="keywordflow">return</span> valid;</div>
-<div class="line"><a id="l05143" name="l05143"></a><span class="lineno"> 5143</span>    }</div>
-<div class="line"><a id="l05144" name="l05144"></a><span class="lineno"> 5144</span>};</div>
-<div class="line"><a id="l05145" name="l05145"></a><span class="lineno"> 5145</span>} <span class="comment">// namespace detail</span></div>
-<div class="line"><a id="l05146" name="l05146"></a><span class="lineno"> 5146</span> </div>
-<div class="line"><a id="l05148" name="l05148"></a><span class="lineno"> 5148</span><span class="keyword">struct </span>size_bytes_checked_result</div>
-<div class="line"><a id="l05149" name="l05149"></a><span class="lineno"> 5149</span>{</div>
-<div class="line"><a id="l05151" name="l05151"></a><span class="lineno"> 5151</span>    <span class="keywordtype">bool</span> valid;</div>
-<div class="line"><a id="l05153" name="l05153"></a><span class="lineno"> 5153</span>    std::size_t size;</div>
-<div class="line"><a id="l05154" name="l05154"></a><span class="lineno"> 5154</span>};</div>
-<div class="line"><a id="l05155" name="l05155"></a><span class="lineno"> 5155</span> </div>
-<div class="line"><a id="l05156" name="l05156"></a><span class="lineno"> 5156</span><span class="comment">// can be used with message/group</span></div>
-<div class="line"><a id="l05167" name="l05167"></a><span class="lineno"> 5167</span><span class="keyword">template</span>&lt;<span class="keyword">typename</span> View&gt;</div>
-<div class="foldopen" id="foldopen05168" data-start="{" data-end="}">
-<div class="line"><a id="l05168" name="l05168"></a><span class="lineno"><a class="line" href="namespacesbepp.html#abd9c1efb3c96d6fa71d1156811b47fa4"> 5168</a></span>SBEPP_CPP20_CONSTEXPR <a class="code hl_struct" href="structsbepp_1_1size__bytes__checked__result.html">size_bytes_checked_result</a></div>
-<div class="line"><a id="l05169" name="l05169"></a><span class="lineno"> 5169</span>    <a class="code hl_function" href="namespacesbepp.html#abd9c1efb3c96d6fa71d1156811b47fa4">size_bytes_checked</a>(View view, std::size_t size) <span class="keyword">noexcept</span></div>
-<div class="line"><a id="l05170" name="l05170"></a><span class="lineno"> 5170</span>{</div>
-<div class="line"><a id="l05171" name="l05171"></a><span class="lineno"> 5171</span>    <span class="comment">// `init_cursor` skips header, we need to ensure there&#39;s enough space for it</span></div>
-<div class="line"><a id="l05172" name="l05172"></a><span class="lineno"> 5172</span>    <span class="keywordflow">if</span>(!<a class="code hl_function" href="namespacesbepp.html#a870241790cb5759575b9f57d654392c2">sbepp::addressof</a>(view) || (size &lt; detail::get_header_size(view)))</div>
-<div class="line"><a id="l05173" name="l05173"></a><span class="lineno"> 5173</span>    {</div>
-<div class="line"><a id="l05174" name="l05174"></a><span class="lineno"> 5174</span>        <span class="keywordflow">return</span> {};</div>
-<div class="line"><a id="l05175" name="l05175"></a><span class="lineno"> 5175</span>    }</div>
-<div class="line"><a id="l05176" name="l05176"></a><span class="lineno"> 5176</span> </div>
-<div class="line"><a id="l05177" name="l05177"></a><span class="lineno"> 5177</span>    detail::size_bytes_checked_visitor visitor{size};</div>
-<div class="line"><a id="l05178" name="l05178"></a><span class="lineno"> 5178</span>    <span class="keyword">auto</span> c = <a class="code hl_function" href="namespacesbepp.html#a125f1fbb9faadde1515f7822a7b6420f">sbepp::init_cursor</a>(view);</div>
-<div class="line"><a id="l05179" name="l05179"></a><span class="lineno"> 5179</span>    <a class="code hl_function" href="namespacesbepp.html#a47c1cd81154bc5c56524604f74d52d27">sbepp::visit</a>(view, c, visitor);</div>
-<div class="line"><a id="l05180" name="l05180"></a><span class="lineno"> 5180</span>    <span class="keywordflow">if</span>(visitor.is_valid())</div>
-<div class="line"><a id="l05181" name="l05181"></a><span class="lineno"> 5181</span>    {</div>
-<div class="line"><a id="l05182" name="l05182"></a><span class="lineno"> 5182</span>        <span class="keywordflow">return</span> {<span class="keyword">true</span>, size - visitor.get_size()};</div>
-<div class="line"><a id="l05183" name="l05183"></a><span class="lineno"> 5183</span>    }</div>
-<div class="line"><a id="l05184" name="l05184"></a><span class="lineno"> 5184</span>    <span class="keywordflow">return</span> {};</div>
+<div class="line"><a id="l05033" name="l05033"></a><span class="lineno"> 5033</span>}</div>
+<div class="line"><a id="l05034" name="l05034"></a><span class="lineno"> 5034</span> </div>
+<div class="line"><a id="l05035" name="l05035"></a><span class="lineno"> 5035</span><span class="keyword">namespace </span>detail</div>
+<div class="line"><a id="l05036" name="l05036"></a><span class="lineno"> 5036</span>{</div>
+<div class="line"><a id="l05037" name="l05037"></a><span class="lineno"> 5037</span><span class="keyword">class </span>size_bytes_checked_visitor</div>
+<div class="line"><a id="l05038" name="l05038"></a><span class="lineno"> 5038</span>{</div>
+<div class="line"><a id="l05039" name="l05039"></a><span class="lineno"> 5039</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l05040" name="l05040"></a><span class="lineno"> 5040</span>    <span class="keyword">constexpr</span> <span class="keyword">explicit</span> size_bytes_checked_visitor(</div>
+<div class="line"><a id="l05041" name="l05041"></a><span class="lineno"> 5041</span>        <span class="keyword">const</span> std::size_t size) noexcept</div>
+<div class="line"><a id="l05042" name="l05042"></a><span class="lineno"> 5042</span>        : size{size}</div>
+<div class="line"><a id="l05043" name="l05043"></a><span class="lineno"> 5043</span>    {</div>
+<div class="line"><a id="l05044" name="l05044"></a><span class="lineno"> 5044</span>    }</div>
+<div class="line"><a id="l05045" name="l05045"></a><span class="lineno"> 5045</span> </div>
+<div class="line"><a id="l05046" name="l05046"></a><span class="lineno"> 5046</span>    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T, <span class="keyword">typename</span> Cursor, <span class="keyword">typename</span> Tag&gt;</div>
+<div class="line"><a id="l05047" name="l05047"></a><span class="lineno"> 5047</span>    SBEPP_CPP14_CONSTEXPR <span class="keywordtype">void</span> on_message(T m, Cursor&amp; c, Tag) <span class="keyword">noexcept</span></div>
+<div class="line"><a id="l05048" name="l05048"></a><span class="lineno"> 5048</span>    {</div>
+<div class="line"><a id="l05049" name="l05049"></a><span class="lineno"> 5049</span>        <span class="keyword">const</span> <span class="keyword">auto</span> header = <a class="code hl_function" href="namespacesbepp.html#a12bbc67580e3f4bb2a0299033f01818d">sbepp::get_header</a>(m);</div>
+<div class="line"><a id="l05050" name="l05050"></a><span class="lineno"> 5050</span>        <span class="keyword">const</span> <span class="keyword">auto</span> header_size = <a class="code hl_function" href="namespacesbepp.html#a9346fd507c2d3760ac40032180d1a7a6">sbepp::size_bytes</a>(header);</div>
+<div class="line"><a id="l05051" name="l05051"></a><span class="lineno"> 5051</span>        <span class="keywordflow">if</span>(!validate_and_subtract(header_size))</div>
+<div class="line"><a id="l05052" name="l05052"></a><span class="lineno"> 5052</span>        {</div>
+<div class="line"><a id="l05053" name="l05053"></a><span class="lineno"> 5053</span>            <span class="keywordflow">return</span>;</div>
+<div class="line"><a id="l05054" name="l05054"></a><span class="lineno"> 5054</span>        }</div>
+<div class="line"><a id="l05055" name="l05055"></a><span class="lineno"> 5055</span> </div>
+<div class="line"><a id="l05056" name="l05056"></a><span class="lineno"> 5056</span>        <span class="keywordflow">if</span>(!validate_and_subtract(*header.blockLength()))</div>
+<div class="line"><a id="l05057" name="l05057"></a><span class="lineno"> 5057</span>        {</div>
+<div class="line"><a id="l05058" name="l05058"></a><span class="lineno"> 5058</span>            <span class="keywordflow">return</span>;</div>
+<div class="line"><a id="l05059" name="l05059"></a><span class="lineno"> 5059</span>        }</div>
+<div class="line"><a id="l05060" name="l05060"></a><span class="lineno"> 5060</span> </div>
+<div class="line"><a id="l05061" name="l05061"></a><span class="lineno"> 5061</span>        <a class="code hl_function" href="namespacesbepp.html#a23abc2b6b892aea5b2b7f6dde6c24e69">sbepp::visit_children</a>(m, c, *<span class="keyword">this</span>);</div>
+<div class="line"><a id="l05062" name="l05062"></a><span class="lineno"> 5062</span>    }</div>
+<div class="line"><a id="l05063" name="l05063"></a><span class="lineno"> 5063</span> </div>
+<div class="line"><a id="l05064" name="l05064"></a><span class="lineno"> 5064</span>    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T, <span class="keyword">typename</span> Cursor, <span class="keyword">typename</span> Tag&gt;</div>
+<div class="line"><a id="l05065" name="l05065"></a><span class="lineno"> 5065</span>    SBEPP_CPP14_CONSTEXPR <span class="keywordtype">bool</span> on_group(T g, Cursor&amp; c, Tag) <span class="keyword">noexcept</span></div>
+<div class="line"><a id="l05066" name="l05066"></a><span class="lineno"> 5066</span>    {</div>
+<div class="line"><a id="l05067" name="l05067"></a><span class="lineno"> 5067</span>        <span class="keyword">const</span> <span class="keyword">auto</span> header = <a class="code hl_function" href="namespacesbepp.html#a12bbc67580e3f4bb2a0299033f01818d">sbepp::get_header</a>(g);</div>
+<div class="line"><a id="l05068" name="l05068"></a><span class="lineno"> 5068</span>        <span class="keyword">const</span> <span class="keyword">auto</span> header_size = <a class="code hl_function" href="namespacesbepp.html#a9346fd507c2d3760ac40032180d1a7a6">sbepp::size_bytes</a>(header);</div>
+<div class="line"><a id="l05069" name="l05069"></a><span class="lineno"> 5069</span>        <span class="keywordflow">if</span>(!validate_and_subtract(header_size))</div>
+<div class="line"><a id="l05070" name="l05070"></a><span class="lineno"> 5070</span>        {</div>
+<div class="line"><a id="l05071" name="l05071"></a><span class="lineno"> 5071</span>            <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a id="l05072" name="l05072"></a><span class="lineno"> 5072</span>        }</div>
+<div class="line"><a id="l05073" name="l05073"></a><span class="lineno"> 5073</span> </div>
+<div class="line"><a id="l05074" name="l05074"></a><span class="lineno"> 5074</span>        <span class="keyword">const</span> <span class="keyword">auto</span> prev_block_length =</div>
+<div class="line"><a id="l05075" name="l05075"></a><span class="lineno"> 5075</span>            set_group_block_length(*header.blockLength());</div>
+<div class="line"><a id="l05076" name="l05076"></a><span class="lineno"> 5076</span>        <a class="code hl_function" href="namespacesbepp.html#a23abc2b6b892aea5b2b7f6dde6c24e69">sbepp::visit_children</a>(g, c, *<span class="keyword">this</span>);</div>
+<div class="line"><a id="l05077" name="l05077"></a><span class="lineno"> 5077</span>        set_group_block_length(prev_block_length);</div>
+<div class="line"><a id="l05078" name="l05078"></a><span class="lineno"> 5078</span> </div>
+<div class="line"><a id="l05079" name="l05079"></a><span class="lineno"> 5079</span>        <span class="keywordflow">return</span> !is_valid();</div>
+<div class="line"><a id="l05080" name="l05080"></a><span class="lineno"> 5080</span>    }</div>
+<div class="line"><a id="l05081" name="l05081"></a><span class="lineno"> 5081</span> </div>
+<div class="line"><a id="l05082" name="l05082"></a><span class="lineno"> 5082</span>    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T, <span class="keyword">typename</span> Cursor&gt;</div>
+<div class="line"><a id="l05083" name="l05083"></a><span class="lineno"> 5083</span>    SBEPP_CPP14_CONSTEXPR <span class="keywordtype">bool</span> on_entry(T e, Cursor&amp; c) <span class="keyword">noexcept</span></div>
+<div class="line"><a id="l05084" name="l05084"></a><span class="lineno"> 5084</span>    {</div>
+<div class="line"><a id="l05085" name="l05085"></a><span class="lineno"> 5085</span>        <span class="keywordflow">if</span>(!validate_and_subtract(group_block_length))</div>
+<div class="line"><a id="l05086" name="l05086"></a><span class="lineno"> 5086</span>        {</div>
+<div class="line"><a id="l05087" name="l05087"></a><span class="lineno"> 5087</span>            <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a id="l05088" name="l05088"></a><span class="lineno"> 5088</span>        }</div>
+<div class="line"><a id="l05089" name="l05089"></a><span class="lineno"> 5089</span> </div>
+<div class="line"><a id="l05090" name="l05090"></a><span class="lineno"> 5090</span>        <span class="keywordflow">return</span> !<a class="code hl_function" href="namespacesbepp.html#a23abc2b6b892aea5b2b7f6dde6c24e69">sbepp::visit_children</a>(e, c, *<span class="keyword">this</span>).is_valid();</div>
+<div class="line"><a id="l05091" name="l05091"></a><span class="lineno"> 5091</span>    }</div>
+<div class="line"><a id="l05092" name="l05092"></a><span class="lineno"> 5092</span> </div>
+<div class="line"><a id="l05093" name="l05093"></a><span class="lineno"> 5093</span>    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T, <span class="keyword">typename</span> Tag&gt;</div>
+<div class="line"><a id="l05094" name="l05094"></a><span class="lineno"> 5094</span>    SBEPP_CPP14_CONSTEXPR <span class="keywordtype">bool</span> on_data(T d, Tag) <span class="keyword">noexcept</span></div>
+<div class="line"><a id="l05095" name="l05095"></a><span class="lineno"> 5095</span>    {</div>
+<div class="line"><a id="l05096" name="l05096"></a><span class="lineno"> 5096</span>        <span class="keywordflow">return</span> !validate_and_subtract(<a class="code hl_function" href="namespacesbepp.html#a9346fd507c2d3760ac40032180d1a7a6">sbepp::size_bytes</a>(d));</div>
+<div class="line"><a id="l05097" name="l05097"></a><span class="lineno"> 5097</span>    }</div>
+<div class="line"><a id="l05098" name="l05098"></a><span class="lineno"> 5098</span> </div>
+<div class="line"><a id="l05099" name="l05099"></a><span class="lineno"> 5099</span>    <span class="comment">// ignore them all because we validate `blockLength`</span></div>
+<div class="line"><a id="l05100" name="l05100"></a><span class="lineno"> 5100</span>    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T, <span class="keyword">typename</span> Tag&gt;</div>
+<div class="line"><a id="l05101" name="l05101"></a><span class="lineno"> 5101</span>    <span class="keyword">constexpr</span> <span class="keywordtype">bool</span> on_field(T, Tag) <span class="keyword">const</span> <span class="keyword">noexcept</span></div>
+<div class="line"><a id="l05102" name="l05102"></a><span class="lineno"> 5102</span>    {</div>
+<div class="line"><a id="l05103" name="l05103"></a><span class="lineno"> 5103</span>        <span class="keywordflow">return</span> {};</div>
+<div class="line"><a id="l05104" name="l05104"></a><span class="lineno"> 5104</span>    }</div>
+<div class="line"><a id="l05105" name="l05105"></a><span class="lineno"> 5105</span> </div>
+<div class="line"><a id="l05106" name="l05106"></a><span class="lineno"> 5106</span>    <span class="keyword">constexpr</span> <span class="keywordtype">bool</span> is_valid() const noexcept</div>
+<div class="line"><a id="l05107" name="l05107"></a><span class="lineno"> 5107</span>    {</div>
+<div class="line"><a id="l05108" name="l05108"></a><span class="lineno"> 5108</span>        <span class="keywordflow">return</span> valid;</div>
+<div class="line"><a id="l05109" name="l05109"></a><span class="lineno"> 5109</span>    }</div>
+<div class="line"><a id="l05110" name="l05110"></a><span class="lineno"> 5110</span> </div>
+<div class="line"><a id="l05111" name="l05111"></a><span class="lineno"> 5111</span>    <span class="comment">// returns previous value</span></div>
+<div class="line"><a id="l05112" name="l05112"></a><span class="lineno"> 5112</span>    SBEPP_CPP14_CONSTEXPR std::size_t</div>
+<div class="line"><a id="l05113" name="l05113"></a><span class="lineno"> 5113</span>        set_group_block_length(<span class="keyword">const</span> std::size_t block_length) <span class="keyword">noexcept</span></div>
+<div class="line"><a id="l05114" name="l05114"></a><span class="lineno"> 5114</span>    {</div>
+<div class="line"><a id="l05115" name="l05115"></a><span class="lineno"> 5115</span>        <span class="keyword">auto</span> prev = group_block_length;</div>
+<div class="line"><a id="l05116" name="l05116"></a><span class="lineno"> 5116</span>        group_block_length = block_length;</div>
+<div class="line"><a id="l05117" name="l05117"></a><span class="lineno"> 5117</span>        <span class="keywordflow">return</span> prev;</div>
+<div class="line"><a id="l05118" name="l05118"></a><span class="lineno"> 5118</span>    }</div>
+<div class="line"><a id="l05119" name="l05119"></a><span class="lineno"> 5119</span> </div>
+<div class="line"><a id="l05120" name="l05120"></a><span class="lineno"> 5120</span>    <span class="keyword">constexpr</span> std::size_t get_size() const noexcept</div>
+<div class="line"><a id="l05121" name="l05121"></a><span class="lineno"> 5121</span>    {</div>
+<div class="line"><a id="l05122" name="l05122"></a><span class="lineno"> 5122</span>        <span class="keywordflow">return</span> size;</div>
+<div class="line"><a id="l05123" name="l05123"></a><span class="lineno"> 5123</span>    }</div>
+<div class="line"><a id="l05124" name="l05124"></a><span class="lineno"> 5124</span> </div>
+<div class="line"><a id="l05125" name="l05125"></a><span class="lineno"> 5125</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l05126" name="l05126"></a><span class="lineno"> 5126</span>    std::size_t size;</div>
+<div class="line"><a id="l05127" name="l05127"></a><span class="lineno"> 5127</span>    <span class="keywordtype">bool</span> valid{<span class="keyword">true</span>};</div>
+<div class="line"><a id="l05128" name="l05128"></a><span class="lineno"> 5128</span>    <span class="comment">// current group&#39;s blockLength, used to validate entry</span></div>
+<div class="line"><a id="l05129" name="l05129"></a><span class="lineno"> 5129</span>    std::size_t group_block_length{};</div>
+<div class="line"><a id="l05130" name="l05130"></a><span class="lineno"> 5130</span> </div>
+<div class="line"><a id="l05131" name="l05131"></a><span class="lineno"> 5131</span>    SBEPP_CPP14_CONSTEXPR <span class="keywordtype">bool</span></div>
+<div class="line"><a id="l05132" name="l05132"></a><span class="lineno"> 5132</span>        validate_and_subtract(<span class="keyword">const</span> std::size_t n) <span class="keyword">noexcept</span></div>
+<div class="line"><a id="l05133" name="l05133"></a><span class="lineno"> 5133</span>    {</div>
+<div class="line"><a id="l05134" name="l05134"></a><span class="lineno"> 5134</span>        <span class="keywordflow">if</span>(size &lt; n)</div>
+<div class="line"><a id="l05135" name="l05135"></a><span class="lineno"> 5135</span>        {</div>
+<div class="line"><a id="l05136" name="l05136"></a><span class="lineno"> 5136</span>            valid = <span class="keyword">false</span>;</div>
+<div class="line"><a id="l05137" name="l05137"></a><span class="lineno"> 5137</span>        }</div>
+<div class="line"><a id="l05138" name="l05138"></a><span class="lineno"> 5138</span>        <span class="keywordflow">else</span></div>
+<div class="line"><a id="l05139" name="l05139"></a><span class="lineno"> 5139</span>        {</div>
+<div class="line"><a id="l05140" name="l05140"></a><span class="lineno"> 5140</span>            size -= n;</div>
+<div class="line"><a id="l05141" name="l05141"></a><span class="lineno"> 5141</span>        }</div>
+<div class="line"><a id="l05142" name="l05142"></a><span class="lineno"> 5142</span> </div>
+<div class="line"><a id="l05143" name="l05143"></a><span class="lineno"> 5143</span>        <span class="keywordflow">return</span> valid;</div>
+<div class="line"><a id="l05144" name="l05144"></a><span class="lineno"> 5144</span>    }</div>
+<div class="line"><a id="l05145" name="l05145"></a><span class="lineno"> 5145</span>};</div>
+<div class="line"><a id="l05146" name="l05146"></a><span class="lineno"> 5146</span>} <span class="comment">// namespace detail</span></div>
+<div class="line"><a id="l05147" name="l05147"></a><span class="lineno"> 5147</span> </div>
+<div class="line"><a id="l05149" name="l05149"></a><span class="lineno"> 5149</span><span class="keyword">struct </span>size_bytes_checked_result</div>
+<div class="line"><a id="l05150" name="l05150"></a><span class="lineno"> 5150</span>{</div>
+<div class="line"><a id="l05152" name="l05152"></a><span class="lineno"> 5152</span>    <span class="keywordtype">bool</span> valid;</div>
+<div class="line"><a id="l05154" name="l05154"></a><span class="lineno"> 5154</span>    std::size_t size;</div>
+<div class="line"><a id="l05155" name="l05155"></a><span class="lineno"> 5155</span>};</div>
+<div class="line"><a id="l05156" name="l05156"></a><span class="lineno"> 5156</span> </div>
+<div class="line"><a id="l05157" name="l05157"></a><span class="lineno"> 5157</span><span class="comment">// can be used with message/group</span></div>
+<div class="line"><a id="l05168" name="l05168"></a><span class="lineno"> 5168</span><span class="keyword">template</span>&lt;<span class="keyword">typename</span> View&gt;</div>
+<div class="foldopen" id="foldopen05169" data-start="{" data-end="}">
+<div class="line"><a id="l05169" name="l05169"></a><span class="lineno"><a class="line" href="namespacesbepp.html#abd9c1efb3c96d6fa71d1156811b47fa4"> 5169</a></span>SBEPP_CPP20_CONSTEXPR <a class="code hl_struct" href="structsbepp_1_1size__bytes__checked__result.html">size_bytes_checked_result</a></div>
+<div class="line"><a id="l05170" name="l05170"></a><span class="lineno"> 5170</span>    <a class="code hl_function" href="namespacesbepp.html#abd9c1efb3c96d6fa71d1156811b47fa4">size_bytes_checked</a>(View view, std::size_t size) <span class="keyword">noexcept</span></div>
+<div class="line"><a id="l05171" name="l05171"></a><span class="lineno"> 5171</span>{</div>
+<div class="line"><a id="l05172" name="l05172"></a><span class="lineno"> 5172</span>    <span class="comment">// `init_cursor` skips header, we need to ensure there&#39;s enough space for it</span></div>
+<div class="line"><a id="l05173" name="l05173"></a><span class="lineno"> 5173</span>    <span class="keywordflow">if</span>(!<a class="code hl_function" href="namespacesbepp.html#a870241790cb5759575b9f57d654392c2">sbepp::addressof</a>(view) || (size &lt; detail::get_header_size(view)))</div>
+<div class="line"><a id="l05174" name="l05174"></a><span class="lineno"> 5174</span>    {</div>
+<div class="line"><a id="l05175" name="l05175"></a><span class="lineno"> 5175</span>        <span class="keywordflow">return</span> {};</div>
+<div class="line"><a id="l05176" name="l05176"></a><span class="lineno"> 5176</span>    }</div>
+<div class="line"><a id="l05177" name="l05177"></a><span class="lineno"> 5177</span> </div>
+<div class="line"><a id="l05178" name="l05178"></a><span class="lineno"> 5178</span>    detail::size_bytes_checked_visitor visitor{size};</div>
+<div class="line"><a id="l05179" name="l05179"></a><span class="lineno"> 5179</span>    <span class="keyword">auto</span> c = <a class="code hl_function" href="namespacesbepp.html#a125f1fbb9faadde1515f7822a7b6420f">sbepp::init_cursor</a>(view);</div>
+<div class="line"><a id="l05180" name="l05180"></a><span class="lineno"> 5180</span>    <a class="code hl_function" href="namespacesbepp.html#a47c1cd81154bc5c56524604f74d52d27">sbepp::visit</a>(view, c, visitor);</div>
+<div class="line"><a id="l05181" name="l05181"></a><span class="lineno"> 5181</span>    <span class="keywordflow">if</span>(visitor.is_valid())</div>
+<div class="line"><a id="l05182" name="l05182"></a><span class="lineno"> 5182</span>    {</div>
+<div class="line"><a id="l05183" name="l05183"></a><span class="lineno"> 5183</span>        <span class="keywordflow">return</span> {<span class="keyword">true</span>, size - visitor.get_size()};</div>
+<div class="line"><a id="l05184" name="l05184"></a><span class="lineno"> 5184</span>    }</div>
+<div class="line"><a id="l05185" name="l05185"></a><span class="lineno"> 5185</span>    <span class="keywordflow">return</span> {};</div>
 </div>
-<div class="line"><a id="l05185" name="l05185"></a><span class="lineno"> 5185</span>}</div>
-<div class="line"><a id="l05186" name="l05186"></a><span class="lineno"> 5186</span>} <span class="comment">// namespace sbepp</span></div>
-<div class="line"><a id="l05187" name="l05187"></a><span class="lineno"> 5187</span> </div>
-<div class="line"><a id="l05188" name="l05188"></a><span class="lineno"> 5188</span><span class="preprocessor">#if SBEPP_HAS_RANGES &amp;&amp; SBEPP_HAS_CONCEPTS</span></div>
-<div class="line"><a id="l05189" name="l05189"></a><span class="lineno"> 5189</span> </div>
-<div class="line"><a id="l05190" name="l05190"></a><span class="lineno"> 5190</span><span class="keyword">template</span>&lt;<span class="keyword">typename</span> Byte, <span class="keyword">typename</span> Value, std::<span class="keywordtype">size_t</span> N, <span class="keyword">typename</span> Tag&gt;</div>
-<div class="line"><a id="l05191" name="l05191"></a><span class="lineno"> 5191</span><span class="keyword">inline</span> <span class="keyword">constexpr</span> <span class="keywordtype">bool</span> std::ranges::enable_borrowed_range&lt;</div>
-<div class="line"><a id="l05192" name="l05192"></a><span class="lineno"> 5192</span>    <a class="code hl_class" href="classsbepp_1_1detail_1_1static__array__ref.html">sbepp::detail::static_array_ref&lt;Byte, Value, N, Tag&gt;</a>&gt; = <span class="keyword">true</span>;</div>
-<div class="line"><a id="l05193" name="l05193"></a><span class="lineno"> 5193</span> </div>
-<div class="line"><a id="l05194" name="l05194"></a><span class="lineno"> 5194</span><span class="keyword">template</span>&lt;<span class="keyword">typename</span> Byte, <span class="keyword">typename</span> Value, <span class="keyword">typename</span> Length, sbepp::endian E&gt;</div>
-<div class="line"><a id="l05195" name="l05195"></a><span class="lineno"> 5195</span><span class="keyword">inline</span> <span class="keyword">constexpr</span> <span class="keywordtype">bool</span> std::ranges::enable_borrowed_range&lt;</div>
-<div class="line"><a id="l05196" name="l05196"></a><span class="lineno"> 5196</span>    <a class="code hl_class" href="classsbepp_1_1detail_1_1dynamic__array__ref.html">sbepp::detail::dynamic_array_ref&lt;Byte, Value, Length, E&gt;</a>&gt; = <span class="keyword">true</span>;</div>
-<div class="line"><a id="l05197" name="l05197"></a><span class="lineno"> 5197</span> </div>
-<div class="line"><a id="l05198" name="l05198"></a><span class="lineno"> 5198</span><span class="keyword">template</span>&lt;sbepp::detail::derived_from_tmp&lt;sbepp::detail::flat_group_base&gt; T&gt;</div>
-<div class="line"><a id="l05199" name="l05199"></a><span class="lineno"> 5199</span><span class="keyword">inline</span> <span class="keyword">constexpr</span> <span class="keywordtype">bool</span> std::ranges::enable_borrowed_range&lt;T&gt; = <span class="keyword">true</span>;</div>
-<div class="line"><a id="l05200" name="l05200"></a><span class="lineno"> 5200</span> </div>
-<div class="line"><a id="l05201" name="l05201"></a><span class="lineno"> 5201</span><span class="keyword">template</span>&lt;sbepp::detail::derived_from_tmp&lt;sbepp::detail::nested_group_base&gt; T&gt;</div>
-<div class="line"><a id="l05202" name="l05202"></a><span class="lineno"> 5202</span><span class="keyword">inline</span> <span class="keyword">constexpr</span> <span class="keywordtype">bool</span> std::ranges::enable_borrowed_range&lt;T&gt; = <span class="keyword">true</span>;</div>
-<div class="line"><a id="l05203" name="l05203"></a><span class="lineno"> 5203</span><span class="preprocessor">#endif</span></div>
-<div class="line"><a id="l05204" name="l05204"></a><span class="lineno"> 5204</span> </div>
-<div class="line"><a id="l05205" name="l05205"></a><span class="lineno"> 5205</span><span class="preprocessor">#undef SBEPP_CPP17_INLINE_VAR</span></div>
-<div class="line"><a id="l05206" name="l05206"></a><span class="lineno"> 5206</span> </div>
-<div class="line"><a id="l05207" name="l05207"></a><span class="lineno"> 5207</span>SBEPP_WARNINGS_ON();</div>
+<div class="line"><a id="l05186" name="l05186"></a><span class="lineno"> 5186</span>}</div>
+<div class="line"><a id="l05187" name="l05187"></a><span class="lineno"> 5187</span>} <span class="comment">// namespace sbepp</span></div>
+<div class="line"><a id="l05188" name="l05188"></a><span class="lineno"> 5188</span> </div>
+<div class="line"><a id="l05189" name="l05189"></a><span class="lineno"> 5189</span><span class="preprocessor">#if SBEPP_HAS_RANGES &amp;&amp; SBEPP_HAS_CONCEPTS</span></div>
+<div class="line"><a id="l05190" name="l05190"></a><span class="lineno"> 5190</span> </div>
+<div class="line"><a id="l05191" name="l05191"></a><span class="lineno"> 5191</span><span class="keyword">template</span>&lt;<span class="keyword">typename</span> Byte, <span class="keyword">typename</span> Value, std::<span class="keywordtype">size_t</span> N, <span class="keyword">typename</span> Tag&gt;</div>
+<div class="line"><a id="l05192" name="l05192"></a><span class="lineno"> 5192</span><span class="keyword">inline</span> <span class="keyword">constexpr</span> <span class="keywordtype">bool</span> std::ranges::enable_borrowed_range&lt;</div>
+<div class="line"><a id="l05193" name="l05193"></a><span class="lineno"> 5193</span>    <a class="code hl_class" href="classsbepp_1_1detail_1_1static__array__ref.html">sbepp::detail::static_array_ref&lt;Byte, Value, N, Tag&gt;</a>&gt; = <span class="keyword">true</span>;</div>
+<div class="line"><a id="l05194" name="l05194"></a><span class="lineno"> 5194</span> </div>
+<div class="line"><a id="l05195" name="l05195"></a><span class="lineno"> 5195</span><span class="keyword">template</span>&lt;<span class="keyword">typename</span> Byte, <span class="keyword">typename</span> Value, <span class="keyword">typename</span> Length, sbepp::endian E&gt;</div>
+<div class="line"><a id="l05196" name="l05196"></a><span class="lineno"> 5196</span><span class="keyword">inline</span> <span class="keyword">constexpr</span> <span class="keywordtype">bool</span> std::ranges::enable_borrowed_range&lt;</div>
+<div class="line"><a id="l05197" name="l05197"></a><span class="lineno"> 5197</span>    <a class="code hl_class" href="classsbepp_1_1detail_1_1dynamic__array__ref.html">sbepp::detail::dynamic_array_ref&lt;Byte, Value, Length, E&gt;</a>&gt; = <span class="keyword">true</span>;</div>
+<div class="line"><a id="l05198" name="l05198"></a><span class="lineno"> 5198</span> </div>
+<div class="line"><a id="l05199" name="l05199"></a><span class="lineno"> 5199</span><span class="keyword">template</span>&lt;sbepp::detail::derived_from_tmp&lt;sbepp::detail::flat_group_base&gt; T&gt;</div>
+<div class="line"><a id="l05200" name="l05200"></a><span class="lineno"> 5200</span><span class="keyword">inline</span> <span class="keyword">constexpr</span> <span class="keywordtype">bool</span> std::ranges::enable_borrowed_range&lt;T&gt; = <span class="keyword">true</span>;</div>
+<div class="line"><a id="l05201" name="l05201"></a><span class="lineno"> 5201</span> </div>
+<div class="line"><a id="l05202" name="l05202"></a><span class="lineno"> 5202</span><span class="keyword">template</span>&lt;sbepp::detail::derived_from_tmp&lt;sbepp::detail::nested_group_base&gt; T&gt;</div>
+<div class="line"><a id="l05203" name="l05203"></a><span class="lineno"> 5203</span><span class="keyword">inline</span> <span class="keyword">constexpr</span> <span class="keywordtype">bool</span> std::ranges::enable_borrowed_range&lt;T&gt; = <span class="keyword">true</span>;</div>
+<div class="line"><a id="l05204" name="l05204"></a><span class="lineno"> 5204</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l05205" name="l05205"></a><span class="lineno"> 5205</span> </div>
+<div class="line"><a id="l05206" name="l05206"></a><span class="lineno"> 5206</span><span class="preprocessor">#undef SBEPP_CPP17_INLINE_VAR</span></div>
+<div class="line"><a id="l05207" name="l05207"></a><span class="lineno"> 5207</span> </div>
+<div class="line"><a id="l05208" name="l05208"></a><span class="lineno"> 5208</span>SBEPP_WARNINGS_ON();</div>
 <div class="ttc" id="aclasssbepp_1_1composite__traits_html"><div class="ttname"><a href="classsbepp_1_1composite__traits.html">sbepp::composite_traits</a></div><div class="ttdoc">Provides various traits/attributes of a &lt;composite&gt; element.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:3933</div></div>
 <div class="ttc" id="aclasssbepp_1_1composite__traits_html_a0b92c7c81c1973207accafaeb65302da"><div class="ttname"><a href="classsbepp_1_1composite__traits.html#a0b92c7c81c1973207accafaeb65302da">sbepp::composite_traits::value_type</a></div><div class="ttdeci">CompositeType&lt; Byte &gt; value_type</div><div class="ttdoc">Representation type.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:3957</div></div>
 <div class="ttc" id="aclasssbepp_1_1composite__traits_html_aa7e0ae6935557bdf01c572f5f26a6a66"><div class="ttname"><a href="classsbepp_1_1composite__traits.html#aa7e0ae6935557bdf01c572f5f26a6a66">sbepp::composite_traits::name</a></div><div class="ttdeci">static constexpr const char * name() noexcept</div><div class="ttdoc">Returns name attribute.</div></div>
@@ -4812,7 +4813,7 @@ $(function(){initNavTree('sbepp_8hpp_source.html',''); initResizable(); });
 <div class="ttc" id="anamespacesbepp_html_a5b8bb415061e959eb3a73e76af382e49"><div class="ttname"><a href="namespacesbepp.html#a5b8bb415061e959eb3a73e76af382e49">sbepp::is_data</a></div><div class="ttdeci">typename detail::is_data_impl&lt; T &gt;::type is_data</div><div class="ttdoc">Checks if T is a data.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:4706</div></div>
 <div class="ttc" id="anamespacesbepp_html_a62faab2402f172fb1d0dde766f51b3d7"><div class="ttname"><a href="namespacesbepp.html#a62faab2402f172fb1d0dde766f51b3d7">sbepp::byte_type_t</a></div><div class="ttdeci">typename byte_type&lt; View &gt;::type byte_type_t</div><div class="ttdoc">Shortcut for byte_type&lt;T&gt;::type</div><div class="ttdef"><b>Definition</b> sbepp.hpp:1546</div></div>
 <div class="ttc" id="anamespacesbepp_html_a664c938df34175bff7de36e45843586e"><div class="ttname"><a href="namespacesbepp.html#a664c938df34175bff7de36e45843586e">sbepp::is_nested_group</a></div><div class="ttdeci">detail::is_base_of_tmp&lt; detail::nested_group_base, T &gt; is_nested_group</div><div class="ttdoc">Checks if T is a nested group.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:4677</div></div>
-<div class="ttc" id="anamespacesbepp_html_a6b2d51af3f026b165fa40fe1d7ab19db"><div class="ttname"><a href="namespacesbepp.html#a6b2d51af3f026b165fa40fe1d7ab19db">sbepp::enum_to_string</a></div><div class="ttdeci">constexpr const char * enum_to_string(const E e) noexcept</div><div class="ttdoc">Converts enum to string.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:5009</div></div>
+<div class="ttc" id="anamespacesbepp_html_a6b2d51af3f026b165fa40fe1d7ab19db"><div class="ttname"><a href="namespacesbepp.html#a6b2d51af3f026b165fa40fe1d7ab19db">sbepp::enum_to_string</a></div><div class="ttdeci">constexpr const char * enum_to_string(const E e) noexcept</div><div class="ttdoc">Converts enum to string.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:5010</div></div>
 <div class="ttc" id="anamespacesbepp_html_a6b570920b082c2bc629036cfeef4af57"><div class="ttname"><a href="namespacesbepp.html#a6b570920b082c2bc629036cfeef4af57">sbepp::is_message</a></div><div class="ttdeci">detail::is_base_of_tmp&lt; detail::message_base, T &gt; is_message</div><div class="ttdoc">Checks if T is a message.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:4669</div></div>
 <div class="ttc" id="anamespacesbepp_html_a7d29b37dfc83150ae34eaaf94dd4ba4c"><div class="ttname"><a href="namespacesbepp.html#a7d29b37dfc83150ae34eaaf94dd4ba4c">sbepp::fill_group_header</a></div><div class="ttdeci">constexpr auto fill_group_header(Group g, Size num_in_group) noexcept -&gt; decltype(g(detail::fill_group_header_tag{}, num_in_group))</div><div class="ttdoc">Fill group header.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:3653</div></div>
 <div class="ttc" id="anamespacesbepp_html_a870241790cb5759575b9f57d654392c2"><div class="ttname"><a href="namespacesbepp.html#a870241790cb5759575b9f57d654392c2">sbepp::addressof</a></div><div class="ttdeci">constexpr auto addressof(T v) noexcept -&gt; decltype(v(detail::addressof_tag{}))</div><div class="ttdoc">Returns pointer to the underlying data referenced by a view.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:1526</div></div>
@@ -4824,13 +4825,13 @@ $(function(){initNavTree('sbepp_8hpp_source.html',''); initResizable(); });
 <div class="ttc" id="anamespacesbepp_html_a9a993b21b185033d9dbc71b7452ee0ca"><div class="ttname"><a href="namespacesbepp.html#a9a993b21b185033d9dbc71b7452ee0ca">sbepp::is_set</a></div><div class="ttdeci">detail::is_base_of_tmp&lt; detail::bitset_base, T &gt; is_set</div><div class="ttdoc">Checks if T is a set.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:4661</div></div>
 <div class="ttc" id="anamespacesbepp_html_a9b69b91021cb0ec2e5cba1f1d105fc60"><div class="ttname"><a href="namespacesbepp.html#a9b69b91021cb0ec2e5cba1f1d105fc60">sbepp::is_type</a></div><div class="ttdeci">std::integral_constant&lt; bool, is_required_type&lt; T &gt;::value||is_optional_type&lt; T &gt;::value||is_array_type&lt; T &gt;::value &gt; is_type</div><div class="ttdoc">Checks if T is a type of any kind.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:4638</div></div>
 <div class="ttc" id="anamespacesbepp_html_a9ef51bb840527f9e8dd92f611364301a"><div class="ttname"><a href="namespacesbepp.html#a9ef51bb840527f9e8dd92f611364301a">sbepp::is_group_v</a></div><div class="ttdeci">constexpr auto is_group_v</div><div class="ttdoc">Shorthand for sbepp::is_group&lt;T&gt;::value</div><div class="ttdef"><b>Definition</b> sbepp.hpp:4755</div></div>
-<div class="ttc" id="anamespacesbepp_html_aa253364a4276b55c0a157aefaa185c37"><div class="ttname"><a href="namespacesbepp.html#aa253364a4276b55c0a157aefaa185c37">sbepp::visit_set</a></div><div class="ttdeci">constexpr auto visit_set(const Set s, Visitor &amp;&amp;visitor) noexcept -&gt; decltype(s(detail::visit_set_tag{}, std::forward&lt; Visitor &gt;(visitor)))</div><div class="ttdoc">Visits set choices in order of their declaration.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:5027</div></div>
+<div class="ttc" id="anamespacesbepp_html_aa253364a4276b55c0a157aefaa185c37"><div class="ttname"><a href="namespacesbepp.html#aa253364a4276b55c0a157aefaa185c37">sbepp::visit_set</a></div><div class="ttdeci">constexpr auto visit_set(const Set s, Visitor &amp;&amp;visitor) noexcept -&gt; decltype(s(detail::visit_set_tag{}, std::forward&lt; Visitor &gt;(visitor)))</div><div class="ttdoc">Visits set choices in order of their declaration.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:5028</div></div>
 <div class="ttc" id="anamespacesbepp_html_aa2d011e14996368bdea31360b2fa674e"><div class="ttname"><a href="namespacesbepp.html#aa2d011e14996368bdea31360b2fa674e">sbepp::default_init</a></div><div class="ttdeci">constexpr default_init_t default_init</div><div class="ttdoc">helper to pass default_init_t to dynamic_array_ref::resize().</div><div class="ttdef"><b>Definition</b> sbepp.hpp:2797</div></div>
 <div class="ttc" id="anamespacesbepp_html_aa2eb4eb5e6a8df682c49fe7f59fe0fb3"><div class="ttname"><a href="namespacesbepp.html#aa2eb4eb5e6a8df682c49fe7f59fe0fb3">sbepp::is_non_array_type</a></div><div class="ttdeci">std::integral_constant&lt; bool, is_required_type&lt; T &gt;::value||is_optional_type&lt; T &gt;::value &gt; is_non_array_type</div><div class="ttdoc">Checks if T is a non-array type.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:4632</div></div>
 <div class="ttc" id="anamespacesbepp_html_aa9dc204d8524610e7a756133d7538949"><div class="ttname"><a href="namespacesbepp.html#aa9dc204d8524610e7a756133d7538949">sbepp::member_id_t</a></div><div class="ttdeci">std::uint16_t member_id_t</div><div class="ttdoc">Represents id trait value type, e.g. field_traits::id()</div><div class="ttdef"><b>Definition</b> sbepp.hpp:286</div></div>
 <div class="ttc" id="anamespacesbepp_html_ab0e51c934bf5a874f859d0f00f7e7c8a"><div class="ttname"><a href="namespacesbepp.html#ab0e51c934bf5a874f859d0f00f7e7c8a">sbepp::is_optional_type_v</a></div><div class="ttdeci">constexpr auto is_optional_type_v</div><div class="ttdoc">Shorthand for sbepp::is_optional_type&lt;T&gt;::value</div><div class="ttdef"><b>Definition</b> sbepp.hpp:4719</div></div>
 <div class="ttc" id="anamespacesbepp_html_aba708f43d3386d2d1718a7011721d5d1"><div class="ttname"><a href="namespacesbepp.html#aba708f43d3386d2d1718a7011721d5d1">sbepp::length_t</a></div><div class="ttdeci">std::uint64_t length_t</div><div class="ttdoc">Represents type_traits::length() value type.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:270</div></div>
-<div class="ttc" id="anamespacesbepp_html_abd9c1efb3c96d6fa71d1156811b47fa4"><div class="ttname"><a href="namespacesbepp.html#abd9c1efb3c96d6fa71d1156811b47fa4">sbepp::size_bytes_checked</a></div><div class="ttdeci">constexpr size_bytes_checked_result size_bytes_checked(View view, std::size_t size) noexcept</div><div class="ttdoc">Calculate view size with additional safety checks.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:5168</div></div>
+<div class="ttc" id="anamespacesbepp_html_abd9c1efb3c96d6fa71d1156811b47fa4"><div class="ttname"><a href="namespacesbepp.html#abd9c1efb3c96d6fa71d1156811b47fa4">sbepp::size_bytes_checked</a></div><div class="ttdeci">constexpr size_bytes_checked_result size_bytes_checked(View view, std::size_t size) noexcept</div><div class="ttdoc">Calculate view size with additional safety checks.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:5169</div></div>
 <div class="ttc" id="anamespacesbepp_html_abe6cd213ddfa41e39a2ec7ea540f62dc"><div class="ttname"><a href="namespacesbepp.html#abe6cd213ddfa41e39a2ec7ea540f62dc">sbepp::is_message_v</a></div><div class="ttdeci">constexpr auto is_message_v</div><div class="ttdoc">Shorthand for sbepp::is_message&lt;T&gt;::value</div><div class="ttdef"><b>Definition</b> sbepp.hpp:4743</div></div>
 <div class="ttc" id="anamespacesbepp_html_ac0fdcdd3dfa93ad4aaac66379da7b0c5"><div class="ttname"><a href="namespacesbepp.html#ac0fdcdd3dfa93ad4aaac66379da7b0c5">sbepp::block_length_t</a></div><div class="ttdeci">std::uint64_t block_length_t</div><div class="ttdoc">Represents block_length trait value type, e.g. message_traits::block_length()</div><div class="ttdef"><b>Definition</b> sbepp.hpp:284</div></div>
 <div class="ttc" id="anamespacesbepp_html_ad3f88b2d3b60123eb13d33e0cde002bd"><div class="ttname"><a href="namespacesbepp.html#ad3f88b2d3b60123eb13d33e0cde002bd">sbepp::is_set_v</a></div><div class="ttdeci">constexpr auto is_set_v</div><div class="ttdoc">Shorthand for sbepp::is_set&lt;T&gt;::value</div><div class="ttdef"><b>Definition</b> sbepp.hpp:4735</div></div>
@@ -4851,7 +4852,7 @@ $(function(){initNavTree('sbepp_8hpp_source.html',''); initResizable(); });
 <div class="ttc" id="astructsbepp_1_1default__init__t_html"><div class="ttname"><a href="structsbepp_1_1default__init__t.html">sbepp::default_init_t</a></div><div class="ttdoc">tag for dynamic_array_ref::resize(). Used to skip value initialization.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:2788</div></div>
 <div class="ttc" id="astructsbepp_1_1is__enum_html"><div class="ttname"><a href="structsbepp_1_1is__enum.html">sbepp::is_enum</a></div><div class="ttdoc">Checks if T is an enumeration.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:4646</div></div>
 <div class="ttc" id="astructsbepp_1_1nullopt__t_html"><div class="ttname"><a href="structsbepp_1_1nullopt__t.html">sbepp::nullopt_t</a></div><div class="ttdoc">Tag type used to initialize optional types with null value.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:3349</div></div>
-<div class="ttc" id="astructsbepp_1_1size__bytes__checked__result_html"><div class="ttname"><a href="structsbepp_1_1size__bytes__checked__result.html">sbepp::size_bytes_checked_result</a></div><div class="ttdoc">Result type of size_bytes_checked</div><div class="ttdef"><b>Definition</b> sbepp.hpp:5148</div></div>
+<div class="ttc" id="astructsbepp_1_1size__bytes__checked__result_html"><div class="ttname"><a href="structsbepp_1_1size__bytes__checked__result.html">sbepp::size_bytes_checked_result</a></div><div class="ttdoc">Result type of size_bytes_checked</div><div class="ttdef"><b>Definition</b> sbepp.hpp:5149</div></div>
 <div class="ttc" id="astructsbepp_1_1traits__tag_html"><div class="ttname"><a href="structsbepp_1_1traits__tag.html">sbepp::traits_tag</a></div><div class="ttdoc">Maps representation type to its tag.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:4282</div></div>
 <div class="ttc" id="astructsbepp_1_1traits__tag_html_a18958c7e8785cc5a83cb1cee0873d588"><div class="ttname"><a href="structsbepp_1_1traits__tag.html#a18958c7e8785cc5a83cb1cee0873d588">sbepp::traits_tag::type</a></div><div class="ttdeci">Tag type</div><div class="ttdoc">Tag to access ValueType's traits.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:4284</div></div>
 <div class="ttc" id="astructsbepp_1_1unknown__enum__value__tag_html"><div class="ttname"><a href="structsbepp_1_1unknown__enum__value__tag.html">sbepp::unknown_enum_value_tag</a></div><div class="ttdoc">Tag for unknown enum values.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:4577</div></div>
