@@ -7,15 +7,15 @@ var searchData=
   ['value_5ftype_5ftag_4',['value_type_tag',['../classsbepp_1_1field__traits.html#ad4c5e229a263bcd729f91992e4a66abd',1,'sbepp::field_traits']]],
   ['version_5',['version',['../classsbepp_1_1schema__traits.html#a34fc19d3d1d2837bbdf4804d722d8cf5',1,'sbepp::schema_traits']]],
   ['version_5ft_6',['version_t',['../namespacesbepp.html#a97309329a3ef93149d698a0c5a9da6ba',1,'sbepp']]],
-  ['versioning_20and_20compatibility_7',['Versioning and compatibility',['../integration.html#autotoc_md6',1,'']]],
-  ['views_8',['Visiting parent views',['../visit-api.html#autotoc_md38',1,'']]],
+  ['versioning_20and_20compatibility_7',['Versioning and compatibility',['../integration.html#versioning',1,'']]],
+  ['views_8',['Visiting parent views',['../visit-api.html#autotoc_md41',1,'']]],
   ['visit_9',['visit',['../namespacesbepp.html#a47c1cd81154bc5c56524604f74d52d27',1,'sbepp::visit(View view, Cursor &amp;c, Visitor &amp;&amp;visitor={})'],['../namespacesbepp.html#a79950b0d08ddf3eafafb25a5693a6e2a',1,'sbepp::visit(View view, Visitor &amp;&amp;visitor={})'],['../namespacesbepp.html#a3dafbabb41e8a71abde1535551de2c6d',1,'sbepp::visit(Set s, Visitor &amp;&amp;visitor={})'],['../namespacesbepp.html#abf05c2c5e3e81c441cce4db02c0c642b',1,'sbepp::visit(Enum e, Visitor &amp;&amp;visitor={})']]],
   ['visit_20api_10',['Visit API',['../visit-api.html',1,'']]],
   ['visit_5fchildren_11',['visit_children',['../namespacesbepp.html#a23abc2b6b892aea5b2b7f6dde6c24e69',1,'sbepp::visit_children(View view, Cursor &amp;c, Visitor &amp;&amp;visitor={})'],['../namespacesbepp.html#a306622dcac701f3c76abd3ea7c2902b6',1,'sbepp::visit_children(View view, Visitor &amp;&amp;visitor={})']]],
   ['visit_5fset_12',['visit_set',['../namespacesbepp.html#aa253364a4276b55c0a157aefaa185c37',1,'sbepp']]],
-  ['visiting_20children_13',['Visiting children',['../visit-api.html#autotoc_md40',1,'']]],
-  ['visiting_20enums_20and_20sets_14',['Visiting enums and sets',['../visit-api.html#autotoc_md42',1,'']]],
-  ['visiting_20parent_20views_15',['Visiting parent views',['../visit-api.html#autotoc_md38',1,'']]],
-  ['vs_20decoding_16',['Encoding vs. decoding',['../representation.html#autotoc_md18',1,'']]],
-  ['vs_20traits_17',['Representation types vs. traits',['../representation.html#autotoc_md10',1,'']]]
+  ['visiting_20children_13',['Visiting children',['../visit-api.html#autotoc_md43',1,'']]],
+  ['visiting_20enums_20and_20sets_14',['Visiting enums and sets',['../visit-api.html#autotoc_md45',1,'']]],
+  ['visiting_20parent_20views_15',['Visiting parent views',['../visit-api.html#autotoc_md41',1,'']]],
+  ['vs_20decoding_16',['Encoding vs. decoding',['../representation.html#autotoc_md21',1,'']]],
+  ['vs_20traits_17',['Representation types vs. traits',['../representation.html#autotoc_md13',1,'']]]
 ];

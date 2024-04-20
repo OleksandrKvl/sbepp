@@ -103,10 +103,79 @@ $(function(){initNavTree('integration.html',''); initResizable(); });
   <div class="headertitle"><div class="title">Integration into your project</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p><a class="anchor" id="md__2home_2runner_2work_2sbepp_2sbepp_2doc_2integration"></a> After schema compilation, the only thing you need to using it is to include generated files into your project and link to <code>sbepp::sbepp</code> CMake target.</p>
-<p>As an example, here are two common approaches:</p>
-<ol type="1">
-<li><p class="startli">Compiling schema on-the-fly using your build system. Here's how it can be achieved in CMake:</p>
+<div class="toc"><h3>Table of Contents</h3>
+<ul><li class="level1"><a href="#autotoc_md4">Compiling schema on-the-fly</a><ul><li class="level2"><a href="#autotoc_md6">CMake helpers</a></li>
+<li class="level2"><a href="#autotoc_md9">Manual schema compilation</a></li>
+</ul>
+</li>
+<li class="level1"><a href="#autotoc_md11">Using pre-compiled schema</a></li>
+<li class="level1"><a href="#versioning">Versioning and compatibility</a></li>
+</ul>
+</div>
+<div class="textblock"><p><a class="anchor" id="md__2home_2runner_2work_2sbepp_2sbepp_2doc_2integration"></a></p>
+<p>After schema compilation, the only thing you need to use it is to include generated files into your project and link to <code>sbepp::sbepp</code> CMake target.</p>
+<hr  />
+<h1><a class="anchor" id="autotoc_md4"></a>
+Compiling schema on-the-fly</h1>
+<p>The most simple way is to compile schema on-the-fly, that is, to store only schema XML in your source tree and generate C++ headers from it during the build process.</p>
+<hr  />
+<h2><a class="anchor" id="autotoc_md6"></a>
+CMake helpers</h2>
+<p><code>sbepp</code> provides a couple of helpers to make on-the-fly schema compilation as easy as possible.</p>
+<p><code>sbeppc_compile_schema</code> - creates <code>INTERFACE</code> library that compiles SBE schema using <code>sbeppc</code>. <br  />
+ Parameters:</p><ul>
+<li><code>SCHEMA_FILE</code>, the path to schema XML file.</li>
+<li><code>TARGET_NAME</code>, the name of the generated <code>INTERFACE</code> library. Same target can be used to compile multiple schemas.</li>
+<li><code>OUTPUT_DIR</code>, optional, the directory in which <code>sbeppc</code> will generate headers. Defaults to <code>${CMAKE_BINARY_DIR}/sbeppc_generated</code>.</li>
+<li><code>SCHEMA_NAME</code>, optional, overrides schema name from XML.</li>
+<li><code>SBEPPC_PATH</code>, optional, the path to <code>sbeppc</code> binary, uses <code>sbepp::sbeppc</code> CMake target by default.</li>
+</ul>
+<p>This function creates custom target using <code>sbeppc_make_schema_target</code> (described below) and then creates <code>INTERFACE</code> library on top of it. This library carries all necessary dependencies and settings so there's a minimal amount of work left to user:</p>
+<div class="fragment"><div class="line">sbeppc_compile_schema(</div>
+<div class="line">    TARGET_NAME compiled_schemas</div>
+<div class="line">    SCHEMA_FILE &quot;schema1.xml&quot;</div>
+<div class="line">)</div>
+<div class="line"> </div>
+<div class="line">sbeppc_compile_schema(</div>
+<div class="line">    # note that we can use the same target name for many schemas</div>
+<div class="line">    TARGET_NAME compiled_schemas</div>
+<div class="line">    SCHEMA_FILE &quot;schema2.xml&quot;</div>
+<div class="line">)</div>
+<div class="line"> </div>
+<div class="line">add_executable(exe)</div>
+<div class="line"># generated target carries all necessary dependencies, just link to it</div>
+<div class="line">target_link_libraries(exe PRIVATE compiled_schemas)</div>
+</div><!-- fragment --><hr  />
+<p><code>sbeppc_make_schema_target</code> - creates a custom target that compiles SBE schema using <code>sbeppc</code>. <br  />
+ Parameters:</p><ul>
+<li><code>SCHEMA_FILE</code>, the path to schema XML file.</li>
+<li><code>TARGET_NAME</code>, the name of generated custom target. Same target can be used to compile multiple schemas.</li>
+<li><code>OUTPUT_DIR</code>, the directory in which <code>sbeppc</code> will generate headers.</li>
+<li><code>SCHEMA_NAME</code>, optional, overrides schema name from XML.</li>
+<li><code>SBEPPC_PATH</code>, optional, the path to <code>sbeppc</code> binary, uses <code>sbepp::sbeppc</code> CMake target by default.</li>
+</ul>
+<p>This is a lower-level function than <code>sbeppc_compile_schema</code>. It only creates a custom command and a custom target to compile the schema leaving the rest of work up to user. When <code>SCHEMA_NAME</code> is not provided, it also creates a special empty anchor file with a name like <code>&lt;HASH&gt;.anchor</code> for a schema. This file is indirectly included into all generated headers and required for CMake and underlying build systems to establish correct dependency graph and enforce automatic recompilation of consumers of this target when either schema XML or <code>sbeppc</code> itself changes.</p>
+<p>Example:</p>
+<div class="fragment"><div class="line">sbeppc_make_schema_target(</div>
+<div class="line">    SCHEMA_FILE &quot;schema1.xml&quot;</div>
+<div class="line">    TARGET_NAME compiled_schemas</div>
+<div class="line">    OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}</div>
+<div class="line">)</div>
+<div class="line"> </div>
+<div class="line">sbeppc_make_schema_target(</div>
+<div class="line">    SCHEMA_FILE &quot;schema2.xml&quot;</div>
+<div class="line">    TARGET_NAME compiled_schemas</div>
+<div class="line">    OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}</div>
+<div class="line">)</div>
+<div class="line"> </div>
+<div class="line">add_executable(exe)</div>
+<div class="line">add_dependencies(exe compiled_schemas)</div>
+<div class="line">target_include_directories(exe SYSTEM PRIVATE ${CMAKE_CURRENT_BINARY_DIR})</div>
+<div class="line">target_link_libraries(exe PRIVATE sbepp::sbepp)</div>
+</div><!-- fragment --><hr  />
+<h2><a class="anchor" id="autotoc_md9"></a>
+Manual schema compilation</h2>
+<p>Here's an example of how to implement the above functionality by-hand:</p>
 <div class="fragment"><div class="line">set(schema &quot;schema_name&quot;)</div>
 <div class="line">set(schema_path &quot;${CMAKE_CURRENT_LIST_DIR}/schemas/${schema}.xml&quot;)</div>
 <div class="line"> </div>
@@ -140,79 +209,23 @@ $(function(){initNavTree('integration.html',''); initResizable(); });
 <div class="line">    PRIVATE</div>
 <div class="line">    sbepp::sbepp</div>
 <div class="line">)</div>
-</div><!-- fragment --><p class="startli">This will automatically compile the schema when its XML or <code>sbeppc</code> changes.</p>
-</li>
-<li><p class="startli">Using pre-generated schema headers. Useful when you don't want to install <code>sbeppc</code> on each dev's machine or you don't have C++17 (required for <code>sbeppc</code>) there. In this case one should be careful to keep once-generated headers compatible with <code>sbepp</code> if it's installed automatically via some dependency management mechanism. <br  />
-</p>
-<p class="startli">Check out <a class="el" href="installation.html">SBEPP_BUILD_SBEPPC</a> CMake option to disable <code>sbeppc</code> building for such cases.</p>
-</li>
-</ol>
-<p>Also, since it's a third-party code, I recommend to include headers path as <code>SYSTEM</code> to hide potential warnings from generated code.</p>
+</div><!-- fragment --><hr  />
+<h1><a class="anchor" id="autotoc_md11"></a>
+Using pre-compiled schema</h1>
+<p>Another approach is to use pre-compiled schema headers, that is, generate headers once and store them in the source tree. This might be useful when it's not desired/possible to build/install <code>sbeppc</code> in developer environment (e.g. if C++17 required for <code>sbeppc</code> is not available). It requires building <code>sbeppc</code> once somewhere, generating schema headers using it and pushing them to the source tree to be used by others. In this case care should be taken to keep once-generated headers <a class="el" href="#versioning">compatible</a> with <code>sbepp</code> if it's installed automatically via some dependency management mechanism.</p>
+<dl class="section note"><dt>Note</dt><dd>Check out <a class="el" href="installation.html#installation-cmake">SBEPP_BUILD_SBEPPC</a> and <a class="el" href="installation.html#installation-conan">with_sbeppc</a> options to see how to disable <code>sbeppc</code> building for such cases.</dd></dl>
+<p>Also, since it's a third-party code, it's recommended to mark include path for generated headers as <code>SYSTEM</code> to hide potential warnings.</p>
 <hr  />
-<h2><a class="anchor" id="autotoc_md6"></a>
-Versioning and compatibility</h2>
+<h1><a class="anchor" id="versioning"></a>
+Versioning and compatibility</h1>
 <p><code>sbepp</code> uses <a href="https://semver.org/">SemVer</a> that is defined in terms of <em>public API</em>, its users and its changes. <code>sbepp</code> defines public API as:</p><ul>
 <li><code>sbepp::sbeppc</code> schema compiler</li>
 <li>public parts of <code>sbepp::sbepp</code> supporting library</li>
 <li>public parts of generated headers</li>
 </ul>
 <p>The most important consequence from this definition is that <b>whether a change is compatible/incompatible depends only on how it affects user's code, not the generated one.</b> In practice it means that headers generated by <code>sbepp::sbeppc</code> version <code>1.2.3</code> might not be compatible with <code>sbepp::sbepp</code> version <code>1.3.0</code> and even with <code>1.2.4</code>. Such incompatibility requires schema recompilation but not the user's code change (only MAJOR update will require that).</p>
-<p>To summarize, the advised strategy is to use the same version of <code>sbepp::sbeppc</code> and <code>sbepp::sbepp</code> to generate and use headers. Types from the <code>detail</code> namespace should never be mentioned/used explicitly, they can be affected even by the PATCH version change.</p>
-<hr  />
-<h2><a class="anchor" id="autotoc_md8"></a>
-CMake helpers</h2>
-<p><code>sbepp 1.2.0</code> introduced a couple of helpers to automate steps described above.</p>
-<p><code>sbeppc_compile_schema</code> - creates <code>INTERFACE</code> library that compiles SBE schema using <code>sbeppc</code>. <br  />
- Parameters:</p><ul>
-<li><code>SCHEMA_FILE</code>, the path to schema XML file.</li>
-<li><code>TARGET_NAME</code>, the name of the generated <code>INTERFACE</code> library. Same target can be used to compile multiple schemas.</li>
-<li><code>OUTPUT_DIR</code>, optional, the directory in which <code>sbeppc</code> will generate headers. Defaults to <code>${CMAKE_BINARY_DIR}/sbeppc_generated</code>.</li>
-<li><code>SCHEMA_NAME</code>, optional, overrides schema name from XML.</li>
-<li><code>SBEPPC_PATH</code>, optional, the path to <code>sbeppc</code> binary, uses <code>sbepp::sbeppc</code> CMake target by default.</li>
-</ul>
-<p>This function creates custom target using <code>sbeppc_make_schema_target</code> (described below) and then creates <code>INTERFACE</code> library on top of it. This library carries all necessary dependencies and settings so there's a minimal amount of work left for the client:</p>
-<div class="fragment"><div class="line">sbeppc_compile_schema(</div>
-<div class="line">    TARGET_NAME compiled_schemas</div>
-<div class="line">    SCHEMA_FILE &quot;schema1.xml&quot;</div>
-<div class="line">)</div>
-<div class="line"> </div>
-<div class="line">sbeppc_compile_schema(</div>
-<div class="line">    # note that we can use the same target name for many schemas</div>
-<div class="line">    TARGET_NAME compiled_schemas</div>
-<div class="line">    SCHEMA_FILE &quot;schema2.xml&quot;</div>
-<div class="line">)</div>
-<div class="line"> </div>
-<div class="line">add_executable(exe)</div>
-<div class="line"># generated target carries all necessary dependencies, just link to it</div>
-<div class="line">target_link_libraries(exe PRIVATE compiled_schemas)</div>
-</div><!-- fragment --><hr  />
-<p><code>sbeppc_make_schema_target</code> - creates a custom target that compiles SBE schema using <code>sbeppc</code>. <br  />
- Parameters:</p><ul>
-<li><code>SCHEMA_FILE</code>, the path to schema XML file.</li>
-<li><code>TARGET_NAME</code>, the name of generated custom target. Same target can be used to compile multiple schemas.</li>
-<li><code>OUTPUT_DIR</code>, the directory in which <code>sbeppc</code> will generate headers.</li>
-<li><code>SCHEMA_NAME</code>, optional, overrides schema name from XML.</li>
-<li><code>SBEPPC_PATH</code>, optional, the path to <code>sbeppc</code> binary, uses <code>sbepp::sbeppc</code> CMake target by default.</li>
-</ul>
-<p>This is a lower-level function than <code>sbeppc_compile_schema</code>. It only creates a custom command and a custom target to compile the schema leaving rest of work up to client. It also creates a special empty anchor file with a name like <code>&lt;HASH&gt;.anchor</code> for each schema. It's required for CMake to establish dependency between custom command and custom target.</p>
-<p>Example:</p>
-<div class="fragment"><div class="line">sbeppc_make_schema_target(</div>
-<div class="line">    SCHEMA_FILE &quot;schema1.xml&quot;</div>
-<div class="line">    TARGET_NAME compiled_schemas</div>
-<div class="line">    OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}</div>
-<div class="line">)</div>
-<div class="line"> </div>
-<div class="line">sbeppc_make_schema_target(</div>
-<div class="line">    SCHEMA_FILE &quot;schema2.xml&quot;</div>
-<div class="line">    TARGET_NAME compiled_schemas</div>
-<div class="line">    OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}</div>
-<div class="line">)</div>
-<div class="line"> </div>
-<div class="line">add_executable(exe)</div>
-<div class="line">add_dependencies(exe compiled_schemas)</div>
-<div class="line">target_include_directories(exe SYSTEM PRIVATE ${CMAKE_CURRENT_BINARY_DIR})</div>
-<div class="line">target_link_libraries(exe PRIVATE sbepp::sbepp)</div>
-</div><!-- fragment --> </div></div><!-- contents -->
+<p>To summarize, the advised strategy is to use the same version of <code>sbepp::sbeppc</code> and <code>sbepp::sbepp</code> to generate and use headers. Types from the <code>detail</code> namespace should never be mentioned/used explicitly, they can be affected even by the PATCH version change. </p>
+</div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->
 <!-- start footer part -->

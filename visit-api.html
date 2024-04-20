@@ -116,7 +116,7 @@ $(function(){initNavTree('visit-api.html',''); initResizable(); });
 </ul>
 <p>However, this order is not required, each call can be used independently from the other. For example, if one wants to visit composite members but not the composite object itself, there's nothing wrong with calling only <code><a class="el" href="namespacesbepp.html#a23abc2b6b892aea5b2b7f6dde6c24e69" title="Visit view&#39;s children using provided cursor.">sbepp::visit_children()</a></code> without <code><a class="el" href="namespacesbepp.html#a47c1cd81154bc5c56524604f74d52d27" title="Visit a view using given cursor.">sbepp::visit()</a></code>.</p>
 <hr  />
-<h1><a class="anchor" id="autotoc_md38"></a>
+<h1><a class="anchor" id="autotoc_md41"></a>
 Visiting parent views</h1>
 <p>Message/group/entry/composite views are called "parent" in this context because they are the only ones that can contain nested/children members. For them, <code><a class="el" href="namespacesbepp.html#a47c1cd81154bc5c56524604f74d52d27" title="Visit a view using given cursor.">sbepp::visit()</a></code> visits only the provided view itself. Here's a complete visitor interface for such a call:</p>
 <div class="fragment"><div class="line"><span class="keyword">class </span>parent_visitor</div>
@@ -136,7 +136,7 @@ Visiting parent views</h1>
 <div class="line">};</div>
 </div><!-- fragment --><p>For message, group and entry visitors, <code>Cursor&amp;</code> is provided to support efficient children visiting. For composites it's not needed because they support efficient member access without cursors.</p>
 <hr  />
-<h1><a class="anchor" id="autotoc_md40"></a>
+<h1><a class="anchor" id="autotoc_md43"></a>
 Visiting children</h1>
 <p><code><a class="el" href="namespacesbepp.html#a23abc2b6b892aea5b2b7f6dde6c24e69" title="Visit view&#39;s children using provided cursor.">sbepp::visit_children()</a></code> visits children of a parent view in the following way:</p><ul>
 <li>for message and group entry, visits their <em>direct</em> field/group/data members in schema order</li>
@@ -173,7 +173,7 @@ Visiting children</h1>
 <div class="line">};</div>
 </div><!-- fragment --><p>Note that a field can be represented by type/enum/set/composite so traits/concepts are often needed to distinguish them for further processing (e.g. <code><a class="el" href="namespacesbepp.html#a9b69b91021cb0ec2e5cba1f1d105fc60" title="Checks if T is a type of any kind.">sbepp::is_type</a></code>, <code><a class="el" href="conceptsbepp_1_1composite.html" title="Concept for sbepp::is_composite&lt;T&gt;::value">sbepp::composite</a></code>).</p>
 <hr  />
-<h1><a class="anchor" id="autotoc_md42"></a>
+<h1><a class="anchor" id="autotoc_md45"></a>
 Visiting enums and sets</h1>
 <p>When <code><a class="el" href="namespacesbepp.html#a47c1cd81154bc5c56524604f74d52d27" title="Visit a view using given cursor.">sbepp::visit()</a></code> is applied to a set, it visits all its known choices and passes their values/tags to a visitor via the following function:</p>
 <div class="fragment"><div class="line"><span class="keyword">class </span>set_visitor{</div>
