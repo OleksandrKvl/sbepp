@@ -40,12 +40,14 @@ char* get_option_value(const int argc, char** argv, int option_index)
 R"(Usage:  sbeppc [OPTIONS]... FILE
 
 Options:
-    --schema-name NAME  override schema name. Uses `messageSchema.package` by
-                        default
-    --output-dir DIR    output directory. Uses current directory by default
-    --version           print version and exit
-    --help              print this help and exit
-    --                  end of optional arguments
+    --schema-name NAME    override schema name. Uses `messageSchema.package` by
+                          default
+    --output-dir DIR      output directory. Uses current directory by default
+    --inject-include PATH injects `#include "PATH"` directive at the top of
+                          `schema/schema.hpp`
+    --version             print version and exit
+    --help                print this help and exit
+    --                    end of optional arguments
 )"
         // clang-format on
     );
@@ -63,6 +65,7 @@ struct sbeppc_config
     std::string schema_file;
     std::optional<std::string> schema_name;
     std::filesystem::path output_dir{"."};
+    std::optional<std::string> inject_include;
 };
 
 sbeppc_config parse_command_line(int argc, char** argv)
@@ -88,6 +91,11 @@ sbeppc_config parse_command_line(int argc, char** argv)
         else if(arg == "--output-dir"sv)
         {
             config.output_dir = get_option_value(argc, argv, i);
+            i++;
+        }
+        else if(arg == "--inject-include"sv)
+        {
+            config.inject_include = get_option_value(argc, argv, i);
             i++;
         }
         else if(arg == "--version"sv)
@@ -150,7 +158,12 @@ int main(int argc, char** argv)
         utils::validate_schema_name(schema, reporter);
 
         schema_compiler::compile(
-            config.output_dir, schema, types, messages, fs_provider);
+            config.output_dir,
+            config.inject_include,
+            schema,
+            types,
+            messages,
+            fs_provider);
     }
     catch(const sbe_error& e)
     {

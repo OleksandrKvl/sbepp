@@ -6,12 +6,14 @@ Usage:
 sbeppc [OPTIONS]... FILE
 
 Options:
-    --schema-name NAME  override schema name. Uses `messageSchema.package` by
-                        default
-    --output-dir DIR    output directory. Uses current directory by default
-    --version           print version and exit
-    --help              print this help and exit
-    --                  end of optional arguments
+    --schema-name NAME    override schema name. Uses `messageSchema.package` by
+                          default
+    --output-dir DIR      output directory. Uses current directory by default
+    --inject-include PATH injects `#include "PATH"` directive at the top of
+                          `schema/schema.hpp`
+    --version             print version and exit
+    --help                print this help and exit
+    --                    end of optional arguments
 ```
 
 Here's an example of the resulting file structure:

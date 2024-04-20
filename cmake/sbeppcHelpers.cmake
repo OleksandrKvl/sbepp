@@ -70,32 +70,47 @@ function(sbeppc_make_schema_target)
         message(FATAL_ERROR "Missing TARGET_NAME argument")
     endif()
 
-    get_filename_component(schema_real_path "${arg_SCHEMA_FILE}" REALPATH)
-    string(SHA256 anchor_file_name "${schema_real_path}")
-    # `cmake_path` requires CMake >=3.20 so concatenate by hand
-    set(anchor_file_path "${arg_OUTPUT_DIR}/${anchor_file_name}.anchor")
-
     if(DEFINED arg_SBEPPC_PATH)
         list(APPEND sbeppc_command "${arg_SBEPPC_PATH}")
+        list(APPEND sbeppc_command_deps "${arg_SBEPPC_PATH}")
     else()
         list(APPEND sbeppc_command "$<TARGET_FILE:sbepp::sbeppc>")
+        list(APPEND sbeppc_command_deps "sbepp::sbeppc")
     endif()
+
+    list(APPEND sbeppc_command_deps "${arg_SCHEMA_FILE}")
 
     if(DEFINED arg_SCHEMA_NAME)
         list(APPEND sbeppc_command "--schema-name" "${arg_SCHEMA_NAME}")
+        # `schema/schema.hpp` path doesn't depend on a schema content and is
+        # indirectly included by all other generated headers so we use it as an
+        # anchor when schema name is known
+        set(anchor_file_path
+            "${arg_OUTPUT_DIR}/${arg_SCHEMA_NAME}/schema/schema.hpp"
+        )
+    else()
+        # We don't know any output file name because it depends on the content
+        # of the schema so we generate a fake anchor file to depend on it in
+        # `add_custom_target`
+        get_filename_component(schema_real_path "${arg_SCHEMA_FILE}" REALPATH)
+        string(SHA256 anchor_file_name "${schema_real_path}")
+        string(APPEND anchor_file_name ".anchor")
+        # `cmake_path` requires CMake >=3.20 so concatenate by hand
+        set(anchor_file_path "${arg_OUTPUT_DIR}/${anchor_file_name}")
+        # inject include directive to the anchor file to create a dependency
+        # chain that will force recompilation of consumers of this target
+        list(APPEND sbeppc_command
+            "--inject-include" "../../${anchor_file_name}"
+        )
+        set(create_anchor_command
+            COMMAND "${CMAKE_COMMAND}" -E touch "${anchor_file_path}"
+        )
     endif()
 
     list(APPEND sbeppc_command
         "--output-dir" "${arg_OUTPUT_DIR}"
         "${arg_SCHEMA_FILE}"
     )
-
-    list(APPEND sbeppc_command_deps "${arg_SCHEMA_FILE}")
-    # depend explicitly only on `SBEPPC_PATH` if given, otherwise the usage of
-    # `TARGET_FILE` creates dependency on `sbepp::sbeppc` target implicitly
-    if(DEFINED arg_SBEPPC_PATH)
-        list(APPEND sbeppc_command_deps "${arg_SBEPPC_PATH}")
-    endif()
 
     add_custom_command(
         VERBATIM
@@ -105,12 +120,7 @@ function(sbeppc_make_schema_target)
             ${sbeppc_command_deps}
         COMMENT
             "Compiling SBE schema: ${arg_SCHEMA_FILE}"
-
-        # We don't know any output file name because it depends on the content
-        # of the schema so we generate a fake anchor file to depend on it in
-        # `add_custom_target`
-        COMMAND
-            "${CMAKE_COMMAND}" -E touch "${anchor_file_path}"
+        ${create_anchor_command}
         OUTPUT
             "${anchor_file_path}"
     )

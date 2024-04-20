@@ -14,7 +14,6 @@
 #include <fmt/std.h>
 
 #include <filesystem>
-#include <fstream>
 #include <string_view>
 
 namespace sbepp::sbeppc
@@ -24,6 +23,7 @@ class schema_compiler
 public:
     static void compile(
         const std::filesystem::path& output_dir,
+        const std::optional<std::string>& inject_include,
         sbe::message_schema& schema,
         type_manager& types,
         message_manager& messages,
@@ -119,6 +119,7 @@ SBEPP_WARNINGS_ON();
 R"({top_comment}
 #pragma once
 
+{injected_include}
 #include <sbepp/sbepp.hpp>
 
 SBEPP_WARNINGS_OFF();
@@ -152,7 +153,10 @@ SBEPP_WARNINGS_ON();
                 // it's not possible to forward declare it
                 fmt::arg("header_type", header_type.impl_name),
                 fmt::arg(
-                    "top_comment", utils::get_compiled_header_top_comment())));
+                    "top_comment", utils::get_compiled_header_top_comment()),
+                fmt::arg(
+                    "injected_include",
+                    make_injected_include(inject_include))));
 
         // messages
         std::vector<std::string> message_includes;
@@ -228,6 +232,7 @@ SBEPP_WARNINGS_ON();
                 // clang-format off
 R"({top_comment}
 #pragma once
+
 #include "schema/schema.hpp"
 {type_includes}
 {message_includes}
@@ -272,6 +277,17 @@ private:
         }
 
         return res;
+    }
+
+    static std::string
+        make_injected_include(const std::optional<std::string>& inject_include)
+    {
+        if(inject_include)
+        {
+            return fmt::format("#include \"{}\"", *inject_include);
+        }
+
+        return {};
     }
 };
 } // namespace sbepp::sbeppc
