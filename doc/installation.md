@@ -1,6 +1,6 @@
 # Installation {#installation}
 
-### CMake {#installation-cmake}
+## CMake {#installation-cmake}
 
 Use classic CMake approach:
 
@@ -38,7 +38,7 @@ requires [googletest](https://github.com/google/googletest) and
 
 There's a `conanfile.txt` which can be used to simplify dependency management.
 
-### Conan package {#installation-conan}
+## Conan package {#installation-conan}
 
 Now available in [ConanCenter](https://conan.io/center/recipes/sbepp). Use
 `with_sbeppc` Conan option to enable/disable `sbeppc` building (defaults to
