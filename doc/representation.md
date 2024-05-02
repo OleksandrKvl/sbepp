@@ -294,8 +294,43 @@ if(!d.empty())
 }
 
 d.clear();
-const char str[]={"hi"};
-d.assign(std::begin(str), std::end(str));
+
+std::vector<char> v;
+// fill somehow...
+d.assign_range(v);
+```
+
+### Strings
+
+According to SBE standard, strings stored inside data members never have
+terminating null character. Conversion from `sbepp::detail::dynamic_array_ref`
+to a more string-specific type can be done using `data()` and `size()` methods:
+
+```cpp
+auto d = msg.data();
+std::string s1{d.data(), d.size()};
+std::string_view s2{d.data(), d.size()};
+
+// since C++23 it's even simpler using range constructor:
+std::string_view s3{d};
+```
+
+There are 2 options for string assignments:
+- `sbepp::detail::dynamic_array_ref::assign_string()` to assign a raw string
+    pointer.
+- `sbepp::detail::dynamic_array_ref::assign_range()`, a generic method to assign
+    from ranges. Since range requires just `begin()`/`end()` methods, most
+    string-specific types satisfy this requirement.
+
+Example:
+
+```cpp
+auto d = msg.data();
+
+d.assign_string("hello");
+
+d.assign_range(std::string{"abc"});
+d.assign_range(std::string_view{"def"});
 ```
 
 ---
@@ -304,12 +339,56 @@ d.assign(std::begin(str), std::end(str));
 
 `sbepp` treats all `<type>`s with `length != 1` (including `0`) as fixed-size
 arrays. They are implemented in terms of `sbepp::detail::static_array_ref` which
-has `std::span`-like interface.
+has `std::span`-like interface with assignment helpers.
 
 ```cpp
 auto array = msg.array();
 
 std::cout.write(array.data(), array.size());
+```
+
+### Strings
+
+Assignment from a string can be done using
+`sbepp::detail::static_array_ref::assign_string()`.
+It
+can handle both, raw string pointers and string ranges like `std::string` or
+`std::string_view`. As a second parameter it takes `sbepp::eos_null eos_mode`
+that controls how to set trailing null bytes (if any). If a stored string is
+shorter than the array, SBE standard requires *all* the remaining bytes to be
+set to null and `sbepp::eos_null::all` is the default argument for `eos_mode`
+parameter. In practice, however, it's not always required because:
+- a single null character is enough for decoder to calculate string length.
+- underlying memory might be zero-initialized from the start, in this case,
+    `sbepp::eos_null::none` is enough to correctly encode a string.
+
+Example:
+
+```cpp
+auto array = msg.array();
+
+array.assign_string("abc");
+array.assign_string(std::string{"abc"});
+```
+
+To convert `sbepp::detail::static_array_ref` to a more string-specific type,
+string length has to be calculated explicitly because the stored string might
+occupy the entire array without having the terminating null character. There are
+two ways to do this:
+- `sbepp::detail::static_array_ref::strlen()`, calculates string length by
+    looking for the first null character from left to right.
+- `sbepp::detail::static_array_ref::strlen_r()`, calculates string length by
+    looking for the first non-null character from right to left. This reversed
+    approach might be useful when user expects that string end is closer to the
+    end of the array than to its start. For it to work, it requires *all*
+    padding bytes (if any) to be set to null.
+
+Example:
+
+```cpp
+auto array = msg.array();
+
+std::string_view sv{array.data(), array.strlen()};
 ```
 
 ---

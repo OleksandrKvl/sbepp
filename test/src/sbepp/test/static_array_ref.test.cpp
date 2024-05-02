@@ -8,6 +8,10 @@
 
 #include <iterator>
 #include <type_traits>
+#include <vector>
+#include <array>
+#include <cstring>
+#include <initializer_list>
 
 namespace
 {
@@ -150,6 +154,15 @@ TEST_F(StaticArrayRefDeathTest, TerminatesIfAccessedWithoutEnoughStorage)
     ASSERT_DEATH({ a.end(); }, ".*");
     ASSERT_DEATH({ a.rbegin(); }, ".*");
     ASSERT_DEATH({ a.rend(); }, ".*");
+    ASSERT_DEATH({ a.strlen(); }, ".*");
+    ASSERT_DEATH({ a.strlen_r(); }, ".*");
+    ASSERT_DEATH({ a.assign_string("abc"); }, ".*");
+    ASSERT_DEATH({ a.assign_string(std::string{}); }, ".*");
+    ASSERT_DEATH({ a.assign_range(std::string{}); }, ".*");
+    ASSERT_DEATH({ a.fill('x'); }, ".*");
+    ASSERT_DEATH({ a.assign(std::begin(a), std::end(a)); }, ".*");
+    ASSERT_DEATH({ a.assign(1, 'x'); }, ".*");
+    ASSERT_DEATH({ a.assign({'a', 'b'}); }, ".*");
 }
 
 TEST_F(StaticArrayRefTest, SubscriptReturnsReference)
@@ -255,10 +268,397 @@ TEST_F(StaticArrayRefTest, ReversedBeginEndRepresentReversedBuffer)
     STATIC_ASSERT(noexcept(a.rend()));
 }
 
+TEST_F(StaticArrayRefTest, StrlenReturnsDistanceToFirstNull)
+{
+    a[0] = 'a';
+    a[1] = '\0';
+    a[2] = 'c';
+
+    ASSERT_EQ(a.strlen(), 1);
+
+    a[0] = '\0';
+
+    ASSERT_EQ(a.strlen(), 0);
+
+    a.fill('x');
+
+    ASSERT_EQ(a.strlen(), a.size());
+    STATIC_ASSERT(noexcept(a.strlen()));
+}
+
+TEST_F(StaticArrayRefTest, StrlenRReturnsDistanceToLastNonNull)
+{
+    a[0] = 'a';
+    a[1] = '\0';
+    a[2] = 'c';
+    a[3] = '\0';
+
+    ASSERT_EQ(a.strlen_r(), 3);
+
+    a.fill('\0');
+
+    ASSERT_EQ(a.strlen_r(), 0);
+
+    a.back() = 'x';
+
+    ASSERT_EQ(a.strlen_r(), a.size());
+
+    STATIC_ASSERT(noexcept(a.strlen_r()));
+}
+
+TEST_F(StaticArrayRefTest, AssignString1AssignsStringWithNoPadding)
+{
+    const auto str = "abc";
+    const auto padding_char = 'x';
+    std::string valid_string = str;
+    valid_string.resize(a.size(), padding_char);
+    std::fill(std::begin(a), std::end(a), padding_char);
+
+    const auto res = a.assign_string(str, sbepp::eos_null::none);
+
+    ASSERT_EQ(std::memcmp(&valid_string[0], &a[0], valid_string.size()), 0);
+    ASSERT_EQ(res, std::begin(a) + std::strlen(str));
+    STATIC_ASSERT(noexcept(a.assign_string(str, sbepp::eos_null::none)));
+}
+
+TEST_F(StaticArrayRefTest, AssignString1AssignsStringWithSingleTrailingNull)
+{
+    const auto str = "abc";
+    const auto padding_char = 'x';
+    std::string valid_string = str;
+    valid_string.resize(a.size(), padding_char);
+    valid_string[3] = '\0';
+    std::fill(std::begin(a), std::end(a), padding_char);
+
+    const auto res = a.assign_string(str, sbepp::eos_null::single);
+
+    ASSERT_EQ(std::memcmp(&valid_string[0], &a[0], valid_string.size()), 0);
+    ASSERT_EQ(res, std::begin(a) + std::strlen(str));
+    STATIC_ASSERT(noexcept(a.assign_string(str, sbepp::eos_null::single)));
+}
+
+TEST_F(StaticArrayRefTest, AssignString1AssignsStringWithAllTrailingNulls)
+{
+    const auto str = "abc";
+    const auto padding_char = 'x';
+    std::string valid_string = str;
+    valid_string.resize(a.size(), '\0');
+    std::fill(std::begin(a), std::end(a), padding_char);
+
+    const auto res = a.assign_string(str, sbepp::eos_null::all);
+
+    ASSERT_EQ(std::memcmp(&valid_string[0], &a[0], valid_string.size()), 0);
+    ASSERT_EQ(res, std::begin(a) + std::strlen(str));
+    STATIC_ASSERT(noexcept(a.assign_string(str, sbepp::eos_null::all)));
+}
+
+TEST_F(StaticArrayRefTest, AssignString1AddsNoPaddingIfStringHasTheSameSize)
+{
+    std::string valid_string;
+    valid_string.resize(a.size(), 'x');
+
+    a.assign_string(valid_string.c_str(), sbepp::eos_null::none);
+
+    ASSERT_EQ(std::memcmp(&valid_string[0], &a[0], valid_string.size()), 0);
+
+    a.assign_string(valid_string.c_str(), sbepp::eos_null::single);
+
+    ASSERT_EQ(std::memcmp(&valid_string[0], &a[0], valid_string.size()), 0);
+
+    a.assign_string(valid_string.c_str(), sbepp::eos_null::all);
+
+    ASSERT_EQ(std::memcmp(&valid_string[0], &a[0], valid_string.size()), 0);
+}
+
+TEST_F(StaticArrayRefDeathTest, AssignString1TerminatesOnNullptr)
+{
+    ASSERT_DEATH({ a.assign_string(nullptr); }, ".*");
+}
+
+TEST_F(StaticArrayRefDeathTest, AssignString1TerminatesIfStringIsTooLong)
+{
+    std::string str;
+    str.resize(a.size() + 1, 'a');
+    ASSERT_DEATH({ a.assign_string(str.c_str()); }, ".*");
+}
+
+struct test_assign_string_1
+{
+    template<typename T>
+    auto operator()(T obj) -> decltype(obj.assign_string("abc"))
+    {
+    }
+};
+
+TEST_F(StaticArrayRefTest, AssignString1NotAvailableForConstByteTypes)
+{
+    STATIC_ASSERT(!sbepp::test::utils::
+                      is_invocable<test_assign_string_1, const_array_t>::value);
+}
+
+TEST_F(StaticArrayRefTest, AssignString2AssignsStringWithNoPadding)
+{
+    const std::string str = "abc";
+    const auto padding_char = 'x';
+    std::string valid_string = str;
+    valid_string.resize(a.size(), padding_char);
+    std::fill(std::begin(a), std::end(a), padding_char);
+
+    const auto res = a.assign_string(str, sbepp::eos_null::none);
+
+    ASSERT_EQ(std::memcmp(&valid_string[0], &a[0], valid_string.size()), 0);
+    ASSERT_EQ(res, std::begin(a) + str.size());
+}
+
+TEST_F(StaticArrayRefTest, AssignString2AssignsStringWithSingleTrailingNull)
+{
+    const std::string str = "abc";
+    const auto padding_char = 'x';
+    std::string valid_string = str;
+    valid_string.resize(a.size(), padding_char);
+    valid_string[3] = '\0';
+    std::fill(std::begin(a), std::end(a), padding_char);
+
+    const auto res = a.assign_string(str, sbepp::eos_null::single);
+
+    ASSERT_EQ(std::memcmp(&valid_string[0], &a[0], valid_string.size()), 0);
+    ASSERT_EQ(res, std::begin(a) + str.size());
+}
+
+TEST_F(StaticArrayRefTest, AssignString2AssignsStringWithAllTrailingNulls)
+{
+    const std::string str = "abc";
+    const auto padding_char = 'x';
+    std::string valid_string = str;
+    valid_string.resize(a.size(), '\0');
+    std::fill(std::begin(a), std::end(a), padding_char);
+
+    const auto res = a.assign_string(str, sbepp::eos_null::all);
+
+    ASSERT_EQ(std::memcmp(&valid_string[0], &a[0], valid_string.size()), 0);
+    ASSERT_EQ(res, std::begin(a) + str.size());
+}
+
+TEST_F(StaticArrayRefTest, AssignString2AddsNoPaddingIfStringHasTheSameSize)
+{
+    std::string valid_string;
+    valid_string.resize(a.size(), 'x');
+
+    a.assign_string(valid_string, sbepp::eos_null::none);
+
+    ASSERT_EQ(std::memcmp(&valid_string[0], &a[0], valid_string.size()), 0);
+
+    a.assign_string(valid_string, sbepp::eos_null::single);
+
+    ASSERT_EQ(std::memcmp(&valid_string[0], &a[0], valid_string.size()), 0);
+
+    a.assign_string(valid_string, sbepp::eos_null::all);
+
+    ASSERT_EQ(std::memcmp(&valid_string[0], &a[0], valid_string.size()), 0);
+}
+
+TEST_F(StaticArrayRefDeathTest, AssignString2TerminatesIfStringIsTooLong)
+{
+    std::string str;
+    str.resize(a.size() + 1, 'a');
+    ASSERT_DEATH({ a.assign_string(str); }, ".*");
+}
+
+struct test_assign_string_2
+{
+    template<typename T>
+    auto operator()(T obj) -> decltype(obj.assign_string({'a', 'b'}))
+    {
+    }
+};
+
+TEST_F(StaticArrayRefTest, AssignString2NotAvailableForConstByteTypes)
+{
+    STATIC_ASSERT(!sbepp::test::utils::
+                      is_invocable<test_assign_string_2, const_array_t>::value);
+}
+
+TEST_F(StaticArrayRefTest, AssignRangeCopiesRangeData)
+{
+    const auto padding_char = 'x';
+    std::vector<char> range{'a', 'b', 'c'};
+    std::vector<char> valid_data = range;
+    valid_data.resize(a.size(), padding_char);
+    std::fill(std::begin(a), std::end(a), padding_char);
+
+    const auto res = a.assign_range(range);
+
+    ASSERT_EQ(std::memcmp(&valid_data[0], &a[0], valid_data.size()), 0);
+    ASSERT_EQ(res, std::begin(a) + range.size());
+}
+
+TEST_F(StaticArrayRefDeathTest, AssignRangeTerminatesIfRangeIsTooLong)
+{
+    std::vector<char> data;
+    data.resize(a.size() + 1, 'a');
+    ASSERT_DEATH({ a.assign_range(data); }, ".*");
+}
+
+struct test_assign_range
+{
+    template<typename T>
+    auto operator()(T obj) -> decltype(obj.assign_range({'a', 'b'}))
+    {
+    }
+};
+
+TEST_F(StaticArrayRefTest, AssignRangeNotAvailableForConstByteTypes)
+{
+    STATIC_ASSERT(!sbepp::test::utils::
+                      is_invocable<test_assign_range, const_array_t>::value);
+}
+
+TEST_F(StaticArrayRefTest, FillSetsAllElementsToValue)
+{
+    const auto value = 'x';
+    std::vector<char> valid_data;
+    valid_data.resize(a.size(), value);
+
+    a.fill(value);
+
+    ASSERT_EQ(std::memcmp(a.data(), valid_data.data(), a.size()), 0);
+    STATIC_ASSERT(noexcept(a.fill(value)));
+}
+
+struct test_fill
+{
+    template<typename T>
+    auto operator()(T obj) -> decltype(obj.fill('a'))
+    {
+    }
+};
+
+TEST_F(StaticArrayRefTest, FillNotAvailableForConstByteTypes)
+{
+    STATIC_ASSERT(
+        !sbepp::test::utils::is_invocable<test_fill, const_array_t>::value);
+}
+
+TEST_F(StaticArrayRefTest, Assign1SetsFirstElementsToValue)
+{
+    const auto leading_value = 'x';
+    const auto trailing_value = 'y';
+    const auto count = 10;
+    ASSERT_LT(count, a.size());
+    std::vector<char> valid_data;
+    valid_data.assign(count, leading_value);
+    valid_data.resize(a.size(), trailing_value);
+    a.fill(trailing_value);
+
+    a.assign(count, leading_value);
+
+    ASSERT_EQ(std::memcmp(a.data(), valid_data.data(), valid_data.size()), 0);
+    STATIC_ASSERT(noexcept(a.assign(count, trailing_value)));
+}
+
+struct test_assign_1
+{
+    template<typename T>
+    auto operator()(T obj) -> decltype(obj.assign(1, 'a'))
+    {
+    }
+};
+
+TEST_F(StaticArrayRefTest, Assign1NotAvailableForConstByteTypes)
+{
+    STATIC_ASSERT(
+        !sbepp::test::utils::is_invocable<test_assign_1, const_array_t>::value);
+}
+
+TEST_F(StaticArrayRefDeathTest, Assign1TerminatesIfCountIsTooBig)
+{
+    ASSERT_DEATH({ a.assign(a.size() + 1, 'x'); }, ".*");
+}
+
+TEST_F(StaticArrayRefTest, Assign2SetsFirstElementsToRangeValues)
+{
+    const auto leading_value = 'x';
+    const auto trailing_value = 'y';
+    std::vector<char> range;
+    range.resize(10, leading_value);
+    ASSERT_LT(range.size(), a.size());
+    std::vector<char> valid_data;
+    valid_data.assign(std::begin(range), std::end(range));
+    valid_data.resize(a.size(), trailing_value);
+    a.fill(trailing_value);
+
+    a.assign(std::begin(range), std::end(range));
+
+    ASSERT_EQ(std::memcmp(a.data(), valid_data.data(), valid_data.size()), 0);
+}
+
+struct test_assign_2
+{
+    template<typename T>
+    auto operator()(T obj)
+        -> decltype(obj.assign((char*)nullptr, (char*)nullptr))
+    {
+    }
+};
+
+TEST_F(StaticArrayRefTest, Assign2NotAvailableForConstByteTypes)
+{
+    STATIC_ASSERT(
+        !sbepp::test::utils::is_invocable<test_assign_2, const_array_t>::value);
+}
+
+TEST_F(StaticArrayRefDeathTest, Assign2TerminatesIfRangeIsTooLong)
+{
+    std::vector<char> range;
+    range.resize(a.size() + 1);
+    ASSERT_DEATH({ a.assign(std::begin(range), std::end(range)); }, ".*");
+}
+
+TEST_F(StaticArrayRefTest, Assign3SetsFirstElementsToInitializerListValues)
+{
+    const auto trailing_value = 'y';
+    std::initializer_list<char> list{'a', 'b', 'c'};
+    std::vector<char> valid_data;
+    valid_data.assign(list);
+    valid_data.resize(a.size(), trailing_value);
+    a.fill(trailing_value);
+
+    a.assign(list);
+
+    ASSERT_EQ(std::memcmp(a.data(), valid_data.data(), valid_data.size()), 0);
+    STATIC_ASSERT(noexcept(a.assign(list)));
+}
+
+struct test_assign_3
+{
+    template<typename T>
+    auto operator()(T obj) -> decltype(obj.assign({'a', 'b'}))
+    {
+    }
+};
+
+TEST_F(StaticArrayRefTest, Assign3NotAvailableForConstByteTypes)
+{
+    STATIC_ASSERT(
+        !sbepp::test::utils::is_invocable<test_assign_3, const_array_t>::value);
+}
+
+TEST_F(StaticArrayRefDeathTest, Assign3TerminatesIfListIsTooLong)
+{
+    using array_t = static_array_ref<byte_type, value_type, 2>;
+    std::array<byte_type, array_t::size()> buf{};
+    array_t a{buf.begin(), buf.end()};
+    std::initializer_list<char> list{'a', 'b', 'c'};
+    ASSERT_GT(list.size(), a.size());
+
+    ASSERT_DEATH({ a.assign(list); }, ".*");
+}
+
 #if SBEPP_HAS_CONSTEXPR_ACCESSORS
 constexpr auto constexpr_test()
 {
     std::array<byte_type, 512> buf{};
+    std::array<byte_type, array_t::size() - 1> data{};
     array_t a1;
     a1 = array_t{buf.data(), buf.size()};
     array_t a2;
@@ -280,6 +680,17 @@ constexpr auto constexpr_test()
     a5.end();
     a5.rbegin();
     a5.rend();
+    a5.assign_string("abc", sbepp::eos_null::none);
+    a5.assign_string("abc", sbepp::eos_null::single);
+    a5.assign_string("abc", sbepp::eos_null::all);
+    a5.assign_string(data, sbepp::eos_null::none);
+    a5.assign_string(data, sbepp::eos_null::single);
+    a5.assign_string(data, sbepp::eos_null::all);
+    a5.assign_range(data);
+    a5.fill('x');
+    a5.assign(std::begin(data), std::end(data));
+    a5.assign(1, 'x');
+    a5.assign({'a', 'b'});
 
     return buf;
 }
