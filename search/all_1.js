@@ -1,7 +1,7 @@
 var searchData=
 [
   ['back_0',['back',['../classsbepp_1_1detail_1_1flat__group__base.html#ad29ce8e67aad9180fe3340ba84f73f3f',1,'sbepp::detail::flat_group_base::back()'],['../classsbepp_1_1detail_1_1static__array__ref.html#a8161979b4c364af8280eab33295a846d',1,'sbepp::detail::static_array_ref::back()'],['../classsbepp_1_1detail_1_1dynamic__array__ref.html#a2d1259db5d27d8d7db07a1683f475f1d',1,'sbepp::detail::dynamic_array_ref::back()']]],
-  ['based_20accessors_1',['Based accessors',['../representation.html#cursor-accessors',1,'Cursor-based accessors'],['../examples.html#autotoc_md53',1,'Decoding a message using cursor-based accessors'],['../examples.html#autotoc_md49',1,'Encoding a message using cursor-based accessors']]],
+  ['based_20accessors_1',['Based accessors',['../representation.html#cursor-accessors',1,'Cursor-based accessors'],['../examples.html#autotoc_md55',1,'Decoding a message using cursor-based accessors'],['../examples.html#autotoc_md51',1,'Encoding a message using cursor-based accessors']]],
   ['begin_2',['begin',['../classsbepp_1_1detail_1_1flat__group__base.html#a7e1d6a86257a96bed56bd00fb8b7e609',1,'sbepp::detail::flat_group_base::begin()'],['../classsbepp_1_1detail_1_1nested__group__base.html#ae7cb7867e43f254ef4ed0f3bee35cdb6',1,'sbepp::detail::nested_group_base::begin()'],['../classsbepp_1_1detail_1_1static__array__ref.html#a52cfd8c882748794a264f46b0e0c713d',1,'sbepp::detail::static_array_ref::begin()'],['../classsbepp_1_1detail_1_1dynamic__array__ref.html#a84298bef272e521a534e5c399facd85a',1,'sbepp::detail::dynamic_array_ref::begin()']]],
   ['benchmarks_3',['Benchmarks',['../benchmarks.html',1,'']]],
   ['big_4',['big',['../namespacesbepp.html#af318e06df8931dd69380221b420caec5ad861877da56b8b4ceb35c8cbfdf65bb4',1,'sbepp']]],

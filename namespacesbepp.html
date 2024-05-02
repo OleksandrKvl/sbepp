@@ -414,8 +414,14 @@ Enumerations</h2></td></tr>
 , <a class="el" href="#af318e06df8931dd69380221b420caec5ad861877da56b8b4ceb35c8cbfdf65bb4">big</a>
 , <a class="el" href="#af318e06df8931dd69380221b420caec5a8e5f3adee38c8fccc13c1f3be0143796">native</a>
  }</td></tr>
-<tr class="memdesc:af318e06df8931dd69380221b420caec5"><td class="mdescLeft">&#160;</td><td class="mdescRight">represents <code>schema_traits::byte_order()</code> value type. When <a class="el" href="group__compiler-features.html#ga78585d1198487e6ba5a99e60fd422271" title="1 if compiler supports concepts, 0 otherwise">SBEPP_HAS_ENDIAN</a> is <code>1</code>, it's just an alias to <code>std::endian</code>. Requires <a class="el" href="sbepp_8hpp.html#a9558ac0bbc3e7b40c3813566f4e3510e" title="Must be defined to either little or big when native endianness cannot be detected automatically.">SBEPP_BYTE_ORDER</a> to be defined if endianness is not detected automatically.  <a href="#af318e06df8931dd69380221b420caec5">More...</a><br /></td></tr>
+<tr class="memdesc:af318e06df8931dd69380221b420caec5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Represents <code>schema_traits::byte_order()</code> value type. When <a class="el" href="group__compiler-features.html#ga78585d1198487e6ba5a99e60fd422271" title="1 if compiler supports concepts, 0 otherwise">SBEPP_HAS_ENDIAN</a> is <code>1</code>, it's just an alias to <code>std::endian</code>. Requires <a class="el" href="sbepp_8hpp.html#a9558ac0bbc3e7b40c3813566f4e3510e" title="Must be defined to either little or big when native endianness cannot be detected automatically.">SBEPP_BYTE_ORDER</a> to be defined if endianness is not detected automatically.  <a href="#af318e06df8931dd69380221b420caec5">More...</a><br /></td></tr>
 <tr class="separator:af318e06df8931dd69380221b420caec5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0ee177accf7d675a768848bb29e1512f" id="r_a0ee177accf7d675a768848bb29e1512f"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0ee177accf7d675a768848bb29e1512f">eos_null</a> { <a class="el" href="#a0ee177accf7d675a768848bb29e1512fa334c4a4c42fdb79d7ebc3e73b517e6f8">none</a>
+, <a class="el" href="#a0ee177accf7d675a768848bb29e1512fadd5c07036f2975ff4bce568b6511d3bc">single</a>
+, <a class="el" href="#a0ee177accf7d675a768848bb29e1512faa181a603769c1f98ad927e7367c7aa51">all</a>
+ }</td></tr>
+<tr class="memdesc:a0ee177accf7d675a768848bb29e1512f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Represents number of null bytes that can be added after the end-of-string by <code>detail::static_array_ref::assign_string()</code>  <a href="#a0ee177accf7d675a768848bb29e1512f">More...</a><br /></td></tr>
+<tr class="separator:a0ee177accf7d675a768848bb29e1512f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
@@ -600,13 +606,45 @@ template&lt;typename T &gt; </td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>represents <code><a class="el" href="classsbepp_1_1schema__traits.html#ad6ebc5adc1b8a2385cb92f1f4d3bbab3" title="Returns byteOrder attribute.">schema_traits::byte_order()</a></code> value type. When <a class="el" href="group__compiler-features.html#ga78585d1198487e6ba5a99e60fd422271" title="1 if compiler supports concepts, 0 otherwise">SBEPP_HAS_ENDIAN</a> is <code>1</code>, it's just an alias to <code>std::endian</code>. Requires <a class="el" href="sbepp_8hpp.html#a9558ac0bbc3e7b40c3813566f4e3510e" title="Must be defined to either little or big when native endianness cannot be detected automatically.">SBEPP_BYTE_ORDER</a> to be defined if endianness is not detected automatically. </p>
+<p>Represents <code><a class="el" href="classsbepp_1_1schema__traits.html#ad6ebc5adc1b8a2385cb92f1f4d3bbab3" title="Returns byteOrder attribute.">schema_traits::byte_order()</a></code> value type. When <a class="el" href="group__compiler-features.html#ga78585d1198487e6ba5a99e60fd422271" title="1 if compiler supports concepts, 0 otherwise">SBEPP_HAS_ENDIAN</a> is <code>1</code>, it's just an alias to <code>std::endian</code>. Requires <a class="el" href="sbepp_8hpp.html#a9558ac0bbc3e7b40c3813566f4e3510e" title="Must be defined to either little or big when native endianness cannot be detected automatically.">SBEPP_BYTE_ORDER</a> to be defined if endianness is not detected automatically. </p>
 <table class="fieldtable">
 <tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="af318e06df8931dd69380221b420caec5aaae6635e044ac56046b2893a529b5114" name="af318e06df8931dd69380221b420caec5aaae6635e044ac56046b2893a529b5114"></a>little&#160;</td><td class="fielddoc"><p>little-endian </p>
 </td></tr>
 <tr><td class="fieldname"><a id="af318e06df8931dd69380221b420caec5ad861877da56b8b4ceb35c8cbfdf65bb4" name="af318e06df8931dd69380221b420caec5ad861877da56b8b4ceb35c8cbfdf65bb4"></a>big&#160;</td><td class="fielddoc"><p>big-endian </p>
 </td></tr>
 <tr><td class="fieldname"><a id="af318e06df8931dd69380221b420caec5a8e5f3adee38c8fccc13c1f3be0143796" name="af318e06df8931dd69380221b420caec5a8e5f3adee38c8fccc13c1f3be0143796"></a>native&#160;</td><td class="fielddoc"><p>current platform endianness </p>
+</td></tr>
+</table>
+
+</div>
+</div>
+<a id="a0ee177accf7d675a768848bb29e1512f" name="a0ee177accf7d675a768848bb29e1512f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0ee177accf7d675a768848bb29e1512f">&#9670;&#160;</a></span>eos_null</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum class <a class="el" href="#a0ee177accf7d675a768848bb29e1512f">sbepp::eos_null</a></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">strong</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Represents number of null bytes that can be added after the end-of-string by <code><a class="el" href="classsbepp_1_1detail_1_1static__array__ref.html#a1f63ff3a5b0cf99df9b632733ff507f3" title="Assigns null-terminated string.">detail::static_array_ref::assign_string()</a></code> </p>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a0ee177accf7d675a768848bb29e1512fa334c4a4c42fdb79d7ebc3e73b517e6f8" name="a0ee177accf7d675a768848bb29e1512fa334c4a4c42fdb79d7ebc3e73b517e6f8"></a>none&#160;</td><td class="fielddoc"><p>Bytes after the last string character will not be touched. Useful when underlying buffer is zero-filled. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a0ee177accf7d675a768848bb29e1512fadd5c07036f2975ff4bce568b6511d3bc" name="a0ee177accf7d675a768848bb29e1512fadd5c07036f2975ff4bce568b6511d3bc"></a>single&#160;</td><td class="fielddoc"><p>Single byte after the last string character will be set to null. Useful when decoder will look for the first null byte to calculate string length. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a0ee177accf7d675a768848bb29e1512faa181a603769c1f98ad927e7367c7aa51" name="a0ee177accf7d675a768848bb29e1512faa181a603769c1f98ad927e7367c7aa51"></a>all&#160;</td><td class="fielddoc"><p>All bytes after the last string character will be set to null. </p>
 </td></tr>
 </table>
 
@@ -921,7 +959,7 @@ template&lt;typename View &gt; </div>
 <div class="line"><span class="keyword">auto</span> c = <a class="code hl_function" href="#a399a5ac768befed2dc73396364eaa0c3">sbepp::init_const_cursor</a>(m);</div>
 <div class="line"><span class="keyword">auto</span> value = m.field(c);</div>
 <div class="line">m.field(1, c);   <span class="comment">// error: cursor has const-qualified byte type</span></div>
-<div class="ttc" id="anamespacesbepp_html_a399a5ac768befed2dc73396364eaa0c3"><div class="ttname"><a href="#a399a5ac768befed2dc73396364eaa0c3">sbepp::init_const_cursor</a></div><div class="ttdeci">constexpr cursor&lt; typename std::add_const&lt; byte_type_t&lt; View &gt; &gt;::type &gt; init_const_cursor(View view) noexcept</div><div class="ttdoc">Initializes cursor from a message/group view with const byte type.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:2776</div></div>
+<div class="ttc" id="anamespacesbepp_html_a399a5ac768befed2dc73396364eaa0c3"><div class="ttname"><a href="#a399a5ac768befed2dc73396364eaa0c3">sbepp::init_const_cursor</a></div><div class="ttdeci">constexpr cursor&lt; typename std::add_const&lt; byte_type_t&lt; View &gt; &gt;::type &gt; init_const_cursor(View view) noexcept</div><div class="ttdoc">Initializes cursor from a message/group view with const byte type.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:2796</div></div>
 </div><!-- fragment --><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">view</td><td>message or group view </td></tr>
@@ -961,7 +999,7 @@ template&lt;typename View &gt; </div>
 <p>Example: </p><div class="fragment"><div class="line">schema::messages::msg1&lt;char&gt; {ptr, size};</div>
 <div class="line"><span class="keyword">auto</span> c = <a class="code hl_function" href="#a125f1fbb9faadde1515f7822a7b6420f">sbepp::init_cursor</a>(m);</div>
 <div class="line"><span class="keyword">auto</span> value = m.field(c);</div>
-<div class="ttc" id="anamespacesbepp_html_a125f1fbb9faadde1515f7822a7b6420f"><div class="ttname"><a href="#a125f1fbb9faadde1515f7822a7b6420f">sbepp::init_cursor</a></div><div class="ttdeci">constexpr cursor&lt; byte_type_t&lt; View &gt; &gt; init_cursor(View view) noexcept</div><div class="ttdoc">Initializes cursor from a message/group view with the same byte type.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:2753</div></div>
+<div class="ttc" id="anamespacesbepp_html_a125f1fbb9faadde1515f7822a7b6420f"><div class="ttname"><a href="#a125f1fbb9faadde1515f7822a7b6420f">sbepp::init_cursor</a></div><div class="ttdeci">constexpr cursor&lt; byte_type_t&lt; View &gt; &gt; init_cursor(View view) noexcept</div><div class="ttdoc">Initializes cursor from a message/group view with the same byte type.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:2773</div></div>
 </div><!-- fragment --><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">view</td><td>message or group view </td></tr>

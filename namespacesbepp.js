@@ -89,6 +89,11 @@ var namespacesbepp =
       [ "big", "namespacesbepp.html#af318e06df8931dd69380221b420caec5ad861877da56b8b4ceb35c8cbfdf65bb4", null ],
       [ "native", "namespacesbepp.html#af318e06df8931dd69380221b420caec5a8e5f3adee38c8fccc13c1f3be0143796", null ]
     ] ],
+    [ "eos_null", "namespacesbepp.html#a0ee177accf7d675a768848bb29e1512f", [
+      [ "none", "namespacesbepp.html#a0ee177accf7d675a768848bb29e1512fa334c4a4c42fdb79d7ebc3e73b517e6f8", null ],
+      [ "single", "namespacesbepp.html#a0ee177accf7d675a768848bb29e1512fadd5c07036f2975ff4bce568b6511d3bc", null ],
+      [ "all", "namespacesbepp.html#a0ee177accf7d675a768848bb29e1512faa181a603769c1f98ad927e7367c7aa51", null ]
+    ] ],
     [ "field_presence", "namespacesbepp.html#a1ef75437d8fabab98acbec11d3702530", [
       [ "required", "namespacesbepp.html#a1ef75437d8fabab98acbec11d3702530aac67ede5a84eb5a1add7ff4440e9a485", null ],
       [ "optional", "namespacesbepp.html#a1ef75437d8fabab98acbec11d3702530ad57c24f3fe52d16e7169b912dd647f0d", null ],

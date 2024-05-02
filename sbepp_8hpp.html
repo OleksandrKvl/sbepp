@@ -123,6 +123,7 @@ $(function(){initNavTree('sbepp_8hpp.html',''); initResizable(); });
 <code>#include &lt;iterator&gt;</code><br />
 <code>#include &lt;limits&gt;</code><br />
 <code>#include &lt;type_traits&gt;</code><br />
+<code>#include &lt;initializer_list&gt;</code><br />
 </div>
 <p><a href="sbepp_8hpp_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
@@ -368,6 +369,10 @@ Macros</h2></td></tr>
 #define&#160;</td><td class="memItemRight" valign="bottom"><b>SBEPP_HAS_RANGES</b>&#160;&#160;&#160;0</td></tr>
 <tr class="memdesc:ga20ab97b68cf5613024f3d95893a7a453"><td class="mdescLeft">&#160;</td><td class="mdescRight"><code>1</code> if compiler supports ranges, <code>0</code> otherwise <br /></td></tr>
 <tr class="separator:ga20ab97b68cf5613024f3d95893a7a453"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaf02e9d1747df137b59c17f9636b79749" id="r_gaf02e9d1747df137b59c17f9636b79749"><td class="memItemLeft" align="right" valign="top">
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>SBEPP_HAS_IS_CONSTANT_EVALUATED</b>&#160;&#160;&#160;0</td></tr>
+<tr class="memdesc:gaf02e9d1747df137b59c17f9636b79749"><td class="mdescLeft">&#160;</td><td class="mdescRight"><code>1</code> if compiler supports <code>std::is_constant_evaluated()</code>, <code>0</code> otherwise <br /></td></tr>
+<tr class="separator:gaf02e9d1747df137b59c17f9636b79749"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6a9a3e2c289e8eb83bd1937c0a54b14e" id="r_a6a9a3e2c289e8eb83bd1937c0a54b14e"><td class="memItemLeft" align="right" valign="top"><a id="a6a9a3e2c289e8eb83bd1937c0a54b14e" name="a6a9a3e2c289e8eb83bd1937c0a54b14e"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><b>SBEPP_DISABLE_ASSERTS</b></td></tr>
 <tr class="memdesc:a6a9a3e2c289e8eb83bd1937c0a54b14e"><td class="mdescLeft">&#160;</td><td class="mdescRight">When defined, unconditionally disables assertions and size checks. <br /></td></tr>
@@ -507,8 +512,14 @@ Enumerations</h2></td></tr>
 , <a class="el" href="namespacesbepp.html#af318e06df8931dd69380221b420caec5ad861877da56b8b4ceb35c8cbfdf65bb4">sbepp::big</a>
 , <a class="el" href="namespacesbepp.html#af318e06df8931dd69380221b420caec5a8e5f3adee38c8fccc13c1f3be0143796">sbepp::native</a>
  }</td></tr>
-<tr class="memdesc:af318e06df8931dd69380221b420caec5"><td class="mdescLeft">&#160;</td><td class="mdescRight">represents <code>schema_traits::byte_order()</code> value type. When <a class="el" href="group__compiler-features.html#ga78585d1198487e6ba5a99e60fd422271" title="1 if compiler supports concepts, 0 otherwise">SBEPP_HAS_ENDIAN</a> is <code>1</code>, it's just an alias to <code>std::endian</code>. Requires <a class="el" href="#a9558ac0bbc3e7b40c3813566f4e3510e" title="Must be defined to either little or big when native endianness cannot be detected automatically.">SBEPP_BYTE_ORDER</a> to be defined if endianness is not detected automatically.  <a href="namespacesbepp.html#af318e06df8931dd69380221b420caec5">More...</a><br /></td></tr>
+<tr class="memdesc:af318e06df8931dd69380221b420caec5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Represents <code>schema_traits::byte_order()</code> value type. When <a class="el" href="group__compiler-features.html#ga78585d1198487e6ba5a99e60fd422271" title="1 if compiler supports concepts, 0 otherwise">SBEPP_HAS_ENDIAN</a> is <code>1</code>, it's just an alias to <code>std::endian</code>. Requires <a class="el" href="#a9558ac0bbc3e7b40c3813566f4e3510e" title="Must be defined to either little or big when native endianness cannot be detected automatically.">SBEPP_BYTE_ORDER</a> to be defined if endianness is not detected automatically.  <a href="namespacesbepp.html#af318e06df8931dd69380221b420caec5">More...</a><br /></td></tr>
 <tr class="separator:af318e06df8931dd69380221b420caec5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0ee177accf7d675a768848bb29e1512f" id="r_a0ee177accf7d675a768848bb29e1512f"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacesbepp.html#a0ee177accf7d675a768848bb29e1512f">sbepp::eos_null</a> { <a class="el" href="namespacesbepp.html#a0ee177accf7d675a768848bb29e1512fa334c4a4c42fdb79d7ebc3e73b517e6f8">sbepp::none</a>
+, <a class="el" href="namespacesbepp.html#a0ee177accf7d675a768848bb29e1512fadd5c07036f2975ff4bce568b6511d3bc">sbepp::single</a>
+, <a class="el" href="namespacesbepp.html#a0ee177accf7d675a768848bb29e1512faa181a603769c1f98ad927e7367c7aa51">sbepp::all</a>
+ }</td></tr>
+<tr class="memdesc:a0ee177accf7d675a768848bb29e1512f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Represents number of null bytes that can be added after the end-of-string by <code>detail::static_array_ref::assign_string()</code>  <a href="namespacesbepp.html#a0ee177accf7d675a768848bb29e1512f">More...</a><br /></td></tr>
+<tr class="separator:a0ee177accf7d675a768848bb29e1512f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>

@@ -9,13 +9,22 @@ var classsbepp_1_1detail_1_1static__array__ref =
     [ "size_type", "classsbepp_1_1detail_1_1static__array__ref.html#abb383b2485f0056dc2da7c7abfe25348", null ],
     [ "tag", "classsbepp_1_1detail_1_1static__array__ref.html#a8f35529c37c4d55f3a28a73996dfcf68", null ],
     [ "value_type", "classsbepp_1_1detail_1_1static__array__ref.html#a8e1cca220f7deac75b4f752714360f0a", null ],
+    [ "assign", "classsbepp_1_1detail_1_1static__array__ref.html#ae223375ae96f2b4a72cf5002c3ff38ea", null ],
+    [ "assign", "classsbepp_1_1detail_1_1static__array__ref.html#affc0a2f84dbd5fcc712f1692b7b372e0", null ],
+    [ "assign", "classsbepp_1_1detail_1_1static__array__ref.html#a65e5c092105176c368e91706e948fca0", null ],
+    [ "assign_range", "classsbepp_1_1detail_1_1static__array__ref.html#add93caee008d318e2faca8d31986f7f0", null ],
+    [ "assign_string", "classsbepp_1_1detail_1_1static__array__ref.html#a1f63ff3a5b0cf99df9b632733ff507f3", null ],
+    [ "assign_string", "classsbepp_1_1detail_1_1static__array__ref.html#acfbcf354ba60eec9135579bf059d93cd", null ],
     [ "back", "classsbepp_1_1detail_1_1static__array__ref.html#a8161979b4c364af8280eab33295a846d", null ],
     [ "begin", "classsbepp_1_1detail_1_1static__array__ref.html#a52cfd8c882748794a264f46b0e0c713d", null ],
     [ "data", "classsbepp_1_1detail_1_1static__array__ref.html#aee2ad1343a3cb7125a0f709823d49ce2", null ],
     [ "end", "classsbepp_1_1detail_1_1static__array__ref.html#abebb90c516c364c907bb12866c63d204", null ],
+    [ "fill", "classsbepp_1_1detail_1_1static__array__ref.html#acfc71a6121767e84db3c226770dab01a", null ],
     [ "front", "classsbepp_1_1detail_1_1static__array__ref.html#a286579c340a4b1e83aa172c8663ea4e4", null ],
     [ "operator[]", "classsbepp_1_1detail_1_1static__array__ref.html#a1ae586c96a448c07cf689c25b19fd029", null ],
     [ "raw", "classsbepp_1_1detail_1_1static__array__ref.html#a5dd21b7f6ea885f1a707ee3da056be14", null ],
     [ "rbegin", "classsbepp_1_1detail_1_1static__array__ref.html#addc12c2bc16cb23b01600c3e57d35ac4", null ],
-    [ "rend", "classsbepp_1_1detail_1_1static__array__ref.html#a08129031f89bb2966ed9c9bac94cd12c", null ]
+    [ "rend", "classsbepp_1_1detail_1_1static__array__ref.html#a08129031f89bb2966ed9c9bac94cd12c", null ],
+    [ "strlen", "classsbepp_1_1detail_1_1static__array__ref.html#a1e2ded095d44aead9e9d3bb51b19f24f", null ],
+    [ "strlen_r", "classsbepp_1_1detail_1_1static__array__ref.html#aba31d1b71c89e974a642de24de7c43bb", null ]
 ];

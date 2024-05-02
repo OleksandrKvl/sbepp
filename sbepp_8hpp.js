@@ -63,6 +63,7 @@ var sbepp_8hpp =
     [ "SBEPP_HAS_CONSTEXPR_ACCESSORS", "group__compiler-features.html#gadb4703db06d7882322d72f1b8b213a05", null ],
     [ "SBEPP_HAS_CONSTEXPR_ALGORITHMS", "group__compiler-features.html#gaa48282f26ded40b3c3824e08f79caea3", null ],
     [ "SBEPP_HAS_ENDIAN", "group__compiler-features.html#ga78585d1198487e6ba5a99e60fd422271", null ],
+    [ "SBEPP_HAS_IS_CONSTANT_EVALUATED", "group__compiler-features.html#gaf02e9d1747df137b59c17f9636b79749", null ],
     [ "SBEPP_HAS_RANGES", "group__compiler-features.html#ga20ab97b68cf5613024f3d95893a7a453", null ],
     [ "SBEPP_HAS_THREE_WAY_COMPARISON", "group__compiler-features.html#ga8143ff71e5eed9a6f297f71a4b40855f", null ],
     [ "block_length_t", "sbepp_8hpp.html#ac0fdcdd3dfa93ad4aaac66379da7b0c5", null ],
@@ -92,6 +93,11 @@ var sbepp_8hpp =
       [ "little", "sbepp_8hpp.html#af318e06df8931dd69380221b420caec5aaae6635e044ac56046b2893a529b5114", null ],
       [ "big", "sbepp_8hpp.html#af318e06df8931dd69380221b420caec5ad861877da56b8b4ceb35c8cbfdf65bb4", null ],
       [ "native", "sbepp_8hpp.html#af318e06df8931dd69380221b420caec5a8e5f3adee38c8fccc13c1f3be0143796", null ]
+    ] ],
+    [ "eos_null", "sbepp_8hpp.html#a0ee177accf7d675a768848bb29e1512f", [
+      [ "none", "sbepp_8hpp.html#a0ee177accf7d675a768848bb29e1512fa334c4a4c42fdb79d7ebc3e73b517e6f8", null ],
+      [ "single", "sbepp_8hpp.html#a0ee177accf7d675a768848bb29e1512fadd5c07036f2975ff4bce568b6511d3bc", null ],
+      [ "all", "sbepp_8hpp.html#a0ee177accf7d675a768848bb29e1512faa181a603769c1f98ad927e7367c7aa51", null ]
     ] ],
     [ "field_presence", "sbepp_8hpp.html#a1ef75437d8fabab98acbec11d3702530", [
       [ "required", "sbepp_8hpp.html#a1ef75437d8fabab98acbec11d3702530aac67ede5a84eb5a1add7ff4440e9a485", null ],
