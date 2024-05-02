@@ -15,6 +15,7 @@
 #include <iterator>
 #include <sstream>
 #include <string>
+#include <cstring>
 
 namespace
 {
@@ -172,6 +173,8 @@ TEST_F(DynamicArrayRefDeathTest, TerminatesIfAccessedWhileHoldsNullptr)
     ASSERT_DEATH({ empty.push_back(0); }, ".*");
     ASSERT_DEATH({ empty.pop_back(); }, ".*");
     ASSERT_DEATH({ empty.assign(1, 'x'); }, ".*");
+    ASSERT_DEATH({ empty.assign_string("abc"); }, ".*");
+    ASSERT_DEATH({ empty.assign_range(std::string{}); }, ".*");
     // other functions require iterators
 }
 
@@ -990,7 +993,7 @@ struct test_assign2
 {
     template<typename T>
     auto operator()(T obj)
-        -> decltype(obj.assign(0, (char*)nullptr, (char*)nullptr))
+        -> decltype(obj.assign((char*)nullptr, (char*)nullptr))
     {
     }
 };
@@ -1051,7 +1054,7 @@ TEST_F(DynamicArrayRefDeathTest, Assign3TerminatesIfHoldsNullptr)
     ASSERT_DEATH({ a.assign({'a', 'b'}); }, ".*");
 }
 
-TEST_F(DynamicArrayRefDeathTest, SizeBytesReturnsSizeIncludingLengthField)
+TEST_F(DynamicArrayRefTest, SizeBytesReturnsSizeIncludingLengthField)
 {
     static constexpr auto new_size = 10;
     a.resize(new_size);
@@ -1060,10 +1063,78 @@ TEST_F(DynamicArrayRefDeathTest, SizeBytesReturnsSizeIncludingLengthField)
     STATIC_ASSERT(noexcept(sbepp::size_bytes(a)));
 }
 
+TEST_F(DynamicArrayRefTest, AssignStringCopiesFromString)
+{
+    const auto str = "abc";
+    a.resize(10, 'x');
+
+    a.assign_string(str);
+
+    ASSERT_EQ(std::strlen(str), a.size());
+    ASSERT_EQ(std::memcmp(str, a.data(), a.size()), 0);
+    STATIC_ASSERT(noexcept(a.assign_string(str)));
+}
+
+struct test_assign_string
+{
+    template<typename T>
+    auto operator()(T obj) -> decltype(obj.assign_string("abc"))
+    {
+    }
+};
+
+TEST_F(DynamicArrayRefTest, AssignStringNotAvailableForConstByteType)
+{
+    STATIC_ASSERT(!sbepp::test::utils::
+                      is_invocable<test_assign_string, const_array_t>::value);
+}
+
+TEST_F(DynamicArrayRefDeathTest, AssignStringTerminatesIfStringIsTooLong)
+{
+    std::string str;
+    str.resize(g_buf_size + 1, 'x');
+
+    ASSERT_DEATH({ a.assign_string(str.c_str()); }, ".*");
+}
+
+TEST_F(DynamicArrayRefTest, AssignRangeCopiesFromRange)
+{
+    std::vector<char> range;
+    range.resize(10, 'x');
+
+    a.assign_range(range);
+
+    ASSERT_EQ(range.size(), a.size());
+    ASSERT_EQ(std::memcmp(range.data(), a.data(), a.size()), 0);
+}
+
+struct test_assign_range
+{
+    template<typename T>
+    auto operator()(T obj) -> decltype(obj.assign_range({'a', 'b'}))
+    {
+    }
+};
+
+TEST_F(DynamicArrayRefTest, AssignRangeNotAvailableForConstByteType)
+{
+    STATIC_ASSERT(!sbepp::test::utils::
+                      is_invocable<test_assign_range, const_array_t>::value);
+}
+
+TEST_F(DynamicArrayRefDeathTest, AssignRangeTerminatesIfRangeIsTooLong)
+{
+    std::vector<char> range;
+    range.resize(g_buf_size + 1, 'x');
+
+    ASSERT_DEATH({ a.assign_range(range); }, ".*");
+}
+
 #if SBEPP_HAS_CONSTEXPR_ACCESSORS
 constexpr auto constexpr_test()
 {
     std::array<byte_type, 512> buf{};
+    std::array<byte_type, 16> range{};
     array_t a1;
     a1 = array_t{buf.data(), buf.size()};
     array_t a2;
@@ -1103,6 +1174,8 @@ constexpr auto constexpr_test()
     a5.assign(1, 'a');
     a5.assign(str, str + 2);
     a5.assign({'a', 'b'});
+    a5.assign_string("abc");
+    a5.assign_range(range);
 
     return buf;
 }

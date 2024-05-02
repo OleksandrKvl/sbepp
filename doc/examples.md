@@ -71,9 +71,7 @@ m.field(3);
 m.number(market::types::numbers::Two);
 
 auto d = m.data();
-d.push_back('h');
-d.push_back('i');
-d.push_back('!');
+d.assign_string("hi!");
 
 auto g = m.group();
 sbepp::fill_group_header(g, 0);
@@ -114,9 +112,7 @@ for(const auto entry : g.cursor_range(c))
 
 // note: don't move cursor yet
 auto d = m.data(sbepp::cursor_ops::dont_move(c));
-d.push_back('h');
-d.push_back('i');
-d.push_back('!');
+d.assign_string("hi!");
 // ok, now just skip it
 m.data(sbepp::cursor_ops::skip(c));
 

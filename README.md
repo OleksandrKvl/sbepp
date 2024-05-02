@@ -85,9 +85,7 @@ for(auto entry : g)
 
 // fill data
 auto d = m.data();
-d.resize(2);
-d[0] = 'h';
-d[1] = 'i';
+d.assign_string("hi");
 
 const auto msg_size = sbepp::size_bytes(m); // get final message size
 send(buf.data(), mgs_size);
