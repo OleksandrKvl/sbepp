@@ -6,7 +6,6 @@ permissions:
 env:
   BUILD_DIR: ${{github.workspace}}/build
   SELECTOR_FILE_NAME: version_selector.html
-  SELECTOR_ID: versionSelector
   GIT_USER_NAME: 'Oleksandr Koval'
   GIT_USER_EMAIL: 'OleksandrKvl@users.noreply.github.com'
 
@@ -101,7 +100,7 @@ jobs:
           dirs=$(find . -mindepth 1 -maxdepth 1 -type d | sort -rV)
       
           # Create HTML
-          echo '<select id="$SELECTOR_ID">' > $SELECTOR_FILE_NAME
+          echo '<select id="versionSelector">' > $SELECTOR_FILE_NAME
           for dir in $dirs; do
               if [[ "$(basename "$dir")" != .* ]]; then
                   version=$(basename "$dir")
