@@ -2879,7 +2879,7 @@ constexpr bool is_constant_evaluated() noexcept
 #endif
 }
 
-inline SBEPP_CPP14_CONSTEXPR std::size_t string_length(const char* str) noexcept
+inline SBEPP_CPP20_CONSTEXPR std::size_t string_length(const char* str) noexcept
 {
     if(is_constant_evaluated())
     {
