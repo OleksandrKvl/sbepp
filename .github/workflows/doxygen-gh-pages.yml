@@ -36,9 +36,7 @@ jobs:
                 echo "$(pwd)/doxygen-1.10.0/bin" >> $GITHUB_PATH
 
       - name: CMake configure
-        run:  cmake -B $BUILD_DIR \
-          -D SBEPP_BUILD_SBEPPC=OFF \
-          -D SBEPP_BUILD_DOCS=ON
+        run:  cmake -DSBEPP_BUILD_SBEPPC=OFF -DSBEPP_BUILD_DOCS=ON -B $BUILD_DIR
 
       - name: CMake build
         run:  cmake --build $BUILD_DIR --target doc
