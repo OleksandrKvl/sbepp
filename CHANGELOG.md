@@ -1,3 +1,23 @@
+# 1.3.0
+
+- fixed optional built-in types macro.
+- provided `operator->()` for iterators.
+- removed `!empty()` pre-condition from `dynamic_array_ref::data()`.
+- made `size_bytes()` `constexpr` for composites.
+- added `size_bytes()` to message/group/data traits to predict their size.
+- added `traits_tag` to map representation types to traits tags.
+- implemented `visit()` for enums and sets.
+- deprecated `enum_to_string()` and `visit_set()`.
+- fixed dependency chain for `sbeppc` CMake helpers.
+- added basic string support in form for `assign_string()`, `assign_range()`,
+    `strlen()` and `strlen_r()`.
+- introduced multi-version documentation.
+
+Thanks to Dmytro Ovdiienko (@ujos) for his feedback that influenced most of the
+above changes.
+
+---
+
 # 1.2.0
 
 Add `sbeppc` CMake helpers. (Thanks to @ngrodzitski for the idea and initial
