@@ -27,6 +27,7 @@ set(DOXYGEN_HTML_EXTRA_FILES
     "doxygen-awesome-css/doxygen-awesome-darkmode-toggle.js"
     "doxygen-awesome-css/doxygen-awesome-paragraph-link.js"
     "doxygen-awesome-css/doxygen-awesome-interactive-toc.js"
+    "version_selector_handler.js"
 )
 set(DOXYGEN_HTML_COLORSTYLE "LIGHT")
 set(DOXYGEN_GENERATE_TREEVIEW "YES")
@@ -45,6 +46,8 @@ set(DOXYGEN_PREDEFINED
 )
 set(DOXYGEN_EXPAND_AS_DEFINED "SBEPP_BUILT_IN_IMPL")
 set(DOXYGEN_WARN_AS_ERROR "FAIL_ON_WARNINGS_PRINT")
+set(DOXYGEN_HTML_OUTPUT "${PROJECT_VERSION}")
+set(DOXYGEN_OUTPUT_DIRECTORY "docs")
 
 doxygen_add_docs(
     doc
