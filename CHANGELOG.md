@@ -1,3 +1,9 @@
+# 1.4.0
+
+- added checks to protect against using cursor accessors in a wrong order
+
+---
+
 # 1.3.0
 
 - fixed optional built-in types macro.

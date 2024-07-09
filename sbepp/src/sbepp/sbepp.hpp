@@ -862,8 +862,12 @@ public:
     SBEPP_CPP20_CONSTEXPR T get_value(
         const View view,
         const std::size_t offset,
-        const std::size_t /*absolute_offset*/) noexcept
+        const std::size_t absolute_offset) noexcept
     {
+        SBEPP_ASSERT(
+            ((view(detail::addressof_tag{}) + absolute_offset)
+             == (ptr + offset))
+            && "Wrong cursor value");
         SBEPP_SIZE_CHECK(ptr, view(detail::end_ptr_tag{}), offset, sizeof(U));
         T res{detail::get_primitive<U, E>(ptr + offset)};
         ptr += offset + sizeof(U);
@@ -874,9 +878,13 @@ public:
     SBEPP_CPP20_CONSTEXPR void set_value(
         const View view,
         const std::size_t offset,
-        const std::size_t /*absolute_offset*/,
+        const std::size_t absolute_offset,
         const T value) noexcept
     {
+        SBEPP_ASSERT(
+            ((view(detail::addressof_tag{}) + absolute_offset)
+             == (ptr + offset))
+            && "Wrong cursor value");
         SBEPP_SIZE_CHECK(ptr, view(detail::end_ptr_tag{}), offset, sizeof(T));
         detail::set_primitive<E>(ptr + offset, value);
         ptr += offset + sizeof(T);
@@ -886,8 +894,12 @@ public:
     SBEPP_CPP20_CONSTEXPR T get_last_value(
         const View view,
         const std::size_t offset,
-        const std::size_t /*absolute_offset*/) noexcept
+        const std::size_t absolute_offset) noexcept
     {
+        SBEPP_ASSERT(
+            ((view(detail::addressof_tag{}) + absolute_offset)
+             == (ptr + offset))
+            && "Wrong cursor value");
         SBEPP_SIZE_CHECK(ptr, view(detail::end_ptr_tag{}), offset, sizeof(U));
         auto res = T{detail::get_primitive<U, E>(ptr + offset)};
         ptr = view(detail::get_level_tag{})
@@ -899,9 +911,13 @@ public:
     SBEPP_CPP20_CONSTEXPR void set_last_value(
         const View view,
         const std::size_t offset,
-        const std::size_t /*absolute_offset*/,
+        const std::size_t absolute_offset,
         const T value) noexcept
     {
+        SBEPP_ASSERT(
+            ((view(detail::addressof_tag{}) + absolute_offset)
+             == (ptr + offset))
+            && "Wrong cursor value");
         SBEPP_SIZE_CHECK(ptr, view(detail::end_ptr_tag{}), offset, sizeof(T));
         detail::set_primitive<E>(ptr + offset, value);
         ptr = view(detail::get_level_tag{})
@@ -912,8 +928,12 @@ public:
     SBEPP_CPP20_CONSTEXPR Res get_static_field_view(
         const View view,
         const std::size_t offset,
-        const std::size_t /*absolute_offset*/) noexcept
+        const std::size_t absolute_offset) noexcept
     {
+        SBEPP_ASSERT(
+            ((view(detail::addressof_tag{}) + absolute_offset)
+             == (ptr + offset))
+            && "Wrong cursor value");
         SBEPP_SIZE_CHECK(ptr, view(detail::end_ptr_tag{}), offset, 0);
         Res res{ptr + offset, view(detail::end_ptr_tag{})};
         ptr += offset + res(detail::size_bytes_tag{});
@@ -924,8 +944,12 @@ public:
     SBEPP_CPP20_CONSTEXPR Res get_last_static_field_view(
         const View view,
         const std::size_t offset,
-        const std::size_t /*absolute_offset*/) noexcept
+        const std::size_t absolute_offset) noexcept
     {
+        SBEPP_ASSERT(
+            ((view(detail::addressof_tag{}) + absolute_offset)
+             == (ptr + offset))
+            && "Wrong cursor value");
         SBEPP_SIZE_CHECK(ptr, view(detail::end_ptr_tag{}), offset, 0);
         Res res{ptr + offset, view(detail::end_ptr_tag{})};
         ptr = view(detail::get_level_tag{})
@@ -957,8 +981,10 @@ public:
 
     template<typename ResView, typename View, typename Getter>
     SBEPP_CPP20_CONSTEXPR ResView
-        get_group_view(const View view, Getter&& /*getter*/) noexcept
+        get_group_view(const View view, Getter&& getter) noexcept
     {
+        SBEPP_ASSERT(
+            (getter()(detail::addressof_tag{}) == ptr) && "Wrong cursor value");
         ResView res{ptr, view(detail::end_ptr_tag{})};
         auto header = res(detail::get_header_tag{});
         ptr += header(detail::size_bytes_tag{});
@@ -967,8 +993,10 @@ public:
 
     template<typename ResView, typename View, typename Getter>
     SBEPP_CPP20_CONSTEXPR ResView
-        get_data_view(const View view, Getter&& /*getter*/) noexcept
+        get_data_view(const View view, Getter&& getter) noexcept
     {
+        SBEPP_ASSERT(
+            (getter()(detail::addressof_tag{}) == ptr) && "Wrong cursor value");
         ResView res{ptr, view(detail::end_ptr_tag{})};
         ptr += res(detail::size_bytes_tag{});
         return res;
@@ -1277,8 +1305,12 @@ public:
     SBEPP_CPP20_CONSTEXPR T get_value(
         const View view,
         const std::size_t offset,
-        const std::size_t /*absolute_offset*/) noexcept
+        const std::size_t absolute_offset) noexcept
     {
+        SBEPP_ASSERT(
+            ((view(detail::addressof_tag{}) + absolute_offset)
+             == (cursor->pointer() + offset))
+            && "Wrong cursor value");
         SBEPP_SIZE_CHECK(
             cursor->pointer(), view(end_ptr_tag{}), offset, sizeof(U));
         return T{get_primitive<U, E>(cursor->pointer() + offset)};
@@ -1288,9 +1320,13 @@ public:
     SBEPP_CPP20_CONSTEXPR void set_value(
         const View view,
         const std::size_t offset,
-        const std::size_t /*absolute_offset*/,
+        const std::size_t absolute_offset,
         const T value) noexcept
     {
+        SBEPP_ASSERT(
+            ((view(detail::addressof_tag{}) + absolute_offset)
+             == (cursor->pointer() + offset))
+            && "Wrong cursor value");
         SBEPP_SIZE_CHECK(
             cursor->pointer(), view(end_ptr_tag{}), offset, sizeof(T));
         set_primitive<E>(cursor->pointer() + offset, value);
@@ -1300,8 +1336,12 @@ public:
     SBEPP_CPP20_CONSTEXPR T get_last_value(
         const View view,
         const std::size_t offset,
-        const std::size_t /*absolute_offset*/) noexcept
+        const std::size_t absolute_offset) noexcept
     {
+        SBEPP_ASSERT(
+            ((view(detail::addressof_tag{}) + absolute_offset)
+             == (cursor->pointer() + offset))
+            && "Wrong cursor value");
         SBEPP_SIZE_CHECK(
             cursor->pointer(), view(end_ptr_tag{}), offset, sizeof(U));
         return T{get_primitive<U, E>(cursor->pointer() + offset)};
@@ -1311,9 +1351,13 @@ public:
     SBEPP_CPP20_CONSTEXPR void set_last_value(
         const View view,
         const std::size_t offset,
-        const std::size_t /*absolute_offset*/,
+        const std::size_t absolute_offset,
         const T value) noexcept
     {
+        SBEPP_ASSERT(
+            ((view(detail::addressof_tag{}) + absolute_offset)
+             == (cursor->pointer() + offset))
+            && "Wrong cursor value");
         SBEPP_SIZE_CHECK(
             cursor->pointer(), view(end_ptr_tag{}), offset, sizeof(T));
         set_primitive<E>(cursor->pointer() + offset, value);
@@ -1323,8 +1367,12 @@ public:
     SBEPP_CPP20_CONSTEXPR Res get_static_field_view(
         const View view,
         const std::size_t offset,
-        const std::size_t /*absolute_offset*/) noexcept
+        const std::size_t absolute_offset) noexcept
     {
+        SBEPP_ASSERT(
+            ((view(detail::addressof_tag{}) + absolute_offset)
+             == (cursor->pointer() + offset))
+            && "Wrong cursor value");
         SBEPP_SIZE_CHECK(cursor->pointer(), view(end_ptr_tag{}), offset, 0);
         return {cursor->pointer() + offset, view(end_ptr_tag{})};
     }
@@ -1333,8 +1381,12 @@ public:
     SBEPP_CPP20_CONSTEXPR Res get_last_static_field_view(
         const View view,
         const std::size_t offset,
-        const std::size_t /*absolute_offset*/) noexcept
+        const std::size_t absolute_offset) noexcept
     {
+        SBEPP_ASSERT(
+            ((view(detail::addressof_tag{}) + absolute_offset)
+             == (cursor->pointer() + offset))
+            && "Wrong cursor value");
         SBEPP_SIZE_CHECK(cursor->pointer(), view(end_ptr_tag{}), offset, 0);
         return {cursor->pointer() + offset, view(end_ptr_tag{})};
     }
@@ -1361,15 +1413,21 @@ public:
 
     template<typename ResView, typename View, typename Getter>
     SBEPP_CPP20_CONSTEXPR ResView
-        get_group_view(const View view, Getter&& /*getter*/) noexcept
+        get_group_view(const View view, Getter&& getter) noexcept
     {
+        SBEPP_ASSERT(
+            (getter()(detail::addressof_tag{}) == cursor->pointer())
+            && "Wrong cursor value");
         return {cursor->pointer(), view(end_ptr_tag{})};
     }
 
     template<typename ResView, typename View, typename Getter>
     SBEPP_CPP20_CONSTEXPR ResView
-        get_data_view(const View view, Getter&& /*getter*/) noexcept
+        get_data_view(const View view, Getter&& getter) noexcept
     {
+        SBEPP_ASSERT(
+            (getter()(detail::addressof_tag{}) == cursor->pointer())
+            && "Wrong cursor value");
         return {cursor->pointer(), view(end_ptr_tag{})};
     }
 
@@ -1397,8 +1455,12 @@ public:
     SBEPP_CPP20_CONSTEXPR void get_value(
         const View view,
         const std::size_t offset,
-        const std::size_t /*absolute_offset*/) noexcept
+        const std::size_t absolute_offset) noexcept
     {
+        SBEPP_ASSERT(
+            ((view(detail::addressof_tag{}) + absolute_offset)
+             == (cursor->pointer() + offset))
+            && "Wrong cursor value");
         SBEPP_SIZE_CHECK(
             cursor->pointer(), view(end_ptr_tag{}), offset, sizeof(U));
         cursor->pointer() += offset + sizeof(U);
@@ -1408,8 +1470,12 @@ public:
     SBEPP_CPP20_CONSTEXPR void get_last_value(
         const View view,
         const std::size_t offset,
-        const std::size_t /*absolute_offset*/) noexcept
+        const std::size_t absolute_offset) noexcept
     {
+        SBEPP_ASSERT(
+            ((view(detail::addressof_tag{}) + absolute_offset)
+             == (cursor->pointer() + offset))
+            && "Wrong cursor value");
         SBEPP_SIZE_CHECK(
             cursor->pointer(), view(end_ptr_tag{}), offset, sizeof(U));
         cursor->pointer() =
@@ -1420,8 +1486,12 @@ public:
     SBEPP_CPP20_CONSTEXPR void get_static_field_view(
         const View view,
         const std::size_t offset,
-        const std::size_t /*absolute_offset*/) noexcept
+        const std::size_t absolute_offset) noexcept
     {
+        SBEPP_ASSERT(
+            ((view(detail::addressof_tag{}) + absolute_offset)
+             == (cursor->pointer() + offset))
+            && "Wrong cursor value");
         SBEPP_SIZE_CHECK(cursor->pointer(), view(end_ptr_tag{}), offset, 0);
         Res res{cursor->pointer(), view(end_ptr_tag{})};
         cursor->pointer() += offset + res(size_bytes_tag{});
@@ -1431,8 +1501,12 @@ public:
     SBEPP_CPP20_CONSTEXPR void get_last_static_field_view(
         const View view,
         const std::size_t offset,
-        const std::size_t /*absolute_offset*/) noexcept
+        const std::size_t absolute_offset) noexcept
     {
+        SBEPP_ASSERT(
+            ((view(detail::addressof_tag{}) + absolute_offset)
+             == (cursor->pointer() + offset))
+            && "Wrong cursor value");
         SBEPP_SIZE_CHECK(cursor->pointer(), view(end_ptr_tag{}), offset, 0);
         cursor->pointer() =
             view(get_level_tag{}) + view(get_block_length_tag{});
@@ -1458,16 +1532,22 @@ public:
 
     template<typename ResView, typename View, typename Getter>
     SBEPP_CPP20_CONSTEXPR void
-        get_group_view(const View view, Getter&& /*getter*/) noexcept
+        get_group_view(const View view, Getter&& getter) noexcept
     {
+        SBEPP_ASSERT(
+            (getter()(detail::addressof_tag{}) == cursor->pointer())
+            && "Wrong cursor value");
         ResView res{cursor->pointer(), view(end_ptr_tag{})};
         cursor->pointer() += res(size_bytes_tag{});
     }
 
     template<typename ResView, typename View, typename Getter>
     SBEPP_CPP20_CONSTEXPR void
-        get_data_view(const View view, Getter&& /*getter*/) noexcept
+        get_data_view(const View view, Getter&& getter) noexcept
     {
+        SBEPP_ASSERT(
+            (getter()(detail::addressof_tag{}) == cursor->pointer())
+            && "Wrong cursor value");
         ResView res{cursor->pointer(), view(end_ptr_tag{})};
         cursor->pointer() += res(size_bytes_tag{});
     }
