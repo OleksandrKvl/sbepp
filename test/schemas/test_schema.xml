@@ -501,4 +501,32 @@
         <data name="varData" id="9" type="varDataEncoding"/>
         <data name="varStr" id="10" type="varStrEncoding"/>
     </sbe:message>
+
+    <!-- cursor value checks -->
+    <sbe:message name="msg29" id="29">
+        <field name="number" id="1" type="uint32_req"/>
+        <field name="array" id="2" type="str128"/>
+        <field name="enumeration" id="3" type="numbers_enum"/>
+        <field name="set" id="4" type="options_set"/>
+        <field name="composite" id="5" type="composite_a"/>
+
+        <!-- cursor is always initialized from scratch for the first group/data
+        so we need to introduce the extra group before the target one -->
+        <group name="first_group" id="60"/>
+
+        <group name="group" id="6">
+            <field name="number" id="1" type="uint32_req"/>
+            <field name="array" id="2" type="str128"/>
+            <field name="enumeration" id="3" type="numbers_enum"/>
+            <field name="set" id="4" type="options_set"/>
+            <field name="composite" id="5" type="composite_a"/>
+
+            <group name="first_group" id="60"/>
+            <group name="group" id="6"/>
+
+            <data name="data" id="7" type="varDataEncoding"/>
+        </group>
+
+        <data name="data" id="7" type="varDataEncoding"/>
+    </sbe:message>
 </sbe:messageSchema>

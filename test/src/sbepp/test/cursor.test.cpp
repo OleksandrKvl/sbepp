@@ -16,6 +16,7 @@
 #    include <test_schema/messages/msg11.hpp>
 #    include <test_schema/messages/msg12.hpp>
 #    include <test_schema/messages/msg13.hpp>
+#    include <test_schema/messages/msg29.hpp>
 #endif
 
 #include <sbepp/test/utils.hpp>
@@ -1852,11 +1853,11 @@ TEST_F(CursorTest, ViewAccessorReturnViewWithSameByteTypeAsCursor)
     auto group = m2.flat_group(sbepp::cursor_ops::init(c));
     auto data = m2.data(sbepp::cursor_ops::init(c));
 
-    STATIC_ASSERT_V(std::is_same<
-                    decltype(group),
-                    sbepp::group_traits<
-                        test_schema::schema::messages::msg12::flat_group>::
-                        value_type<cursor_byte_type>>);
+    STATIC_ASSERT_V(
+        std::is_same<
+            decltype(group),
+            sbepp::group_traits<test_schema::schema::messages::msg12::
+                                    flat_group>::value_type<cursor_byte_type>>);
     STATIC_ASSERT_V(
         std::is_same<
             decltype(data),
@@ -2112,6 +2113,202 @@ TEST_F(
         ".*");
 }
 
+template<typename Level, typename Cursor>
+struct level_cursor_pair
+{
+    using level_t = Level;
+    using cursor_t = Cursor;
+};
+
+// simple wrapper to initialize `block_length` parameter of entry's constructor
+// to make it constructible from pointer+size
+template<typename Byte>
+class entry_wrapper
+    : public sbepp::group_traits<
+          test_schema::schema::messages::msg29::group>::entry_type<Byte>
+{
+public:
+    using base_t = sbepp::group_traits<
+        test_schema::schema::messages::msg29::group>::entry_type<Byte>;
+
+    constexpr entry_wrapper(Byte* ptr, const std::size_t size)
+        : base_t{
+              ptr,
+              size,
+              sbepp::group_traits<
+                  test_schema::schema::messages::msg29::group>::block_length()}
+    {
+    }
+};
+
+using WriteEnabledCursors = ::testing::Types<
+    level_cursor_pair<
+        test_schema::messages::msg29<byte_type>,
+        sbepp::cursor<byte_type>>,
+    // level_cursor_pair<
+    //     test_schema::messages::msg29<byte_type>,
+    //     sbepp::detail::skip_cursor_wrapper<byte_type>>,
+    level_cursor_pair<
+        test_schema::messages::msg29<byte_type>,
+        sbepp::detail::dont_move_cursor_wrapper<byte_type>>,
+    level_cursor_pair<entry_wrapper<byte_type>, sbepp::cursor<byte_type>>,
+    // level_cursor_pair<
+    //     entry_wrapper<byte_type>,
+    //     sbepp::detail::skip_cursor_wrapper<byte_type>>,
+    level_cursor_pair<
+        entry_wrapper<byte_type>,
+        sbepp::detail::dont_move_cursor_wrapper<byte_type>>>;
+
+using SkipCursors = ::testing::Types<
+    level_cursor_pair<
+        test_schema::messages::msg29<byte_type>,
+        sbepp::detail::skip_cursor_wrapper<byte_type>>,
+    level_cursor_pair<
+        entry_wrapper<byte_type>,
+        sbepp::detail::skip_cursor_wrapper<byte_type>>>;
+
+template<typename LevelCursorPair>
+class MessageLevel : public ::testing::Test
+{
+public:
+    using cursor_wrapper_t = typename LevelCursorPair::cursor_t;
+
+    std::array<byte_type, 256> buf{};
+    typename LevelCursorPair::level_t level{buf.data(), buf.size()};
+    cursor_t c;
+};
+
+template<typename T>
+using CursorChecksDeathTest = MessageLevel<T>;
+
+template<typename T>
+using CursorChecksDeathTest2 = CursorChecksDeathTest<T>;
+
+TYPED_TEST_SUITE(CursorChecksDeathTest, WriteEnabledCursors);
+TYPED_TEST_SUITE(CursorChecksDeathTest2, SkipCursors);
+
+TYPED_TEST(CursorChecksDeathTest, TerminatesIfCursorHasWrongValue)
+{
+    const auto& l = this->level;
+    auto& c = this->c;
+    using cursor_wrapper_t = typename TestFixture::cursor_wrapper_t;
+    static constexpr auto enum_value = test_schema::types::numbers_enum::One;
+    static constexpr auto set_value = test_schema::types::options_set{};
+
+    // initializing the cursor ensures that it's non-null but it will point to
+    // the next field so accessing the same field again should fail
+    ASSERT_DEATH(
+        {
+            l.number(sbepp::cursor_ops::init(c));
+            l.number(cursor_wrapper_t{c});
+        },
+        ".*");
+    ASSERT_DEATH(
+        {
+            l.number(sbepp::cursor_ops::init(c));
+            l.number(0, cursor_wrapper_t{c});
+        },
+        ".*");
+    ASSERT_DEATH(
+        {
+            l.array(sbepp::cursor_ops::init(c));
+            l.array(cursor_wrapper_t{c});
+        },
+        ".*");
+    ASSERT_DEATH(
+        {
+            l.enumeration(sbepp::cursor_ops::init(c));
+            l.enumeration(cursor_wrapper_t{c});
+        },
+        ".*");
+    ASSERT_DEATH(
+        {
+            l.enumeration(sbepp::cursor_ops::init(c));
+            l.enumeration(enum_value, cursor_wrapper_t{c});
+        },
+        ".*");
+    ASSERT_DEATH(
+        {
+            l.set(sbepp::cursor_ops::init(c));
+            l.set(cursor_wrapper_t{c});
+        },
+        ".*");
+    ASSERT_DEATH(
+        {
+            l.set(sbepp::cursor_ops::init(c));
+            l.set(set_value, cursor_wrapper_t{c});
+        },
+        ".*");
+    ASSERT_DEATH(
+        {
+            l.composite(sbepp::cursor_ops::init(c));
+            l.composite(cursor_wrapper_t{c});
+        },
+        ".*");
+    ASSERT_DEATH(
+        {
+            l.group(sbepp::cursor_ops::init(c));
+            l.group(cursor_wrapper_t{c});
+        },
+        ".*");
+    ASSERT_DEATH(
+        {
+            l.data(sbepp::cursor_ops::init(c));
+            l.data(cursor_wrapper_t{c});
+        },
+        ".*");
+}
+
+TYPED_TEST(CursorChecksDeathTest2, TerminatesIfCursorHasWrongValue)
+{
+    const auto& l = this->level;
+    auto& c = this->c;
+    using cursor_wrapper_t = typename TestFixture::cursor_wrapper_t;
+
+    ASSERT_DEATH(
+        {
+            l.number(sbepp::cursor_ops::init(c));
+            l.number(cursor_wrapper_t{c});
+        },
+        ".*");
+    ASSERT_DEATH(
+        {
+            l.array(sbepp::cursor_ops::init(c));
+            l.array(cursor_wrapper_t{c});
+        },
+        ".*");
+    ASSERT_DEATH(
+        {
+            l.enumeration(sbepp::cursor_ops::init(c));
+            l.enumeration(cursor_wrapper_t{c});
+        },
+        ".*");
+    ASSERT_DEATH(
+        {
+            l.set(sbepp::cursor_ops::init(c));
+            l.set(cursor_wrapper_t{c});
+        },
+        ".*");
+    ASSERT_DEATH(
+        {
+            l.composite(sbepp::cursor_ops::init(c));
+            l.composite(cursor_wrapper_t{c});
+        },
+        ".*");
+    ASSERT_DEATH(
+        {
+            l.group(sbepp::cursor_ops::init(c));
+            l.group(cursor_wrapper_t{c});
+        },
+        ".*");
+    ASSERT_DEATH(
+        {
+            l.data(sbepp::cursor_ops::init(c));
+            l.data(cursor_wrapper_t{c});
+        },
+        ".*");
+}
+
 #if SBEPP_HAS_CONSTEXPR_ACCESSORS
 constexpr auto constexpr_test1()
 {
@@ -2123,46 +2320,51 @@ constexpr auto constexpr_test1()
 
     m.number(c);
     m.number(sbepp::cursor_ops::init(c));
-    m.number(sbepp::cursor_ops::dont_move(c));
     m.number(sbepp::cursor_ops::init_dont_move(c));
+    m.number(sbepp::cursor_ops::dont_move(c));
     m.number(sbepp::cursor_ops::skip(c));
-    m.composite(c);
-    m.composite(sbepp::cursor_ops::init(c));
-    m.composite(sbepp::cursor_ops::dont_move(c));
-    m.composite(sbepp::cursor_ops::init_dont_move(c));
-    m.composite(sbepp::cursor_ops::skip(c));
+    m.array(c);
+    m.array(sbepp::cursor_ops::init(c));
+    m.array(sbepp::cursor_ops::init_dont_move(c));
+    m.array(sbepp::cursor_ops::dont_move(c));
+    m.array(sbepp::cursor_ops::skip(c));
     m.enumeration(c);
     m.enumeration(sbepp::cursor_ops::init(c));
-    m.enumeration(sbepp::cursor_ops::dont_move(c));
     m.enumeration(sbepp::cursor_ops::init_dont_move(c));
+    m.enumeration(sbepp::cursor_ops::dont_move(c));
     m.enumeration(sbepp::cursor_ops::skip(c));
     m.set(c);
     m.set(sbepp::cursor_ops::init(c));
-    m.set(sbepp::cursor_ops::dont_move(c));
     m.set(sbepp::cursor_ops::init_dont_move(c));
+    m.set(sbepp::cursor_ops::dont_move(c));
     m.set(sbepp::cursor_ops::skip(c));
     m.composite(c);
     m.composite(sbepp::cursor_ops::init(c));
-    m.composite(sbepp::cursor_ops::dont_move(c));
     m.composite(sbepp::cursor_ops::init_dont_move(c));
+    m.composite(sbepp::cursor_ops::dont_move(c));
     m.composite(sbepp::cursor_ops::skip(c));
+    m.number(1, sbepp::cursor_ops::init_dont_move(c));
     m.number(1, c);
     m.number(1, sbepp::cursor_ops::init(c));
-    m.number(1, sbepp::cursor_ops::dont_move(c));
     m.number(1, sbepp::cursor_ops::init_dont_move(c));
+    m.number(1, sbepp::cursor_ops::dont_move(c));
+    m.enumeration(
+        test_schema::types::numbers_enum::One,
+        sbepp::cursor_ops::init_dont_move(c));
     m.enumeration(test_schema::types::numbers_enum::One, c);
     m.enumeration(
         test_schema::types::numbers_enum::One, sbepp::cursor_ops::init(c));
     m.enumeration(
-        test_schema::types::numbers_enum::One, sbepp::cursor_ops::dont_move(c));
-    m.enumeration(
         test_schema::types::numbers_enum::One,
         sbepp::cursor_ops::init_dont_move(c));
+    m.enumeration(
+        test_schema::types::numbers_enum::One, sbepp::cursor_ops::dont_move(c));
     auto set = m.set().A(true).B(true);
+    m.set(set, sbepp::cursor_ops::init_dont_move(c));
     m.set(set, c);
     m.set(set, sbepp::cursor_ops::init(c));
-    m.set(set, sbepp::cursor_ops::dont_move(c));
     m.set(set, sbepp::cursor_ops::init_dont_move(c));
+    m.set(set, sbepp::cursor_ops::dont_move(c));
 
     auto g = m.group(c);
     sbepp::fill_group_header(g, 3);
@@ -2173,47 +2375,52 @@ constexpr auto constexpr_test1()
     {
         entry.number(c);
         entry.number(sbepp::cursor_ops::init(c));
-        entry.number(sbepp::cursor_ops::dont_move(c));
         entry.number(sbepp::cursor_ops::init_dont_move(c));
+        entry.number(sbepp::cursor_ops::dont_move(c));
         entry.number(sbepp::cursor_ops::skip(c));
-        entry.composite(c);
-        entry.composite(sbepp::cursor_ops::init(c));
-        entry.composite(sbepp::cursor_ops::dont_move(c));
-        entry.composite(sbepp::cursor_ops::init_dont_move(c));
-        entry.composite(sbepp::cursor_ops::skip(c));
+        entry.array(c);
+        entry.array(sbepp::cursor_ops::init(c));
+        entry.array(sbepp::cursor_ops::init_dont_move(c));
+        entry.array(sbepp::cursor_ops::dont_move(c));
+        entry.array(sbepp::cursor_ops::skip(c));
         entry.enumeration(c);
         entry.enumeration(sbepp::cursor_ops::init(c));
-        entry.enumeration(sbepp::cursor_ops::dont_move(c));
         entry.enumeration(sbepp::cursor_ops::init_dont_move(c));
+        entry.enumeration(sbepp::cursor_ops::dont_move(c));
         entry.enumeration(sbepp::cursor_ops::skip(c));
         entry.set(c);
         entry.set(sbepp::cursor_ops::init(c));
-        entry.set(sbepp::cursor_ops::dont_move(c));
         entry.set(sbepp::cursor_ops::init_dont_move(c));
+        entry.set(sbepp::cursor_ops::dont_move(c));
         entry.set(sbepp::cursor_ops::skip(c));
         entry.composite(c);
         entry.composite(sbepp::cursor_ops::init(c));
-        entry.composite(sbepp::cursor_ops::dont_move(c));
         entry.composite(sbepp::cursor_ops::init_dont_move(c));
+        entry.composite(sbepp::cursor_ops::dont_move(c));
         entry.composite(sbepp::cursor_ops::skip(c));
+        entry.number(1, sbepp::cursor_ops::init_dont_move(c));
         entry.number(1, c);
         entry.number(1, sbepp::cursor_ops::init(c));
-        entry.number(1, sbepp::cursor_ops::dont_move(c));
         entry.number(1, sbepp::cursor_ops::init_dont_move(c));
+        entry.number(1, sbepp::cursor_ops::dont_move(c));
+        entry.enumeration(
+            test_schema::types::numbers_enum::One,
+            sbepp::cursor_ops::init_dont_move(c));
         entry.enumeration(test_schema::types::numbers_enum::One, c);
         entry.enumeration(
             test_schema::types::numbers_enum::One, sbepp::cursor_ops::init(c));
         entry.enumeration(
             test_schema::types::numbers_enum::One,
-            sbepp::cursor_ops::dont_move(c));
+            sbepp::cursor_ops::init_dont_move(c));
         entry.enumeration(
             test_schema::types::numbers_enum::One,
-            sbepp::cursor_ops::init_dont_move(c));
+            sbepp::cursor_ops::dont_move(c));
         auto set = entry.set().A(true).B(true);
+        entry.set(set, sbepp::cursor_ops::init_dont_move(c));
         entry.set(set, c);
         entry.set(set, sbepp::cursor_ops::init(c));
-        entry.set(set, sbepp::cursor_ops::dont_move(c));
         entry.set(set, sbepp::cursor_ops::init_dont_move(c));
+        entry.set(set, sbepp::cursor_ops::dont_move(c));
 
         auto g = entry.group(c);
         sbepp::fill_group_header(g, 3);
@@ -2221,26 +2428,26 @@ constexpr auto constexpr_test1()
         g.cursor_subrange(c, 0);
         g.cursor_subrange(c, 0, 0);
         entry.group(sbepp::cursor_ops::init(c));
-        entry.group(sbepp::cursor_ops::dont_move(c));
         entry.group(sbepp::cursor_ops::init_dont_move(c));
+        entry.group(sbepp::cursor_ops::dont_move(c));
         entry.group(sbepp::cursor_ops::skip(c));
 
         entry.data(c);
         entry.data(sbepp::cursor_ops::init(c));
-        entry.data(sbepp::cursor_ops::dont_move(c));
         entry.data(sbepp::cursor_ops::init_dont_move(c));
+        entry.data(sbepp::cursor_ops::dont_move(c));
         entry.data(sbepp::cursor_ops::skip(c));
     }
 
     m.group(sbepp::cursor_ops::init(c));
-    m.group(sbepp::cursor_ops::dont_move(c));
     m.group(sbepp::cursor_ops::init_dont_move(c));
+    m.group(sbepp::cursor_ops::dont_move(c));
     m.group(sbepp::cursor_ops::skip(c));
 
     m.data(c);
     m.data(sbepp::cursor_ops::init(c));
-    m.data(sbepp::cursor_ops::dont_move(c));
     m.data(sbepp::cursor_ops::init_dont_move(c));
+    m.data(sbepp::cursor_ops::dont_move(c));
     m.data(sbepp::cursor_ops::skip(c));
 
     sbepp::size_bytes(m, c);
@@ -2257,23 +2464,26 @@ constexpr auto constexpr_test2()
 
     m.number1(c);
     m.number1(sbepp::cursor_ops::init(c));
-    m.number1(sbepp::cursor_ops::dont_move(c));
     m.number1(sbepp::cursor_ops::init_dont_move(c));
+    m.number1(sbepp::cursor_ops::dont_move(c));
     m.number1(sbepp::cursor_ops::skip(c));
+    m.number1(1, sbepp::cursor_ops::init_dont_move(c));
     m.number1(1, c);
     m.number1(1, sbepp::cursor_ops::init(c));
-    m.number1(1, sbepp::cursor_ops::dont_move(c));
     m.number1(1, sbepp::cursor_ops::init_dont_move(c));
+    m.number1(1, sbepp::cursor_ops::dont_move(c));
 
+    m.number2(sbepp::cursor_ops::init_dont_move(c));
     m.number2(c);
     m.number2(sbepp::cursor_ops::init(c));
-    m.number2(sbepp::cursor_ops::dont_move(c));
     m.number2(sbepp::cursor_ops::init_dont_move(c));
+    m.number2(sbepp::cursor_ops::dont_move(c));
     m.number2(sbepp::cursor_ops::skip(c));
+    m.number2(1, sbepp::cursor_ops::init_dont_move(c));
     m.number2(1, c);
     m.number2(1, sbepp::cursor_ops::init(c));
-    m.number2(1, sbepp::cursor_ops::dont_move(c));
     m.number2(1, sbepp::cursor_ops::init_dont_move(c));
+    m.number2(1, sbepp::cursor_ops::dont_move(c));
 
     return buf;
 }
@@ -2287,31 +2497,38 @@ constexpr auto constexpr_test3()
 
     m.enumeration1(c);
     m.enumeration1(sbepp::cursor_ops::init(c));
-    m.enumeration1(sbepp::cursor_ops::dont_move(c));
     m.enumeration1(sbepp::cursor_ops::init_dont_move(c));
+    m.enumeration1(sbepp::cursor_ops::dont_move(c));
     m.enumeration1(sbepp::cursor_ops::skip(c));
+    m.enumeration1(
+        test_schema::types::numbers_enum::One,
+        sbepp::cursor_ops::init_dont_move(c));
     m.enumeration1(test_schema::types::numbers_enum::One, c);
     m.enumeration1(
         test_schema::types::numbers_enum::One, sbepp::cursor_ops::init(c));
     m.enumeration1(
-        test_schema::types::numbers_enum::One, sbepp::cursor_ops::dont_move(c));
-    m.enumeration1(
         test_schema::types::numbers_enum::One,
         sbepp::cursor_ops::init_dont_move(c));
+    m.enumeration1(
+        test_schema::types::numbers_enum::One, sbepp::cursor_ops::dont_move(c));
 
+    m.enumeration2(sbepp::cursor_ops::init_dont_move(c));
     m.enumeration2(c);
     m.enumeration2(sbepp::cursor_ops::init(c));
-    m.enumeration2(sbepp::cursor_ops::dont_move(c));
     m.enumeration2(sbepp::cursor_ops::init_dont_move(c));
+    m.enumeration2(sbepp::cursor_ops::dont_move(c));
     m.enumeration2(sbepp::cursor_ops::skip(c));
+    m.enumeration2(
+        test_schema::types::numbers_enum::One,
+        sbepp::cursor_ops::init_dont_move(c));
     m.enumeration2(test_schema::types::numbers_enum::One, c);
     m.enumeration2(
         test_schema::types::numbers_enum::One, sbepp::cursor_ops::init(c));
     m.enumeration2(
-        test_schema::types::numbers_enum::One, sbepp::cursor_ops::dont_move(c));
-    m.enumeration2(
         test_schema::types::numbers_enum::One,
         sbepp::cursor_ops::init_dont_move(c));
+    m.enumeration2(
+        test_schema::types::numbers_enum::One, sbepp::cursor_ops::dont_move(c));
 
     return buf;
 }
@@ -2327,23 +2544,26 @@ constexpr auto constexpr_test4()
 
     m.set1(c);
     m.set1(sbepp::cursor_ops::init(c));
-    m.set1(sbepp::cursor_ops::dont_move(c));
     m.set1(sbepp::cursor_ops::init_dont_move(c));
+    m.set1(sbepp::cursor_ops::dont_move(c));
     m.set1(sbepp::cursor_ops::skip(c));
+    m.set1(s, sbepp::cursor_ops::init_dont_move(c));
     m.set1(s, c);
     m.set1(s, sbepp::cursor_ops::init(c));
-    m.set1(s, sbepp::cursor_ops::dont_move(c));
     m.set1(s, sbepp::cursor_ops::init_dont_move(c));
+    m.set1(s, sbepp::cursor_ops::dont_move(c));
 
+    m.set2(sbepp::cursor_ops::init_dont_move(c));
     m.set2(c);
     m.set2(sbepp::cursor_ops::init(c));
-    m.set2(sbepp::cursor_ops::dont_move(c));
     m.set2(sbepp::cursor_ops::init_dont_move(c));
+    m.set2(sbepp::cursor_ops::dont_move(c));
     m.set2(sbepp::cursor_ops::skip(c));
+    m.set2(s, sbepp::cursor_ops::init_dont_move(c));
     m.set2(s, c);
     m.set2(s, sbepp::cursor_ops::init(c));
-    m.set2(s, sbepp::cursor_ops::dont_move(c));
     m.set2(s, sbepp::cursor_ops::init_dont_move(c));
+    m.set2(s, sbepp::cursor_ops::dont_move(c));
 
     return buf;
 }
@@ -2357,14 +2577,14 @@ constexpr auto constexpr_test5()
 
     m.array1(c);
     m.array1(sbepp::cursor_ops::init(c));
-    m.array1(sbepp::cursor_ops::dont_move(c));
     m.array1(sbepp::cursor_ops::init_dont_move(c));
+    m.array1(sbepp::cursor_ops::dont_move(c));
     m.array1(sbepp::cursor_ops::skip(c));
 
     m.array2(c);
     m.array2(sbepp::cursor_ops::init(c));
-    m.array2(sbepp::cursor_ops::dont_move(c));
     m.array2(sbepp::cursor_ops::init_dont_move(c));
+    m.array2(sbepp::cursor_ops::dont_move(c));
     m.array2(sbepp::cursor_ops::skip(c));
 
     return buf;
@@ -2378,16 +2598,16 @@ constexpr auto constexpr_test6()
     auto c = sbepp::init_cursor(m);
 
     m.composite1(c);
-    m.composite1(sbepp::cursor_ops::init(c));
-    m.composite1(sbepp::cursor_ops::dont_move(c));
     m.composite1(sbepp::cursor_ops::init_dont_move(c));
+    m.composite1(sbepp::cursor_ops::dont_move(c));
     m.composite1(sbepp::cursor_ops::skip(c));
+    m.composite1(sbepp::cursor_ops::init(c));
 
     m.composite2(c);
-    m.composite2(sbepp::cursor_ops::init(c));
-    m.composite2(sbepp::cursor_ops::dont_move(c));
     m.composite2(sbepp::cursor_ops::init_dont_move(c));
+    m.composite2(sbepp::cursor_ops::dont_move(c));
     m.composite2(sbepp::cursor_ops::skip(c));
+    m.composite2(sbepp::cursor_ops::init(c));
 
     return buf;
 }
@@ -2403,8 +2623,8 @@ constexpr auto constexpr_test7()
 
     auto g1 = m.group1(c);
     m.group1(sbepp::cursor_ops::init(c));
-    m.group1(sbepp::cursor_ops::dont_move(c));
     m.group1(sbepp::cursor_ops::init_dont_move(c));
+    m.group1(sbepp::cursor_ops::dont_move(c));
     m.group1(sbepp::cursor_ops::skip(c));
     sbepp::fill_group_header(g1, 3);
     g1.cursor_range(c);
@@ -2415,10 +2635,11 @@ constexpr auto constexpr_test7()
         (void)entry;
     }
 
+    m.group2(sbepp::cursor_ops::init_dont_move(c));
     auto g2 = m.group2(c);
     m.group2(sbepp::cursor_ops::init(c));
-    m.group2(sbepp::cursor_ops::dont_move(c));
     m.group2(sbepp::cursor_ops::init_dont_move(c));
+    m.group2(sbepp::cursor_ops::dont_move(c));
     m.group2(sbepp::cursor_ops::skip(c));
     sbepp::fill_group_header(g2, 3);
     g2.cursor_range(c);
@@ -2443,14 +2664,15 @@ constexpr auto constexpr_test8()
 
     m.data1(c);
     m.data1(sbepp::cursor_ops::init(c));
-    m.data1(sbepp::cursor_ops::dont_move(c));
     m.data1(sbepp::cursor_ops::init_dont_move(c));
+    m.data1(sbepp::cursor_ops::dont_move(c));
     m.data1(sbepp::cursor_ops::skip(c));
 
+    m.data2(sbepp::cursor_ops::init_dont_move(c));
     m.data2(c);
     m.data2(sbepp::cursor_ops::init(c));
-    m.data2(sbepp::cursor_ops::dont_move(c));
     m.data2(sbepp::cursor_ops::init_dont_move(c));
+    m.data2(sbepp::cursor_ops::dont_move(c));
     m.data2(sbepp::cursor_ops::skip(c));
 
     return buf;
