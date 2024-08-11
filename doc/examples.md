@@ -141,7 +141,7 @@ auto m = sbepp::make_const_view<market::messages::msg>(buf.data(), buf.size());
 
 // let's pretend we got this buffer from an untrusted network and want to be
 // sure that the message is fully contained within given buffer.
-auto checked_size = sbepp::size_bytes_checked(m);
+auto checked_size = sbepp::size_bytes_checked(m, buf.size());
 if(!checked_size.valid)
 {
     std::cerr << "bad message\n";
