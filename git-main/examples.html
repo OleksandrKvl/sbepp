@@ -246,7 +246,7 @@ Decoding a message using normal accessors</h1>
 <div class="line"> </div>
 <div class="line"><span class="comment">// let&#39;s pretend we got this buffer from an untrusted network and want to be</span></div>
 <div class="line"><span class="comment">// sure that the message is fully contained within given buffer.</span></div>
-<div class="line"><span class="keyword">auto</span> checked_size = <a class="code hl_function" href="namespacesbepp.html#abd9c1efb3c96d6fa71d1156811b47fa4">sbepp::size_bytes_checked</a>(m);</div>
+<div class="line"><span class="keyword">auto</span> checked_size = <a class="code hl_function" href="namespacesbepp.html#abd9c1efb3c96d6fa71d1156811b47fa4">sbepp::size_bytes_checked</a>(m, buf.size());</div>
 <div class="line"><span class="keywordflow">if</span>(!checked_size.valid)</div>
 <div class="line">{</div>
 <div class="line">    std::cerr &lt;&lt; <span class="stringliteral">&quot;bad message\n&quot;</span>;</div>
