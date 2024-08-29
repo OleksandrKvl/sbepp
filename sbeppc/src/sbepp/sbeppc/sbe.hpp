@@ -6,10 +6,8 @@
 #include <sbepp/sbepp.hpp>
 #include <sbepp/sbeppc/source_location.hpp>
 
-#include <cstdint>
 #include <optional>
 #include <string>
-#include <unordered_map>
 #include <variant>
 #include <vector>
 
