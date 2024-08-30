@@ -382,22 +382,23 @@ inline std::string to_integer_literal(
     }
 }
 
-inline void
-    validate_schema_name(const sbe::message_schema& schema, ireporter& reporter)
-{
-    if(!utils::is_valid_name(schema.name)
-       || utils::is_reserved_cpp_namespace(schema.name))
-    {
-        throw_error(
-            "{}: schema namespace `{}` is not valid. Change "
-            "`messageSchema.package` attribute or provide a custom name with "
-            "`--schema-name`",
-            schema.location,
-            schema.name);
-    }
-    utils::warn_about_reserved_identifier(
-        schema.name, schema.location, reporter);
-}
+// TODO: refactor
+// inline void
+//     validate_schema_name(const sbe::message_schema& schema, ireporter& reporter)
+// {
+//     if(!utils::is_valid_name(schema.name)
+//        || utils::is_reserved_cpp_namespace(schema.name))
+//     {
+//         throw_error(
+//             "{}: schema namespace `{}` is not valid. Change "
+//             "`messageSchema.package` attribute or provide a custom name with "
+//             "`--schema-name`",
+//             schema.location,
+//             schema.name);
+//     }
+//     utils::warn_about_reserved_identifier(
+//         schema.name, schema.location, reporter);
+// }
 
 inline std::string get_compiled_header_top_comment()
 {

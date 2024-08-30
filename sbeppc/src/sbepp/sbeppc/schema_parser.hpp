@@ -9,8 +9,6 @@
 #include <sbepp/sbeppc/ireporter.hpp>
 #include <sbepp/sbeppc/ifs_provider.hpp>
 #include <sbepp/sbeppc/sbe.hpp>
-#include <sbepp/sbeppc/type_manager.hpp>
-#include <sbepp/sbeppc/message_manager.hpp>
 #include <sbepp/sbeppc/throw_error.hpp>
 #include <sbepp/sbeppc/unique_set.hpp>
 #include <sbepp/sbepp.hpp>
@@ -55,24 +53,14 @@ public:
         return message_schema;
     }
 
-    const type_manager& get_types() const
-    {
-        return types;
-    }
-
-    const message_manager& get_messages() const
-    {
-        return messages;
-    }
-
 private:
     ireporter* reporter;
     ifs_provider* fs_provider;
     location_manager locations;
     pugi::xml_document xml_doc;
     sbe::message_schema message_schema;
-    type_manager types;
-    message_manager messages;
+    unique_set<std::string> unique_message_names;
+    unique_set<message_id_t> unique_message_ids;
 
     enum class ordered_member_type
     {
@@ -95,14 +83,62 @@ private:
         return attribute;
     }
 
+    void add_unique_type(sbe::encoding e)
+    {
+        // SBE requires type lookup to be case insensitive
+        auto name = utils::to_lower(utils::get_encoding_name(e));
+        const auto [it, inserted] =
+            message_schema.types.try_emplace(std::move(name), std::move(e));
+
+        if(!inserted)
+        {
+            throw_error(
+                "{}: encoding `{}` already exists at {}",
+                utils::get_location(e),
+                utils::get_encoding_name(e),
+                utils::get_location(it->second));
+        }
+    }
+
+    void
+        merge_types(const std::unordered_map<std::string, sbe::encoding>& types)
+    {
+        for(const auto& [name, enc] : types)
+        {
+            add_unique_type(enc);
+        }
+    }
+
+    void add_unique_message(sbe::message m)
+    {
+        unique_message_names.add_or_throw(
+            m.name,
+            "{}: message with name `{}` already exists",
+            m.location,
+            m.name);
+        unique_message_ids.add_or_throw(
+            m.id, "{}: message with id `{}` already exists", m.location, m.id);
+
+        message_schema.messages.push_back(std::move(m));
+    }
+
+    void merge_messages(const std::vector<sbe::message>& messages)
+    {
+        for(const auto& m : messages)
+        {
+            add_unique_message(m);
+        }
+    }
+
     void parse_include(const pugi::xml_node root)
     {
         const auto path = get_required_non_empty_string(root, "href");
         auto parser = schema_parser{path, *reporter, *fs_provider};
         parser.parse_schema_content();
 
-        types.merge(parser.get_types());
-        messages.merge(parser.get_messages());
+        const auto& schema = parser.get_message_schema();
+        merge_types(schema.types);
+        merge_messages(schema.messages);
     }
 
     std::string get_required_non_empty_string(
@@ -495,19 +531,19 @@ private:
         {
             if(is_node_name_equal_to(child.name(), "type"))
             {
-                types.add_unique(parse_type_encoding(child));
+                add_unique_type(parse_type_encoding(child));
             }
             else if(is_node_name_equal_to(child.name(), "composite"))
             {
-                types.add_unique(parse_composite_encoding(child));
+                add_unique_type(parse_composite_encoding(child));
             }
             else if(is_node_name_equal_to(child.name(), "enum"))
             {
-                types.add_unique(parse_enum_encoding(child));
+                add_unique_type(parse_enum_encoding(child));
             }
             else if(is_node_name_equal_to(child.name(), "set"))
             {
-                types.add_unique(parse_set_encoding(child));
+                add_unique_type(parse_set_encoding(child));
             }
         }
     }
@@ -717,7 +753,7 @@ private:
         validate_versions(m);
         m.members = get_level_members(root);
 
-        messages.add_unique(std::move(m));
+        add_unique_message(std::move(m));
     }
 
     void parse_schema_content(const pugi::xml_node root)

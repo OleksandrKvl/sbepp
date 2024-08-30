@@ -6,15 +6,11 @@
 #include <sbepp/sbeppc/reporter.hpp>
 #include <sbepp/sbeppc/schema_parser.hpp>
 #include <sbepp/sbeppc/sbe_error.hpp>
-#include <sbepp/sbeppc/types_compiler.hpp>
-#include <sbepp/sbeppc/messages_compiler.hpp>
-#include <sbepp/sbeppc/traits_generator.hpp>
-#include <sbepp/sbeppc/schema_compiler.hpp>
+// #include <sbepp/sbeppc/schema_compiler.hpp>
 #include <sbepp/sbeppc/build_info.hpp>
 
 #include <fmt/core.h>
 
-#include <cstdint>
 #include <string>
 #include <string_view>
 #include <optional>
@@ -150,20 +146,20 @@ int main(int argc, char** argv)
     {
         const auto config = sbepp::sbeppc::parse_command_line(argc, argv);
         schema_parser parser{config.schema_file, reporter, fs_provider};
-        parser.parse_schema();
-        auto schema = parser.get_message_schema();
-        auto types = parser.get_types();
-        auto messages = parser.get_messages();
-        schema.name = config.schema_name.value_or(schema.package);
-        utils::validate_schema_name(schema, reporter);
+        // parser.parse_schema();
+        // auto schema = parser.get_message_schema();
+        // auto types = parser.get_types();
+        // auto messages = parser.get_messages();
+        // schema.name = config.schema_name.value_or(schema.package);
+        // utils::validate_schema_name(schema, reporter);
 
-        schema_compiler::compile(
-            config.output_dir,
-            config.inject_include,
-            schema,
-            types,
-            messages,
-            fs_provider);
+        // schema_compiler::compile(
+        //     config.output_dir,
+        //     config.inject_include,
+        //     schema,
+        //     types,
+        //     messages,
+        //     fs_provider);
     }
     catch(const sbe_error& e)
     {
