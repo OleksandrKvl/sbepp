@@ -6,6 +6,9 @@
 #include <sbepp/sbeppc/ifs_provider.hpp>
 #include <sbepp/sbeppc/throw_error.hpp>
 
+// for `std::filesystem::path` formatting
+#include <fmt/std.h>
+
 #include <string>
 #include <fstream>
 

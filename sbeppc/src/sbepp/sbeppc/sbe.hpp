@@ -10,6 +10,7 @@
 #include <string>
 #include <variant>
 #include <vector>
+#include <unordered_map>
 
 namespace sbepp::sbeppc::sbe
 {
@@ -46,17 +47,6 @@ struct type
     std::optional<std::string> constant_value;
     std::optional<std::string> value_ref;
     source_location location;
-
-    // info used for codegen
-    std::string tag;
-    std::string impl_name;
-    std::string impl_type;
-    std::string underlying_type;
-    std::size_t size;
-    std::string public_type;
-    bool is_template;
-    // set for anonymous types only
-    std::optional<offset_t> actual_offset;
 };
 
 struct composite
@@ -69,15 +59,6 @@ struct composite
     std::optional<version_t> deprecated_since;
     std::vector<composite_element> elements;
     source_location location;
-
-    // info used for codegen
-    std::string tag;
-    std::string impl_name;
-    std::string impl_type;
-    std::size_t size;
-    std::string public_type;
-    // set for anonymous types only
-    std::optional<offset_t> actual_offset;
 };
 
 struct ref
@@ -88,10 +69,6 @@ struct ref
     version_t added_since;
     std::optional<version_t> deprecated_since;
     source_location location;
-
-    // info used for codegen
-    std::string tag;
-    offset_t actual_offset;
 };
 
 struct enum_valid_value
@@ -102,9 +79,6 @@ struct enum_valid_value
     std::optional<version_t> deprecated_since;
     std::string value;
     source_location location;
-
-    // info used for codegen
-    std::string tag;
 };
 
 struct enumeration
@@ -117,16 +91,6 @@ struct enumeration
     std::optional<offset_t> offset;
     std::vector<enum_valid_value> valid_values;
     source_location location;
-
-    // info used for codegen
-    std::string tag;
-    std::string impl_name;
-    std::string impl_type;
-    std::string underlying_type;
-    std::size_t size;
-    std::string public_type;
-    // set for anonymous types only
-    std::optional<offset_t> actual_offset;
 };
 
 struct set_choice
@@ -137,9 +101,6 @@ struct set_choice
     std::optional<version_t> deprecated_since;
     choice_index_t value;
     source_location location;
-
-    // info used for codegen
-    std::string tag;
 };
 
 struct set
@@ -152,16 +113,6 @@ struct set
     std::optional<offset_t> offset;
     std::vector<set_choice> choices;
     source_location location;
-
-    // info used for codegen
-    std::string tag;
-    std::string impl_name;
-    std::string impl_type;
-    std::string underlying_type;
-    std::size_t size;
-    std::string public_type;
-    // set for anonymous types only
-    std::optional<offset_t> actual_offset;
 };
 
 struct field;
@@ -188,13 +139,6 @@ struct message
     std::optional<version_t> deprecated_since;
     level_members members;
     source_location location;
-
-    // info used for codegen
-    std::string tag;
-    std::string impl_name;
-    std::string impl_type;
-    std::string public_type;
-    block_length_t actual_block_length;
 };
 
 struct field
@@ -209,16 +153,6 @@ struct field
     version_t added_since;
     std::optional<version_t> deprecated_since;
     source_location location;
-
-    // info used for codegen
-    std::string tag;
-    // does NOT include message/group header size
-    offset_t actual_offset;
-    std::size_t size;
-    field_presence actual_presence;
-    std::string value_type;
-    std::string value_type_tag;
-    bool is_template;
 };
 
 struct group
@@ -233,13 +167,6 @@ struct group
     version_t added_since;
     std::optional<version_t> deprecated_since;
     source_location location;
-
-    // info used for codegen
-    std::string tag;
-    std::string entry_impl_type;
-    std::string impl_name;
-    std::string impl_type;
-    block_length_t actual_block_length;
 };
 
 struct data
@@ -251,11 +178,6 @@ struct data
     version_t added_since;
     std::optional<version_t> deprecated_since;
     source_location location;
-
-    // info used for codegen
-    std::string tag;
-    const sbe::type* length_type;
-    std::string impl_type;
 };
 
 struct message_schema
@@ -269,8 +191,7 @@ struct message_schema
     std::string header_type;
     source_location location;
 
-    // info used for codegen
-    std::string name;
-    std::string tag;
+    std::unordered_map<std::string, encoding> types;
+    std::vector<message> messages;
 };
 } // namespace sbepp::sbeppc::sbe
