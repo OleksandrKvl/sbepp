@@ -167,6 +167,14 @@ endfunction()
 required_name_test("type")
 required_name_test("valid_value")
 required_name_test("enum")
+required_name_test("choice")
+required_name_test("set")
+required_name_test("ref")
+required_name_test("composite")
+required_name_test("field")
+required_name_test("group")
+required_name_test("data")
+required_name_test("message")
 
 # get_required_numeric_attribute
 # C++ codegen errors
