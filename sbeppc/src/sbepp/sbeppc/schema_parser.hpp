@@ -23,6 +23,8 @@
 
 namespace sbepp::sbeppc
 {
+// SBE schema parser, performs some basic XML checks but not related to C++ (or
+// any other language) codegen
 class schema_parser
 {
 public:
@@ -162,11 +164,10 @@ private:
         auto name = get_required_non_empty_string(root, "name");
 
         const auto location = locations.find(root.offset_debug());
-        if(!utils::is_valid_name(name))
+        if(!utils::is_sbe_symbolic_name(name))
         {
-            throw_error("{}: invalid name `{}`", location, name);
+            throw_error("{}: `{}` is not a valid SBE name", location, name);
         }
-        utils::warn_about_reserved_identifier(name, location, *reporter);
 
         return name;
     }
@@ -222,7 +223,7 @@ private:
         if(!utils::is_primitive_type(type))
         {
             throw_error(
-                "{}: primitiveType `{}` is not valid primitive type",
+                "{}: primitiveType `{}` is not a valid primitive type",
                 locations.find(root.offset_debug()),
                 type);
         }
@@ -355,7 +356,7 @@ private:
             auto valid_value = get_enum_valid_value(child);
             unique_value_names.add_or_throw(
                 valid_value.name,
-                "{}: duplicated validValue `name`: {}",
+                "{}: duplicated validValue name: `{}`",
                 valid_value.location,
                 valid_value.name);
 
@@ -417,7 +418,7 @@ private:
             auto choice = get_choice(child);
             unique_choice_names.add_or_throw(
                 choice.name,
-                "{}: duplicated choice `name`: {}",
+                "{}: duplicated choice name: `{}`",
                 choice.location,
                 choice.name);
             choices.push_back(std::move(choice));
@@ -499,7 +500,7 @@ private:
 
             unique_element_names.add_or_throw(
                 utils::get_encoding_name(element),
-                "{}: duplicated composite element `{}`",
+                "{}: duplicated composite element: `{}`",
                 utils::get_location(element),
                 utils::get_encoding_name(element));
 
@@ -605,7 +606,7 @@ private:
         if(current < previous)
         {
             throw_error(
-                "{}: member `{}` in unexpected here , valid order is fields, "
+                "{}: member `{}` is unexpected here, valid order is fields, "
                 "groups, data",
                 location,
                 name);
@@ -815,7 +816,7 @@ private:
         {
             const auto location = locations.find(result.offset);
             throw_error(
-                "{}: XML parsing error: {}", location, result.description());
+                "{}: XML parsing error: `{}`", location, result.description());
         }
     }
 
@@ -861,7 +862,7 @@ private:
         }
 
         throw_error(
-            "{}: Unknown byteOrder ({})",
+            "{}: unknown byteOrder value: `{}`",
             locations.find(root.offset_debug()),
             value);
     }
@@ -894,7 +895,7 @@ private:
         if(lhs > rhs)
         {
             reporter->warning(
-                "{}: {} version (`{}`) is greater than {} version (`{}`)",
+                "{}: {} version ({}) is greater than {} version (`{}`)",
                 location,
                 lhs_name,
                 lhs,
