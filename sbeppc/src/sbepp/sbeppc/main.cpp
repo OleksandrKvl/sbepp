@@ -146,7 +146,7 @@ int main(int argc, char** argv)
     {
         const auto config = sbepp::sbeppc::parse_command_line(argc, argv);
         schema_parser parser{config.schema_file, reporter, fs_provider};
-        // parser.parse_schema();
+        parser.parse_schema();
         // auto schema = parser.get_message_schema();
         // auto types = parser.get_types();
         // auto messages = parser.get_messages();
