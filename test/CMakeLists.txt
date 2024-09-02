@@ -101,3 +101,5 @@ foreach(version IN LISTS cpp_versions)
     add_test_binary("mf" ${version})
     add_test_binary("tf" ${version} USE_TOP_FILE)
 endforeach()
+
+add_subdirectory(sbeppc_errors)
