@@ -115,5 +115,34 @@ required_name_test("group")
 required_name_test("data")
 required_name_test("message")
 
-# get_required_numeric_attribute
+# 4 scenarios: no id, empty id, out-of-range id, text id
+function(numeric_attribute_test name attribute)
+    non_empty_attribute_test("${name}" "${attribute}")
+
+    sbeppc_error_test(
+        NAME "out_of_range_${name}"
+        ARGS "out_of_range_${name}.xml"
+        ERROR "cannot convert `${attribute}` value \\(-1\\) to its underlying numeric type"
+    )
+
+    sbeppc_error_test(
+        NAME "text_${name}"
+        ARGS "text_${name}.xml"
+        ERROR "cannot convert `${attribute}` value \\(text\\) to its underlying numeric type"
+    )
+endfunction()
+
+function(id_test name)
+    numeric_attribute_test("${name}_id" "id")
+endfunction()
+
+
+id_test("message")
+id_test("field")
+id_test("group")
+id_test("data")
+id_test("schema")
+
+numeric_attribute_test("schema_version" "version")
+
 # C++ codegen errors
