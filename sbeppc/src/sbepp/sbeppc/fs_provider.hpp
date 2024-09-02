@@ -41,7 +41,7 @@ public:
         std::ofstream output_stream{path, std::ios::binary | std::ios::out};
         if(!output_stream)
         {
-            throw_error("can't open file {}", path);
+            throw_error("can't open file: `{}`", path);
         }
         output_stream << data;
     }
