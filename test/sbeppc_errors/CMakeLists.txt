@@ -70,92 +70,31 @@ sbeppc_error_test(
     ERROR "required attribute `primitiveType` doesn't exist"
 )
 
-sbeppc_error_test(
-    NAME "no_href"
-    ARGS "no_href.xml"
-    ERROR "required attribute `href` doesn't exist"
-)
+# 2 scenarios: no attribute, empty attribute
+function(non_empty_attribute_test name attribute)
+    sbeppc_error_test(
+        NAME "no_${name}"
+        ARGS "no_${name}.xml"
+        ERROR "required attribute `${attribute}` doesn't exist"
+    )
 
-sbeppc_error_test(
-    NAME "empty_href"
-    ARGS "empty_href.xml"
-    ERROR "`href` attribute is empty"
-)
+    sbeppc_error_test(
+        NAME "empty_${name}"
+        ARGS "empty_${name}.xml"
+        ERROR "`${attribute}` attribute is empty"
+    )
+endfunction()
 
-sbeppc_error_test(
-    NAME "no_enum_encoding_type"
-    ARGS "no_enum_encoding_type.xml"
-    ERROR "required attribute `encodingType` doesn't exist"
-)
+non_empty_attribute_test("href" "href")
+non_empty_attribute_test("enum_encoding_type" "encodingType")
+non_empty_attribute_test("set_encoding_type" "encodingType")
+non_empty_attribute_test("ref_type" "type")
+non_empty_attribute_test("field_type" "type")
+non_empty_attribute_test("data_type" "type")
 
-sbeppc_error_test(
-    NAME "empty_enum_encoding_type"
-    ARGS "empty_enum_encoding_type.xml"
-    ERROR "`encodingType` attribute is empty"
-)
-
-sbeppc_error_test(
-    NAME "no_set_encoding_type"
-    ARGS "no_set_encoding_type.xml"
-    ERROR "required attribute `encodingType` doesn't exist"
-)
-
-sbeppc_error_test(
-    NAME "empty_set_encoding_type"
-    ARGS "empty_set_encoding_type.xml"
-    ERROR "`encodingType` attribute is empty"
-)
-
-sbeppc_error_test(
-    NAME "no_ref_type"
-    ARGS "no_ref_type.xml"
-    ERROR "required attribute `type` doesn't exist"
-)
-
-sbeppc_error_test(
-    NAME "empty_ref_type"
-    ARGS "empty_ref_type.xml"
-    ERROR "`type` attribute is empty"
-)
-
-sbeppc_error_test(
-    NAME "no_field_type"
-    ARGS "no_field_type.xml"
-    ERROR "required attribute `type` doesn't exist"
-)
-
-sbeppc_error_test(
-    NAME "empty_field_type"
-    ARGS "empty_field_type.xml"
-    ERROR "`type` attribute is empty"
-)
-
-sbeppc_error_test(
-    NAME "no_data_type"
-    ARGS "no_data_type.xml"
-    ERROR "required attribute `type` doesn't exist"
-)
-
-sbeppc_error_test(
-    NAME "empty_data_type"
-    ARGS "empty_data_type.xml"
-    ERROR "`type` attribute is empty"
-)
-
-# get_required_name
-# 3 scenarios: no name, empty name, non SBE name
+# 3 scenarios: no name, empty name, non-SBE name
 function(required_name_test sbe_node)
-    sbeppc_error_test(
-        NAME "no_${sbe_node}_name"
-        ARGS "no_${sbe_node}_name.xml"
-        ERROR "required attribute `name` doesn't exist"
-    )
-
-    sbeppc_error_test(
-        NAME "empty_${sbe_node}_name"
-        ARGS "empty_${sbe_node}_name.xml"
-        ERROR "`name` attribute is empty"
-    )
+    non_empty_attribute_test("${sbe_node}_name" "name")
 
     sbeppc_error_test(
         NAME "non_sbe_${sbe_node}_name"
