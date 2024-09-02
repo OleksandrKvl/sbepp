@@ -153,7 +153,7 @@ private:
             throw_error(
                 "{}: `{}` attribute is empty",
                 locations.find(root.offset_debug()),
-                value);
+                name);
         }
 
         return value;
