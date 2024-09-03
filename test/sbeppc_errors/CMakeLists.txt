@@ -13,6 +13,11 @@ function(sbeppc_error_test)
 
     set(test_name "sbeppc_error_${arg_NAME}")
 
+    # for most test cases, test case and its schema file have the same name
+    if(NOT arg_ARGS)
+        set(arg_ARGS "${arg_NAME}.xml")
+    endif()
+
     add_test(
         NAME "${test_name}"
         COMMAND sbepp::sbeppc ${arg_ARGS}
@@ -59,28 +64,26 @@ sbeppc_error_test(
 
 # `schema_parser` errors
 sbeppc_error_test(
-    NAME "wrong_schema_file"
-    ARGS "wrong_file_name.xml"
+    NAME "wrong_file_name"
     ERROR "can't open file"
 )
 
 sbeppc_error_test(
     NAME "no_primitive_type"
-    ARGS "no_primitive_type.xml"
     ERROR "required attribute `primitiveType` doesn't exist"
 )
+
+# TODO: add helper that uses the same test and schema name
 
 # 2 scenarios: no attribute, empty attribute
 function(non_empty_attribute_test name attribute)
     sbeppc_error_test(
         NAME "no_${name}"
-        ARGS "no_${name}.xml"
         ERROR "required attribute `${attribute}` doesn't exist"
     )
 
     sbeppc_error_test(
         NAME "empty_${name}"
-        ARGS "empty_${name}.xml"
         ERROR "`${attribute}` attribute is empty"
     )
 endfunction()
@@ -98,7 +101,6 @@ function(required_name_test sbe_node)
 
     sbeppc_error_test(
         NAME "non_sbe_${sbe_node}_name"
-        ARGS "non_sbe_${sbe_node}_name.xml"
         ERROR "is not a valid SBE name"
     )
 endfunction()
@@ -115,25 +117,26 @@ required_name_test("group")
 required_name_test("data")
 required_name_test("message")
 
-# 4 scenarios: no id, empty id, out-of-range id, text id
-function(numeric_attribute_test name attribute)
-    non_empty_attribute_test("${name}" "${attribute}")
-
+function(numeric_conversion_test name attribute)
     sbeppc_error_test(
         NAME "out_of_range_${name}"
-        ARGS "out_of_range_${name}.xml"
         ERROR "cannot convert `${attribute}` value \\(-1\\) to its underlying numeric type"
     )
 
     sbeppc_error_test(
         NAME "text_${name}"
-        ARGS "text_${name}.xml"
         ERROR "cannot convert `${attribute}` value \\(text\\) to its underlying numeric type"
     )
 endfunction()
 
+# 4 scenarios: no id, empty id, out-of-range id, text id
+function(required_numeric_attribute_test name attribute)
+    non_empty_attribute_test("${name}" "${attribute}")
+    numeric_conversion_test("${name}" "${attribute}")
+endfunction()
+
 function(id_test name)
-    numeric_attribute_test("${name}_id" "id")
+    required_numeric_attribute_test("${name}_id" "id")
 endfunction()
 
 
@@ -143,6 +146,111 @@ id_test("group")
 id_test("data")
 id_test("schema")
 
-numeric_attribute_test("schema_version" "version")
+required_numeric_attribute_test("schema_version" "version")
+
+sbeppc_error_test(
+    NAME "duplicate_encoding_name"
+    ERROR "encoding `type_name` already exists"
+)
+
+sbeppc_error_test(
+    NAME "duplicate_message_name"
+    ERROR "message with name `msg_name` already exists"
+)
+
+sbeppc_error_test(
+    NAME "duplicate_message_id"
+    ERROR "message with id `1` already exists"
+)
+
+sbeppc_error_test(
+    NAME "wrong_type_presence"
+    ERROR "wrong presence token `wrong`"
+)
+
+sbeppc_error_test(
+    NAME "wrong_field_presence"
+    ERROR "wrong presence token `wrong`"
+)
+
+sbeppc_error_test(
+    NAME "wrong_primitive_type"
+    ERROR "primitiveType `uint33` is not a valid primitive type"
+)
+
+sbeppc_error_test(
+    NAME "no_constant_value"
+    ERROR "either `valueRef` or value must be provided for constant `constant`"
+)
+
+sbeppc_error_test(
+    NAME "no_valid_value_content"
+    ERROR "required node content is empty"
+)
+
+sbeppc_error_test(
+    NAME "no_choice_content"
+    ERROR "required node content is empty"
+)
+
+sbeppc_error_test(
+    NAME "duplicate_valid_value_name"
+    ERROR "duplicate validValue name: `A`"
+)
+
+sbeppc_error_test(
+    NAME "duplicate_choice_name"
+    ERROR "duplicate choice name: `A`"
+)
+
+sbeppc_error_test(
+    NAME "out_of_range_choice_index"
+    ERROR "node's value `-1` doesn't represent choice_index_t"
+)
+
+sbeppc_error_test(
+    NAME "text_choice_index"
+    ERROR "node's value `text` doesn't represent choice_index_t"
+)
+
+sbeppc_error_test(
+    NAME "duplicate_composite_element"
+    ERROR "duplicate composite element: `A`"
+)
+
+# get_optional_numeric_attribute, use `numeric_conversion_test`
+function(offset_test name)
+    numeric_conversion_test("${name}_offset" "offset")
+endfunction()
+
+offset_test("type")
+offset_test("enum")
+offset_test("set")
+offset_test("ref")
+offset_test("composite")
+offset_test("field")
+
+function(version_test name)
+    numeric_conversion_test("${name}_depr_version" "deprecated")
+    numeric_conversion_test("${name}_since_version" "sinceVersion")
+endfunction()
+
+version_test("type")
+version_test("valid_value")
+version_test("enum")
+version_test("choice")
+version_test("set")
+version_test("ref")
+version_test("composite")
+version_test("field")
+version_test("group")
+version_test("data")
+version_test("message")
+
+numeric_conversion_test("type_length" "length")
+numeric_conversion_test("message_block_length" "blockLength")
+numeric_conversion_test("group_block_length" "blockLength")
+
+# TODO: continue from 19th occurence of "throw"
 
 # C++ codegen errors

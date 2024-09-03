@@ -356,7 +356,7 @@ private:
             auto valid_value = get_enum_valid_value(child);
             unique_value_names.add_or_throw(
                 valid_value.name,
-                "{}: duplicated validValue name: `{}`",
+                "{}: duplicate validValue name: `{}`",
                 valid_value.location,
                 valid_value.name);
 
@@ -418,7 +418,7 @@ private:
             auto choice = get_choice(child);
             unique_choice_names.add_or_throw(
                 choice.name,
-                "{}: duplicated choice name: `{}`",
+                "{}: duplicate choice name: `{}`",
                 choice.location,
                 choice.name);
             choices.push_back(std::move(choice));
@@ -500,7 +500,7 @@ private:
 
             unique_element_names.add_or_throw(
                 utils::get_encoding_name(element),
-                "{}: duplicated composite element: `{}`",
+                "{}: duplicate composite element: `{}`",
                 utils::get_location(element),
                 utils::get_encoding_name(element));
 
@@ -571,7 +571,8 @@ private:
         {
             return utils::string_to_number_or_throw<T>(
                 *as_str,
-                "{}: cannot convert `{}` value ({}) to underlying numeric type",
+                "{}: cannot convert `{}` value ({}) to its underlying numeric "
+                "type",
                 locations.find(root.offset_debug()),
                 attr_name,
                 *as_str);
