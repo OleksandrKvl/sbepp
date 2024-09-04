@@ -218,8 +218,7 @@ private:
 
     std::string get_primitive_type(const pugi::xml_node root)
     {
-        const auto type =
-            get_required_attribute(root, "primitiveType").as_string();
+        const auto type = get_required_non_empty_string(root, "primitiveType");
         if(!utils::is_primitive_type(type))
         {
             throw_error(
@@ -725,11 +724,9 @@ private:
             else if(is_node_name_equal_to(child.name(), "data"))
             {
                 auto d = parse_data_member(child);
-                throw_if_unexpected_member_type(
-                    ordered_member_type::data,
-                    prev_member_type,
-                    d.name,
-                    d.location);
+                // no need to use `throw_if_unexpected_member_type` here because
+                // data members can appear after any other member type, they
+                // can never trigger an error on their own
                 prev_member_type = ordered_member_type::data;
                 throw_if_not_unique_member_name(
                     unique_member_names, d.name, d.location);
