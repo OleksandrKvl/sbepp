@@ -458,11 +458,14 @@ using std::byteswap;
 
 #else
 
-// because `if((E == endian::native) || (sizeof(T) == 1))` is not a constexpr-if
-// this function has to be declared for single byte types even if it will never
-// be used
-template<typename T>
-T byteswap(T) noexcept;
+// because `if((E == endian::native) || (sizeof(T) == 1))` used in
+// `get/set_primitive` is not a constexpr-if, this function has to be declared
+// (and defined for MSVC) for single byte types even if it will never be used
+template<typename T, typename = enable_if_t<sizeof(T) == 1>>
+constexpr T byteswap(T value) noexcept
+{
+    return value;
+}
 
 #    if defined(_MSC_VER) && (!defined(__clang__) || defined(__c2__))
 
