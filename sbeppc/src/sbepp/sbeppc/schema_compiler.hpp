@@ -11,7 +11,9 @@
 #include <sbepp/sbeppc/traits_generator.hpp>
 #include <sbepp/sbeppc/tags_generator.hpp>
 
+#include <fmt/core.h>
 #include <fmt/std.h>
+#include <fmt/ranges.h>
 
 #include <filesystem>
 #include <string_view>
