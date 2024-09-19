@@ -395,77 +395,12 @@ using enable_if_writable_t = enable_if_t<!std::is_const<Byte>::value, T>;
 template<typename...>
 using void_t = void;
 
-template<typename T, typename = enable_if_t<!std::is_floating_point<T>::value>>
-constexpr typename std::make_unsigned<T>::type to_unsigned(T v) noexcept
-{
-    return static_cast<typename std::make_unsigned<T>::type>(v);
-}
-
-inline std::uint64_t to_unsigned(double v) noexcept
-{
-    std::uint64_t res{};
-    std::memcpy(&res, &v, sizeof(res));
-    return res;
-}
-
-inline std::uint32_t to_unsigned(float v) noexcept
-{
-    std::uint32_t res{};
-    std::memcpy(&res, &v, sizeof(res));
-    return res;
-}
-
-template<typename To>
-struct from_unsigned
-{
-    constexpr To
-        operator()(typename std::make_unsigned<To>::type from) const noexcept
-    {
-        return static_cast<To>(from);
-    }
-};
-
-template<>
-struct from_unsigned<double>
-{
-    double operator()(std::uint64_t from) const noexcept
-    {
-        double res{};
-        std::memcpy(&res, &from, sizeof(res));
-        return res;
-    }
-};
-
-template<>
-struct from_unsigned<float>
-{
-    float operator()(std::uint32_t from) const noexcept
-    {
-        float res{};
-        std::memcpy(&res, &from, sizeof(res));
-        return res;
-    }
-};
+#if !SBEPP_HAS_BYTESWAP
 
 // intrinsics detection is taken from <boost/endian/detail/intrinsic.hpp>
-#ifndef __has_builtin          // Optional of course
-#    define __has_builtin(x) 0 // Compatibility with non-clang compilers
-#endif
-
-#if SBEPP_HAS_BYTESWAP
-
-using std::byteswap;
-
-#else
-
-// because `if((E == endian::native) || (sizeof(T) == 1))` used in
-// `get/set_primitive` is not a constexpr-if, this function has to be declared
-// (and defined for MSVC) for single byte types even if it will never be used
-template<typename T, typename = enable_if_t<sizeof(T) == 1>>
-constexpr T byteswap(T value) noexcept
-{
-    return value;
-}
+#    ifndef __has_builtin          // Optional of course
+#        define __has_builtin(x) 0 // Compatibility with non-clang compilers
+#    endif
 
 #    if defined(_MSC_VER) && (!defined(__clang__) || defined(__c2__))
 
@@ -550,12 +485,67 @@ constexpr std::uint16_t byteswap(std::uint16_t v) noexcept
 #    endif
 #endif
 
+template<typename T>
+struct fp_underlying_type;
+
+template<typename T>
+using fp_underlying_type_t = typename fp_underlying_type<T>::type;
+
+template<>
+struct fp_underlying_type<float>
+{
+    using type = std::uint32_t;
+};
+
+template<>
+struct fp_underlying_type<double>
+{
+    using type = std::uint64_t;
+};
+
+// usually, I don't like putting `enable_if` into return type but these
+// overloads are not public and it looks better than adding `typename = void` to
+// template headers
+template<typename T>
+constexpr enable_if_t<sizeof(T) == 1, T> byteswap(T value) noexcept
+{
+    return value;
+}
+
+template<typename T>
+SBEPP_CPP20_CONSTEXPR
+    enable_if_t<!std::is_floating_point<T>::value && (sizeof(T) != 1), T>
+    byteswap(T value) noexcept
+{
+#if SBEPP_HAS_BYTESWAP
+    // casts are required because this overload is selected for enums which are
+    // not integral and can't be passed to `std::byteswap` as is
+    return static_cast<T>(std::byteswap(
+        static_cast<typename std::make_unsigned<T>::type>(value)));
+#else
+    return static_cast<T>(
+        byteswap(static_cast<typename std::make_unsigned<T>::type>(value)));
+#endif
+}
+
+template<typename T>
+enable_if_t<std::is_floating_point<T>::value, T> byteswap(T value) noexcept
+{
+    fp_underlying_type_t<T> underlying{};
+    std::memcpy(&underlying, &value, sizeof(underlying));
+    underlying = byteswap(underlying);
+
+    std::memcpy(&value, &underlying, sizeof(underlying));
+
+    return value;
+}
+
 template<typename T, endian E, typename Byte>
 SBEPP_CPP20_CONSTEXPR T get_primitive(const Byte* ptr)
 {
 #if SBEPP_HAS_BITCAST
     std::array<Byte, sizeof(T)> arr;
-    if((E == endian::native) || (sizeof(T) == 1))
+    if(E == endian::native)
     {
         std::copy(ptr, ptr + sizeof(T), std::begin(arr));
     }
@@ -569,13 +559,13 @@ SBEPP_CPP20_CONSTEXPR T get_primitive(const Byte* ptr)
     // why explicit `std::memcpy` call is required
     T res;
     std::memcpy(&res, ptr, sizeof(T));
-    if((E == endian::native) || (sizeof(T) == 1))
+    if(E == endian::native)
     {
         return res;
     }
     else
     {
-        return from_unsigned<T>{}(byteswap(to_unsigned(res)));
+        return byteswap(res);
     }
 #endif
 }
@@ -585,7 +575,7 @@ SBEPP_CPP20_CONSTEXPR void set_primitive(Byte* ptr, T value)
 {
 #if SBEPP_HAS_BITCAST
     auto arr = std::bit_cast<std::array<Byte, sizeof(T)>>(value);
-    if((E == endian::native) || (sizeof(T) == 1))
+    if(E == endian::native)
     {
         std::copy(std::begin(arr), std::end(arr), ptr);
     }
@@ -596,9 +586,9 @@ SBEPP_CPP20_CONSTEXPR void set_primitive(Byte* ptr, T value)
 #else
     // old compilers don't optimize `std::copy` approach good enough, that's
     // why explicit `std::memcpy` call is required
-    if((E != endian::native) && (sizeof(T) != 1))
+    if(E != endian::native)
     {
-        value = from_unsigned<T>{}(byteswap(to_unsigned(value)));
+        value = byteswap(value);
     }
     std::memcpy(ptr, &value, sizeof(T));
 #endif
