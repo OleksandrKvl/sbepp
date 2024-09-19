@@ -555,7 +555,7 @@ SBEPP_CPP20_CONSTEXPR T get_primitive(const Byte* ptr)
 {
 #if SBEPP_HAS_BITCAST
     std::array<Byte, sizeof(T)> arr;
-    if((E == endian::native) || (sizeof(T) == 1))
+    if(E == endian::native)
     {
         std::copy(ptr, ptr + sizeof(T), std::begin(arr));
     }
@@ -569,7 +569,7 @@ SBEPP_CPP20_CONSTEXPR T get_primitive(const Byte* ptr)
     // why explicit `std::memcpy` call is required
     T res;
     std::memcpy(&res, ptr, sizeof(T));
-    if((E == endian::native) || (sizeof(T) == 1))
+    if(E == endian::native)
     {
         return res;
     }
@@ -585,7 +585,7 @@ SBEPP_CPP20_CONSTEXPR void set_primitive(Byte* ptr, T value)
 {
 #if SBEPP_HAS_BITCAST
     auto arr = std::bit_cast<std::array<Byte, sizeof(T)>>(value);
-    if((E == endian::native) || (sizeof(T) == 1))
+    if(E == endian::native)
     {
         std::copy(std::begin(arr), std::end(arr), ptr);
     }
@@ -596,7 +596,7 @@ SBEPP_CPP20_CONSTEXPR void set_primitive(Byte* ptr, T value)
 #else
     // old compilers don't optimize `std::copy` approach good enough, that's
     // why explicit `std::memcpy` call is required
-    if((E != endian::native) && (sizeof(T) != 1))
+    if(E != endian::native)
     {
         value = from_unsigned<T>{}(byteswap(to_unsigned(value)));
     }
