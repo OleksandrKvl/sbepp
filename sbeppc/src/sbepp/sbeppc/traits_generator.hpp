@@ -11,6 +11,7 @@
 #include <sbepp/sbeppc/utils.hpp>
 
 #include <fmt/core.h>
+#include <fmt/ranges.h>
 
 #include <string>
 #include <iterator>

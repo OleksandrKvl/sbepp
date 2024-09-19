@@ -13,6 +13,7 @@
 #include <sbepp/sbeppc/normal_accessors.hpp>
 
 #include <fmt/core.h>
+#include <fmt/ranges.h>
 
 #include <algorithm>
 #include <unordered_set>
