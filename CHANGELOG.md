@@ -1,3 +1,11 @@
+# 1.4.1
+
+- fixed `sbepp::size_bytes_checked` example
+- fixed `fmt/11` build
+- fixed `byteswap` MSVC error
+
+---
+
 # 1.4.0
 
 - added checks to protect against using cursor accessors in a wrong order
