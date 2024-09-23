@@ -8,6 +8,7 @@
 #include <sbepp/sbeppc/sbe_error.hpp>
 // #include <sbepp/sbeppc/schema_compiler.hpp>
 #include <sbepp/sbeppc/build_info.hpp>
+#include <sbepp/sbeppc/sbe_checker.hpp>
 
 #include <fmt/core.h>
 
@@ -147,9 +148,11 @@ int main(int argc, char** argv)
         const auto config = sbepp::sbeppc::parse_command_line(argc, argv);
         schema_parser parser{config.schema_file, reporter, fs_provider};
         parser.parse_schema();
-        // auto schema = parser.get_message_schema();
-        // auto types = parser.get_types();
-        // auto messages = parser.get_messages();
+        const auto& schema = parser.get_message_schema();
+        // TODO: SBE-related verification
+        sbe_checker checker;
+        checker.check(schema);
+
         // schema.name = config.schema_name.value_or(schema.package);
         // utils::validate_schema_name(schema, reporter);
 
