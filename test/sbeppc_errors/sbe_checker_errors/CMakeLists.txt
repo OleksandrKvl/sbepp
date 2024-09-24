@@ -39,3 +39,33 @@ sbeppc_error_test(
     NAME "non_type_enum_encoding"
     ERROR "encoding `composite` is not a type"
 )
+
+sbeppc_error_test(
+    NAME "no_set_encoding"
+    ERROR "encoding `wrong_type` doesn't exist"
+)
+
+sbeppc_error_test(
+    NAME "non_type_set_encoding"
+    ERROR "encoding `composite` is not a type"
+)
+
+sbeppc_error_test(
+    NAME "non_unsigned_set_encoding1"
+    ERROR "underlying type must be unsigned"
+)
+
+sbeppc_error_test(
+    NAME "non_unsigned_set_encoding2"
+    ERROR "underlying type must be unsigned"
+)
+
+sbeppc_error_test(
+    NAME "out_of_range_choice_index1"
+    ERROR "choice index `8` is out of valid range \\(\\[0, 7\\]\\)"
+)
+
+sbeppc_error_test(
+    NAME "out_of_range_choice_index2"
+    ERROR "choice index `8` is out of valid range \\(\\[0, 7\\]\\)"
+)
