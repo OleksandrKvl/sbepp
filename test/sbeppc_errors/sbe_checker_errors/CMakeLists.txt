@@ -29,3 +29,13 @@ sbeppc_error_test(
     NAME "no_value_ref_enumerator"
     ERROR "enum `numbers_enum` doesn't have `One` enumerator"
 )
+
+sbeppc_error_test(
+    NAME "no_enum_encoding"
+    ERROR "encoding `wrong_type` doesn't exist"
+)
+
+sbeppc_error_test(
+    NAME "non_type_enum_encoding"
+    ERROR "encoding `composite` is not a type"
+)
