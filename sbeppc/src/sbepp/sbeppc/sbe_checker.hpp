@@ -206,29 +206,34 @@ private:
 
     void validate_encoding(const sbe::type& t)
     {
-        fmt::print(
-            "t.name: {}, t.length: {}, t.primitive_type: {}\n",
-            t.name,
-            t.length,
-            t.primitive_type);
         if(t.presence == field_presence::constant)
         {
             validate_constant_value(t);
         }
-
-        if((t.presence == field_presence::constant) && (t.length != 1)
-           && (t.primitive_type != "char"))
-        {
-            // TODO: it can also be a numeric value or enum? How value is
-            // treated in those cases if it's a text?
-            throw_error(
-                "{}: array constants must have primitive type `char`",
-                t.location);
-        }
+        // else - nothing we validate at the moment
     }
 
-    void validate_encoding(const sbe::enumeration& /*e*/)
+    void validate_encoding(const sbe::enumeration& e)
     {
+        if(utils::is_primitive_type(e.type))
+        {
+            return;
+        }
+
+        const auto enc = get_encoding(e.type);
+        if(!enc)
+        {
+            throw_error("{}: encoding `{}` doesn't exist", e.location, e.type);
+        }
+
+        if(!std::holds_alternative<sbe::type>(*enc))
+        {
+            throw_error("{}: encoding `{}` is not a type", e.location, e.type);
+        }
+
+        // strict: type should be a non-const, non-array, char or integer (SBE
+        //  even requires unsigned integer)
+        // strict: validate enumerators
     }
 
     void validate_encoding(const sbe::set& /*s*/)

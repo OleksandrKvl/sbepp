@@ -44,6 +44,7 @@ struct type
     version_t added_since;
     std::optional<version_t> deprecated_since;
     std::optional<std::string> character_encoding;
+    // if not null, string is not empty
     std::optional<std::string> constant_value;
     std::optional<std::string> value_ref;
     source_location location;
