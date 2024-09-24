@@ -197,11 +197,23 @@ private:
         {
             validate_value_ref(*t.value_ref, t.location);
         }
-        // else if(t.primitive_type != "char")
+        else if(t.primitive_type == "char")
+        {
+            const auto value_length = t.constant_value->length();
+            if(t.length < value_length)
+            {
+                throw_error(
+                    "{}: constant length ({}) is greater than `length` "
+                    "attribute ({})",
+                    t.location,
+                    value_length,
+                    t.length);
+            }
+        }
+        // else
         // {
         //     // strict: check that value fits into primitive type
         // }
-        // else - it's a string constant, nothing to check
     }
 
     void validate_encoding(const sbe::type& t)
@@ -299,6 +311,7 @@ private:
                 throw_error(
                     "{}: encoding `{}` is not a type", s.location, s.type);
             }
+            // strict: type should be non-const, non-array
 
             underlying_type = t->primitive_type;
         }

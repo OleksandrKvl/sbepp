@@ -69,3 +69,8 @@ sbeppc_error_test(
     NAME "out_of_range_choice_index2"
     ERROR "choice index `8` is out of valid range \\(\\[0, 7\\]\\)"
 )
+
+sbeppc_error_test(
+    NAME "wrong_char_const_length"
+    ERROR "constant length \\(3\\) is greater than `length` attribute \\(1\\)"
+)
