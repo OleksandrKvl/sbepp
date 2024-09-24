@@ -1,5 +1,7 @@
 #pragma once
 
+#include "sbepp/sbeppc/source_location.hpp"
+#include <cassert>
 #include <sbepp/sbepp.hpp>
 #include <sbepp/sbeppc/sbe.hpp>
 #include <sbepp/sbeppc/throw_error.hpp>
@@ -141,8 +143,88 @@ private:
     //     return false;
     // }
 
-    void validate_encoding(const sbe::type& /*t*/)
+    void validate_value_ref(
+        const std::string& value_ref, const source_location& location)
     {
+        const auto parsed = utils::parse_value_ref(value_ref);
+        if(parsed.enum_name.empty() || parsed.enumerator.empty())
+        {
+            throw_error(
+                "{}: `{}` is not a valid valueRef", location, value_ref);
+        }
+
+        const auto enc = get_encoding(parsed.enum_name);
+        if(!enc)
+        {
+            throw_error(
+                "{}: encoding `{}` doesn't exist", location, parsed.enum_name);
+        }
+
+        const auto e = std::get_if<sbe::enumeration>(enc);
+        if(!e)
+        {
+            throw_error(
+                "{}: encoding `{}` is not an enum", location, parsed.enum_name);
+        }
+
+        const auto& values = e->valid_values;
+        if(std::find_if(
+               std::begin(values),
+               std::end(values),
+               [&parsed](const auto& choice)
+               {
+                   return (choice.name == parsed.enumerator);
+               })
+           == std::end(values))
+        {
+            throw_error(
+                "{}: enum `{}` doesn't have `{}` enumerator",
+                location,
+                parsed.enum_name,
+                parsed.enumerator);
+        }
+
+        // strict: check that `valueRef` fits into underlying type
+    }
+
+    void validate_constant_value(const sbe::type& t)
+    {
+        assert(t.value_ref || t.constant_value);
+
+        // strict: `length` should be 1 if primitive type is not "char"
+
+        if(t.value_ref)
+        {
+            validate_value_ref(*t.value_ref, t.location);
+        }
+        // else if(t.primitive_type != "char")
+        // {
+        //     // strict: check that value fits into primitive type
+        // }
+        // else - it's a string constant, nothing to check
+    }
+
+    void validate_encoding(const sbe::type& t)
+    {
+        fmt::print(
+            "t.name: {}, t.length: {}, t.primitive_type: {}\n",
+            t.name,
+            t.length,
+            t.primitive_type);
+        if(t.presence == field_presence::constant)
+        {
+            validate_constant_value(t);
+        }
+
+        if((t.presence == field_presence::constant) && (t.length != 1)
+           && (t.primitive_type != "char"))
+        {
+            // TODO: it can also be a numeric value or enum? How value is
+            // treated in those cases if it's a text?
+            throw_error(
+                "{}: array constants must have primitive type `char`",
+                t.location);
+        }
     }
 
     void validate_encoding(const sbe::enumeration& /*e*/)
