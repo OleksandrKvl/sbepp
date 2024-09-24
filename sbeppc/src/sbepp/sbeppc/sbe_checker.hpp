@@ -236,8 +236,79 @@ private:
         // strict: validate enumerators
     }
 
-    void validate_encoding(const sbe::set& /*s*/)
+    static bool is_unsigned_primitive_type(const std::string_view type)
     {
+        static const std::unordered_set<std::string_view> unsigned_types{
+            "uint8", "uint16", "uint32", "uint64"};
+        return unsigned_types.count(type);
+    }
+
+    static std::size_t
+        get_underlying_size(const std::string_view underlying_type)
+    {
+        static const std::unordered_map<std::string_view, std::size_t> map{
+            {"uint8", sizeof(std::uint8_t)},
+            {"uint16", sizeof(std::uint16_t)},
+            {"uint32", sizeof(std::uint32_t)},
+            {"uint64", sizeof(std::uint64_t)}};
+
+        return map.at(underlying_type);
+    }
+
+    static void validate_choice_indexes(
+        const std::vector<sbe::set_choice>& choices,
+        const std::string_view underlying_type)
+    {
+        const auto underlying_size = get_underlying_size(underlying_type);
+        static constexpr auto bits_per_byte = 8;
+        const auto bit_length = underlying_size * bits_per_byte - 1;
+
+        for(const auto& choice : choices)
+        {
+            if(choice.value > bit_length)
+            {
+                throw_error(
+                    "{}: choice index `{}` is out of valid range ([0, {}])",
+                    choice.location,
+                    choice.value,
+                    bit_length);
+            }
+        }
+    }
+
+    void validate_encoding(const sbe::set& s)
+    {
+        std::string_view underlying_type;
+
+        if(utils::is_primitive_type(s.type))
+        {
+            underlying_type = s.type;
+        }
+        else
+        {
+            const auto enc = get_encoding(s.type);
+            if(!enc)
+            {
+                throw_error(
+                    "{}: encoding `{}` doesn't exist", s.location, s.type);
+            }
+
+            const auto t = std::get_if<sbe::type>(enc);
+            if(!t)
+            {
+                throw_error(
+                    "{}: encoding `{}` is not a type", s.location, s.type);
+            }
+
+            underlying_type = t->primitive_type;
+        }
+
+        if(!is_unsigned_primitive_type(underlying_type))
+        {
+            throw_error("{}: underlying type must be unsigned", s.location);
+        }
+
+        validate_choice_indexes(s.choices, underlying_type);
     }
 
     void validate_encoding(const sbe::ref& r)
