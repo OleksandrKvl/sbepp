@@ -1,16 +1,16 @@
 #pragma once
 
-#include "sbepp/sbeppc/source_location.hpp"
-#include <cassert>
 #include <sbepp/sbepp.hpp>
 #include <sbepp/sbeppc/sbe.hpp>
 #include <sbepp/sbeppc/throw_error.hpp>
 #include <sbepp/sbeppc/utils.hpp>
+#include <sbepp/sbeppc/context_manager.hpp>
 
 #include <string>
 #include <string_view>
 #include <unordered_map>
 #include <variant>
+#include <cassert>
 
 namespace sbepp::sbeppc
 {
@@ -19,9 +19,10 @@ namespace sbepp::sbeppc
 class sbe_checker
 {
 public:
-    void check(const sbe::message_schema& schema)
+    void check(const sbe::message_schema& schema, context_manager& ctx_manager)
     {
         this->schema = &schema;
+        this->ctx_manager = &ctx_manager;
 
         validate_types();
         // validate_message_header();
@@ -30,6 +31,7 @@ public:
 
 private:
     const sbe::message_schema* schema{};
+    context_manager* ctx_manager{};
     // TODO: better names?
     enum class processing_state
     {
@@ -179,54 +181,55 @@ private:
     }
 
     static bool value_fits_into_type(
-        const std::string_view value, const std::string_view type)
+        const std::string_view value, const std::string_view primitive_type)
     {
         if(value.empty())
         {
             return false;
         }
 
-        if(type == "char")
+        // TODO: is char case ever used?
+        if(primitive_type == "char")
         {
             return can_be_parsed_as<char>(value);
         }
-        else if(type == "int8")
+        else if(primitive_type == "int8")
         {
             return can_be_parsed_as<std::int8_t>(value);
         }
-        else if(type == "uint8")
+        else if(primitive_type == "uint8")
         {
             return can_be_parsed_as<std::uint8_t>(value);
         }
-        else if(type == "int16")
+        else if(primitive_type == "int16")
         {
             return can_be_parsed_as<std::int16_t>(value);
         }
-        else if(type == "uint16")
+        else if(primitive_type == "uint16")
         {
             return can_be_parsed_as<std::uint16_t>(value);
         }
-        else if(type == "int32")
+        else if(primitive_type == "int32")
         {
             return can_be_parsed_as<std::int32_t>(value);
         }
-        else if(type == "uint32")
+        else if(primitive_type == "uint32")
         {
             return can_be_parsed_as<std::uint32_t>(value);
         }
-        else if(type == "int64")
+        else if(primitive_type == "int64")
         {
             return can_be_parsed_as<std::int64_t>(value);
         }
-        else if(type == "uint64")
+        else if(primitive_type == "uint64")
         {
             return can_be_parsed_as<std::uint64_t>(value);
         }
-        else if(type == "float")
+        else if(primitive_type == "float")
         {
             return can_be_parsed_as_fp<float>(value);
         }
-        else if(type == "double")
+        else if(primitive_type == "double")
         {
             return can_be_parsed_as_fp<double>(value);
         }
@@ -327,6 +330,24 @@ private:
         }
     }
 
+    static std::size_t get_primitive_type_size(const std::string_view type)
+    {
+        static const std::unordered_map<std::string_view, std::size_t> map{
+            {"char", sizeof(char)},
+            {"int8", sizeof(std::int8_t)},
+            {"int16", sizeof(std::int16_t)},
+            {"int32", sizeof(std::int32_t)},
+            {"int64", sizeof(std::int64_t)},
+            {"uint8", sizeof(std::uint8_t)},
+            {"uint16", sizeof(std::uint16_t)},
+            {"uint32", sizeof(std::uint32_t)},
+            {"uint64", sizeof(std::uint64_t)},
+            {"float", sizeof(float)},
+            {"double", sizeof(double)}};
+
+        return map.at(type);
+    }
+
     void validate_encoding(const sbe::type& t)
     {
         if(t.presence == field_presence::constant)
@@ -334,25 +355,28 @@ private:
             validate_constant_value(t);
         }
         // else - nothing we validate at the moment
+
+        ctx_manager->get(t).size =
+            t.length * get_primitive_type_size(t.primitive_type);
     }
 
     static void validate_valid_values(
         const std::vector<sbe::enum_valid_value>& valid_values,
-        const std::string_view underlying_type)
+        const std::string_view primitive_type)
     {
         for(const auto& value : valid_values)
         {
             // strict: SBE char has strictly defined range
             const auto has_wrong_char_value =
-                ((underlying_type == "char") && (value.value.size() != 1));
+                ((primitive_type == "char") && (value.value.size() != 1));
             if(has_wrong_char_value
-               || !value_fits_into_type(value.value, underlying_type))
+               || !value_fits_into_type(value.value, primitive_type))
             {
                 throw_error(
                     "{}: value `{}` cannot be represented by type `{}`",
                     value.location,
                     value.value,
-                    underlying_type);
+                    primitive_type);
             }
         }
     }
@@ -374,11 +398,11 @@ private:
 
     void validate_encoding(const sbe::enumeration& e)
     {
-        std::string_view underlying_type;
+        std::string_view primitive_type;
 
         if(utils::is_primitive_type(e.type))
         {
-            underlying_type = e.type;
+            primitive_type = e.type;
         }
         else
         {
@@ -397,20 +421,21 @@ private:
             }
             // strict: type should be non-const, non-array
 
-            underlying_type = t->primitive_type;
+            primitive_type = t->primitive_type;
         }
 
         // strict: SBE even requires unsigned integer or char but I see no
         // reason to forbid signed integers
-        if(!is_integral_type(underlying_type))
+        if(!is_integral_type(primitive_type))
         {
             throw_error(
                 "{}: enum type should be `char` or integer, got `{}`",
                 e.location,
-                underlying_type);
+                primitive_type);
         }
 
-        validate_valid_values(e.valid_values, underlying_type);
+        validate_valid_values(e.valid_values, primitive_type);
+        ctx_manager->get(e).size = get_primitive_type_size(primitive_type);
     }
 
     static bool is_unsigned_primitive_type(const std::string_view type)
@@ -420,25 +445,14 @@ private:
         return unsigned_types.count(type);
     }
 
-    static std::size_t
-        get_underlying_size(const std::string_view underlying_type)
-    {
-        static const std::unordered_map<std::string_view, std::size_t> map{
-            {"uint8", sizeof(std::uint8_t)},
-            {"uint16", sizeof(std::uint16_t)},
-            {"uint32", sizeof(std::uint32_t)},
-            {"uint64", sizeof(std::uint64_t)}};
-
-        return map.at(underlying_type);
-    }
-
     static void validate_choice_indexes(
         const std::vector<sbe::set_choice>& choices,
-        const std::string_view underlying_type)
+        const std::string_view primitive_type)
     {
-        const auto underlying_size = get_underlying_size(underlying_type);
+        const auto primitive_type_size =
+            get_primitive_type_size(primitive_type);
         static constexpr auto bits_per_byte = 8;
-        const auto bit_length = underlying_size * bits_per_byte - 1;
+        const auto bit_length = primitive_type_size * bits_per_byte - 1;
 
         for(const auto& choice : choices)
         {
@@ -455,11 +469,11 @@ private:
 
     void validate_encoding(const sbe::set& s)
     {
-        std::string_view underlying_type;
+        std::string_view primitive_type;
 
         if(utils::is_primitive_type(s.type))
         {
-            underlying_type = s.type;
+            primitive_type = s.type;
         }
         else
         {
@@ -478,15 +492,16 @@ private:
             }
             // strict: type should be non-const, non-array
 
-            underlying_type = t->primitive_type;
+            primitive_type = t->primitive_type;
         }
 
-        if(!is_unsigned_primitive_type(underlying_type))
+        if(!is_unsigned_primitive_type(primitive_type))
         {
             throw_error("{}: underlying type must be unsigned", s.location);
         }
 
-        validate_choice_indexes(s.choices, underlying_type);
+        validate_choice_indexes(s.choices, primitive_type);
+        ctx_manager->get(s).size = get_primitive_type_size(primitive_type);
     }
 
     void validate_encoding(const sbe::ref& r)
@@ -498,19 +513,91 @@ private:
         }
 
         validate_public_encoding(*enc);
+
+        std::visit(
+            [this, &r](const auto& enc)
+            {
+                ctx_manager->get(r).size = ctx_manager->get(enc).size;
+            },
+            *enc);
+    }
+
+    template<typename T>
+    static bool is_constant_composite_element(const T& element)
+    {
+        if constexpr(std::is_same_v<T, sbe::type>)
+        {
+            return element.presence == field_presence::constant;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    bool is_constant_composite_element(const sbe::ref& r)
+    {
+        const auto enc = get_encoding(utils::to_lower(r.type));
+        assert(enc);
+
+        return std::visit(
+            [](const auto& enc)
+            {
+                return is_constant_composite_element(enc);
+            },
+            *enc);
+    }
+
+    template<typename T>
+    void validate_element_offset(const T& element, offset_t& current_offset)
+    {
+        if(is_constant_composite_element(element))
+        {
+            return;
+        }
+
+        auto& context = ctx_manager->get(element);
+
+        if(element.offset)
+        {
+            if(element.offset < current_offset)
+            {
+                throw_error(
+                    "{}: custom offset ({}) is less than minimum "
+                    "possible ({})",
+                    element.location,
+                    *element.offset,
+                    current_offset);
+            }
+            context.offset_in_composite = *element.offset;
+            current_offset = *element.offset;
+        }
+        else
+        {
+            context.offset_in_composite = current_offset;
+        }
+
+        const auto enc_size = context.size;
+        current_offset += enc_size;
     }
 
     void validate_encoding(const sbe::composite& c)
     {
+        offset_t offset{};
+
         for(const auto& element : c.elements)
         {
             std::visit(
-                [this](const auto& enc)
+                [this, &offset](const auto& enc)
                 {
                     validate_encoding(enc);
+                    validate_element_offset(enc, offset);
                 },
                 element);
         }
+
+        // `offset` points past the last element, it's effectively the size
+        ctx_manager->get(c).size = offset;
     }
 
     void validate_public_encoding(const sbe::encoding& encoding)

@@ -151,7 +151,8 @@ int main(int argc, char** argv)
         const auto& schema = parser.get_message_schema();
         // TODO: SBE-related verification
         sbe_checker checker;
-        checker.check(schema);
+        context_manager ctx_manager;
+        checker.check(schema, ctx_manager);
 
         // schema.name = config.schema_name.value_or(schema.package);
         // utils::validate_schema_name(schema, reporter);
