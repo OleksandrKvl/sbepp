@@ -314,10 +314,17 @@ private:
                     t.length);
             }
         }
-        // else
-        // {
-        //     // strict: check that value fits into primitive type
-        // }
+        else
+        {
+            if(!value_fits_into_type(*t.constant_value, t.primitive_type))
+            {
+                throw_error(
+                    "{}: value `{}` cannot be represented by type `{}`",
+                    t.location,
+                    *t.constant_value,
+                    t.primitive_type);
+            }
+        }
     }
 
     void validate_encoding(const sbe::type& t)
