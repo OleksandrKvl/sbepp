@@ -101,3 +101,8 @@ sbeppc_error_test(
     NAME "wrong_value_ref_value"
     ERROR "valueRef `numbers_enum.Two` \\(255\\) cannot be represented by type `int8`"
 )
+
+sbeppc_error_test(
+    NAME "wrong_numeric_constant_value"
+    ERROR "value `255` cannot be represented by type `int8`"
+)
