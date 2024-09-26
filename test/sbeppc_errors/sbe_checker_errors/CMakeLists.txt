@@ -27,7 +27,7 @@ sbeppc_error_test(
 
 sbeppc_error_test(
     NAME "no_value_ref_enumerator"
-    ERROR "enum `numbers_enum` doesn't have `One` enumerator"
+    ERROR "enum `numbers_enum` doesn't have valid value `One`"
 )
 
 sbeppc_error_test(
@@ -95,4 +95,9 @@ valid_value_test("uint64" "-1")
 sbeppc_error_test(
     NAME "wrong_enum_encoding"
     ERROR "enum type should be `char` or integer, got `float`"
+)
+
+sbeppc_error_test(
+    NAME "wrong_value_ref_value"
+    ERROR "valueRef `numbers_enum.Two` \\(255\\) cannot be represented by type `int8`"
 )
