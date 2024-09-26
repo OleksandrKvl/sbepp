@@ -9,10 +9,10 @@
                    byteOrder="littleEndian">
     <types>
         <enum name="numbers_enum" encodingType="uint8">
-            <validValue name="Two">0</validValue>
+            <validValue name="Two">255</validValue>
         </enum>
 
-        <type name="enum_const" primitiveType="uint32"
-            presence="constant" valueRef="numbers_enum.One"/>
+        <type name="enum_const" primitiveType="int8"
+            presence="constant" valueRef="numbers_enum.Two"/>
     </types>
 </sbe:messageSchema>

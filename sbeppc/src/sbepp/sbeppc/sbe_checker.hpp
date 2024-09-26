@@ -235,48 +235,60 @@ private:
         return false;
     }
 
-    void validate_value_ref(
-        const std::string& value_ref, const source_location& location)
+    void validate_value_ref(const sbe::type& t)
     {
+        const auto& value_ref = *t.value_ref;
         const auto parsed = utils::parse_value_ref(value_ref);
         if(parsed.enum_name.empty() || parsed.enumerator.empty())
         {
             throw_error(
-                "{}: `{}` is not a valid valueRef", location, value_ref);
+                "{}: `{}` is not a valid valueRef", t.location, value_ref);
         }
 
         const auto enc = get_encoding(parsed.enum_name);
         if(!enc)
         {
             throw_error(
-                "{}: encoding `{}` doesn't exist", location, parsed.enum_name);
+                "{}: encoding `{}` doesn't exist",
+                t.location,
+                parsed.enum_name);
         }
 
         const auto e = std::get_if<sbe::enumeration>(enc);
         if(!e)
         {
             throw_error(
-                "{}: encoding `{}` is not an enum", location, parsed.enum_name);
+                "{}: encoding `{}` is not an enum",
+                t.location,
+                parsed.enum_name);
         }
 
         const auto& values = e->valid_values;
-        if(std::find_if(
-               std::begin(values),
-               std::end(values),
-               [&parsed](const auto& choice)
-               {
-                   return (choice.name == parsed.enumerator);
-               })
-           == std::end(values))
+        const auto search = std::find_if(
+            std::begin(values),
+            std::end(values),
+            [&parsed](const auto& value)
+            {
+                return (value.name == parsed.enumerator);
+            });
+        if(search == std::end(values))
         {
             throw_error(
-                "{}: enum `{}` doesn't have `{}` enumerator",
-                location,
+                "{}: enum `{}` doesn't have valid value `{}`",
+                t.location,
                 parsed.enum_name,
                 parsed.enumerator);
         }
 
-        // strict: check that `valueRef` fits into underlying type
+        if(!value_fits_into_type(search->value, t.primitive_type))
+        {
+            throw_error(
+                "{}: valueRef `{}` ({}) cannot be represented by type `{}`",
+                t.location,
+                value_ref,
+                search->value,
+                t.primitive_type);
+        }
     }
 
     void validate_constant_value(const sbe::type& t)
@@ -287,7 +299,7 @@ private:
 
         if(t.value_ref)
         {
-            validate_value_ref(*t.value_ref, t.location);
+            validate_value_ref(t);
         }
         else if(t.primitive_type == "char")
         {
