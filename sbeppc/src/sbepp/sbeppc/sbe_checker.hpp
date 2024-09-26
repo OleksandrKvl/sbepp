@@ -143,6 +143,98 @@ private:
     //     return false;
     // }
 
+    template<typename T>
+    static bool can_be_parsed_as(const std::string_view str)
+    {
+        T value{};
+        const auto last = str.data() + str.size();
+        auto res = std::from_chars(str.data(), last, value);
+        if((res.ec == std::errc{}) && (res.ptr == last))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    template<typename T>
+    static bool can_be_parsed_as_fp(const std::string_view str)
+    {
+        static std::string_view nan{"nan"};
+        if(std::equal(
+               std::begin(str),
+               std::end(str),
+               std::begin(nan),
+               [](const auto lhs, const auto rhs)
+               {
+                   return std::tolower(lhs) == rhs;
+               }))
+        {
+            return true;
+        }
+        else
+        {
+            return can_be_parsed_as<T>(str);
+        }
+    }
+
+    static bool value_fits_into_type(
+        const std::string_view value, const std::string_view type)
+    {
+        if(value.empty())
+        {
+            return false;
+        }
+
+        if(type == "char")
+        {
+            return can_be_parsed_as<char>(value);
+        }
+        else if(type == "int8")
+        {
+            return can_be_parsed_as<std::int8_t>(value);
+        }
+        else if(type == "uint8")
+        {
+            return can_be_parsed_as<std::uint8_t>(value);
+        }
+        else if(type == "int16")
+        {
+            return can_be_parsed_as<std::int16_t>(value);
+        }
+        else if(type == "uint16")
+        {
+            return can_be_parsed_as<std::uint16_t>(value);
+        }
+        else if(type == "int32")
+        {
+            return can_be_parsed_as<std::int32_t>(value);
+        }
+        else if(type == "uint32")
+        {
+            return can_be_parsed_as<std::uint32_t>(value);
+        }
+        else if(type == "int64")
+        {
+            return can_be_parsed_as<std::int64_t>(value);
+        }
+        else if(type == "uint64")
+        {
+            return can_be_parsed_as<std::uint64_t>(value);
+        }
+        else if(type == "float")
+        {
+            return can_be_parsed_as_fp<float>(value);
+        }
+        else if(type == "double")
+        {
+            return can_be_parsed_as_fp<double>(value);
+        }
+
+        assert(false && "Wrong primitive type");
+        return false;
+    }
+
     void validate_value_ref(
         const std::string& value_ref, const source_location& location)
     {
@@ -225,27 +317,81 @@ private:
         // else - nothing we validate at the moment
     }
 
+    static void validate_valid_values(
+        const std::vector<sbe::enum_valid_value>& valid_values,
+        const std::string_view underlying_type)
+    {
+        for(const auto& value : valid_values)
+        {
+            // strict: SBE char has strictly defined range
+            const auto has_wrong_char_value =
+                ((underlying_type == "char") && (value.value.size() != 1));
+            if(has_wrong_char_value
+               || !value_fits_into_type(value.value, underlying_type))
+            {
+                throw_error(
+                    "{}: value `{}` cannot be represented by type `{}`",
+                    value.location,
+                    value.value,
+                    underlying_type);
+            }
+        }
+    }
+
+    static bool is_integral_type(const std::string_view type)
+    {
+        static const std::unordered_set<std::string_view> unsigned_types{
+            "char",
+            "int8",
+            "uint8",
+            "int16",
+            "uint16",
+            "int32",
+            "uint32",
+            "int64",
+            "uint64"};
+        return unsigned_types.count(type);
+    }
+
     void validate_encoding(const sbe::enumeration& e)
     {
+        std::string_view underlying_type;
+
         if(utils::is_primitive_type(e.type))
         {
-            return;
+            underlying_type = e.type;
         }
-
-        const auto enc = get_encoding(e.type);
-        if(!enc)
+        else
         {
-            throw_error("{}: encoding `{}` doesn't exist", e.location, e.type);
+            const auto enc = get_encoding(e.type);
+            if(!enc)
+            {
+                throw_error(
+                    "{}: encoding `{}` doesn't exist", e.location, e.type);
+            }
+
+            const auto t = std::get_if<sbe::type>(enc);
+            if(!t)
+            {
+                throw_error(
+                    "{}: encoding `{}` is not a type", e.location, e.type);
+            }
+            // strict: type should be non-const, non-array
+
+            underlying_type = t->primitive_type;
         }
 
-        if(!std::holds_alternative<sbe::type>(*enc))
+        // strict: SBE even requires unsigned integer or char but I see no
+        // reason to forbid signed integers
+        if(!is_integral_type(underlying_type))
         {
-            throw_error("{}: encoding `{}` is not a type", e.location, e.type);
+            throw_error(
+                "{}: enum type should be `char` or integer, got `{}`",
+                e.location,
+                underlying_type);
         }
 
-        // strict: type should be a non-const, non-array, char or integer (SBE
-        //  even requires unsigned integer)
-        // strict: validate enumerators
+        validate_valid_values(e.valid_values, underlying_type);
     }
 
     static bool is_unsigned_primitive_type(const std::string_view type)

@@ -74,3 +74,25 @@ sbeppc_error_test(
     NAME "wrong_char_const_length"
     ERROR "constant length \\(3\\) is greater than `length` attribute \\(1\\)"
 )
+
+function(valid_value_test type value)
+    sbeppc_error_test(
+        NAME "wrong_valid_value_${type}"
+        ERROR "value `${value}` cannot be represented by type `${type}`"
+    )
+endfunction()
+
+valid_value_test("char" "not_char")
+valid_value_test("int8" "128")
+valid_value_test("uint8" "-1")
+valid_value_test("int16" "32768")
+valid_value_test("uint16" "-1")
+valid_value_test("int32" "2147483648")
+valid_value_test("uint32" "-1")
+valid_value_test("int64" "9223372036854775808")
+valid_value_test("uint64" "-1")
+
+sbeppc_error_test(
+    NAME "wrong_enum_encoding"
+    ERROR "enum type should be `char` or integer, got `float`"
+)
