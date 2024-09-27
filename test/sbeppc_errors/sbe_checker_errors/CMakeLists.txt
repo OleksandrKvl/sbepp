@@ -106,3 +106,16 @@ sbeppc_error_test(
     NAME "wrong_numeric_constant_value"
     ERROR "value `255` cannot be represented by type `int8`"
 )
+
+function(offset_test encoding)
+    sbeppc_error_test(
+        NAME "bad_${encoding}_offset"
+        ERROR "custom offset \\(4\\) is less than minimum possible \\(8\\)"
+    )
+endfunction()
+
+offset_test("type")
+offset_test("enum")
+offset_test("set")
+offset_test("composite")
+offset_test("ref")

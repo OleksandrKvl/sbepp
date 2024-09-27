@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sbe:messageSchema xmlns:sbe="http://fixprotocol.io/2016/sbe"
+                   xmlns:xi="http://www.w3.org/2001/XInclude"
+                   package="bad_schema"
+                   id="1"
+                   version="0"
+                   semanticVersion="5.2"
+                   description="Example base schema which can be extended."
+                   byteOrder="littleEndian">
+    <types>
+        <type name="arr" primitiveType="uint8" length="8"/>
+
+        <composite name="composite">
+            <type name="num_const" primitiveType="uint8"
+                presence="constant">0</type>
+            <ref name="arr" type="arr"/>
+            <enum name="enumeration" encodingType="uint8" offset="4"/>
+        </composite>
+    </types>
+</sbe:messageSchema>
