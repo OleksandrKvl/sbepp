@@ -25,8 +25,7 @@ public:
         this->ctx_manager = &ctx_manager;
 
         validate_types();
-        // validate_message_header();
-        // check all messages
+        validate_messages();
     }
 
 private:
@@ -41,58 +40,63 @@ private:
 
     std::unordered_map<std::string_view, processing_state> processing_states;
 
-    static void validate_message_header_element(
-        const sbe::composite& c, const std::string_view name)
+    void validate_messages()
     {
-        // TODO: complete this function when types are checked
-        const auto e = utils::find_composite_element(c, name);
-        if(!e)
+        validate_message_header();
+    }
+
+    void validate_message_header_element(
+        const sbe::composite& c, const std::string_view name) const
+    {
+        const auto element = utils::find_composite_element(c, name);
+        if(!element)
         {
             throw_error(
-                "{}: message header composite `{}` doesn't have required `{}` "
-                "element",
+                "{}: message header `{}` doesn't have required `{}` element",
                 c.location,
                 c.name,
                 name);
         }
 
-        // TODO: should not be a constant?
-        // TODO: support `ref`
-        // SBE also requires underlying type to be unsigned integer but I don't
-        // want to restrict, we can do a warning about it
-        const auto t = std::get_if<sbe::type>(e);
+        const sbe::type* t = std::get_if<sbe::type>(element);
         if(!t)
         {
-            throw_error(
-                "{}: message header composite `{}` element `{}` must be a "
-                "non-array type",
-                t->location,
-                c.name,
-                t->name);
+            const auto r = std::get_if<sbe::ref>(element);
+            if(!r)
+            {
+                throw_error(
+                    "{}: message header element `{}` must be a type or a ref",
+                    utils::get_location(*element),
+                    name);
+            }
+
+            t = std::get_if<sbe::type>(get_encoding(r->type));
+            if(!t)
+            {
+                throw_error(
+                    "{}: message header element `{}` must refer to a type",
+                    r->location,
+                    name);
+            }
         }
 
-        if(!t || (t->length != 1))
+        // strict: SBE requires underlying type to be unsigned integer
+
+        if(t->length != 1)
         {
             throw_error(
-                "{}: message header composite element `{}` must be a "
-                "non-array type",
-                utils::get_location(*e),
-                utils::get_encoding_name(*e));
+                "{}: message header element `{}` must be a non-array type",
+                utils::get_location(*element),
+                name);
         }
 
         if(t->presence == field_presence::constant)
         {
             throw_error(
-                "{}: message header composite element `{}` cannot be a "
-                "constant",
-                t->location,
-                t->name);
+                "{}: message header element `{}` cannot be a constant",
+                utils::get_location(*element),
+                name);
         }
-
-        // if(!is_unsigned_primitive_type(t->primitive_type))
-        // {
-        //     // warning
-        // }
     }
 
     void validate_message_header() const
@@ -123,7 +127,8 @@ private:
 
     const sbe::encoding* get_encoding(const std::string& name) const
     {
-        const auto search = schema->types.find(name);
+        const auto lowered_name = utils::to_lower(name);
+        const auto search = schema->types.find(lowered_name);
         if(search != std::end(schema->types))
         {
             return &search->second;
@@ -532,7 +537,7 @@ private:
 
     void validate_encoding(const sbe::ref& r)
     {
-        const auto enc = get_encoding(utils::to_lower(r.type));
+        const auto enc = get_encoding(r.type);
         if(!enc)
         {
             throw_error("{}: encoding `{}` doesn't exist", r.location, r.type);
@@ -563,7 +568,7 @@ private:
 
     bool is_constant_composite_element(const sbe::ref& r)
     {
-        const auto enc = get_encoding(utils::to_lower(r.type));
+        const auto enc = get_encoding(r.type);
         assert(enc);
 
         return std::visit(

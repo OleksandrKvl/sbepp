@@ -139,3 +139,55 @@ sbeppc_error_test(
     NAME "wrong_numeric_constant_length"
     ERROR "non-char constant length must be equal to 1, got `2`"
 )
+
+sbeppc_error_test(
+    NAME "no_message_header"
+    ERROR "message header encoding `messageHeader` doesn't exist"
+)
+
+sbeppc_error_test(
+    NAME "non_composite_message_header"
+    ERROR "message header encoding `messageHeader` is not a composite"
+)
+
+function(message_header_element_test element)
+    sbeppc_error_test(
+        NAME "no_message_header_${element}"
+        ERROR "message header `messageHeader` doesn't have required `${element}` element"
+    )
+
+    sbeppc_error_test(
+        NAME "wrong_message_header_${element}_kind"
+        ERROR "message header element `${element}` must be a type or a ref"
+    )
+
+    sbeppc_error_test(
+        NAME "non_type_message_header_${element}_ref"
+        ERROR "message header element `${element}` must refer to a type"
+    )
+
+    sbeppc_error_test(
+        NAME "array_message_header_${element}"
+        ERROR "message header element `${element}` must be a non-array type"
+    )
+
+    sbeppc_error_test(
+        NAME "array_message_header_${element}_ref"
+        ERROR "message header element `${element}` must be a non-array type"
+    )
+
+    sbeppc_error_test(
+        NAME "constant_message_header_${element}"
+        ERROR "message header element `${element}` cannot be a constant"
+    )
+
+    sbeppc_error_test(
+        NAME "constant_message_header_${element}_ref"
+        ERROR "message header element `${element}` cannot be a constant"
+    )
+endfunction()
+
+message_header_element_test("schemaId")
+message_header_element_test("templateId")
+message_header_element_test("version")
+message_header_element_test("blockLength")
