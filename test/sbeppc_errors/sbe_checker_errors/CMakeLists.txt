@@ -119,3 +119,13 @@ offset_test("enum")
 offset_test("set")
 offset_test("composite")
 offset_test("ref")
+
+sbeppc_error_test(
+    NAME "array_enum_encoding"
+    ERROR "encoding type `arr` must have length equal to 1, got `8`"
+)
+
+sbeppc_error_test(
+    NAME "array_set_encoding"
+    ERROR "encoding type `arr` must have length equal to 1, got `8`"
+)

@@ -419,7 +419,17 @@ private:
                 throw_error(
                     "{}: encoding `{}` is not a type", e.location, e.type);
             }
-            // strict: type should be non-const, non-array
+            // strict: type should be non-const
+
+            if(t->length != 1)
+            {
+                throw_error(
+                    "{}: encoding type `{}` must have length equal to 1, got "
+                    "`{}`",
+                    e.location,
+                    e.type,
+                    t->length);
+            }
 
             primitive_type = t->primitive_type;
         }
@@ -490,7 +500,17 @@ private:
                 throw_error(
                     "{}: encoding `{}` is not a type", s.location, s.type);
             }
-            // strict: type should be non-const, non-array
+            // strict: type should be non-const
+
+            if(t->length != 1)
+            {
+                throw_error(
+                    "{}: encoding type `{}` must have length equal to 1, got "
+                    "`{}`",
+                    s.location,
+                    s.type,
+                    t->length);
+            }
 
             primitive_type = t->primitive_type;
         }
