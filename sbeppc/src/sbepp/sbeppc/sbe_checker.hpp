@@ -40,9 +40,42 @@ private:
 
     std::unordered_map<std::string_view, processing_state> processing_states;
 
+    void validate_members(const sbe::level_members& members)
+    {
+        for(const auto& f : members.fields)
+        {
+            if(!utils::is_primitive_type(f.type))
+            {
+                const auto enc = get_encoding(f.type);
+                if(!enc)
+                {
+                    throw_error(
+                        "{}: field type `{}` doesn't exist",
+                        f.location,
+                        f.type);
+                }
+            }
+        }
+
+        for(const auto& g : members.groups)
+        {
+            validate_members(g.members);
+        }
+    }
+
+    void validate_message(const sbe::message& m)
+    {
+        validate_members(m.members);
+    }
+
     void validate_messages()
     {
         validate_message_header();
+
+        for(const auto& m : schema->messages)
+        {
+            validate_message(m);
+        }
     }
 
     void validate_message_header_element(
@@ -125,7 +158,7 @@ private:
         validate_message_header_element(*c, "blockLength");
     }
 
-    const sbe::encoding* get_encoding(const std::string& name) const
+    const sbe::encoding* get_encoding(std::string_view name) const
     {
         const auto lowered_name = utils::to_lower(name);
         const auto search = schema->types.find(lowered_name);

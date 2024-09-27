@@ -191,3 +191,13 @@ message_header_element_test("schemaId")
 message_header_element_test("templateId")
 message_header_element_test("version")
 message_header_element_test("blockLength")
+
+sbeppc_error_test(
+    NAME "bad_field_type"
+    ERROR "field type `some_type` doesn't exist"
+)
+
+sbeppc_error_test(
+    NAME "bad_group_field_type"
+    ERROR "field type `some_type` doesn't exist"
+)
