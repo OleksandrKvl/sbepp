@@ -129,3 +129,13 @@ sbeppc_error_test(
     NAME "array_set_encoding"
     ERROR "encoding type `arr` must have length equal to 1, got `8`"
 )
+
+sbeppc_error_test(
+    NAME "wrong_value_ref_constant_length"
+    ERROR "non-char constant length must be equal to 1, got `2`"
+)
+
+sbeppc_error_test(
+    NAME "wrong_numeric_constant_length"
+    ERROR "non-char constant length must be equal to 1, got `2`"
+)

@@ -298,8 +298,6 @@ private:
     {
         assert(t.value_ref || t.constant_value);
 
-        // strict: `length` should be 1 if primitive type is not "char"
-
         if(t.value_ref)
         {
             validate_value_ref(t);
@@ -327,6 +325,14 @@ private:
                     *t.constant_value,
                     t.primitive_type);
             }
+        }
+
+        if((t.value_ref || (t.primitive_type != "char")) && (t.length != 1))
+        {
+            throw_error(
+                "{}: non-char constant length must be equal to 1, got `{}`",
+                t.location,
+                t.length);
         }
     }
 
