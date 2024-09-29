@@ -11,6 +11,7 @@
 #include <unordered_map>
 #include <variant>
 #include <cassert>
+#include <vector>
 
 namespace sbepp::sbeppc
 {
@@ -59,6 +60,7 @@ private:
 
         for(const auto& g : members.groups)
         {
+            validate_group_header(g);
             validate_members(g.members);
         }
     }
@@ -78,15 +80,18 @@ private:
         }
     }
 
-    void validate_message_header_element(
-        const sbe::composite& c, const std::string_view name) const
+    void validate_level_header_element(
+        const sbe::composite& c,
+        const std::string_view level_name,
+        const std::string_view name) const
     {
         const auto element = utils::find_composite_element(c, name);
         if(!element)
         {
             throw_error(
-                "{}: message header `{}` doesn't have required `{}` element",
+                "{}: {} header `{}` doesn't have required `{}` element",
                 c.location,
+                level_name,
                 c.name,
                 name);
         }
@@ -98,8 +103,9 @@ private:
             if(!r)
             {
                 throw_error(
-                    "{}: message header element `{}` must be a type or a ref",
+                    "{}: {} header element `{}` must be a type or a ref",
                     utils::get_location(*element),
+                    level_name,
                     name);
             }
 
@@ -107,8 +113,9 @@ private:
             if(!t)
             {
                 throw_error(
-                    "{}: message header element `{}` must refer to a type",
+                    "{}: {} header element `{}` must refer to a type",
                     r->location,
+                    level_name,
                     name);
             }
         }
@@ -118,44 +125,72 @@ private:
         if(t->length != 1)
         {
             throw_error(
-                "{}: message header element `{}` must be a non-array type",
+                "{}: {} header element `{}` must be a non-array type",
                 utils::get_location(*element),
+                level_name,
                 name);
         }
 
         if(t->presence == field_presence::constant)
         {
             throw_error(
-                "{}: message header element `{}` cannot be a constant",
+                "{}: {} header element `{}` cannot be a constant",
                 utils::get_location(*element),
+                level_name,
                 name);
         }
     }
 
-    void validate_message_header() const
+    void validate_level_header(
+        const std::string_view level_name,
+        const source_location& level_location,
+        const std::string_view header_type,
+        const std::vector<std::string_view>& required_fields) const
     {
-        const auto enc = get_encoding(schema->header_type);
+        const auto enc = get_encoding(header_type);
         if(!enc)
         {
             throw_error(
-                "{}: message header encoding `{}` doesn't exist",
-                schema->location,
-                schema->header_type);
+                "{}: {} header encoding `{}` doesn't exist",
+                level_location,
+                level_name,
+                header_type);
         }
 
         const auto c = std::get_if<sbe::composite>(enc);
         if(!c)
         {
             throw_error(
-                "{}: message header encoding `{}` is not a composite",
+                "{}: {} header encoding `{}` is not a composite",
                 utils::get_location(*enc),
-                schema->header_type);
+                level_name,
+                header_type);
         }
 
-        validate_message_header_element(*c, "schemaId");
-        validate_message_header_element(*c, "templateId");
-        validate_message_header_element(*c, "version");
-        validate_message_header_element(*c, "blockLength");
+        for(const auto& field : required_fields)
+        {
+            validate_level_header_element(*c, level_name, field);
+        }
+    }
+
+    void validate_message_header() const
+    {
+        validate_level_header(
+            "message",
+            schema->location,
+            schema->header_type,
+            {"schemaId", "templateId", "version", "blockLength"});
+        // strict: validate optional `numGroups` and `numVarDataFields`
+    }
+
+    void validate_group_header(const sbe::group& g) const
+    {
+        validate_level_header(
+            "group",
+            g.location,
+            g.dimension_type,
+            {"numInGroup", "blockLength"});
+        // strict: validate optional `numGroups` and `numVarDataFields`
     }
 
     const sbe::encoding* get_encoding(std::string_view name) const
