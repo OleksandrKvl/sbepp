@@ -150,41 +150,45 @@ sbeppc_error_test(
     ERROR "message header encoding `messageHeader` is not a composite"
 )
 
+function(level_header_element_test level header_name element)
+    sbeppc_error_test(
+        NAME "no_${level}_header_${element}"
+        ERROR "${level} header `${header_name}` doesn't have required `${element}` element"
+    )
+
+    sbeppc_error_test(
+        NAME "wrong_${level}_header_${element}_kind"
+        ERROR "${level} header element `${element}` must be a type or a ref"
+    )
+
+    sbeppc_error_test(
+        NAME "non_type_${level}_header_${element}_ref"
+        ERROR "${level} header element `${element}` must refer to a type"
+    )
+
+    sbeppc_error_test(
+        NAME "array_${level}_header_${element}"
+        ERROR "${level} header element `${element}` must be a non-array type"
+    )
+
+    sbeppc_error_test(
+        NAME "array_${level}_header_${element}_ref"
+        ERROR "${level} header element `${element}` must be a non-array type"
+    )
+
+    sbeppc_error_test(
+        NAME "constant_${level}_header_${element}"
+        ERROR "${level} header element `${element}` cannot be a constant"
+    )
+
+    sbeppc_error_test(
+        NAME "constant_${level}_header_${element}_ref"
+        ERROR "${level} header element `${element}` cannot be a constant"
+    )
+endfunction()
+
 function(message_header_element_test element)
-    sbeppc_error_test(
-        NAME "no_message_header_${element}"
-        ERROR "message header `messageHeader` doesn't have required `${element}` element"
-    )
-
-    sbeppc_error_test(
-        NAME "wrong_message_header_${element}_kind"
-        ERROR "message header element `${element}` must be a type or a ref"
-    )
-
-    sbeppc_error_test(
-        NAME "non_type_message_header_${element}_ref"
-        ERROR "message header element `${element}` must refer to a type"
-    )
-
-    sbeppc_error_test(
-        NAME "array_message_header_${element}"
-        ERROR "message header element `${element}` must be a non-array type"
-    )
-
-    sbeppc_error_test(
-        NAME "array_message_header_${element}_ref"
-        ERROR "message header element `${element}` must be a non-array type"
-    )
-
-    sbeppc_error_test(
-        NAME "constant_message_header_${element}"
-        ERROR "message header element `${element}` cannot be a constant"
-    )
-
-    sbeppc_error_test(
-        NAME "constant_message_header_${element}_ref"
-        ERROR "message header element `${element}` cannot be a constant"
-    )
+    level_header_element_test("message" "messageHeader" "${element}")
 endfunction()
 
 message_header_element_test("schemaId")
@@ -201,3 +205,20 @@ sbeppc_error_test(
     NAME "bad_group_field_type"
     ERROR "field type `some_type` doesn't exist"
 )
+
+sbeppc_error_test(
+    NAME "no_group_header"
+    ERROR "group header encoding `groupSizeEncoding` doesn't exist"
+)
+
+sbeppc_error_test(
+    NAME "non_composite_group_header"
+    ERROR "group header encoding `groupSizeEncoding` is not a composite"
+)
+
+function(group_header_element_test element)
+    level_header_element_test("group" "groupSizeEncoding" "${element}")
+endfunction()
+
+group_header_element_test("blockLength")
+group_header_element_test("numInGroup")
