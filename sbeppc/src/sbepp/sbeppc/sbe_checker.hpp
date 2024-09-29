@@ -9,6 +9,7 @@
 #include <string>
 #include <string_view>
 #include <unordered_map>
+#include <unordered_set>
 #include <variant>
 #include <cassert>
 #include <vector>
@@ -40,6 +41,7 @@ private:
     };
 
     std::unordered_map<std::string_view, processing_state> processing_states;
+    std::unordered_set<std::string> validated_group_headers;
 
     void validate_members(const sbe::level_members& members)
     {
@@ -183,14 +185,22 @@ private:
         // strict: validate optional `numGroups` and `numVarDataFields`
     }
 
-    void validate_group_header(const sbe::group& g) const
+    void validate_group_header(const sbe::group& g)
     {
-        validate_level_header(
-            "group",
-            g.location,
-            g.dimension_type,
-            {"numInGroup", "blockLength"});
-        // strict: validate optional `numGroups` and `numVarDataFields`
+        // multiple groups usually share the same header type, we don't need to
+        // validate it more than once
+        const auto lowered_name = utils::to_lower(g.dimension_type);
+        if(!validated_group_headers.count(lowered_name))
+        {
+            validate_level_header(
+                "group",
+                g.location,
+                g.dimension_type,
+                {"numInGroup", "blockLength"});
+            // strict: validate optional `numGroups` and `numVarDataFields`
+
+            validated_group_headers.insert(lowered_name);
+        }
     }
 
     const sbe::encoding* get_encoding(std::string_view name) const
