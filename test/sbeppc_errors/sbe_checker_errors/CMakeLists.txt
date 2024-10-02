@@ -232,3 +232,13 @@ sbeppc_error_test(
     NAME "bad_group_field_offset"
     ERROR "custom offset \\(5\\) is less than minimum possible \\(6\\)"
 )
+
+sbeppc_error_test(
+    NAME "bad_message_blockLength"
+    ERROR "custom `blockLength` \\(5\\) is less than minimum possible \\(6\\)"
+)
+
+sbeppc_error_test(
+    NAME "bad_group_blockLength"
+    ERROR "custom `blockLength` \\(5\\) is less than minimum possible \\(6\\)"
+)
