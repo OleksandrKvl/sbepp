@@ -222,3 +222,13 @@ endfunction()
 
 group_header_element_test("blockLength")
 group_header_element_test("numInGroup")
+
+sbeppc_error_test(
+    NAME "bad_message_field_offset"
+    ERROR "custom offset \\(5\\) is less than minimum possible \\(6\\)"
+)
+
+sbeppc_error_test(
+    NAME "bad_group_field_offset"
+    ERROR "custom offset \\(5\\) is less than minimum possible \\(6\\)"
+)
