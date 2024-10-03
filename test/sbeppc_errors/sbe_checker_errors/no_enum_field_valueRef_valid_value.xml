@@ -6,8 +6,7 @@
                    version="0"
                    semanticVersion="5.2"
                    description="Example base schema which can be extended."
-                   byteOrder="littleEndian"
-                   messageHeader="messageHeader">
+                   byteOrder="littleEndian">
     <types>
         <composite name="messageHeader">
             <type name="blockLength" primitiveType="uint16"/>
@@ -16,15 +15,10 @@
             <type name="version" primitiveType="uint16"/>
         </composite>
 
-        <type name="arr" primitiveType="uint8" length="2"/>
-
-        <composite name="groupSizeEncoding">
-            <ref name="numInGroup" type="arr"/>
-            <type name="blockLength" primitiveType="uint16"/>
-        </composite>
+        <enum name="options" encodingType="uint8"/>
     </types>
 
     <sbe:message name="msg" id="1">
-        <group name="group" id="1"/>
+        <field name="field1" id="1" type="options" presence="constant" valueRef="options.def"/>
     </sbe:message>
 </sbe:messageSchema>

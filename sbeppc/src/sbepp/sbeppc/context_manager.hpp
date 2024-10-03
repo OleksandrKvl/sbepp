@@ -89,14 +89,14 @@ struct message_context
 
 struct field_context
 {
-    std::string tag;
+    // std::string tag;
     // does NOT include message/group header size
-    offset_t actual_offset;
+    offset_t level_offset;
     std::size_t size;
     field_presence actual_presence;
-    std::string value_type;
-    std::string value_type_tag;
-    bool is_template;
+    // std::string value_type;
+    // std::string value_type_tag;
+    // bool is_template;
 };
 
 struct group_context
@@ -157,6 +157,12 @@ struct context_type<sbe::ref>
     using type = ref_context;
 };
 
+template<>
+struct context_type<sbe::field>
+{
+    using type = field_context;
+};
+
 class context_manager
 {
 public:
@@ -175,7 +181,8 @@ private:
         map_type<sbe::enumeration>,
         map_type<sbe::set>,
         map_type<sbe::composite>,
-        map_type<sbe::ref>>
+        map_type<sbe::ref>,
+        map_type<sbe::field>>
         contexts;
 };
 } // namespace sbepp::sbeppc

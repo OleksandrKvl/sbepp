@@ -15,6 +15,11 @@
             <type name="version" primitiveType="uint16"/>
         </composite>
 
+        <composite name="groupSizeEncoding">
+            <type name="blockLength" primitiveType="uint16"/>
+            <type name="numInGroup" primitiveType="uint16"/>
+        </composite>
+
         <type name="uint16_t" primitiveType="uint16"/>
     </types>
 

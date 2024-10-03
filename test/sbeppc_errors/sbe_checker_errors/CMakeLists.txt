@@ -284,3 +284,88 @@ sbeppc_error_test(
     NAME "non_zero_length_data_header_varData_ref"
     ERROR "data header element `varData` must have length equal to 0"
 )
+
+sbeppc_error_test(
+    NAME "no_field_valueRef"
+    ERROR "field constant must have `valueRef`"
+)
+
+sbeppc_error_test(
+    NAME "invalid_field_valueRef1"
+    ERROR "`bad_ref` is not a valid `valueRef`"
+)
+
+sbeppc_error_test(
+    NAME "invalid_field_valueRef2"
+    ERROR "`abc.` is not a valid `valueRef`"
+)
+
+sbeppc_error_test(
+    NAME "invalid_field_valueRef3"
+    ERROR "`.abc` is not a valid `valueRef`"
+)
+
+sbeppc_error_test(
+    NAME "no_field_valueRef_encoding"
+    ERROR "encoding `abc` doesn't exist"
+)
+
+sbeppc_error_test(
+    NAME "non_enum_field_valueRef_encoding"
+    ERROR "encoding `messageHeader` is not an enum"
+)
+
+sbeppc_error_test(
+    NAME "no_field_valueRef_valid_value"
+    ERROR "enum `options` doesn't have valid value `def`"
+)
+
+sbeppc_error_test(
+    NAME "out_of_range_field_valueRef_valid_value"
+    ERROR "valueRef `options.a` \\(256\\) cannot be represented by type `uint8`"
+)
+
+sbeppc_error_test(
+    NAME "composite_field_constant"
+    ERROR "composite field can't be a constant"
+)
+
+sbeppc_error_test(
+    NAME "no_enum_field_valueRef"
+    ERROR "field constant must have `valueRef`"
+)
+
+sbeppc_error_test(
+    NAME "invalid_enum_field_valueRef1"
+    ERROR "`bad_ref` is not a valid `valueRef`"
+)
+
+sbeppc_error_test(
+    NAME "invalid_enum_field_valueRef2"
+    ERROR "`abc.` is not a valid `valueRef`"
+)
+
+sbeppc_error_test(
+    NAME "invalid_enum_field_valueRef3"
+    ERROR "`.abc` is not a valid `valueRef`"
+)
+
+sbeppc_error_test(
+    NAME "no_enum_field_valueRef_encoding"
+    ERROR "encoding `abc` doesn't exist"
+)
+
+sbeppc_error_test(
+    NAME "non_enum_enum_field_valueRef_encoding"
+    ERROR "encoding `messageHeader` is not an enum"
+)
+
+sbeppc_error_test(
+    NAME "no_enum_field_valueRef_valid_value"
+    ERROR "enum `options` doesn't have valid value `def`"
+)
+
+sbeppc_error_test(
+    NAME "wrong_enum_field_valueRef_enum"
+    ERROR "enum constant type `some_enum` should match field type `options`"
+)

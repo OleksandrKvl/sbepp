@@ -42,11 +42,350 @@ private:
 
     std::unordered_map<std::string_view, processing_state> processing_states;
     std::unordered_set<std::string> validated_group_headers;
+    std::unordered_set<std::string> validated_data_headers;
 
-    void validate_members(const sbe::level_members& members)
+    static bool is_single_byte_type(const std::string_view type)
     {
+        static const std::unordered_set<std::string_view> single_byte_types{
+            "char", "int8", "uint8"};
+        return single_byte_types.count(type);
+    }
+
+    void validate_data_element_type(const sbe::composite& c)
+    {
+        static constexpr std::string_view element_name = "varData";
+        // TODO: deduplicate
+        const auto element = utils::find_composite_element(c, element_name);
+        if(!element)
+        {
+            throw_error(
+                "{}: data header `{}` doesn't have required `{}` element",
+                c.location,
+                c.name,
+                element_name);
+        }
+
+        const sbe::type* t = std::get_if<sbe::type>(element);
+        if(!t)
+        {
+            const auto r = std::get_if<sbe::ref>(element);
+            if(!r)
+            {
+                throw_error(
+                    "{}: data header element `{}` must be a type or a ref",
+                    utils::get_location(*element),
+                    element_name);
+            }
+
+            t = std::get_if<sbe::type>(get_encoding(r->type));
+            if(!t)
+            {
+                throw_error(
+                    "{}: data header element `{}` must refer to a type",
+                    r->location,
+                    element_name);
+            }
+        }
+
+        if(t->length != 0)
+        {
+            throw_error(
+                "{}: data header element `{}` must have length equal to 0",
+                utils::get_location(*element),
+                element_name);
+        }
+
+        // strict: t->presence should be `required`?
+
+        // `t->primitive_type` must be a single-byte type but it's already
+        // checked during type validation
+    }
+
+    void validate_data_header(const sbe::data& d)
+    {
+        // multiple groups usually share the same header type, we don't need to
+        // validate it more than once
+        const auto lowered_name = utils::to_lower(d.type);
+        if(!validated_data_headers.count(lowered_name))
+        {
+            const auto enc = get_encoding(d.type);
+            if(!enc)
+            {
+                throw_error(
+                    "{}: data header encoding `{}` doesn't exist",
+                    d.location,
+                    d.type);
+            }
+
+            const auto c = std::get_if<sbe::composite>(enc);
+            if(!c)
+            {
+                throw_error(
+                    "{}: data header encoding `{}` is not a composite",
+                    utils::get_location(*enc),
+                    d.type);
+            }
+
+            validate_level_header_element(*c, "data", "length");
+            validate_data_element_type(*c);
+            // strict: the order should be `length -> varData` and no other
+            //  elements are allowed
+
+            validated_data_headers.insert(lowered_name);
+        }
+    }
+
+    void validate_field_offset(const sbe::field& f, offset_t& current_offset)
+    {
+        auto& context = ctx_manager->get(f);
+
+        if(f.offset)
+        {
+            if(f.offset < current_offset)
+            {
+                throw_error(
+                    "{}: custom offset ({}) is less than minimum "
+                    "possible ({})",
+                    f.location,
+                    *f.offset,
+                    current_offset);
+            }
+            context.level_offset = *f.offset;
+            current_offset = *f.offset;
+        }
+        else
+        {
+            context.level_offset = current_offset;
+        }
+
+        const auto enc_size = context.size;
+        current_offset += enc_size;
+    }
+
+    static field_presence
+        get_actual_presence(const sbe::field& f, const sbe::encoding& enc)
+    {
+        // ideally, field presence must match encoding presence but in
+        // reality some schemas break this rule and, for example,
+        // specify enum fields as optional. Here, we figure out valid
+        // presence silently, without error or warning message about
+        // their mismatch.
+        return std::visit(
+            utils::overloaded{
+                [](const sbe::type& t)
+                {
+                    return t.presence;
+                },
+                [&f](const sbe::composite&)
+                {
+                    return f.presence;
+                },
+                [&f](const sbe::enumeration&)
+                {
+                    // enum field can be either `constant`, with value
+                    // provided in `valueRef`, or `required`, but not
+                    // `optional`
+                    if(f.presence == field_presence::optional)
+                    {
+                        return field_presence::required;
+                    }
+                    return f.presence;
+                },
+                [](const sbe::set&)
+                {
+                    return field_presence::required;
+                }},
+            enc);
+    }
+
+    // TODO: deduplicate
+    void validate_value_ref2(const sbe::field& f)
+    {
+        if(!f.value_ref)
+        {
+            throw_error("{}: field constant must have `valueRef`", f.location);
+        }
+
+        const auto& value_ref = *f.value_ref;
+        const auto parsed = utils::parse_value_ref(value_ref);
+        if(parsed.enum_name.empty() || parsed.enumerator.empty())
+        {
+            throw_error(
+                "{}: `{}` is not a valid `valueRef`", f.location, value_ref);
+        }
+
+        const auto enc = get_encoding(parsed.enum_name);
+        if(!enc)
+        {
+            throw_error(
+                "{}: encoding `{}` doesn't exist",
+                f.location,
+                parsed.enum_name);
+        }
+
+        const auto e = std::get_if<sbe::enumeration>(enc);
+        if(!e)
+        {
+            throw_error(
+                "{}: encoding `{}` is not an enum",
+                f.location,
+                parsed.enum_name);
+        }
+
+        const auto& values = e->valid_values;
+        const auto search = std::find_if(
+            std::begin(values),
+            std::end(values),
+            [&parsed](const auto& value)
+            {
+                return (value.name == parsed.enumerator);
+            });
+        if(search == std::end(values))
+        {
+            throw_error(
+                "{}: enum `{}` doesn't have valid value `{}`",
+                f.location,
+                parsed.enum_name,
+                parsed.enumerator);
+        }
+
+        if(!value_fits_into_type(search->value, f.type))
+        {
+            throw_error(
+                "{}: valueRef `{}` ({}) cannot be represented by type `{}`",
+                f.location,
+                value_ref,
+                search->value,
+                f.type);
+        }
+    }
+
+    // TODO: deduplicate
+    void validate_value_ref3(const sbe::field& f)
+    {
+        if(!f.value_ref)
+        {
+            throw_error("{}: field constant must have `valueRef`", f.location);
+        }
+
+        const auto& value_ref = *f.value_ref;
+        const auto parsed = utils::parse_value_ref(value_ref);
+        if(parsed.enum_name.empty() || parsed.enumerator.empty())
+        {
+            throw_error(
+                "{}: `{}` is not a valid `valueRef`", f.location, value_ref);
+        }
+
+        const auto enc = get_encoding(parsed.enum_name);
+        if(!enc)
+        {
+            throw_error(
+                "{}: encoding `{}` doesn't exist",
+                f.location,
+                parsed.enum_name);
+        }
+
+        const auto e = std::get_if<sbe::enumeration>(enc);
+        if(!e)
+        {
+            throw_error(
+                "{}: encoding `{}` is not an enum",
+                f.location,
+                parsed.enum_name);
+        }
+
+        const auto& values = e->valid_values;
+        const auto search = std::find_if(
+            std::begin(values),
+            std::end(values),
+            [&parsed](const auto& value)
+            {
+                return (value.name == parsed.enumerator);
+            });
+        if(search == std::end(values))
+        {
+            throw_error(
+                "{}: enum `{}` doesn't have valid value `{}`",
+                f.location,
+                parsed.enum_name,
+                parsed.enumerator);
+        }
+
+        const auto lowered_field_type = utils::to_lower(f.type);
+        const auto lowered_enum_type = utils::to_lower(parsed.enum_name);
+        if(lowered_field_type != lowered_enum_type)
+        {
+            throw_error(
+                "{}: enum constant type `{}` should match field type `{}`",
+                f.location,
+                parsed.enum_name,
+                f.type);
+        }
+    }
+
+    void validate_constant_field(const sbe::field& f)
+    {
+        if(utils::is_primitive_type(f.type))
+        {
+            validate_value_ref2(f);
+        }
+        else
+        {
+            const auto enc = get_encoding(f.type);
+            assert(enc);
+            std::visit(
+                utils::overloaded{
+                    [](const sbe::type&)
+                    {
+                        // nothing to validate because types are already
+                        // validated
+                    },
+                    [](const sbe::set&)
+                    {
+                        // not possible because sets can't be constant
+                        assert(false);
+                    },
+                    [&f](const sbe::composite&)
+                    {
+                        throw_error(
+                            "{}: composite field can't be a constant",
+                            f.location);
+                    },
+                    [&f, this](const sbe::enumeration&)
+                    {
+                        validate_value_ref3(f);
+                    }},
+                *enc);
+        }
+    }
+
+    static void validate_block_length(
+        const std::optional<block_length_t>& block_length,
+        const block_length_t actual_block_length,
+        const source_location& location)
+    {
+        if(block_length && (*block_length < actual_block_length))
+        {
+            throw_error(
+                "{}: custom `blockLength` ({}) is less than minimum possible "
+                "({})",
+                location,
+                *block_length,
+                actual_block_length);
+        }
+    }
+
+    void validate_members(
+        const sbe::level_members& members,
+        const std::optional<block_length_t>& block_length,
+        const source_location& location)
+    {
+        offset_t offset{};
+
         for(const auto& f : members.fields)
         {
+            auto& context = ctx_manager->get(f);
+            field_presence actual_presence{};
             if(!utils::is_primitive_type(f.type))
             {
                 const auto enc = get_encoding(f.type);
@@ -57,19 +396,53 @@ private:
                         f.location,
                         f.type);
                 }
+
+                // TODO: refactor?
+                context.size = std::visit(
+                    [this](const auto& type)
+                    {
+                        return ctx_manager->get(type).size;
+                    },
+                    *enc);
+                actual_presence = get_actual_presence(f, *enc);
             }
+            else
+            {
+                context.size = get_primitive_type_size(f.type);
+                actual_presence = f.presence;
+            }
+
+            context.actual_presence = actual_presence;
+            if(actual_presence == field_presence::constant)
+            {
+                validate_constant_field(f);
+            }
+            // else
+            // {
+            //     // strict: warn about optional composite
+            // }
+
+            validate_field_offset(f, offset);
         }
+
+        // at this point `offset` is essentially a minimal blockLength value
+        validate_block_length(block_length, offset, location);
 
         for(const auto& g : members.groups)
         {
             validate_group_header(g);
-            validate_members(g.members);
+            validate_members(g.members, g.block_length, g.location);
+        }
+
+        for(const auto& d : members.data)
+        {
+            validate_data_header(d);
         }
     }
 
     void validate_message(const sbe::message& m)
     {
-        validate_members(m.members);
+        validate_members(m.members, m.block_length, m.location);
     }
 
     void validate_messages()
@@ -443,7 +816,14 @@ private:
         {
             validate_constant_value(t);
         }
-        // else - nothing we validate at the moment
+        else
+        {
+            if((t.length != 1) && !is_single_byte_type(t.primitive_type))
+            {
+                throw_error(
+                    "{}: arrays must have a single-byte type", t.location);
+            }
+        }
 
         ctx_manager->get(t).size =
             t.length * get_primitive_type_size(t.primitive_type);
@@ -472,7 +852,7 @@ private:
 
     static bool is_integral_type(const std::string_view type)
     {
-        static const std::unordered_set<std::string_view> unsigned_types{
+        static const std::unordered_set<std::string_view> integral_types{
             "char",
             "int8",
             "uint8",
@@ -482,7 +862,7 @@ private:
             "uint32",
             "int64",
             "uint64"};
-        return unsigned_types.count(type);
+        return integral_types.count(type);
     }
 
     void validate_encoding(const sbe::enumeration& e)
