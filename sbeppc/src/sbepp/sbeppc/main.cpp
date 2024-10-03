@@ -6,10 +6,11 @@
 #include <sbepp/sbeppc/reporter.hpp>
 #include <sbepp/sbeppc/schema_parser.hpp>
 #include <sbepp/sbeppc/sbe_error.hpp>
-// #include <sbepp/sbeppc/schema_compiler.hpp>
+#include <sbepp/sbeppc/schema_compiler.hpp>
 #include <sbepp/sbeppc/build_info.hpp>
 #include <sbepp/sbeppc/sbe_checker.hpp>
 #include <sbepp/sbeppc/cpp_validator.hpp>
+#include <sbepp/sbeppc/context_manager.hpp>
 
 #include <fmt/core.h>
 
@@ -164,14 +165,12 @@ int main(int argc, char** argv)
         cpp_checker.validate(schema);
 
         // now we can generate C++ code
-
-        // schema_compiler::compile(
-        //     config.output_dir,
-        //     config.inject_include,
-        //     schema,
-        //     types,
-        //     messages,
-        //     fs_provider);
+        schema_compiler::compile(
+            config.output_dir,
+            config.inject_include,
+            schema,
+            ctx_manager,
+            fs_provider);
     }
     catch(const sbe_error& e)
     {
