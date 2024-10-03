@@ -211,65 +211,6 @@ inline std::string_view presence_to_string(const field_presence presence)
     }
 }
 
-inline bool is_reserved_cpp_identifier(const std::string_view str)
-{
-    if(str.find("__") != std::string_view::npos)
-    {
-        return true;
-    }
-
-    if((str.size() > 1) && (str[0] == '_')
-       && (std::isupper(static_cast<unsigned char>(str[1]))))
-    {
-        return true;
-    }
-
-    return false;
-}
-
-inline bool is_reserved_cpp_namespace(const std::string_view str)
-{
-    return (str == "std") || (str == "posix");
-}
-
-inline bool is_cpp_keyword(const std::string_view str)
-{
-    static const std::unordered_set<std::string_view> cpp_keywords{
-        "alignas",       "alignof",     "and",
-        "and_eq",        "asm",         "auto",
-        "bitand",        "bitor",       "bool",
-        "break",         "case",        "catch",
-        "char",          "char8_t",     "char16_t",
-        "char32_t",      "class",       "compl",
-        "concept",       "const",       "consteval",
-        "constexpr",     "constinit",   "const_cast",
-        "continue",      "co_await",    "co_return",
-        "co_yield",      "decltype",    "default",
-        "delete",        "do",          "double",
-        "dynamic_cast",  "else",        "enum",
-        "explicit",      "export",      "extern",
-        "false",         "float",       "for",
-        "friend",        "goto",        "if",
-        "inline",        "int",         "long",
-        "mutable",       "namespace",   "new",
-        "noexcept",      "not",         "not_eq",
-        "nullptr",       "operator",    "or",
-        "or_eq",         "private",     "protected",
-        "public",        "register",    "reinterpret_cast",
-        "requires",      "return",      "short",
-        "signed",        "sizeof",      "static",
-        "static_assert", "static_cast", "struct",
-        "switch",        "template",    "this",
-        "thread_local",  "throw",       "true",
-        "try",           "typedef",     "typeid",
-        "typename",      "union",       "unsigned",
-        "using",         "virtual",     "void",
-        "volatile",      "wchar_t",     "while",
-        "xor",           "xor_eq"};
-
-    return cpp_keywords.count(str);
-}
-
 inline bool is_sbe_symbolic_name(const std::string_view name)
 {
     // SBE also sets maximum name length to 64 but it doesn't make sense to me
@@ -286,23 +227,6 @@ inline bool is_sbe_symbolic_name(const std::string_view name)
             return std::isalnum(ch) || (ch == '_');
         });
     return (search == std::end(name));
-}
-
-inline bool is_valid_name(const std::string_view name)
-{
-    return is_sbe_symbolic_name(name) && !is_cpp_keyword(name);
-}
-
-inline void warn_about_reserved_identifier(
-    const std::string_view name,
-    const source_location& location,
-    ireporter& reporter)
-{
-    if(is_reserved_cpp_identifier(name))
-    {
-        reporter.warning(
-            "{}: name `{}` is a reserved C++ identifier\n", location, name);
-    }
 }
 
 inline std::string to_lower(const std::string_view str)
@@ -382,26 +306,6 @@ inline std::string to_integer_literal(
         return std::string{str};
     }
 }
-
-// TODO: refactor
-// inline void
-//     validate_schema_name(const sbe::message_schema& schema, ireporter&
-//     reporter)
-// {
-//     if(!utils::is_valid_name(schema.name)
-//        || utils::is_reserved_cpp_namespace(schema.name))
-//     {
-//         throw_error(
-//             "{}: schema namespace `{}` is not valid. Change "
-//             "`messageSchema.package` attribute or provide a custom name with
-//             "
-//             "`--schema-name`",
-//             schema.location,
-//             schema.name);
-//     }
-//     utils::warn_about_reserved_identifier(
-//         schema.name, schema.location, reporter);
-// }
 
 inline std::string get_compiled_header_top_comment()
 {

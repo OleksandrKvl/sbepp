@@ -9,6 +9,7 @@
 // #include <sbepp/sbeppc/schema_compiler.hpp>
 #include <sbepp/sbeppc/build_info.hpp>
 #include <sbepp/sbeppc/sbe_checker.hpp>
+#include <sbepp/sbeppc/cpp_validator.hpp>
 
 #include <fmt/core.h>
 
@@ -149,13 +150,20 @@ int main(int argc, char** argv)
         schema_parser parser{config.schema_file, reporter, fs_provider};
         parser.parse_schema();
         const auto& schema = parser.get_message_schema();
-        // TODO: SBE-related verification
-        sbe_checker checker;
         context_manager ctx_manager;
+        sbe_checker checker;
         checker.check(schema, ctx_manager);
 
-        // schema.name = config.schema_name.value_or(schema.package);
-        // utils::validate_schema_name(schema, reporter);
+        // TODO: should we hide this inside some class?
+        ctx_manager.get(schema).name =
+            config.schema_name.value_or(schema.package);
+
+        // C++ related checks
+        // TODO: better names
+        cpp_validator cpp_checker{reporter, ctx_manager};
+        cpp_checker.validate(schema);
+
+        // now we can generate C++ code
 
         // schema_compiler::compile(
         //     config.output_dir,

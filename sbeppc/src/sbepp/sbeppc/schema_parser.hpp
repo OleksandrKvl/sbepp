@@ -164,6 +164,7 @@ private:
         auto name = get_required_non_empty_string(root, "name");
 
         const auto location = locations.find(root.offset_debug());
+        // TODO: move this check inside `sbe_checker`
         if(!utils::is_sbe_symbolic_name(name))
         {
             throw_error("{}: `{}` is not a valid SBE name", location, name);

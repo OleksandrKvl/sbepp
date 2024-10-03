@@ -119,7 +119,7 @@ struct data_context
 struct message_schema_context
 {
     std::string name;
-    std::string tag;
+    // std::string tag;
 };
 
 template<typename T>
@@ -164,7 +164,14 @@ struct context_type<sbe::field>
     using type = field_context;
 };
 
+template<>
+struct context_type<sbe::message_schema>
+{
+    using type = message_schema_context;
+};
+
 class context_manager
+
 {
 public:
     template<typename T>
@@ -183,7 +190,8 @@ private:
         map_type<sbe::set>,
         map_type<sbe::composite>,
         map_type<sbe::ref>,
-        map_type<sbe::field>>
+        map_type<sbe::field>,
+        map_type<sbe::message_schema>>
         contexts;
 };
 } // namespace sbepp::sbeppc
