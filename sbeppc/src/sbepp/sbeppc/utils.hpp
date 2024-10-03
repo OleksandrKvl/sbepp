@@ -419,8 +419,8 @@ R"(// SPDX-License-Identifier: MIT
 
 struct parsed_value_ref
 {
-    std::string enum_name;
-    std::string enumerator;
+    std::string_view enum_name;
+    std::string_view enumerator;
 };
 
 inline parsed_value_ref parse_value_ref(const std::string_view value_ref)

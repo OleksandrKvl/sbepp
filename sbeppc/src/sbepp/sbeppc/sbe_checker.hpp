@@ -33,14 +33,14 @@ public:
 private:
     const sbe::message_schema* schema{};
     context_manager* ctx_manager{};
-    // TODO: better names?
+
     enum class processing_state
     {
         in_progress,
         complete
     };
-
-    std::unordered_map<std::string_view, processing_state> processing_states;
+    std::unordered_map<std::string_view, processing_state>
+        encoding_processing_states;
     std::unordered_set<std::string> validated_group_headers;
     std::unordered_set<std::string> validated_data_headers;
 
@@ -644,7 +644,6 @@ private:
             return false;
         }
 
-        // TODO: is char case ever used?
         if(primitive_type == "char")
         {
             return can_be_parsed_as<char>(value);
@@ -1091,7 +1090,7 @@ private:
 
     void validate_public_encoding(const sbe::encoding& encoding)
     {
-        const auto [it, emplaced] = processing_states.try_emplace(
+        const auto [it, emplaced] = encoding_processing_states.try_emplace(
             utils::get_encoding_name(encoding), processing_state::in_progress);
         if(emplaced)
         {
