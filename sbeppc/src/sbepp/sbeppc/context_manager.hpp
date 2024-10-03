@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024, Oleksandr Koval
+
 #pragma once
 
 #include <sbepp/sbeppc/sbe.hpp>
