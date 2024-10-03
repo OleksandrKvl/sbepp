@@ -242,3 +242,45 @@ sbeppc_error_test(
     NAME "bad_group_blockLength"
     ERROR "custom `blockLength` \\(5\\) is less than minimum possible \\(6\\)"
 )
+
+sbeppc_error_test(
+    NAME "non_single_byte_array"
+    ERROR "arrays must have a single-byte type"
+)
+
+sbeppc_error_test(
+    NAME "no_data_header"
+    ERROR "data header encoding `varDataEncoding` doesn't exist"
+)
+
+sbeppc_error_test(
+    NAME "non_composite_data_header"
+    ERROR "data header encoding `varDataEncoding` is not a composite"
+)
+
+level_header_element_test("data" "varDataEncoding" "length")
+
+sbeppc_error_test(
+    NAME "no_data_header_varData"
+    ERROR "data header `varDataEncoding` doesn't have required `varData` element"
+)
+
+sbeppc_error_test(
+    NAME "wrong_data_header_varData_kind"
+    ERROR "data header element `varData` must be a type or a ref"
+)
+
+sbeppc_error_test(
+    NAME "non_type_data_header_varData_ref"
+    ERROR "data header element `varData` must refer to a type"
+)
+
+sbeppc_error_test(
+    NAME "non_zero_length_data_header_varData"
+    ERROR "data header element `varData` must have length equal to 0"
+)
+
+sbeppc_error_test(
+    NAME "non_zero_length_data_header_varData_ref"
+    ERROR "data header element `varData` must have length equal to 0"
+)
