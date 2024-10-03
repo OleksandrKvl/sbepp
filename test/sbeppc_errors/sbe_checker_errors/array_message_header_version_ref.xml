@@ -9,7 +9,7 @@
                    byteOrder="littleEndian"
                    messageHeader="messageHeader">
     <types>
-        <type name="arr" primitiveType="uint16" length="2"/>
+        <type name="arr" primitiveType="uint8" length="2"/>
 
         <composite name="messageHeader">
             <type name="blockLength" primitiveType="uint16"/>

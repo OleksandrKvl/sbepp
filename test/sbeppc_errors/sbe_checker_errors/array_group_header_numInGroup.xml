@@ -17,7 +17,7 @@
         </composite>
 
         <composite name="groupSizeEncoding">
-            <type name="numInGroup" primitiveType="uint16" length="2"/>
+            <type name="numInGroup" primitiveType="uint8" length="2"/>
             <type name="blockLength" primitiveType="uint16"/>
         </composite>
     </types>

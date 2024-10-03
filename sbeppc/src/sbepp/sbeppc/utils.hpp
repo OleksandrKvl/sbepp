@@ -328,6 +328,7 @@ T string_to_number_or_throw(
     {
         T value{};
         auto res = std::from_chars(str.data(), str.data() + str.size(), value);
+        // TODO: check that res.ptr points to string end
         if(res.ec == std::errc{})
         {
             return value;
@@ -384,14 +385,16 @@ inline std::string to_integer_literal(
 
 // TODO: refactor
 // inline void
-//     validate_schema_name(const sbe::message_schema& schema, ireporter& reporter)
+//     validate_schema_name(const sbe::message_schema& schema, ireporter&
+//     reporter)
 // {
 //     if(!utils::is_valid_name(schema.name)
 //        || utils::is_reserved_cpp_namespace(schema.name))
 //     {
 //         throw_error(
 //             "{}: schema namespace `{}` is not valid. Change "
-//             "`messageSchema.package` attribute or provide a custom name with "
+//             "`messageSchema.package` attribute or provide a custom name with
+//             "
 //             "`--schema-name`",
 //             schema.location,
 //             schema.name);
@@ -423,8 +426,7 @@ struct parsed_value_ref
 inline parsed_value_ref parse_value_ref(const std::string_view value_ref)
 {
     const auto dot_pos = value_ref.find('.');
-    if((dot_pos == std::string_view::npos) || (value_ref.size() < 3)
-       || (dot_pos == 0) || (dot_pos == (value_ref.size() - 1)))
+    if(dot_pos == std::string_view::npos)
     {
         return {};
     }
@@ -502,7 +504,7 @@ inline std::optional<std::string> numeric_literal_to_value(
 {
     if(!value)
     {
-        return value;
+        return {};
     }
 
     if((type == "float") || (type == "double"))

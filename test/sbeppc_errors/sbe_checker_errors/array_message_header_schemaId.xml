@@ -12,7 +12,7 @@
         <composite name="messageHeader">
             <type name="blockLength" primitiveType="uint16"/>
             <type name="templateId" primitiveType="uint16"/>
-            <type name="schemaId" primitiveType="uint16" length="2"/>
+            <type name="schemaId" primitiveType="uint8" length="2"/>
             <type name="version" primitiveType="uint16"/>
         </composite>
     </types>
