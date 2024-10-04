@@ -3,10 +3,11 @@
 
 #pragma once
 
+#include <sbepp/sbeppc/sbe.hpp>
 #include <sbepp/sbeppc/ifs_provider.hpp>
 #include <sbepp/sbeppc/throw_error.hpp>
 #include <sbepp/sbeppc/utils.hpp>
-// #include <sbepp/sbeppc/types_compiler.hpp>
+#include <sbepp/sbeppc/types_compiler.hpp>
 // #include <sbepp/sbeppc/messages_compiler.hpp>
 #include <sbepp/sbeppc/traits_generator.hpp>
 #include <sbepp/sbeppc/tags_generator.hpp>
@@ -38,12 +39,13 @@ public:
 
         traits_generator traits_gen{schema, ctx_manager};
 
-#if 0
+        const auto& schema_name = ctx_manager.get(schema).name;
+
         // types
         std::vector<std::string> type_includes;
-        types_compiler tc{schema.name, schema.byte_order, types, traits_gen};
+        types_compiler tc{schema, traits_gen, ctx_manager};
         tc.compile(
-            [&type_includes, &output_dir, &schema, &fs_provider](
+            [&type_includes, &output_dir, &fs_provider, &schema_name](
                 const auto name,
                 const auto implementation,
                 const auto alias,
@@ -54,7 +56,7 @@ public:
                     std::filesystem::path{"types"} / name += ".hpp";
                 type_includes.push_back(
                     fmt::format("#include \"{}\"", include_path.string()));
-                const auto file_path = output_dir / schema.name / include_path;
+                const auto file_path = output_dir / schema_name / include_path;
 
                 fs_provider.write_file(
                     file_path,
@@ -94,7 +96,7 @@ namespace sbepp
 SBEPP_WARNINGS_ON();
 )",
                         // clang-format on
-                        fmt::arg("schema", schema.name),
+                        fmt::arg("schema", schema_name),
                         fmt::arg(
                             "dependency_includes",
                             make_local_includes(dependencies)),
@@ -110,14 +112,11 @@ SBEPP_WARNINGS_ON();
         // schema traits must be generated after types compilation because they
         // need message header type to be compiled
         const auto schema_traits = traits_gen.make_schema_traits();
-        const auto& header_type = types.get_as_or_throw<sbe::composite>(
-            schema.header_type,
-            "{}: type `{}` doesn't exist or it's not a composite",
-            schema.location,
-            schema.header_type);
+        const auto& header_type = utils::get_schema_encoding_as<sbe::composite>(
+            schema, schema.header_type);
 
         fs_provider.write_file(
-            output_dir / schema.name / "schema" / "schema.hpp",
+            output_dir / schema_name / "schema" / "schema.hpp",
             fmt::format(
                 // clang-format off
 R"({top_comment}
@@ -150,18 +149,19 @@ namespace sbepp
 SBEPP_WARNINGS_ON();
 )",
                 // clang-format on
-                fmt::arg("schema", schema.name),
+                fmt::arg("schema", schema_name),
                 fmt::arg("tags", tags),
                 fmt::arg("schema_traits", schema_traits),
                 // can't use `header_type.name` here because it's an alias and
                 // it's not possible to forward declare it
-                fmt::arg("header_type", header_type.impl_name),
+                fmt::arg("header_type", ctx_manager.get(header_type).impl_name),
                 fmt::arg(
                     "top_comment", utils::get_compiled_header_top_comment()),
                 fmt::arg(
                     "injected_include",
                     make_injected_include(inject_include))));
 
+#if 0
         // messages
         std::vector<std::string> message_includes;
         messages_compiler mc{schema, types, messages, traits_gen};

@@ -5,12 +5,11 @@
 
 #include <sbepp/sbepp.hpp>
 #include <sbepp/sbeppc/source_location.hpp>
-#include <sbepp/sbeppc/throw_error.hpp>
 #include <sbepp/sbeppc/sbe.hpp>
 #include <sbepp/sbeppc/utils.hpp>
-#include <sbepp/sbeppc/type_manager.hpp>
 #include <sbepp/sbeppc/traits_generator.hpp>
 #include <sbepp/sbeppc/normal_accessors.hpp>
+#include <sbepp/sbeppc/context_manager.hpp>
 
 #include <fmt/core.h>
 #include <fmt/ranges.h>
@@ -36,14 +35,14 @@ public:
         const std::string_view traits)>;
 
     types_compiler(
-        const std::string_view schema_name,
-        const sbe::byte_order_kind byte_order,
-        type_manager& types,
-        traits_generator& traits_gen)
-        : schema_name{schema_name},
-          byte_order{byte_order},
-          types{&types},
-          traits_gen{&traits_gen}
+        const sbe::message_schema& schema,
+        traits_generator& traits_gen,
+        context_manager& ctx_manager)
+        : schema{&schema},
+          traits_gen{&traits_gen},
+          ctx_manager{&ctx_manager},
+          schema_name{ctx_manager.get(schema).name},
+          byte_order{schema.byte_order}
     {
     }
 
@@ -51,21 +50,23 @@ public:
     {
         on_public_type_cb = std::move(cb);
 
-        types->for_each(
-            [this](auto& enc)
-            {
-                dependencies.emplace_back();
-                compile_public_encoding(enc);
-                dependencies.pop_back();
-            });
+        for(const auto& [name, enc] : schema->types)
+        {
+            dependencies.emplace_back();
+            compile_public_encoding(enc);
+            dependencies.pop_back();
+        }
     }
 
 private:
+    const sbe::message_schema* schema{};
+    traits_generator* traits_gen{};
+    context_manager* ctx_manager{};
+
     std::string_view schema_name;
     sbe::byte_order_kind byte_order;
-    type_manager* types;
-    traits_generator* traits_gen;
     on_public_type_cb_t on_public_type_cb;
+    // TODO: better name
     std::unordered_map<std::string_view, bool> compiled;
     std::vector<std::unordered_set<std::string>> dependencies;
 
@@ -132,18 +133,13 @@ private:
             .value_or(built_in_null_values.at(t.primitive_type));
     }
 
-    static std::string make_constant_type(const sbe::type& t)
+    std::string make_constant_type(const sbe::type& t) const
     {
         assert(t.presence == field_presence::constant);
+        const auto& context = ctx_manager->get(t);
 
         if(t.length != 1)
         {
-            if(t.underlying_type != "char")
-            {
-                throw_error(
-                    "{}: array constants must have type `char`", t.location);
-            }
-
             return fmt::format(
                 // clang-format off
 R"(
@@ -151,21 +147,22 @@ using {type_name} = ::sbepp::detail::static_array_ref<
     const char, {element_type}, {length}, {tag}>;
 )",
                 // clang-format on
-                fmt::arg("type_name", t.impl_name),
-                fmt::arg("element_type", t.underlying_type),
+                fmt::arg("type_name", context.impl_name),
+                fmt::arg("element_type", context.underlying_type),
                 fmt::arg("length", t.length),
-                fmt::arg("tag", t.tag));
+                fmt::arg("tag", context.tag));
         }
         else
         {
             return fmt::format(
-                "using {} = {};\n", t.impl_name, t.underlying_type);
+                "using {} = {};\n", context.impl_name, context.underlying_type);
         }
     }
 
-    static std::string make_array_type(sbe::type& t)
+    std::string make_array_type(const sbe::type& t) const
     {
         assert((t.length != 1) && (t.presence != field_presence::constant));
+        const auto& context = ctx_manager->get(t);
 
         return fmt::format(
             // clang-format off
@@ -175,15 +172,16 @@ using {type_name} = ::sbepp::detail::static_array_ref<
     Byte, {element_type}, {length}, {tag}>;
 )",
             // clang-format on
-            fmt::arg("type_name", t.impl_name),
-            fmt::arg("element_type", t.underlying_type),
+            fmt::arg("type_name", context.impl_name),
+            fmt::arg("element_type", context.underlying_type),
             fmt::arg("length", t.length),
-            fmt::arg("tag", t.tag));
+            fmt::arg("tag", context.tag));
     }
 
-    static std::string make_required_type(const sbe::type& t)
+    std::string make_required_type(const sbe::type& t) const
     {
         assert((t.presence == field_presence::required) && (t.length == 1));
+        const auto& context = ctx_manager->get(t);
 
         return fmt::format(
             // clang-format off
@@ -207,15 +205,16 @@ public:
 }};
 )",
             // clang-format on
-            fmt::arg("type_name", t.impl_name),
-            fmt::arg("underlying_type", t.underlying_type),
+            fmt::arg("type_name", context.impl_name),
+            fmt::arg("underlying_type", context.underlying_type),
             fmt::arg("min_value", get_min_value(t)),
             fmt::arg("max_value", get_max_value(t)));
     }
 
-    static std::string make_optional_type(const sbe::type& t)
+    std::string make_optional_type(const sbe::type& t) const
     {
         assert((t.presence == field_presence::optional) && (t.length == 1));
+        const auto& context = ctx_manager->get(t);
 
         return fmt::format(
             // clang-format off
@@ -244,21 +243,22 @@ public:
 }};
 )",
             // clang-format on
-            fmt::arg("type_name", t.impl_name),
-            fmt::arg("underlying_type", t.underlying_type),
+            fmt::arg("type_name", context.impl_name),
+            fmt::arg("underlying_type", context.underlying_type),
             fmt::arg("min_value", get_min_value(t)),
             fmt::arg("max_value", get_max_value(t)),
             fmt::arg("null_value", get_null_value(t)));
     }
 
-    std::string compile_encoding(sbe::type& t) const
+    std::string compile_encoding(const sbe::type& t)
     {
-        t.impl_type =
-            fmt::format("::{}::detail::types::{}", schema_name, t.impl_name);
-        t.public_type = t.impl_type;
-        t.is_template = false;
-        t.underlying_type = utils::primitive_type_to_cpp_type(t.primitive_type);
-        t.size = utils::get_underlying_size(t.underlying_type) * t.length;
+        auto& context = ctx_manager->get(t);
+        context.impl_type = fmt::format(
+            "::{}::detail::types::{}", schema_name, context.impl_name);
+        context.public_type = context.impl_type;
+        context.is_template = false;
+        context.underlying_type =
+            utils::primitive_type_to_cpp_type(t.primitive_type);
 
         if(t.presence == field_presence::constant)
         {
@@ -266,7 +266,7 @@ public:
         }
         else if(t.length != 1)
         {
-            t.is_template = true;
+            context.is_template = true;
             return make_array_type(t);
         }
         else if(t.presence == field_presence::required)
@@ -288,21 +288,17 @@ public:
         }
 
         return utils::primitive_type_to_cpp_type(
-            types
-                ->get_as_or_throw<sbe::type>(
-                    enc.type,
-                    "{}: encoding `{}` doesn't exist or it's not a type",
-                    enc.location,
-                    enc.type)
+            utils::get_schema_encoding_as<sbe::type>(*schema, enc.type)
                 .primitive_type);
     }
 
-    static std::string make_enumerators(const sbe::enumeration& e)
+    std::string make_enumerators(const sbe::enumeration& e) const
     {
         std::vector<std::string> enumerators;
         enumerators.reserve(e.valid_values.size());
 
-        const auto is_char_type = (e.underlying_type == "char");
+        const auto is_char_type =
+            (ctx_manager->get(e).underlying_type == "char");
         for(const auto& valid_value : e.valid_values)
         {
             if(is_char_type)
@@ -323,10 +319,11 @@ public:
         return fmt::format("{}", fmt::join(enumerators, ",\n"));
     }
 
-    static std::string make_enum_visit_impl(const sbe::enumeration& e)
+    std::string make_enum_visit_impl(const sbe::enumeration& e) const
     {
         std::vector<std::string> switch_cases;
         switch_cases.reserve(e.valid_values.size());
+        const auto& context = ctx_manager->get(e);
 
         for(const auto& valid_value : e.valid_values)
         {
@@ -336,9 +333,9 @@ R"(case {enum_type}::{enumerator}:
         visitor.on_enum_value(e, {tag}{{}});
         break;)",
                 // clang-format on
-                fmt::arg("enum_type", e.impl_name),
+                fmt::arg("enum_type", context.impl_name),
                 fmt::arg("enumerator", valid_value.name),
-                fmt::arg("tag", valid_value.tag)));
+                fmt::arg("tag", ctx_manager->get(valid_value).tag)));
         }
 
         return fmt::format(
@@ -356,17 +353,17 @@ SBEPP_CPP14_CONSTEXPR void tag_invoke(
 }}
 )",
             // clang-format on
-            fmt::arg("enum", e.impl_name),
+            fmt::arg("enum", context.impl_name),
             fmt::arg("switch_cases", fmt::join(switch_cases, "\n    ")));
     }
 
-    std::string compile_encoding(sbe::enumeration& e)
+    std::string compile_encoding(const sbe::enumeration& e)
     {
-        e.impl_type =
-            fmt::format("::{}::detail::types::{}", schema_name, e.impl_name);
-        e.public_type = e.impl_type;
-        e.underlying_type = get_underlying_type(e);
-        e.size = utils::get_underlying_size(e.underlying_type);
+        auto& context = ctx_manager->get(e);
+        context.impl_type = fmt::format(
+            "::{}::detail::types::{}", schema_name, context.impl_name);
+        context.public_type = context.impl_type;
+        context.underlying_type = get_underlying_type(e);
 
         const auto enumerators = make_enumerators(e);
 
@@ -381,8 +378,8 @@ enum class {name} : {type}
 {enum_visit_impl}
 )",
             // clang-format on
-            fmt::arg("name", e.impl_name),
-            fmt::arg("type", e.underlying_type),
+            fmt::arg("name", context.impl_name),
+            fmt::arg("type", context.underlying_type),
             fmt::arg("enumerators", enumerators),
             fmt::arg("enum_visit_impl", make_enum_visit_impl(e)));
     }
@@ -397,20 +394,13 @@ enum class {name} : {type}
         return unsigned_types.count(type);
     }
 
-    static std::string make_set_accessors(const sbe::set& s)
+    std::string make_set_accessors(const sbe::set& s) const
     {
+        const auto& context = ctx_manager->get(s);
         std::string res;
-        static constexpr auto bits_per_byte = 8;
-        const auto bit_length = s.size * bits_per_byte - 1;
 
         for(const auto& choice : s.choices)
         {
-            if(choice.value > bit_length)
-            {
-                throw_error(
-                    "{}: choice value is out of range", choice.location);
-            }
-
             res += fmt::format(
                 // clang-format off
 R"(
@@ -428,7 +418,7 @@ R"(
                 // clang-format on
                 fmt::arg("name", choice.name),
                 fmt::arg("index", choice.value),
-                fmt::arg("class_name", s.impl_name));
+                fmt::arg("class_name", context.impl_name));
         }
 
         return res;
@@ -460,7 +450,7 @@ SBEPP_CPP14_CONSTEXPR Visitor&& operator()(
             fmt::arg("visitors", fmt::join(visitors, "\n    ")));
     }
 
-    static std::string make_visit_set_impl2(const sbe::set& s)
+    std::string make_visit_set_impl2(const sbe::set& s) const
     {
         std::vector<std::string> visitors;
         visitors.reserve(s.choices.size());
@@ -470,7 +460,7 @@ SBEPP_CPP14_CONSTEXPR Visitor&& operator()(
             visitors.push_back(fmt::format(
                 "visitor.on_set_choice(this->{choice_name}(), {tag}{{}});",
                 fmt::arg("choice_name", choice.name),
-                fmt::arg("tag", choice.tag)));
+                fmt::arg("tag", ctx_manager->get(choice).tag)));
         }
 
         return fmt::format(
@@ -487,18 +477,13 @@ SBEPP_CPP14_CONSTEXPR void operator()(
             fmt::arg("visitors", fmt::join(visitors, "\n    ")));
     }
 
-    std::string compile_encoding(sbe::set& s)
+    std::string compile_encoding(const sbe::set& s)
     {
-        s.impl_type =
-            fmt::format("::{}::detail::types::{}", schema_name, s.impl_name);
-        s.public_type = s.impl_type;
-
-        s.underlying_type = get_underlying_type(s);
-        s.size = utils::get_underlying_size(s.underlying_type);
-        if(!is_unsigned(s.underlying_type))
-        {
-            throw_error("{}: underlying types must be unsigned", s.location);
-        }
+        auto& context = ctx_manager->get(s);
+        context.impl_type = fmt::format(
+            "::{}::detail::types::{}", schema_name, context.impl_name);
+        context.public_type = context.impl_type;
+        context.underlying_type = get_underlying_type(s);
 
         return fmt::format(
             // clang-format off
@@ -515,50 +500,36 @@ public:
 }};
 )",
             // clang-format on
-            fmt::arg("name", s.impl_name),
-            fmt::arg("type", s.underlying_type),
+            fmt::arg("name", context.impl_name),
+            fmt::arg("type", context.underlying_type),
             fmt::arg("accessors", make_set_accessors(s)),
             fmt::arg("visit_set_impl", make_visit_set_impl(s)),
             fmt::arg("visit_set_impl2", make_visit_set_impl2(s)));
     }
 
-    static std::string get_const_impl_type(const sbe::encoding& enc)
+    std::string get_const_impl_type(const sbe::encoding& enc) const
     {
         const auto& t = std::get<sbe::type>(enc);
+        const auto& context = ctx_manager->get(t);
+
         if(t.length != 1)
         {
-            return t.impl_type;
+            return context.impl_type;
         }
-        return t.underlying_type;
+        return context.underlying_type;
     }
 
-    std::string value_ref_to_enum_value(
-        const std::string_view value_ref, const source_location& location)
+    std::string value_ref_to_enum_value(const std::string_view value_ref)
     {
         const auto parsed = utils::parse_value_ref(value_ref);
-        if(parsed.enum_name.empty() || parsed.enumerator.empty())
-        {
-            throw_error(
-                "{}: `{}` is not a valid valueRef", location, value_ref);
-        }
+        auto& e = utils::get_schema_encoding_as<sbe::enumeration>(
+            *schema, parsed.enum_name);
 
-        auto& enc = types->get_or_throw(
-            parsed.enum_name,
-            "{}: no type named `{}`",
-            location,
-            parsed.enum_name);
-        auto enum_enc = std::get_if<sbe::enumeration>(&enc);
-        if(!enum_enc)
-        {
-            throw_error(
-                "{}: `{}` is not an enumeration", location, parsed.enum_name);
-        }
-
-        compile_public_encoding(enc);
+        compile_public_encoding(e);
 
         return fmt::format(
             "::sbepp::to_underlying({}::{})",
-            enum_enc->impl_type,
+            ctx_manager->get(e).impl_type,
             parsed.enumerator);
     }
 
@@ -570,7 +541,7 @@ public:
         assert(t.value_ref || t.constant_value);
         if(t.value_ref)
         {
-            return value_ref_to_enum_value(*t.value_ref, t.location);
+            return value_ref_to_enum_value(*t.value_ref);
         }
 
         if(t.primitive_type == "char")
@@ -579,6 +550,8 @@ public:
                 *t.constant_value, t.length, t.location);
         }
 
+        // TODO: check the return value? it should already be checked by
+        // `sbe_checker`
         return *utils::numeric_literal_to_value(
             t.constant_value, t.primitive_type, t.location);
     }
@@ -591,26 +564,26 @@ public:
             std::tuple<std::string_view, std::string_view, std::string_view>;
 
         const auto types_visitor = utils::overloaded{
-            [](const sbe::type& t) -> string_view_triple
+            [this](const sbe::type& t) -> string_view_triple
             {
                 if(t.presence == field_presence::constant)
                 {
                     return {};
                 }
 
-                return {"on_type", t.name, t.tag};
+                return {"on_type", t.name, ctx_manager->get(t).tag};
             },
-            [](const sbe::enumeration& e) -> string_view_triple
+            [this](const sbe::enumeration& e) -> string_view_triple
             {
-                return {"on_enum", e.name, e.tag};
+                return {"on_enum", e.name, ctx_manager->get(e).tag};
             },
-            [](const sbe::set& s) -> string_view_triple
+            [this](const sbe::set& s) -> string_view_triple
             {
-                return {"on_set", s.name, s.tag};
+                return {"on_set", s.name, ctx_manager->get(s).tag};
             },
-            [](const sbe::composite& c) -> string_view_triple
+            [this](const sbe::composite& c) -> string_view_triple
             {
-                return {"on_composite", c.name, c.tag};
+                return {"on_composite", c.name, ctx_manager->get(c).tag};
             }};
 
         for(const auto& e : elements)
@@ -620,15 +593,13 @@ public:
                     [this,
                      &types_visitor](const sbe::ref& r) -> string_view_triple
                     {
-                        const auto& enc = types->get_or_throw(
-                            r.type,
-                            "{}: ref `{}` refers to an unknown type `{}`",
-                            r.location,
-                            r.name,
-                            r.type);
-
+                        const auto& enc =
+                            utils::get_schema_encoding(*schema, r.type);
                         auto enc_visit_info = std::visit(types_visitor, enc);
-                        return {std::get<0>(enc_visit_info), r.name, r.tag};
+                        return {
+                            std::get<0>(enc_visit_info),
+                            r.name,
+                            ctx_manager->get(r).tag};
                     },
                     types_visitor},
                 e);
@@ -674,9 +645,8 @@ R"(
     }
 
     std::pair<std::string, std::string>
-        make_element_accessors(sbe::composite& c)
+        make_element_accessors(const sbe::composite& c)
     {
-        offset_t offset{};
         std::string accessors;
         std::string inline_types_impl;
 
@@ -684,15 +654,9 @@ R"(
         {
             accessors += std::visit(
                 utils::overloaded{
-                    [this, &offset](sbe::ref& r)
+                    [this](const sbe::ref& r)
                     {
-                        auto& enc = types->get_or_throw(
-                            r.type,
-                            "{}: `ref` `{}` refers to an unknown type `{}`",
-                            r.location,
-                            r.name,
-                            r.type);
-
+                        auto& enc = utils::get_schema_encoding(*schema, r.type);
                         compile_public_encoding(enc);
 
                         if(utils::is_constant(enc))
@@ -703,22 +667,20 @@ R"(
                                 get_const_value(enc));
                         }
 
-                        // if ref has offset - use it
-                        offset = utils::get_valid_offset(
-                            r.offset, offset, r.location);
-                        r.actual_offset = offset;
-
                         return std::visit(
-                            [&offset, &r, this](auto& enc)
+                            [&r, this](auto& enc)
                             {
-                                auto accessor = normal_accessors::make_accessor(
-                                    enc, offset, r.name, byte_order, false);
-                                offset += enc.size;
-                                return accessor;
+                                return normal_accessors::make_accessor(
+                                    enc,
+                                    ctx_manager->get(r).offset_in_composite,
+                                    r.name,
+                                    byte_order,
+                                    false,
+                                    ctx_manager->get(enc));
                             },
                             enc);
                     },
-                    [this, &offset, &inline_types_impl](auto& enc)
+                    [this, &inline_types_impl](auto& enc)
                     {
                         inline_types_impl += compile_encoding(enc);
                         if(utils::is_constant(enc))
@@ -728,26 +690,27 @@ R"(
                                 get_const_impl_type(enc),
                                 get_const_value(enc));
                         }
-                        offset = utils::get_valid_offset(
-                            enc.offset, offset, enc.location);
-                        enc.actual_offset = offset;
-                        auto accessor = normal_accessors::make_accessor(
-                            enc, offset, enc.name, byte_order, false);
-                        offset += enc.size;
-                        return accessor;
+                        const auto& context = ctx_manager->get(enc);
+                        return normal_accessors::make_accessor(
+                            enc,
+                            *context.offset_in_composite,
+                            enc.name,
+                            byte_order,
+                            false,
+                            context);
                     }},
                 e);
         }
-        c.size = offset;
 
         return {accessors, inline_types_impl};
     }
 
-    std::string compile_encoding(sbe::composite& c)
+    std::string compile_encoding(const sbe::composite& c)
     {
-        c.impl_type =
-            fmt::format("::{}::detail::types::{}", schema_name, c.impl_name);
-        c.public_type = c.impl_type;
+        auto& context = ctx_manager->get(c);
+        context.impl_type = fmt::format(
+            "::{}::detail::types::{}", schema_name, context.impl_name);
+        context.public_type = context.impl_type;
 
         const auto accessors = make_element_accessors(c);
 
@@ -782,15 +745,15 @@ public:
 }};
 )",
             // clang-format on
-            fmt::arg("name", c.impl_name),
+            fmt::arg("name", context.impl_name),
             fmt::arg("accessors", accessors.first),
-            fmt::arg("size", c.size),
+            fmt::arg("size", context.size),
             fmt::arg("inline_types_impl", accessors.second),
             fmt::arg("visit_children_impl", make_visit_children(c.elements)),
-            fmt::arg("tag", c.tag));
+            fmt::arg("tag", context.tag));
     }
 
-    std::string compile_encoding(sbe::encoding& enc)
+    std::string compile_encoding(const sbe::encoding& enc)
     {
         return std::visit(
             [this](auto& enc)
@@ -805,44 +768,49 @@ public:
         return fmt::format("::{}::types::{}", schema_name, name);
     }
 
-    std::string make_alias(sbe::encoding& enc)
+    std::string make_alias(const sbe::encoding& enc)
     {
         return std::visit(
             utils::overloaded{
-                [this](sbe::composite& c)
+                [this](const sbe::composite& c)
                 {
-                    c.public_type = make_public_type(c.name);
-                    return utils::make_alias_template(c.name, c.impl_type);
+                    auto& context = ctx_manager->get(c);
+                    context.public_type = make_public_type(c.name);
+                    return utils::make_alias_template(
+                        c.name, context.impl_type);
                 },
-                [this](sbe::type& t)
+                [this](const sbe::type& t)
                 {
-                    t.public_type = make_public_type(t.name);
-                    if(t.is_template)
+                    auto& context = ctx_manager->get(t);
+                    context.public_type = make_public_type(t.name);
+                    if(context.is_template)
                     {
-                        return utils::make_alias_template(t.name, t.impl_type);
+                        return utils::make_alias_template(
+                            t.name, context.impl_type);
                     }
                     else
                     {
-                        return utils::make_type_alias(t.name, t.impl_type);
+                        return utils::make_type_alias(
+                            t.name, context.impl_type);
                     }
                 },
-                [this](auto& e)
+                [this](const auto& e)
                 {
-                    e.public_type = make_public_type(e.name);
-                    return utils::make_type_alias(e.name, e.impl_type);
+                    auto& context = ctx_manager->get(e);
+                    context.public_type = make_public_type(e.name);
+                    return utils::make_type_alias(e.name, context.impl_type);
                 }},
             enc);
     }
 
-    void compile_public_encoding(sbe::encoding& enc)
+    void compile_public_encoding(const sbe::encoding& enc)
     {
         const auto name = utils::get_encoding_name(enc);
         assert(!dependencies.empty());
         dependencies.back().emplace(name);
 
-        if(!compiled.count(name))
+        if(!compiled[name])
         {
-            compiled[name] = false;
             dependencies.emplace_back();
             const auto implementation = compile_encoding(enc);
             compiled[name] = true;
@@ -851,13 +819,6 @@ public:
             on_public_type_cb(
                 name, implementation, alias, dependencies.back(), traits);
             dependencies.pop_back();
-        }
-        else if(!compiled[name])
-        {
-            throw_error(
-                "{}: cyclic reference detected while processing encoding `{}`",
-                utils::get_location(enc),
-                utils::get_encoding_name(enc));
         }
     }
 };
