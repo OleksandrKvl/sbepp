@@ -24,7 +24,7 @@ struct type_context
     bool is_template;
     std::string public_type;
     std::string underlying_type;
-    // std::string impl_type;
+    std::string impl_type;
 };
 
 struct composite_context
@@ -58,7 +58,7 @@ struct enumeration_context
     std::string tag;
     std::string impl_name;
     std::string public_type;
-    // std::string impl_type;
+    std::string impl_type;
     std::string underlying_type;
 };
 
@@ -74,7 +74,7 @@ struct set_context
     std::string tag;
     std::string impl_name;
     std::string public_type;
-    // std::string impl_type;
+    std::string impl_type;
     std::string underlying_type;
 };
 

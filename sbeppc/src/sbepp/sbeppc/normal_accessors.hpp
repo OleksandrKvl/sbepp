@@ -6,6 +6,7 @@
 #include <sbepp/sbepp.hpp>
 #include <sbepp/sbeppc/sbe.hpp>
 #include <sbepp/sbeppc/utils.hpp>
+#include <sbepp/sbeppc/context_manager.hpp>
 
 #include <fmt/core.h>
 
@@ -40,9 +41,11 @@ R"(    static constexpr {type} {name}() noexcept
         const offset_t offset,
         const std::string_view name,
         const sbe::byte_order_kind byte_order,
-        const bool use_public_type)
+        const bool use_public_type,
+        const type_context& context)
     {
-        const auto& type = use_public_type ? t.public_type : t.impl_type;
+        const auto& type =
+            use_public_type ? context.public_type : context.impl_type;
 
         if(t.length == 1)
         {
@@ -81,13 +84,15 @@ R"(    SBEPP_CPP20_CONSTEXPR {type} {name}() const noexcept
     }
 
     static std::string make_accessor(
-        const sbe::enumeration& e,
+        const sbe::enumeration&,
         const offset_t offset,
         const std::string_view name,
         const sbe::byte_order_kind byte_order,
-        const bool use_public_type)
+        const bool use_public_type,
+        const enumeration_context& context)
     {
-        const auto& type = use_public_type ? e.public_type : e.impl_type;
+        const auto& type =
+            use_public_type ? context.public_type : context.impl_type;
 
         return fmt::format(
             // clang-format off
@@ -113,13 +118,15 @@ R"(    SBEPP_CPP20_CONSTEXPR {type} {name}() const noexcept
     }
 
     static std::string make_accessor(
-        const sbe::set& s,
+        const sbe::set&,
         const offset_t offset,
         const std::string_view name,
         const sbe::byte_order_kind byte_order,
-        const bool use_public_type)
+        const bool use_public_type,
+        const set_context& context)
     {
-        const auto& type = use_public_type ? s.public_type : s.impl_type;
+        const auto& type =
+            use_public_type ? context.public_type : context.impl_type;
 
         return fmt::format(
             // clang-format off
@@ -141,19 +148,22 @@ R"(    SBEPP_CPP20_CONSTEXPR {type} {name}() const noexcept
             fmt::arg("type", type),
             fmt::arg("name", name),
             fmt::arg("offset", offset),
-            fmt::arg("underlying_type", s.underlying_type),
+            fmt::arg("underlying_type", context.underlying_type),
             fmt::arg("endian", utils::byte_order_to_endian(byte_order)));
     }
 
+    // TODO: here and above, first parameter is unused, refactor this mess
     static std::string make_accessor(
-        const sbe::composite& c,
+        const sbe::composite&,
         const offset_t offset,
         const std::string_view name,
         // to make all signatures equivalent, useful with `std::visit`
         const sbe::byte_order_kind,
-        const bool use_public_type)
+        const bool use_public_type,
+        const composite_context& context)
     {
-        const auto& type = use_public_type ? c.public_type : c.impl_type;
+        const auto& type =
+            use_public_type ? context.public_type : context.impl_type;
 
         return fmt::format(
             // clang-format off
