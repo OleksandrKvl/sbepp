@@ -334,30 +334,17 @@ R"(struct {name}
             enc);
     }
 
-    // TODO: deduplicate
-    const sbe::encoding* get_encoding(std::string_view name) const
-    {
-        const auto lowered_name = utils::to_lower(name);
-        const auto search = schema->types.find(lowered_name);
-        if(search != std::end(schema->types))
-        {
-            return &search->second;
-        }
-
-        return {};
-    }
-
     std::string make_tag(const sbe::ref& r, std::vector<std::string>& path)
     {
-        auto& type = *get_encoding(r.type);
-        handle_public_encoding(type);
+        auto& enc = utils::get_schema_encoding(*schema, r.type);
+        handle_public_encoding(enc);
 
         ctx_manager->get(r).tag = make_public_tag(path, r.name);
 
         return fmt::format(
             "struct {name} : {type}{{}};\n",
             fmt::arg("name", r.name),
-            fmt::arg("type", get_impl_name(type)));
+            fmt::arg("type", get_impl_name(enc)));
     }
 
     void handle_public_encoding(const sbe::encoding& encoding)
@@ -391,7 +378,8 @@ R"(struct {name}
     {
         if(!utils::is_primitive_type(type_name))
         {
-            return std::get_if<sbe::composite>(get_encoding(type_name));
+            return std::get_if<sbe::composite>(
+                &utils::get_schema_encoding(*schema, type_name));
         }
         return {};
     }

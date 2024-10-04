@@ -430,6 +430,7 @@ private:
 
         // at this point `offset` is essentially a minimal blockLength value
         validate_block_length(block_length, offset, location);
+        // TODO: set `actual_block_length` here
 
         for(const auto& g : members.groups)
         {
