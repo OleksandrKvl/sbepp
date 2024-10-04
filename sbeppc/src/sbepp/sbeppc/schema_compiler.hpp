@@ -6,10 +6,11 @@
 #include <sbepp/sbeppc/ifs_provider.hpp>
 #include <sbepp/sbeppc/throw_error.hpp>
 #include <sbepp/sbeppc/utils.hpp>
-#include <sbepp/sbeppc/types_compiler.hpp>
-#include <sbepp/sbeppc/messages_compiler.hpp>
+// #include <sbepp/sbeppc/types_compiler.hpp>
+// #include <sbepp/sbeppc/messages_compiler.hpp>
 #include <sbepp/sbeppc/traits_generator.hpp>
 #include <sbepp/sbeppc/tags_generator.hpp>
+#include <sbepp/sbeppc/context_manager.hpp>
 
 #include <fmt/core.h>
 #include <fmt/std.h>
@@ -26,17 +27,18 @@ public:
     static void compile(
         const std::filesystem::path& output_dir,
         const std::optional<std::string>& inject_include,
-        sbe::message_schema& schema,
-        type_manager& types,
-        message_manager& messages,
+        const sbe::message_schema& schema,
+        context_manager& ctx_manager,
         ifs_provider& fs_provider)
     {
-        create_dirs(output_dir, schema.name, fs_provider);
+        create_dirs(output_dir, ctx_manager.get(schema).name, fs_provider);
 
-        tags_generator tags_gen{schema, types, messages};
+        tags_generator tags_gen{schema, ctx_manager};
         const auto& tags = tags_gen.get();
-        traits_generator traits_gen{schema, types};
 
+        traits_generator traits_gen{schema, ctx_manager};
+
+#if 0
         // types
         std::vector<std::string> type_includes;
         types_compiler tc{schema.name, schema.byte_order, types, traits_gen};
@@ -244,6 +246,7 @@ R"({top_comment}
                 fmt::arg("message_includes", fmt::join(message_includes, "\n")),
                 fmt::arg(
                     "top_comment", utils::get_compiled_header_top_comment())));
+#endif
     }
 
 private:

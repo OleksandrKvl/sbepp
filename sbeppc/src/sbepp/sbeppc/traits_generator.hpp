@@ -3,12 +3,10 @@
 
 #pragma once
 
-#include <sbepp/sbeppc/throw_error.hpp>
 #include <sbepp/sbepp.hpp>
-#include <sbepp/sbeppc/type_manager.hpp>
-#include <sbepp/sbeppc/message_manager.hpp>
 #include <sbepp/sbeppc/sbe.hpp>
 #include <sbepp/sbeppc/utils.hpp>
+#include <sbepp/sbeppc/context_manager.hpp>
 
 #include <fmt/core.h>
 #include <fmt/ranges.h>
@@ -23,18 +21,16 @@ class traits_generator
 {
 public:
     traits_generator(
-        const sbe::message_schema& schema, const type_manager& types)
-        : schema{&schema}, types{&types}
+        const sbe::message_schema& schema, context_manager& ctx_manager)
+        : schema{&schema}, ctx_manager{&ctx_manager}
     {
     }
 
     std::string make_schema_traits() const
     {
-        const auto& header_type = types->get_as_or_throw<sbe::composite>(
-            schema->header_type,
-            "{}: type `{}` doesn't exist or it's not a composite",
-            schema->location,
-            schema->header_type);
+        const auto& header_type = utils::get_schema_encoding_as<sbe::composite>(
+            *schema, schema->header_type);
+        const auto& header_context = ctx_manager->get(header_type);
 
         return fmt::format(
             // clang-format off
@@ -78,7 +74,7 @@ public:
 }};
 )",
             // clang-format on
-            fmt::arg("tag", schema->tag),
+            fmt::arg("tag", ctx_manager->get(*schema).tag),
             fmt::arg("package", schema->package),
             fmt::arg("id", schema->id),
             fmt::arg("version", schema->version),
@@ -88,10 +84,10 @@ public:
             fmt::arg(
                 "header_type",
                 utils::make_alias_template(
-                    "header_type", header_type.impl_type)),
+                    "header_type", header_context.impl_type)),
             fmt::arg(
                 "header_type_tag",
-                utils::make_type_alias("header_type_tag", header_type.tag)));
+                utils::make_type_alias("header_type_tag", header_context.tag)));
     }
 
     std::string make_message_traits(const sbe::message& m) const
@@ -110,8 +106,8 @@ public:
     }
 
 private:
-    const sbe::message_schema* schema;
-    const type_manager* types;
+    const sbe::message_schema* schema{};
+    context_manager* ctx_manager{};
 
     static std::string make_min_max_null_values(const sbe::type& t)
     {
@@ -151,14 +147,16 @@ R"(
         return {};
     }
 
-    static std::string make_value_type(const sbe::type& t)
+    std::string make_value_type(const sbe::type& t) const
     {
-        if(t.is_template)
+        const auto& context = ctx_manager->get(t);
+        if(context.is_template)
         {
-            return utils::make_alias_template("value_type", t.public_type);
+            return utils::make_alias_template(
+                "value_type", context.public_type);
         }
 
-        return utils::make_type_alias("value_type", t.public_type);
+        return utils::make_type_alias("value_type", context.public_type);
     }
 
     static std::string
@@ -199,8 +197,10 @@ R"(static constexpr offset_t offset() noexcept
         return {};
     }
 
-    static std::string make_traits(const sbe::type& t)
+    std::string make_traits(const sbe::type& t) const
     {
+        const auto& context = ctx_manager->get(t);
+
         return fmt::format(
             // clang-format off
 R"(
@@ -255,16 +255,18 @@ public:
 {traits_tag}
 )",
             // clang-format on
-            fmt::arg("tag", t.tag),
+            fmt::arg("tag", context.tag),
             fmt::arg("name", t.name),
             fmt::arg("description", t.description),
             fmt::arg("presence", utils::presence_to_string(t.presence)),
             fmt::arg("length", t.length),
             fmt::arg(
-                "offset_impl", make_offset_impl(t.offset, t.actual_offset)),
+                "offset_impl",
+                make_offset_impl(t.offset, context.offset_in_composite)),
             fmt::arg(
                 "primitive_type",
-                utils::make_type_alias("primitive_type", t.underlying_type)),
+                utils::make_type_alias(
+                    "primitive_type", context.underlying_type)),
             fmt::arg("semantic_type", t.semantic_type),
             fmt::arg("since_version", t.added_since),
             fmt::arg("value_type", make_value_type(t)),
@@ -274,8 +276,10 @@ public:
             fmt::arg("traits_tag", make_traits_tag(t)));
     }
 
-    static std::string make_enum_traits(const sbe::enumeration& e)
+    std::string make_enum_traits(const sbe::enumeration& e) const
     {
+        const auto& context = ctx_manager->get(e);
+
         return fmt::format(
             // clang-format off
 R"(
@@ -308,27 +312,35 @@ public:
 {traits_tag}
 )",
             // clang-format on
-            fmt::arg("tag", e.tag),
+            fmt::arg("tag", context.tag),
             fmt::arg("name", e.name),
             fmt::arg("description", e.description),
             fmt::arg(
-                "offset_impl", make_offset_impl(e.offset, e.actual_offset)),
+                "offset_impl",
+                make_offset_impl(e.offset, context.offset_in_composite)),
             fmt::arg(
                 "encoding_type",
-                utils::make_type_alias("encoding_type", e.underlying_type)),
+                utils::make_type_alias(
+                    "encoding_type", context.underlying_type)),
             fmt::arg("since_version", e.added_since),
             fmt::arg(
                 "value_type",
-                utils::make_type_alias("value_type", e.public_type)),
+                utils::make_type_alias("value_type", context.public_type)),
             fmt::arg("deprecated_impl", make_deprecated(e.deprecated_since)),
-            fmt::arg("traits_tag", make_traits_tag(e.public_type, e.tag)));
+            fmt::arg(
+                "traits_tag",
+                make_traits_tag(context.public_type, context.tag)));
     }
 
-    static std::string make_enum_value_traits(const sbe::enumeration& e)
+    std::string make_enum_value_traits(const sbe::enumeration& e) const
     {
+        const auto& enum_context = ctx_manager->get(e);
         std::string res;
+
         for(const auto& value : e.valid_values)
         {
+            const auto& value_context = ctx_manager->get(value);
+
             res += fmt::format(
                 // clang-format off
 R"(
@@ -360,11 +372,11 @@ public:
 }};
 )",
                 // clang-format on
-                fmt::arg("tag", value.tag),
+                fmt::arg("tag", value_context.tag),
                 fmt::arg("name", value.name),
                 fmt::arg("description", value.description),
                 fmt::arg("since_version", value.added_since),
-                fmt::arg("enum_type", e.public_type),
+                fmt::arg("enum_type", enum_context.public_type),
                 fmt::arg(
                     "deprecated_impl",
                     make_deprecated(value.deprecated_since)));
@@ -373,13 +385,15 @@ public:
         return res;
     }
 
-    static std::string make_traits(const sbe::enumeration& e)
+    std::string make_traits(const sbe::enumeration& e) const
     {
         return make_enum_traits(e) + make_enum_value_traits(e);
     }
 
-    static std::string make_set_traits(const sbe::set& s)
+    std::string make_set_traits(const sbe::set& s) const
     {
+        const auto& context = ctx_manager->get(s);
+
         return fmt::format(
             // clang-format off
 R"(
@@ -412,27 +426,34 @@ public:
 {traits_tag}
 )",
             // clang-format on
-            fmt::arg("tag", s.tag),
+            fmt::arg("tag", context.tag),
             fmt::arg("name", s.name),
             fmt::arg("description", s.description),
             fmt::arg(
-                "offset_impl", make_offset_impl(s.offset, s.actual_offset)),
+                "offset_impl",
+                make_offset_impl(s.offset, context.offset_in_composite)),
             fmt::arg(
                 "encoding_type",
-                utils::make_type_alias("encoding_type", s.underlying_type)),
+                utils::make_type_alias(
+                    "encoding_type", context.underlying_type)),
             fmt::arg("since_version", s.added_since),
             fmt::arg(
                 "value_type",
-                utils::make_type_alias("value_type", s.public_type)),
+                utils::make_type_alias("value_type", context.public_type)),
             fmt::arg("deprecated_impl", make_deprecated(s.deprecated_since)),
-            fmt::arg("traits_tag", make_traits_tag(s.public_type, s.tag)));
+            fmt::arg(
+                "traits_tag",
+                make_traits_tag(context.public_type, context.tag)));
     }
 
-    static std::string make_set_choice_traits(const sbe::set& s)
+    std::string make_set_choice_traits(const sbe::set& s) const
     {
         std::string res;
+
         for(const auto& choice : s.choices)
         {
+            const auto& context = ctx_manager->get(choice);
+
             res += fmt::format(
                 // clang-format off
 R"(
@@ -464,7 +485,7 @@ public:
 }};
 )",
                 // clang-format on
-                fmt::arg("tag", choice.tag),
+                fmt::arg("tag", context.tag),
                 fmt::arg("name", choice.name),
                 fmt::arg("description", choice.description),
                 fmt::arg("since_version", choice.added_since),
@@ -477,13 +498,15 @@ public:
         return res;
     }
 
-    static std::string make_traits(const sbe::set& s)
+    std::string make_traits(const sbe::set& s) const
     {
         return make_set_traits(s) + make_set_choice_traits(s);
     }
 
-    static std::string make_composite_traits(const sbe::composite& c)
+    std::string make_composite_traits(const sbe::composite& c) const
     {
+        const auto& context = ctx_manager->get(c);
+
         return fmt::format(
             // clang-format off
 R"(
@@ -525,20 +548,22 @@ public:
 {traits_tag}
 )",
             // clang-format on
-            fmt::arg("tag", c.tag),
+            fmt::arg("tag", context.tag),
             fmt::arg("name", c.name),
             fmt::arg("description", c.description),
             fmt::arg("semantic_type", c.semantic_type),
             fmt::arg(
-                "offset_impl", make_offset_impl(c.offset, c.actual_offset)),
+                "offset_impl",
+                make_offset_impl(c.offset, context.offset_in_composite)),
             fmt::arg("since_version", c.added_since),
             fmt::arg(
                 "value_type",
-                utils::make_alias_template("value_type", c.public_type)),
-            fmt::arg("size", c.size),
+                utils::make_alias_template("value_type", context.public_type)),
+            fmt::arg("size", context.size),
             fmt::arg("deprecated_impl", make_deprecated(c.deprecated_since)),
             fmt::arg(
-                "traits_tag", make_templated_traits_tag(c.public_type, c.tag)));
+                "traits_tag",
+                make_templated_traits_tag(context.public_type, context.tag)));
     }
 
     std::string make_traits(const sbe::composite& c) const
@@ -583,23 +608,22 @@ public:
             encoding);
     }
 
-    static std::string_view get_tag(const sbe::encoding& encoding)
+    std::string_view get_tag(const sbe::encoding& encoding) const
     {
         return std::visit(
-            [](const auto& enc) -> std::string_view
+            [this](const auto& enc) -> std::string_view
             {
-                return enc.tag;
+                return ctx_manager->get(enc).tag;
             },
             encoding);
     }
 
     std::string make_traits(const sbe::ref& r) const
     {
-        const auto& target_type = types->get_or_throw(
-            r.type, "{}: encoding `{}` doesn't exist", r.location);
-
+        const auto& target_type = utils::get_schema_encoding(*schema, r.type);
         const auto& traits_name = get_traits_name(target_type);
         const auto& target_tag = get_tag(target_type);
+        const auto& context = ctx_manager->get(r);
 
         return fmt::format(
             // clang-format off
@@ -625,30 +649,23 @@ public:
 )",
             // clang-format on
             fmt::arg("traits_name", traits_name),
-            fmt::arg("tag", r.tag),
+            fmt::arg("tag", context.tag),
             fmt::arg("target_tag", target_tag),
             fmt::arg("name", r.name),
-            fmt::arg("offset_impl", make_offset_impl(r.actual_offset)),
+            fmt::arg(
+                "offset_impl", make_offset_impl(context.offset_in_composite)),
             fmt::arg("since_version", r.added_since),
             fmt::arg("deprecated_impl", make_deprecated(r.deprecated_since)));
     }
 
     std::string get_num_in_group_underlying_type(const sbe::group& g) const
     {
-        const auto& header = types->get_as_or_throw<sbe::composite>(
-            g.dimension_type,
-            "{}: encoding `{}` doesn't exist or it's not a composite");
+        const auto& header = utils::get_schema_encoding_as<sbe::composite>(
+            *schema, g.dimension_type);
+        const auto& t = std::get<sbe::type>(
+            *utils::find_composite_element(header, "numInGroup"));
 
-        const auto t = std::get_if<sbe::type>(
-            utils::find_composite_element(header, "numInGroup"));
-        if(t)
-        {
-            return t->underlying_type;
-        }
-
-        throw_error(
-            "{}: `numInGroup` is not found or it's not a type",
-            header.location);
+        return ctx_manager->get(t).underlying_type;
     }
 
     static std::string make_unique_param_name(
@@ -673,24 +690,26 @@ public:
         return desired_name;
     }
 
-    static std::string get_group_payload_size(
-        const sbe::group& g, std::vector<std::string>& param_names)
+    std::string get_group_payload_size(
+        const sbe::group& g, std::vector<std::string>& param_names) const
     {
         std::vector<std::string> headers_sum;
         headers_sum.reserve(g.members.groups.size() + g.members.data.size());
 
         for(const auto& nested_group : g.members.groups)
         {
+            const auto& context = ctx_manager->get(nested_group);
             headers_sum.push_back(fmt::format(
                 "::sbepp::composite_traits<::sbepp::group_traits<{}"
                 ">::dimension_type_tag>::size_bytes()",
-                nested_group.tag));
+                context.tag));
         }
 
         for(const auto& d : g.members.data)
         {
-            headers_sum.push_back(
-                fmt::format("::sbepp::data_traits<{}>::size_bytes(0)", d.tag));
+            const auto& context = ctx_manager->get(d);
+            headers_sum.push_back(fmt::format(
+                "::sbepp::data_traits<{}>::size_bytes(0)", context.tag));
         }
 
         if(!headers_sum.empty())
@@ -702,7 +721,7 @@ public:
             "{num_in_group_param} * "
             "(::sbepp::group_traits<{tag}>::block_length() {headers_sum})",
             fmt::arg("num_in_group_param", param_names.back()),
-            fmt::arg("tag", g.tag),
+            fmt::arg("tag", ctx_manager->get(g).tag),
             fmt::arg("headers_sum", fmt::join(headers_sum, "\n+ ")));
     }
 
@@ -872,7 +891,7 @@ R"(static constexpr ::std::size_t size_bytes({params}) noexcept
 
             sum_terms.push_back(fmt::format(
                 "::sbepp::group_traits<{tag}>::size_bytes({params})",
-                fmt::arg("tag", g.tag),
+                fmt::arg("tag", ctx_manager->get(g).tag),
                 fmt::arg(
                     "params",
                     make_group_size_bytes_args(
@@ -883,8 +902,9 @@ R"(static constexpr ::std::size_t size_bytes({params}) noexcept
         has_data_members |= !members.data.empty();
         for(const auto& d : members.data)
         {
-            sum_terms.push_back(
-                fmt::format("::sbepp::data_traits<{}>::size_bytes(0)", d.tag));
+            sum_terms.push_back(fmt::format(
+                "::sbepp::data_traits<{}>::size_bytes(0)",
+                ctx_manager->get(d).tag));
         }
     }
 
@@ -928,14 +948,16 @@ R"(static constexpr ::std::size_t size_bytes({params}) noexcept
             fmt::arg("sum_terms", fmt::join(sum_terms, "\n+ ")));
     }
 
-    static std::string make_traits_tag(const sbe::type& t)
+    std::string make_traits_tag(const sbe::type& t) const
     {
         // `traits_tag` specialization for array types exists in sbepp.hpp. For
         // numeric constants we don't generate this mapping because they are
         // represented using raw types
-        if(!t.is_template && (t.presence != field_presence::constant))
+        const auto& context = ctx_manager->get(t);
+
+        if(!context.is_template && (t.presence != field_presence::constant))
         {
-            return make_traits_tag(t.public_type, t.tag);
+            return make_traits_tag(context.public_type, context.tag);
         }
 
         return "";
@@ -975,6 +997,8 @@ struct traits_tag<{type}>
 
     std::string make_message_root_traits(const sbe::message& m) const
     {
+        const auto& context = ctx_manager->get(m);
+
         return fmt::format(
             // clang-format off
 R"(
@@ -1021,49 +1045,60 @@ public:
 {traits_tag}
 )",
             // clang-format on
-            fmt::arg("tag", m.tag),
+            fmt::arg("tag", context.tag),
             fmt::arg("name", m.name),
             fmt::arg("description", m.description),
             fmt::arg("id", m.id),
-            fmt::arg("block_length", m.actual_block_length),
+            fmt::arg("block_length", context.actual_block_length),
             fmt::arg("semantic_type", m.semantic_type),
             fmt::arg("since_version", m.added_since),
             fmt::arg(
                 "value_type",
-                utils::make_alias_template("value_type", m.public_type)),
+                utils::make_alias_template("value_type", context.public_type)),
             fmt::arg("deprecated_impl", make_deprecated(m.deprecated_since)),
             fmt::arg("size_bytes_impl", make_message_size_bytes(m)),
             fmt::arg(
                 "schema_tag",
-                utils::make_type_alias("schema_tag", schema->tag)),
+                utils::make_type_alias(
+                    "schema_tag", ctx_manager->get(*schema).tag)),
             fmt::arg(
-                "traits_tag", make_templated_traits_tag(m.public_type, m.tag)));
+                "traits_tag",
+                make_templated_traits_tag(context.public_type, context.tag)));
     }
 
-    static std::string make_field_value_type(const sbe::field& f)
+    // TODO: can't we just pass `field_context` instead of `sbe::field`?
+    std::string make_field_value_type(const sbe::field& f) const
     {
-        if((f.actual_presence == field_presence::constant) || (!f.is_template))
+        const auto& context = ctx_manager->get(f);
+
+        if((context.actual_presence == field_presence::constant)
+           || (!context.is_template))
         {
-            return utils::make_type_alias("value_type", f.value_type);
+            return utils::make_type_alias("value_type", context.value_type);
         }
         else
         {
-            return utils::make_alias_template("value_type", f.value_type);
+            return utils::make_alias_template("value_type", context.value_type);
         }
     }
 
-    static std::string make_field_value_type_tag(const sbe::field& f)
+    std::string make_field_value_type_tag(const sbe::field& f) const
     {
-        if(f.actual_presence != field_presence::constant)
+        const auto& context = ctx_manager->get(f);
+
+        if(context.actual_presence != field_presence::constant)
         {
-            return utils::make_type_alias("value_type_tag", f.value_type_tag);
+            return utils::make_type_alias(
+                "value_type_tag", context.value_type_tag);
         }
 
         return {};
     }
 
-    static std::string make_traits(const sbe::field& f)
+    std::string make_traits(const sbe::field& f) const
     {
+        const auto& context = ctx_manager->get(f);
+
         return fmt::format(
             // clang-format off
 R"(
@@ -1104,12 +1139,13 @@ public:
 }};
 )",
             // clang-format on
-            fmt::arg("tag", f.tag),
+            fmt::arg("tag", context.tag),
             fmt::arg("name", f.name),
             fmt::arg("id", f.id),
             fmt::arg("description", f.description),
-            fmt::arg("presence", utils::presence_to_string(f.actual_presence)),
-            fmt::arg("offset_impl", make_offset_impl(f.actual_offset)),
+            fmt::arg(
+                "presence", utils::presence_to_string(context.actual_presence)),
+            fmt::arg("offset_impl", make_offset_impl(context.level_offset)),
             fmt::arg("since_version", f.added_since),
             fmt::arg("value_type", make_field_value_type(f)),
             fmt::arg("value_type_tag", make_field_value_type_tag(f)),
@@ -1129,11 +1165,12 @@ public:
 
     std::string make_traits(const sbe::group& g) const
     {
-        const auto& dimension_type = types->get_as_or_throw<sbe::composite>(
-            g.dimension_type,
-            "{}: encoding `{}` doesn't exist or it's not a composite",
-            g.location,
-            g.dimension_type);
+        const auto& dimension_type =
+            utils::get_schema_encoding_as<sbe::composite>(
+                *schema, g.dimension_type);
+        const auto& group_context = ctx_manager->get(g);
+        const auto& header_context = ctx_manager->get(dimension_type);
+
         return fmt::format(
             // clang-format off
 R"(
@@ -1184,36 +1221,43 @@ public:
 {traits_tag}
 )",
             // clang-format on
-            fmt::arg("tag", g.tag),
+            fmt::arg("tag", group_context.tag),
             fmt::arg("name", g.name),
             fmt::arg("description", g.description),
             fmt::arg("id", g.id),
-            fmt::arg("block_length", g.actual_block_length),
+            fmt::arg("block_length", group_context.actual_block_length),
             fmt::arg("semantic_type", g.semantic_type),
             fmt::arg("since_version", g.added_since),
             fmt::arg(
                 "value_type",
-                utils::make_alias_template("value_type", g.impl_type)),
+                utils::make_alias_template(
+                    "value_type", group_context.impl_type)),
             fmt::arg(
                 "dimension_type",
                 utils::make_alias_template(
-                    "dimension_type", dimension_type.public_type)),
+                    "dimension_type", header_context.public_type)),
             fmt::arg(
                 "dimension_type_tag",
                 utils::make_type_alias(
-                    "dimension_type_tag", dimension_type.tag)),
+                    "dimension_type_tag", header_context.tag)),
             fmt::arg(
                 "entry_type",
-                utils::make_alias_template("entry_type", g.entry_impl_type)),
+                utils::make_alias_template(
+                    "entry_type", group_context.entry_impl_type)),
             fmt::arg("level_traits", make_level_traits(g.members)),
             fmt::arg("deprecated_impl", make_deprecated(g.deprecated_since)),
             fmt::arg("size_bytes_impl", make_group_size_bytes(g)),
             fmt::arg(
-                "traits_tag", make_templated_traits_tag(g.impl_type, g.tag)));
+                "traits_tag",
+                make_templated_traits_tag(
+                    group_context.impl_type, group_context.tag)));
     }
 
-    static std::string make_traits(const sbe::data& d)
+    std::string make_traits(const sbe::data& d) const
     {
+        const auto& context = ctx_manager->get(d);
+        const auto& header_context = ctx_manager->get(*context.length_type);
+
         return fmt::format(
             // clang-format off
 R"(
@@ -1256,19 +1300,19 @@ public:
 }};
 )",
             // clang-format on
-            fmt::arg("tag", d.tag),
+            fmt::arg("tag", context.tag),
             fmt::arg("name", d.name),
             fmt::arg("description", d.description),
             fmt::arg("id", d.id),
             fmt::arg("since_version", d.added_since),
-            fmt::arg("value_type", d.impl_type),
+            fmt::arg("value_type", context.impl_type),
             fmt::arg(
                 "length_type",
                 utils::make_type_alias(
-                    "length_type", d.length_type->public_type)),
+                    "length_type", header_context.public_type)),
             fmt::arg(
                 "length_type_tag",
-                utils::make_type_alias("length_type_tag", d.length_type->tag)),
+                utils::make_type_alias("length_type_tag", header_context.tag)),
             fmt::arg("deprecated_impl", make_deprecated(d.deprecated_since)));
     }
 

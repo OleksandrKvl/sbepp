@@ -449,4 +449,20 @@ inline const sbe::composite_element*
 
     return {};
 }
+
+// returns existing encoding using case-insensitive search
+inline const sbe::encoding& get_schema_encoding(
+    const sbe::message_schema& schema, std::string_view name)
+{
+    const auto lowered_name = utils::to_lower(name);
+    return schema.types.at(lowered_name);
+}
+
+template<typename T>
+const T& get_schema_encoding_as(
+    const sbe::message_schema& schema, std::string_view name)
+{
+    const auto lowered_name = utils::to_lower(name);
+    return std::get<T>(schema.types.at(lowered_name));
+}
 } // namespace sbepp::sbeppc::utils
