@@ -171,21 +171,6 @@ inline offset_t get_valid_offset(
     return min_offset;
 }
 
-inline bool is_constant(const sbe::encoding& encoding)
-{
-    return std::visit(
-        utils::overloaded{
-            [](const sbe::type& t)
-            {
-                return t.presence == field_presence::constant;
-            },
-            [](const auto&)
-            {
-                return false;
-            }},
-        encoding);
-}
-
 inline std::string_view byte_order_to_endian(const sbe::byte_order_kind order)
 {
     if(order == sbe::byte_order_kind::big_endian)
@@ -462,7 +447,6 @@ template<typename T>
 const T& get_schema_encoding_as(
     const sbe::message_schema& schema, std::string_view name)
 {
-    const auto lowered_name = utils::to_lower(name);
-    return std::get<T>(schema.types.at(lowered_name));
+    return std::get<T>(get_schema_encoding(schema, name));
 }
 } // namespace sbepp::sbeppc::utils
