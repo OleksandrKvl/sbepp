@@ -8,7 +8,7 @@
 #include <sbepp/sbeppc/throw_error.hpp>
 #include <sbepp/sbeppc/utils.hpp>
 #include <sbepp/sbeppc/types_compiler.hpp>
-// #include <sbepp/sbeppc/messages_compiler.hpp>
+#include <sbepp/sbeppc/messages_compiler.hpp>
 #include <sbepp/sbeppc/traits_generator.hpp>
 #include <sbepp/sbeppc/tags_generator.hpp>
 #include <sbepp/sbeppc/context_manager.hpp>
@@ -159,12 +159,11 @@ SBEPP_WARNINGS_ON();
                     "injected_include",
                     make_injected_include(inject_include))));
 
-#if 0
         // messages
         std::vector<std::string> message_includes;
-        messages_compiler mc{schema, types, messages, traits_gen};
+        messages_compiler mc{schema, traits_gen, ctx_manager};
         mc.compile(
-            [&message_includes, &output_dir, &schema, &fs_provider](
+            [&message_includes, &output_dir, &schema_name, &fs_provider](
                 const auto name,
                 const auto implementation,
                 const auto alias,
@@ -175,7 +174,7 @@ SBEPP_WARNINGS_ON();
                     std::filesystem::path{"messages"} / name += ".hpp";
                 message_includes.push_back(
                     fmt::format("#include \"{}\"", include_path.string()));
-                const auto file_path = output_dir / schema.name / include_path;
+                const auto file_path = output_dir / schema_name / include_path;
 
                 fs_provider.write_file(
                     file_path,
@@ -215,7 +214,7 @@ namespace sbepp
 SBEPP_WARNINGS_ON();
 )",
                         // clang-format on
-                        fmt::arg("schema", schema.name),
+                        fmt::arg("schema", schema_name),
                         fmt::arg(
                             "dependency_includes",
                             make_type_dependency_includes(dependencies)),
@@ -229,7 +228,7 @@ SBEPP_WARNINGS_ON();
 
         // top level header
         fs_provider.write_file(
-            output_dir / schema.name / schema.name += ".hpp",
+            output_dir / schema_name / schema_name += ".hpp",
             fmt::format(
                 // clang-format off
 R"({top_comment}
@@ -244,7 +243,6 @@ R"({top_comment}
                 fmt::arg("message_includes", fmt::join(message_includes, "\n")),
                 fmt::arg(
                     "top_comment", utils::get_compiled_header_top_comment())));
-#endif
     }
 
 private:

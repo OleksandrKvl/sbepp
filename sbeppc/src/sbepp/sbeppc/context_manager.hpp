@@ -82,7 +82,7 @@ struct message_context
 {
     std::string tag;
     std::string impl_name;
-    // std::string impl_type;
+    std::string impl_type;
     std::string public_type;
     block_length_t actual_block_length;
 };
