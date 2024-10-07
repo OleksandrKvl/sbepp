@@ -10,6 +10,7 @@
 #include <cstddef>
 #include <optional>
 #include <tuple>
+#include <cassert>
 
 namespace sbepp::sbeppc
 {
@@ -204,16 +205,42 @@ class context_manager
 
 {
 public:
+    // `create` and `get` separation is required to avoid bugs when accidentally
+    // copied object, whose address used as a key, gets an empty context created
+    // automatically by `unordered_map::operator[]`.
+
+    template<typename T>
+    [[maybe_unused]] context_type_t<T>& create(const T& t)
+    {
+        auto& map = std::get<map_type<T>>(contexts);
+        const auto [it, inserted] = map.emplace(&t, context_type_t<T>{});
+        assert(inserted && "Context should be created only once");
+
+        return it->second;
+    }
+
     template<typename T>
     context_type_t<T>& get(const T& t)
     {
-        return std::get<map_type<T>>(contexts)[&t];
+        // `unordered_map::at` can be used to achieve similar behavior but this
+        // condition indicates an `sbeppc` bug, not something that client can
+        // fix on their side so assertion better fits this check
+        auto& map = std::get<map_type<T>>(contexts);
+        const auto search = map.find(&t);
+        assert((search != std::end(map)) && "Context doesn't exist");
+
+        return search->second;
     }
 
     template<typename T>
     const context_type_t<T>& get(const T& t) const
     {
-        return std::get<map_type<T>>(contexts).at(&t);
+        auto& map = std::get<map_type<T>>(contexts);
+        const auto search = map.find(&t);
+        // see the comment in non-const `get` version
+        assert((search != std::end(map)) && "Context doesn't exist");
+
+        return search->second;
     }
 
 private:

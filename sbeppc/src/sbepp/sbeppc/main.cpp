@@ -156,7 +156,7 @@ int main(int argc, char** argv)
         checker.check(schema, ctx_manager);
 
         // TODO: should we hide this inside some class?
-        ctx_manager.get(schema).name =
+        ctx_manager.create(schema).name =
             config.schema_name.value_or(schema.package);
 
         // C++ related checks
@@ -172,6 +172,7 @@ int main(int argc, char** argv)
             ctx_manager,
             fs_provider);
     }
+    // TODO: catch more basic `std::exception`?
     catch(const sbe_error& e)
     {
         reporter.error(e.what());
