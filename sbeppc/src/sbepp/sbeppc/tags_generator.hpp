@@ -206,7 +206,7 @@ private:
         for(auto& value : e.valid_values)
         {
             res += fmt::format("    struct {}{{}};\n", value.name);
-            ctx_manager->get(value).tag = make_public_tag(path, value.name);
+            ctx_manager->create(value).tag = make_public_tag(path, value.name);
         }
         return res;
     }
@@ -243,7 +243,8 @@ R"(struct {name}
         for(auto& choice : s.choices)
         {
             res += fmt::format("    struct {}{{}};\n", choice.name);
-            ctx_manager->get(choice).tag = make_public_tag(path, choice.name);
+            ctx_manager->create(choice).tag =
+                make_public_tag(path, choice.name);
         }
 
         return res;
@@ -452,7 +453,7 @@ R"(struct {group}
 
         for(auto& data : data_members)
         {
-            ctx_manager->get(data).tag = make_public_tag(path, data.name);
+            ctx_manager->create(data).tag = make_public_tag(path, data.name);
             res += fmt::format("    struct {}{{}};\n", data.name);
         }
 

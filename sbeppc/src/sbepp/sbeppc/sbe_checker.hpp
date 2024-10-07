@@ -394,7 +394,7 @@ private:
 
         for(const auto& f : members.fields)
         {
-            auto& context = ctx_manager->get(f);
+            auto& context = ctx_manager->create(f);
             field_presence actual_presence{};
             if(!utils::is_primitive_type(f.type))
             {
@@ -440,6 +440,7 @@ private:
 
         for(const auto& g : members.groups)
         {
+            ctx_manager->create(g);
             validate_group_header(g);
             validate_members(g);
         }
@@ -452,6 +453,7 @@ private:
 
     void validate_message(const sbe::message& m)
     {
+        ctx_manager->create(m);
         validate_members(m);
     }
 
@@ -834,7 +836,7 @@ private:
             }
         }
 
-        ctx_manager->get(t).size =
+        ctx_manager->create(t).size =
             t.length * get_primitive_type_size(t.primitive_type);
     }
 
@@ -923,7 +925,7 @@ private:
         }
 
         validate_valid_values(e.valid_values, primitive_type);
-        ctx_manager->get(e).size = get_primitive_type_size(primitive_type);
+        ctx_manager->create(e).size = get_primitive_type_size(primitive_type);
     }
 
     static bool is_unsigned_primitive_type(const std::string_view type)
@@ -999,7 +1001,7 @@ private:
         }
 
         validate_choice_indexes(s.choices, primitive_type);
-        ctx_manager->get(s).size = get_primitive_type_size(primitive_type);
+        ctx_manager->create(s).size = get_primitive_type_size(primitive_type);
     }
 
     void validate_encoding(const sbe::ref& r)
@@ -1015,7 +1017,7 @@ private:
         std::visit(
             [this, &r](const auto& enc)
             {
-                ctx_manager->get(r).size = ctx_manager->get(enc).size;
+                ctx_manager->create(r).size = ctx_manager->get(enc).size;
             },
             *enc);
     }
@@ -1095,7 +1097,7 @@ private:
         }
 
         // `offset` points past the last element, it's effectively the size
-        ctx_manager->get(c).size = offset;
+        ctx_manager->create(c).size = offset;
     }
 
     void validate_public_encoding(const sbe::encoding& encoding)
@@ -1123,9 +1125,6 @@ private:
 
     void validate_types()
     {
-        // cyclic refs
-        // collect all type-related errors from the existing code
-        // probably it's a good idea to list them
         for(const auto& [name, encoding] : schema->types)
         {
             validate_public_encoding(encoding);
