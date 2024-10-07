@@ -140,7 +140,7 @@ private:
         // TODO: should we provide different error message for custom or
         // XML name?
         const auto& name = ctx_manager->get(*schema).name;
-        if(!utils::is_sbe_symbolic_name(name) || !is_cpp_keyword(name)
+        if(!utils::is_sbe_symbolic_name(name) || is_cpp_keyword(name)
            || is_reserved_cpp_namespace(name))
         {
             throw_error(
@@ -226,7 +226,7 @@ private:
     void validate_name(
         const std::string_view name, const source_location& location)
     {
-        if(!is_cpp_keyword(name))
+        if(is_cpp_keyword(name))
         {
             throw_error("{}: `{}` is not a valid C++ name", location, name);
         }
