@@ -16,6 +16,9 @@
 #include <variant>
 #include <cassert>
 #include <vector>
+#include <cctype>
+#include <cstdlib>
+#include <cerrno>
 
 namespace sbepp::sbeppc
 {
@@ -600,19 +603,6 @@ private:
         return {};
     }
 
-    // template<typename T>
-    // bool has_encoding_as(const std::string& name) const
-    // {
-    //     const auto search = schema->types.find(name);
-    //     if(search != std::end(schema->types))
-    //     {
-    //         const auto& value = search->second;
-    //         return std::holds_alternative<T>(value);
-    //     }
-
-    //     return false;
-    // }
-
     template<typename T>
     static bool can_be_parsed_as(const std::string_view str)
     {
@@ -630,22 +620,42 @@ private:
     template<typename T>
     static bool can_be_parsed_as_fp(const std::string_view str)
     {
-        static std::string_view nan{"nan"};
-        if(std::equal(
-               std::begin(str),
-               std::end(str),
-               std::begin(nan),
-               [](const auto lhs, const auto rhs)
-               {
-                   return std::tolower(lhs) == rhs;
-               }))
+        // `std::from_chars` for FP types support is poor over the compilers so
+        // we have to use custom implementation. SBE is not clear about FP
+        // string requirements, probably XML rules should be used but there's no
+        // existing C/C++ API to validate such a string so we allow slightly
+        // more than XML by using `strtod/f`. This check is considered
+        // low-priority anyway because it can only be performed for FP
+        // min/max/null/constant values which are quite rare in SBE schemas.
+
+        if(str.empty())
         {
-            return true;
+            return false;
+        }
+
+        // XML doesn't allow leading or trailing spaces
+        if(std::isspace(str.front()))
+        {
+            return false;
+        }
+
+        char* last_parsed{};
+        errno = 0;
+        if constexpr(std::is_same_v<T, float>)
+        {
+            std::strtof(str.data(), &last_parsed);
         }
         else
         {
-            return can_be_parsed_as<T>(str);
+            std::strtod(str.data(), &last_parsed);
         }
+
+        if((errno == ERANGE) || (last_parsed != str.data() + str.size()))
+        {
+            return false;
+        }
+
+        return true;
     }
 
     static bool value_fits_into_type(
