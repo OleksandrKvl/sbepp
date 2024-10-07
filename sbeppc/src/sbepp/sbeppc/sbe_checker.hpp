@@ -362,27 +362,34 @@ private:
         }
     }
 
-    static void validate_block_length(
-        const std::optional<block_length_t>& block_length,
-        const block_length_t actual_block_length,
-        const source_location& location)
+    template<typename MessageOrGroup>
+    void validate_block_length(
+        const MessageOrGroup& level, const block_length_t actual_block_length)
     {
-        if(block_length && (*block_length < actual_block_length))
+        if(level.block_length)
         {
-            throw_error(
-                "{}: custom `blockLength` ({}) is less than minimum possible "
-                "({})",
-                location,
-                *block_length,
-                actual_block_length);
+            if(*level.block_length < actual_block_length)
+            {
+                throw_error(
+                    "{}: custom `blockLength` ({}) is less than minimum "
+                    "possible "
+                    "({})",
+                    level.location,
+                    *level.block_length,
+                    actual_block_length);
+            }
+            ctx_manager->get(level).actual_block_length = *level.block_length;
+        }
+        else
+        {
+            ctx_manager->get(level).actual_block_length = actual_block_length;
         }
     }
 
-    void validate_members(
-        const sbe::level_members& members,
-        const std::optional<block_length_t>& block_length,
-        const source_location& location)
+    template<typename MessageOrGroup>
+    void validate_members(const MessageOrGroup& level)
     {
+        const auto& members = level.members;
         offset_t offset{};
 
         for(const auto& f : members.fields)
@@ -429,13 +436,12 @@ private:
         }
 
         // at this point `offset` is essentially a minimal blockLength value
-        validate_block_length(block_length, offset, location);
-        // TODO: set `actual_block_length` here
+        validate_block_length(level, offset);
 
         for(const auto& g : members.groups)
         {
             validate_group_header(g);
-            validate_members(g.members, g.block_length, g.location);
+            validate_members(g);
         }
 
         for(const auto& d : members.data)
@@ -446,7 +452,7 @@ private:
 
     void validate_message(const sbe::message& m)
     {
-        validate_members(m.members, m.block_length, m.location);
+        validate_members(m);
     }
 
     void validate_messages()
