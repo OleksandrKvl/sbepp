@@ -445,7 +445,7 @@ public:
     constexpr bool operator()(
         ::sbepp::detail::visit_tag, Visitor& v, Cursor& c) const
     {{
-        return v.template on_entry(*this, c);
+        return v.on_entry(*this, c);
     }}
 
     {visit_children_impl}
@@ -611,7 +611,7 @@ public:
     constexpr bool operator()(
         ::sbepp::detail::visit_tag, Visitor& v, Cursor& c) const
     {{
-        return v.template on_group(*this, c, "{public_name}");
+        return v.on_group(*this, c, "{public_name}");
     }}
 }};
 )",
@@ -1700,7 +1700,7 @@ R"(
             }
 
             res.push_back(fmt::format(
-                "v.template on_field(this->{name}(c), {tag}{{}})",
+                "v.on_field(this->{name}(c), {tag}{{}})",
                 fmt::arg("name", f.name),
                 fmt::arg("tag", f.tag)));
         }
@@ -1708,7 +1708,7 @@ R"(
         for(const auto& g : members.groups)
         {
             res.push_back(fmt::format(
-                "v.template on_group(this->{name}(c), c, {tag}{{}})",
+                "v.on_group(this->{name}(c), c, {tag}{{}})",
                 fmt::arg("name", g.name),
                 fmt::arg("tag", g.tag)));
         }
@@ -1716,7 +1716,7 @@ R"(
         for(const auto& d : members.data)
         {
             res.push_back(fmt::format(
-                "v.template on_data(this->{name}(c), {tag}{{}})",
+                "v.on_data(this->{name}(c), {tag}{{}})",
                 fmt::arg("name", d.name),
                 fmt::arg("tag", d.tag)));
         }
@@ -1796,7 +1796,7 @@ public:
     SBEPP_CPP14_CONSTEXPR void operator()(
         ::sbepp::detail::visit_tag, Visitor& v, Cursor& c)
     {{
-        v.template on_message(*this, c, {tag}{{}});
+        v.on_message(*this, c, {tag}{{}});
     }}
 
 {visit_children_impl}
