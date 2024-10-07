@@ -2505,7 +2505,7 @@ public:
     {
         for(const auto entry : this->cursor_range(c))
         {
-            if(v.template on_entry(entry, c))
+            if(v.on_entry(entry, c))
             {
                 return true;
             }
@@ -2727,7 +2727,7 @@ public:
     {
         for(const auto entry : this->cursor_range(c))
         {
-            if(v.template on_entry(entry, c))
+            if(v.on_entry(entry, c))
             {
                 return true;
             }
