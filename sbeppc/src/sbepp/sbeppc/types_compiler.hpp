@@ -507,9 +507,8 @@ public:
             fmt::arg("visit_set_impl2", make_visit_set_impl2(s)));
     }
 
-    std::string get_const_impl_type(const sbe::encoding& enc) const
+    std::string get_const_impl_type(const sbe::type& t) const
     {
-        const auto& t = std::get<sbe::type>(enc);
         const auto& context = ctx_manager->get(t);
 
         if(t.length != 1)
@@ -522,10 +521,10 @@ public:
     std::string value_ref_to_enum_value(const std::string_view value_ref)
     {
         const auto parsed = utils::parse_value_ref(value_ref);
-        auto& e = utils::get_schema_encoding_as<sbe::enumeration>(
-            *schema, parsed.enum_name);
+        const auto& enc = utils::get_schema_encoding(*schema, parsed.enum_name);
+        const auto& e = std::get<sbe::enumeration>(enc);
 
-        compile_public_encoding(e);
+        compile_public_encoding(enc);
 
         return fmt::format(
             "::sbepp::to_underlying({}::{})",
@@ -533,10 +532,9 @@ public:
             parsed.enumerator);
     }
 
-    std::string get_const_value(const sbe::encoding& enc)
+    std::string get_const_value(const sbe::type& t)
     {
-        assert(utils::is_constant(enc));
-        auto& t = std::get<sbe::type>(enc);
+        assert(t.presence == field_presence::constant);
 
         assert(t.value_ref || t.constant_value);
         if(t.value_ref)
@@ -659,12 +657,13 @@ R"(
                         auto& enc = utils::get_schema_encoding(*schema, r.type);
                         compile_public_encoding(enc);
 
-                        if(utils::is_constant(enc))
+                        if(const auto t = std::get_if<sbe::type>(&enc);
+                           t && (t->presence == field_presence::constant))
                         {
                             return normal_accessors::make_constant_accessor(
                                 r.name,
-                                get_const_impl_type(enc),
-                                get_const_value(enc));
+                                get_const_impl_type(*t),
+                                get_const_value(*t));
                         }
 
                         return std::visit(
@@ -680,16 +679,30 @@ R"(
                             },
                             enc);
                     },
+                    [this, &inline_types_impl](const sbe::type& t)
+                    {
+                        inline_types_impl += compile_encoding(t);
+                        if(t.presence == field_presence::constant)
+                        {
+                            return normal_accessors::make_constant_accessor(
+                                t.name,
+                                get_const_impl_type(t),
+                                get_const_value(t));
+                        }
+
+                        const auto& context = ctx_manager->get(t);
+                        return normal_accessors::make_accessor(
+                            t,
+                            *context.offset_in_composite,
+                            t.name,
+                            byte_order,
+                            false,
+                            context);
+                    },
                     [this, &inline_types_impl](auto& enc)
                     {
                         inline_types_impl += compile_encoding(enc);
-                        if(utils::is_constant(enc))
-                        {
-                            return normal_accessors::make_constant_accessor(
-                                enc.name,
-                                get_const_impl_type(enc),
-                                get_const_value(enc));
-                        }
+
                         const auto& context = ctx_manager->get(enc);
                         return normal_accessors::make_accessor(
                             enc,
