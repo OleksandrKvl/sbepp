@@ -397,6 +397,7 @@ private:
 
         for(const auto& f : members.fields)
         {
+            validate_name(f);
             auto& context = ctx_manager->create(f);
             field_presence actual_presence{};
             if(!utils::is_primitive_type(f.type))
@@ -443,6 +444,7 @@ private:
 
         for(const auto& g : members.groups)
         {
+            validate_name(g);
             ctx_manager->create(g);
             validate_group_header(g);
             validate_members(g);
@@ -450,12 +452,14 @@ private:
 
         for(const auto& d : members.data)
         {
+            validate_name(d);
             validate_data_header(d);
         }
     }
 
     void validate_message(const sbe::message& m)
     {
+        validate_name(m);
         ctx_manager->create(m);
         validate_members(m);
     }
@@ -833,6 +837,8 @@ private:
 
     void validate_encoding(const sbe::type& t)
     {
+        validate_name(t);
+
         if(t.presence == field_presence::constant)
         {
             validate_constant_value(t);
@@ -850,12 +856,13 @@ private:
             t.length * get_primitive_type_size(t.primitive_type);
     }
 
-    static void validate_valid_values(
+    void validate_valid_values(
         const std::vector<sbe::enum_valid_value>& valid_values,
-        const std::string_view primitive_type)
+        const std::string_view primitive_type) const
     {
         for(const auto& value : valid_values)
         {
+            validate_name(value);
             // strict: SBE char has strictly defined range
             const auto has_wrong_char_value =
                 ((primitive_type == "char") && (value.value.size() != 1));
@@ -888,6 +895,7 @@ private:
 
     void validate_encoding(const sbe::enumeration& e)
     {
+        validate_name(e);
         std::string_view primitive_type;
 
         if(utils::is_primitive_type(e.type))
@@ -945,17 +953,19 @@ private:
         return unsigned_types.count(type);
     }
 
-    static void validate_choice_indexes(
+    void validate_choices(
         const std::vector<sbe::set_choice>& choices,
-        const std::string_view primitive_type)
+        const std::string_view primitive_type) const
     {
         const auto primitive_type_size =
             get_primitive_type_size(primitive_type);
         static constexpr auto bits_per_byte = 8;
-        const auto bit_length = primitive_type_size * bits_per_byte - 1;
+        const auto bit_length = (primitive_type_size * bits_per_byte) - 1;
 
         for(const auto& choice : choices)
         {
+            validate_name(choice);
+
             if(choice.value > bit_length)
             {
                 throw_error(
@@ -969,6 +979,7 @@ private:
 
     void validate_encoding(const sbe::set& s)
     {
+        validate_name(s);
         std::string_view primitive_type;
 
         if(utils::is_primitive_type(s.type))
@@ -1010,12 +1021,14 @@ private:
             throw_error("{}: underlying type must be unsigned", s.location);
         }
 
-        validate_choice_indexes(s.choices, primitive_type);
+        validate_choices(s.choices, primitive_type);
         ctx_manager->create(s).size = get_primitive_type_size(primitive_type);
     }
 
     void validate_encoding(const sbe::ref& r)
     {
+        validate_name(r);
+
         const auto enc = get_encoding(r.type);
         if(!enc)
         {
@@ -1093,6 +1106,8 @@ private:
 
     void validate_encoding(const sbe::composite& c)
     {
+        validate_name(c);
+
         offset_t offset{};
 
         for(const auto& element : c.elements)
@@ -1138,6 +1153,18 @@ private:
         for(const auto& [name, encoding] : schema->types)
         {
             validate_public_encoding(encoding);
+        }
+    }
+
+    template<typename T>
+    void validate_name(const T& entity) const
+    {
+        if(!utils::is_sbe_symbolic_name(entity.name))
+        {
+            throw_error(
+                "{}: `{}` is not a valid SBE name",
+                entity.location,
+                entity.name);
         }
     }
 };

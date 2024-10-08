@@ -369,3 +369,22 @@ sbeppc_error_test(
     NAME "wrong_enum_field_valueRef_enum"
     ERROR "enum constant type `some_enum` should match field type `options`"
 )
+
+function(non_sbe_name_test sbe_node)
+    sbeppc_error_test(
+        NAME "non_sbe_${sbe_node}_name"
+        ERROR "`non-SBE name` is not a valid SBE name"
+    )
+endfunction()
+
+non_sbe_name_test("type")
+non_sbe_name_test("valid_value")
+non_sbe_name_test("enum")
+non_sbe_name_test("choice")
+non_sbe_name_test("set")
+non_sbe_name_test("ref")
+non_sbe_name_test("composite")
+non_sbe_name_test("field")
+non_sbe_name_test("group")
+non_sbe_name_test("data")
+non_sbe_name_test("message")

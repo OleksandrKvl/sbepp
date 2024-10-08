@@ -7,7 +7,16 @@
                    semanticVersion="5.2"
                    description="Example base schema which can be extended."
                    byteOrder="littleEndian">
+    <types>
+        <composite name="messageHeader">
+            <type name="blockLength" primitiveType="uint16"/>
+            <type name="templateId" primitiveType="uint16"/>
+            <type name="schemaId" primitiveType="uint16"/>
+            <type name="version" primitiveType="uint16"/>
+        </composite>
+    </types>
+
     <sbe:message name="msg" id="1">
-        <group name="non-SBE name"/>
+        <field name="non-SBE name" id="1" type="uint8"/>
     </sbe:message>
 </sbe:messageSchema>

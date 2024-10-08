@@ -8,6 +8,15 @@
                    description="Example base schema which can be extended."
                    byteOrder="littleEndian">
     <types>
-        <set name="non-SBE name"/>
+        <composite name="messageHeader">
+            <type name="blockLength" primitiveType="uint16"/>
+            <type name="templateId" primitiveType="uint16"/>
+            <type name="schemaId" primitiveType="uint16"/>
+            <type name="version" primitiveType="uint16"/>
+        </composite>
+
+        <enum name="enumeration" encodingType="uint8">
+            <validValue name="non-SBE name">0</validValue>
+        </enum>
     </types>
 </sbe:messageSchema>
