@@ -1,10 +1,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2023, Oleksandr Koval
 
-#ifdef USE_SINGLE_FILE
-#    include <traits_test_schema.hpp>
-#    include <traits_test_schema2.hpp>
-#elif defined(USE_TOP_FILE)
+#if defined(USE_TOP_FILE)
 #    include <traits_test_schema/traits_test_schema.hpp>
 #    include <traits_test_schema2/traits_test_schema2.hpp>
 #else

@@ -1,10 +1,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2023, Oleksandr Koval
 
-#ifdef USE_SINGLE_FILE
-#    include <test_schema.hpp>
-#    include <test_schema2.hpp>
-#elif defined(USE_TOP_FILE)
+#if defined(USE_TOP_FILE)
 #    include <test_schema/test_schema.hpp>
 #    include <test_schema2/test_schema2.hpp>
 #else
