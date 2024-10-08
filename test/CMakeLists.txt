@@ -35,8 +35,8 @@ get_available_cpp_versions(cpp_versions)
 
 set(src_dir "src/sbepp/test")
 
-function(add_test_binary name_suffix cpp_version)
-    set(test_name tests_cpp_${cpp_version}_${name_suffix})
+function(add_test_binary cpp_version)
+    set(test_name tests_cpp_${cpp_version})
     add_executable(${test_name})
     sbepp_set_target_language_standard(${test_name} CXX ${cpp_version})
     target_sources(${test_name}
@@ -69,6 +69,7 @@ function(add_test_binary name_suffix cpp_version)
         ${src_dir}/float_fields.test.cpp
         ${src_dir}/stdbyte_adl.test.cpp
         ${src_dir}/built_in_types.test.cpp
+        ${src_dir}/top_header_includes.test.cpp
     )
 
     target_include_directories(${test_name}
@@ -85,7 +86,6 @@ function(add_test_binary name_suffix cpp_version)
 
     target_compile_definitions(${test_name} PRIVATE
         SBEPP_ENABLE_ASSERTS_WITH_HANDLER
-        ${ARGN}
     )
 
     sbepp_set_strict_compiler_options(${test_name})
@@ -98,8 +98,7 @@ function(add_test_binary name_suffix cpp_version)
 endfunction()
 
 foreach(version IN LISTS cpp_versions)
-    add_test_binary("mf" ${version})
-    add_test_binary("tf" ${version} USE_TOP_FILE)
+    add_test_binary(${version})
 endforeach()
 
 add_subdirectory(sbeppc_errors)

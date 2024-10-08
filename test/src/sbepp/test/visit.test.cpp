@@ -1,14 +1,10 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2023, Oleksandr Koval
 
-#ifdef USE_TOP_FILE
-#    include <test_schema/test_schema.hpp>
-#else
-#    include <test_schema/messages/msg26.hpp>
-#    include <test_schema/messages/msg17.hpp>
-#    include <test_schema/types/refs_composite.hpp>
-#    include <test_schema/types/composite_b.hpp>
-#endif
+#include <test_schema/messages/msg26.hpp>
+#include <test_schema/messages/msg17.hpp>
+#include <test_schema/types/refs_composite.hpp>
+#include <test_schema/types/composite_b.hpp>
 
 #include <gtest/gtest.h>
 
