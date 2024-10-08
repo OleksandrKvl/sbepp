@@ -196,24 +196,6 @@ inline std::string_view presence_to_string(const field_presence presence)
     }
 }
 
-inline bool is_sbe_symbolic_name(const std::string_view name)
-{
-    // SBE also sets maximum name length to 64 but it doesn't make sense to me
-    if(name.empty() || std::isdigit(static_cast<unsigned char>(name[0])))
-    {
-        return false;
-    }
-
-    auto search = std::find_if_not(
-        std::begin(name),
-        std::end(name),
-        [](unsigned char ch)
-        {
-            return std::isalnum(ch) || (ch == '_');
-        });
-    return (search == std::end(name));
-}
-
 inline std::string to_lower(const std::string_view str)
 {
     std::string res;

@@ -3,8 +3,9 @@
 
 #pragma once
 
-#include "sbepp/sbeppc/source_location.hpp"
-#include "sbepp/sbeppc/throw_error.hpp"
+#include <sbepp/sbeppc/sbe_checker.hpp>
+#include <sbepp/sbeppc/source_location.hpp>
+#include <sbepp/sbeppc/throw_error.hpp>
 #include <sbepp/sbeppc/ireporter.hpp>
 #include <sbepp/sbeppc/sbe.hpp>
 #include <sbepp/sbeppc/utils.hpp>
@@ -30,8 +31,9 @@ public:
         this->schema = &schema;
 
         // at this point all names except schema one satisfy
-        // `utils::is_sbe_symbolic_name` so they have valid C++ name format but
-        // we still need to check them against reserved C++ names or keywords
+        // `sbe_checker::is_sbe_symbolic_name` so they have valid C++ name
+        // format but we still need to check them against reserved C++ names or
+        // keywords
         validate_schema_name();
         validate_type_names();
         validate_message_names();
@@ -140,7 +142,7 @@ private:
         // TODO: should we provide different error message for custom or
         // XML name?
         const auto& name = ctx_manager->get(*schema).name;
-        if(!utils::is_sbe_symbolic_name(name) || is_cpp_keyword(name)
+        if(!sbe_checker::is_sbe_symbolic_name(name) || is_cpp_keyword(name)
            || is_reserved_cpp_namespace(name))
         {
             throw_error(

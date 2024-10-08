@@ -36,6 +36,25 @@ public:
         validate_messages();
     }
 
+    static bool is_sbe_symbolic_name(const std::string_view name)
+    {
+        // strict: SBE also sets maximum name length to 64 but it doesn't make
+        // sense to me
+        if(name.empty() || std::isdigit(static_cast<unsigned char>(name[0])))
+        {
+            return false;
+        }
+
+        auto search = std::find_if_not(
+            std::begin(name),
+            std::end(name),
+            [](unsigned char ch)
+            {
+                return std::isalnum(ch) || (ch == '_');
+            });
+        return (search == std::end(name));
+    }
+
 private:
     const sbe::message_schema* schema{};
     context_manager* ctx_manager{};
@@ -1159,7 +1178,7 @@ private:
     template<typename T>
     void validate_name(const T& entity) const
     {
-        if(!utils::is_sbe_symbolic_name(entity.name))
+        if(!is_sbe_symbolic_name(entity.name))
         {
             throw_error(
                 "{}: `{}` is not a valid SBE name",
