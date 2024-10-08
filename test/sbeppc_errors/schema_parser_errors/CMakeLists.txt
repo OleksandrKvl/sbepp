@@ -26,14 +26,9 @@ non_empty_attribute_test("ref_type" "type")
 non_empty_attribute_test("field_type" "type")
 non_empty_attribute_test("data_type" "type")
 
-# 3 scenarios: no name, empty name, non-SBE name
+# 2 scenarios: no name, empty name
 function(required_name_test sbe_node)
     non_empty_attribute_test("${sbe_node}_name" "name")
-
-    sbeppc_error_test(
-        NAME "non_sbe_${sbe_node}_name"
-        ERROR "is not a valid SBE name"
-    )
 endfunction()
 
 required_name_test("type")
