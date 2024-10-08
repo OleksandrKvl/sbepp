@@ -1,51 +1,46 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2023, Oleksandr Koval
 
-#if defined(USE_TOP_FILE)
-#    include <traits_test_schema/traits_test_schema.hpp>
-#    include <traits_test_schema2/traits_test_schema2.hpp>
-#else
-#    include <traits_test_schema/types/messageHeader.hpp>
-#    include <traits_test_schema/types/groupSizeEncoding.hpp>
-#    include <traits_test_schema/types/customGroupSizeEncoding.hpp>
-#    include <traits_test_schema/types/varDataEncoding.hpp>
-#    include <traits_test_schema/types/enum_1.hpp>
-#    include <traits_test_schema/types/enum_2.hpp>
-#    include <traits_test_schema/types/composite_1.hpp>
-#    include <traits_test_schema/types/set_1.hpp>
-#    include <traits_test_schema/types/set_2.hpp>
-#    include <traits_test_schema/types/composite_2.hpp>
-#    include <traits_test_schema/types/composite_3.hpp>
-#    include <traits_test_schema/types/composite_4.hpp>
-#    include <traits_test_schema/types/composite_5.hpp>
-#    include <traits_test_schema/types/composite_6.hpp>
-#    include <traits_test_schema/types/composite_7.hpp>
-#    include <traits_test_schema/types/composite_8.hpp>
-#    include <traits_test_schema/types/str128.hpp>
-#    include <traits_test_schema/types/str_const.hpp>
-#    include <traits_test_schema/types/uint32_req.hpp>
-#    include <traits_test_schema/types/uint32_opt.hpp>
-#    include <traits_test_schema/types/uint32_const.hpp>
-#    include <traits_test_schema/types/type_1.hpp>
-#    include <traits_test_schema/messages/msg_1.hpp>
-#    include <traits_test_schema/messages/msg_2.hpp>
-#    include <traits_test_schema/messages/msg_3.hpp>
-#    include <traits_test_schema/messages/msg_4.hpp>
-#    include <traits_test_schema/messages/msg_5.hpp>
-#    include <traits_test_schema/messages/msg_6.hpp>
-#    include <traits_test_schema/messages/msg_7.hpp>
-#    include <traits_test_schema/messages/msg_8.hpp>
-#    include <traits_test_schema/messages/msg_9.hpp>
-#    include <traits_test_schema/messages/msg_10.hpp>
-#    include <traits_test_schema/messages/msg_11.hpp>
-#    include <traits_test_schema/messages/msg_12.hpp>
-#    include <traits_test_schema/messages/msg_13.hpp>
-#    include <traits_test_schema/messages/msg_14.hpp>
-#    include <traits_test_schema/messages/msg_15.hpp>
-#    include <traits_test_schema/messages/msg_16.hpp>
+#include <traits_test_schema/types/messageHeader.hpp>
+#include <traits_test_schema/types/groupSizeEncoding.hpp>
+#include <traits_test_schema/types/customGroupSizeEncoding.hpp>
+#include <traits_test_schema/types/varDataEncoding.hpp>
+#include <traits_test_schema/types/enum_1.hpp>
+#include <traits_test_schema/types/enum_2.hpp>
+#include <traits_test_schema/types/composite_1.hpp>
+#include <traits_test_schema/types/set_1.hpp>
+#include <traits_test_schema/types/set_2.hpp>
+#include <traits_test_schema/types/composite_2.hpp>
+#include <traits_test_schema/types/composite_3.hpp>
+#include <traits_test_schema/types/composite_4.hpp>
+#include <traits_test_schema/types/composite_5.hpp>
+#include <traits_test_schema/types/composite_6.hpp>
+#include <traits_test_schema/types/composite_7.hpp>
+#include <traits_test_schema/types/composite_8.hpp>
+#include <traits_test_schema/types/str128.hpp>
+#include <traits_test_schema/types/str_const.hpp>
+#include <traits_test_schema/types/uint32_req.hpp>
+#include <traits_test_schema/types/uint32_opt.hpp>
+#include <traits_test_schema/types/uint32_const.hpp>
+#include <traits_test_schema/types/type_1.hpp>
+#include <traits_test_schema/messages/msg_1.hpp>
+#include <traits_test_schema/messages/msg_2.hpp>
+#include <traits_test_schema/messages/msg_3.hpp>
+#include <traits_test_schema/messages/msg_4.hpp>
+#include <traits_test_schema/messages/msg_5.hpp>
+#include <traits_test_schema/messages/msg_6.hpp>
+#include <traits_test_schema/messages/msg_7.hpp>
+#include <traits_test_schema/messages/msg_8.hpp>
+#include <traits_test_schema/messages/msg_9.hpp>
+#include <traits_test_schema/messages/msg_10.hpp>
+#include <traits_test_schema/messages/msg_11.hpp>
+#include <traits_test_schema/messages/msg_12.hpp>
+#include <traits_test_schema/messages/msg_13.hpp>
+#include <traits_test_schema/messages/msg_14.hpp>
+#include <traits_test_schema/messages/msg_15.hpp>
+#include <traits_test_schema/messages/msg_16.hpp>
 
-#    include <traits_test_schema2/schema/schema.hpp>
-#endif
+#include <traits_test_schema2/schema/schema.hpp>
 
 #include <sbepp/test/utils.hpp>
 
@@ -61,8 +56,7 @@ constexpr auto g_custom_offset = 20;
 
 // `description` is a common static function for all the traits
 template<
-    template<typename>
-    class Trait,
+    template<typename> class Trait,
     typename Tag,
     typename = sbepp::test::utils::void_t<>>
 struct has_description : std::false_type

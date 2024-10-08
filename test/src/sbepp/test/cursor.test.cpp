@@ -1,23 +1,19 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2023, Oleksandr Koval
 
-#ifdef USE_TOP_FILE
-#    include <test_schema/test_schema.hpp>
-#else
-#    include <test_schema/messages/msg2.hpp>
-#    include <test_schema/messages/msg3.hpp>
-#    include <test_schema/messages/msg4.hpp>
-#    include <test_schema/messages/msg5.hpp>
-#    include <test_schema/messages/msg6.hpp>
-#    include <test_schema/messages/msg7.hpp>
-#    include <test_schema/messages/msg8.hpp>
-#    include <test_schema/messages/msg9.hpp>
-#    include <test_schema/messages/msg10.hpp>
-#    include <test_schema/messages/msg11.hpp>
-#    include <test_schema/messages/msg12.hpp>
-#    include <test_schema/messages/msg13.hpp>
-#    include <test_schema/messages/msg29.hpp>
-#endif
+#include <test_schema/messages/msg2.hpp>
+#include <test_schema/messages/msg3.hpp>
+#include <test_schema/messages/msg4.hpp>
+#include <test_schema/messages/msg5.hpp>
+#include <test_schema/messages/msg6.hpp>
+#include <test_schema/messages/msg7.hpp>
+#include <test_schema/messages/msg8.hpp>
+#include <test_schema/messages/msg9.hpp>
+#include <test_schema/messages/msg10.hpp>
+#include <test_schema/messages/msg11.hpp>
+#include <test_schema/messages/msg12.hpp>
+#include <test_schema/messages/msg13.hpp>
+#include <test_schema/messages/msg29.hpp>
 
 #include <sbepp/test/utils.hpp>
 

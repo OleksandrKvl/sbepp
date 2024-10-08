@@ -3,6 +3,8 @@
 
 #include <sbepp/sbepp.hpp>
 
+#include <exception>
+
 namespace sbepp
 {
 void assertion_failed(

@@ -1,11 +1,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2023, Oleksandr Koval
 
-#ifdef USE_TOP_FILE
-#    include <test_schema/test_schema.hpp>
-#else
-#    include <test_schema/messages/msg2.hpp>
-#endif
+#include <test_schema/messages/msg2.hpp>
 
 #if SBEPP_HAS_RANGES && SBEPP_HAS_CONCEPTS
 #    include <ranges>

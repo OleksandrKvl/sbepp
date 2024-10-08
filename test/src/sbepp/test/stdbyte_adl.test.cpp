@@ -1,12 +1,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2023, Oleksandr Koval
 
-#include "sbepp/sbepp.hpp"
-#ifdef USE_TOP_FILE
-#    include <test_schema/test_schema.hpp>
-#else
-#    include <test_schema/types/messageHeader.hpp>
-#endif
+#include <test_schema/types/messageHeader.hpp>
 
 #include <gtest/gtest.h>
 

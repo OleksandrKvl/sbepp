@@ -1,14 +1,10 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2023, Oleksandr Koval
 
-#ifdef USE_TOP_FILE
-#    include <test_schema/test_schema.hpp>
-#else
-#    include <test_schema/messages/msg2.hpp>
-#    include <test_schema/types/uint32_opt.hpp>
-#    include <test_schema/types/uint32_req.hpp>
-#    include <test_schema/types/options_set.hpp>
-#endif
+#include <test_schema/messages/msg2.hpp>
+#include <test_schema/types/uint32_opt.hpp>
+#include <test_schema/types/uint32_req.hpp>
+#include <test_schema/types/options_set.hpp>
 
 #include <sbepp/test/utils.hpp>
 
