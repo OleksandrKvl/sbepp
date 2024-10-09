@@ -380,18 +380,19 @@ inline std::optional<std::string> numeric_literal_to_value(
 
     if((type == "float") || (type == "double"))
     {
-        static std::string_view nan{"nan"};
-        if(std::equal(
-               std::begin(*value),
-               std::end(*value),
-               std::begin(nan),
-               [](const auto lhs, const auto rhs)
-               {
-                   return std::tolower(lhs) == rhs;
-               }))
+        if(value == "NaN")
         {
             return fmt::format("::std::numeric_limits<{}>::quiet_NaN()", type);
         }
+        else if((value == "INF") || (value == "+INF"))
+        {
+            return fmt::format("::std::numeric_limits<{}>::infinity()", type);
+        }
+        else if(value == "-INF")
+        {
+            return fmt::format("-::std::numeric_limits<{}>::infinity()", type);
+        }
+
         return value;
     }
 
