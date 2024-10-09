@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <sbepp/sbeppc/source_location.hpp>
 #include <sbepp/sbepp.hpp>
 #include <sbepp/sbeppc/sbe.hpp>
 #include <sbepp/sbeppc/throw_error.hpp>
@@ -887,6 +888,21 @@ private:
         return map.at(type);
     }
 
+    static void validate_optional_value(
+        const std::optional<std::string>& value,
+        const std::string_view primitive_type,
+        const source_location& location)
+    {
+        if(value && !value_fits_into_type(*value, primitive_type))
+        {
+            throw_error(
+                "{}: value `{}` cannot be represented by type `{}`",
+                location,
+                *value,
+                primitive_type);
+        }
+    }
+
     void validate_encoding(const sbe::type& t)
     {
         validate_name(t);
@@ -901,6 +917,16 @@ private:
             {
                 throw_error(
                     "{}: arrays must have a single-byte type", t.location);
+            }
+
+            validate_optional_value(t.min_value, t.primitive_type, t.location);
+            validate_optional_value(t.max_value, t.primitive_type, t.location);
+            // strict: min_value should be less than max_value
+
+            if(t.presence == field_presence::optional)
+            {
+                validate_optional_value(
+                    t.null_value, t.primitive_type, t.location);
             }
         }
 
