@@ -645,22 +645,53 @@ private:
     {
         // `std::from_chars` for FP types support is poor over the compilers so
         // we have to use custom implementation. SBE is not clear about FP
-        // string requirements, probably XML rules should be used but there's no
-        // existing C/C++ API to validate such a string so we allow slightly
-        // more than XML by using `strtod/f`. This check is considered
-        // low-priority anyway because it can only be performed for FP
-        // min/max/null/constant values which are quite rare in SBE schemas.
+        // string requirements so XML rules are used.
 
         if(str.empty())
         {
             return false;
         }
 
-        // XML doesn't allow leading or trailing spaces
+        // XML doesn't allow leading spaces
         if(std::isspace(str.front()))
         {
             return false;
         }
+
+        auto signless_value = str;
+        bool has_sign{};
+        if((str.front() == '+') || (str.front() == '-'))
+        {
+            has_sign = true;
+            signless_value = str.substr(1);
+        }
+
+        if(signless_value.size() > 1)
+        {
+            // XML doesn't allow hex FP literals
+            if((signless_value[0] == '0')
+               && ((signless_value[1] == 'x') || (signless_value[1] == 'X')))
+            {
+                return false;
+            }
+
+            // XML allows only `NaN` and `INF`, case-sensitive
+            if(std::isalpha(signless_value.front()))
+            {
+                // XML doesn't allow `NaN` with a sign
+                const auto has_signless_nan =
+                    ((signless_value == "NaN") && (!has_sign));
+                if(!has_signless_nan && (signless_value != "INF"))
+                {
+                    return false;
+                }
+            }
+        }
+
+        // what's left should effectively be one of:
+        //  - "+/-INF" or "NaN"
+        //  - non-hexadecimal FP literal with optional "e/E" exponent part
+        // anything else should be detected by `std::strtof/d` as error
 
         char* last_parsed{};
         errno = 0;
@@ -673,7 +704,9 @@ private:
             std::strtod(str.data(), &last_parsed);
         }
 
-        if((errno == ERANGE) || (last_parsed != str.data() + str.size()))
+        // XML doesn't allow trailing spaces or any other garbage at the end
+        const auto fully_parsed = (last_parsed == str.data() + str.size());
+        if((errno == ERANGE) || !fully_parsed)
         {
             return false;
         }
