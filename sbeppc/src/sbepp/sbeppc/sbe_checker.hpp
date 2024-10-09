@@ -994,8 +994,10 @@ private:
                 primitive_type);
         }
 
+        auto& context = ctx_manager->create(e);
+        context.primitive_type = primitive_type;
         validate_valid_values(e.valid_values, primitive_type);
-        ctx_manager->create(e).size = get_primitive_type_size(primitive_type);
+        context.size = get_primitive_type_size(primitive_type);
     }
 
     static bool is_unsigned_primitive_type(const std::string_view type)
@@ -1073,8 +1075,10 @@ private:
             throw_error("{}: underlying type must be unsigned", s.location);
         }
 
+        auto& context = ctx_manager->create(s);
+        context.primitive_type = primitive_type;
         validate_choices(s.choices, primitive_type);
-        ctx_manager->create(s).size = get_primitive_type_size(primitive_type);
+        context.size = get_primitive_type_size(primitive_type);
     }
 
     void validate_encoding(const sbe::ref& r)
