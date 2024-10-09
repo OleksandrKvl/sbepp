@@ -279,19 +279,6 @@ public:
         }
     }
 
-    template<typename EnumOrSet>
-    std::string_view get_underlying_type(const EnumOrSet& enc) const
-    {
-        if(utils::is_primitive_type(enc.type))
-        {
-            return utils::primitive_type_to_cpp_type(enc.type);
-        }
-
-        return utils::primitive_type_to_cpp_type(
-            utils::get_schema_encoding_as<sbe::type>(*schema, enc.type)
-                .primitive_type);
-    }
-
     std::string make_enumerators(const sbe::enumeration& e) const
     {
         std::vector<std::string> enumerators;
@@ -363,7 +350,8 @@ SBEPP_CPP14_CONSTEXPR void tag_invoke(
         context.impl_type = fmt::format(
             "::{}::detail::types::{}", schema_name, context.impl_name);
         context.public_type = context.impl_type;
-        context.underlying_type = get_underlying_type(e);
+        context.underlying_type =
+            utils::primitive_type_to_cpp_type(context.primitive_type);
 
         const auto enumerators = make_enumerators(e);
 
@@ -483,7 +471,8 @@ SBEPP_CPP14_CONSTEXPR void operator()(
         context.impl_type = fmt::format(
             "::{}::detail::types::{}", schema_name, context.impl_name);
         context.public_type = context.impl_type;
-        context.underlying_type = get_underlying_type(s);
+        context.underlying_type =
+            utils::primitive_type_to_cpp_type(context.primitive_type);
 
         return fmt::format(
             // clang-format off

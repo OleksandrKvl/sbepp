@@ -14,6 +14,7 @@
 
 namespace sbepp::sbeppc
 {
+// TODO: explain context values
 // TODO: extract context types into separate headers?
 struct type_context
 {
@@ -56,6 +57,7 @@ struct enumeration_context
 {
     std::size_t size;
     std::optional<offset_t> offset_in_composite;
+    std::string primitive_type;
     std::string tag;
     std::string impl_name;
     std::string public_type;
@@ -72,6 +74,7 @@ struct set_context
 {
     std::size_t size;
     std::optional<offset_t> offset_in_composite;
+    std::string primitive_type;
     std::string tag;
     std::string impl_name;
     std::string public_type;
