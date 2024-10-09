@@ -377,7 +377,7 @@ private:
     {
         const auto content = get_required_node_content(root);
 
-        return utils::string_to_number_or_throw<choice_index_t>(
+        return string_to_number_or_throw<choice_index_t>(
             content,
             "{}: node's value `{}` doesn't represent choice_index_t",
             locations.find(root.offset_debug()),
@@ -545,7 +545,7 @@ private:
         const pugi::xml_node root, const std::string_view attr_name) const
     {
         const auto as_str = get_required_non_empty_string(root, attr_name);
-        return utils::string_to_number_or_throw<T>(
+        return string_to_number_or_throw<T>(
             as_str,
             "{}: cannot convert `{}` value ({}) to its underlying numeric type",
             locations.find(root.offset_debug()),
@@ -560,7 +560,7 @@ private:
         const auto as_str = get_optional_string_attribute(root, attr_name);
         if(as_str)
         {
-            return utils::string_to_number_or_throw<T>(
+            return string_to_number_or_throw<T>(
                 *as_str,
                 "{}: cannot convert `{}` value ({}) to its underlying numeric "
                 "type",
@@ -919,6 +919,24 @@ private:
                 "deprecated",
                 entity.location);
         }
+    }
+
+    template<typename T, typename Format, typename... Args>
+    static T string_to_number_or_throw(
+        const std::string_view str, const Format& format, Args&&... args)
+    {
+        if(!str.empty())
+        {
+            T value{};
+            const auto str_end = str.data() + str.size();
+            auto res = std::from_chars(str.data(), str_end, value);
+            if((res.ec == std::errc{}) && (res.ptr == str_end))
+            {
+                return value;
+            }
+        }
+
+        throw_error(format, std::forward<Args>(args)...);
     }
 };
 } // namespace sbepp::sbeppc

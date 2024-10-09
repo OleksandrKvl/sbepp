@@ -86,9 +86,12 @@ private:
                 {"float", "::std::numeric_limits<float>::min()"},
                 {"double", "::std::numeric_limits<double>::min()"}};
 
-        return utils::numeric_literal_to_value(
-                   t.min_value, t.primitive_type, t.location)
-            .value_or(built_in_min_values.at(t.primitive_type));
+        if(t.min_value)
+        {
+            return utils::numeric_literal_to_value(
+                *t.min_value, t.primitive_type);
+        }
+        return built_in_min_values.at(t.primitive_type);
     }
 
     static std::string get_max_value(const sbe::type& t)
@@ -107,9 +110,12 @@ private:
                 {"float", "::std::numeric_limits<float>::max()"},
                 {"double", "::std::numeric_limits<double>::max()"}};
 
-        return utils::numeric_literal_to_value(
-                   t.max_value, t.primitive_type, t.location)
-            .value_or(built_in_max_values.at(t.primitive_type));
+        if(t.max_value)
+        {
+            return utils::numeric_literal_to_value(
+                *t.max_value, t.primitive_type);
+        }
+        return built_in_max_values.at(t.primitive_type);
     }
 
     static std::string get_null_value(const sbe::type& t)
@@ -128,9 +134,12 @@ private:
                 {"float", "::std::numeric_limits<float>::quiet_NaN()"},
                 {"double", "::std::numeric_limits<double>::quiet_NaN()"}};
 
-        return utils::numeric_literal_to_value(
-                   t.null_value, t.primitive_type, t.location)
-            .value_or(built_in_null_values.at(t.primitive_type));
+        if(t.null_value)
+        {
+            return utils::numeric_literal_to_value(
+                *t.null_value, t.primitive_type);
+        }
+        return built_in_null_values.at(t.primitive_type);
     }
 
     std::string make_constant_type(const sbe::type& t) const
@@ -284,8 +293,9 @@ public:
         std::vector<std::string> enumerators;
         enumerators.reserve(e.valid_values.size());
 
-        const auto is_char_type =
-            (ctx_manager->get(e).underlying_type == "char");
+        const auto& context = ctx_manager->get(e);
+        const auto is_char_type = (context.underlying_type == "char");
+
         for(const auto& valid_value : e.valid_values)
         {
             if(is_char_type)
@@ -299,7 +309,7 @@ public:
                     "    {} = {}",
                     valid_value.name,
                     utils::to_integer_literal(
-                        valid_value.value, valid_value.location)));
+                        valid_value.value, context.primitive_type)));
             }
         }
 
@@ -537,10 +547,10 @@ public:
                 *t.constant_value, t.length, t.location);
         }
 
-        // TODO: check the return value? it should already be checked by
-        // `sbe_checker`
-        return *utils::numeric_literal_to_value(
-            t.constant_value, t.primitive_type, t.location);
+        // TODO: check that constant_value exist? it should already be checked
+        // by `sbe_checker`
+        return utils::numeric_literal_to_value(
+            *t.constant_value, t.primitive_type);
     }
 
     std::vector<std::string> make_children_visit_calls(

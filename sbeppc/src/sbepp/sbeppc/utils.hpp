@@ -211,67 +211,50 @@ inline std::string to_lower(const std::string_view str)
     return res;
 }
 
-template<typename T, typename Format, typename... Args>
-T string_to_number_or_throw(
-    const std::string_view str, const Format& format, Args&&... args)
+template<typename T>
+T string_to_number(const std::string_view str)
 {
-    if(!str.empty())
-    {
-        T value{};
-        auto res = std::from_chars(str.data(), str.data() + str.size(), value);
-        // TODO: check that res.ptr points to string end
-        if(res.ec == std::errc{})
-        {
-            return value;
-        }
-    }
+    assert(!str.empty());
 
-    throw_error(format, std::forward<Args>(args)...);
+    T value{};
+    const auto str_end = str.data() + str.size();
+    auto res = std::from_chars(str.data(), str_end, value);
+    assert((res.ec == std::errc{}) && (res.ptr == str_end));
+
+    return value;
 }
 
-// should NOT be used for floating point types
 inline std::string to_integer_literal(
-    const std::string_view str, const source_location& location)
+    const std::string_view value, const std::string_view type)
 {
-    if(str.empty())
-    {
-        throw_error("{}: can't convert empty string to number", location);
-    }
+    assert(!value.empty() && (type != "float") && (type != "double"));
 
-    if(str[0] == '-')
+    if((type == "int64") && (value[0] == '-'))
     {
-        const auto v = string_to_number_or_throw<signed long long>(
-            str,
-            "{}: cannot convert `{}` to `signed long long`",
-            location,
-            str);
+        const auto v = string_to_number<std::int64_t>(value);
         static constexpr auto min_signed_literal = -9223372036854775807;
         if(v < min_signed_literal)
         {
-            // that difference is going to be negative, no need for sign in
-            // the format string
+            // the difference is going to be negative, no need for a sign in the
+            // format string
             return fmt::format(
                 "{} {}", min_signed_literal, (v - min_signed_literal));
         }
-        return std::string{str};
     }
-    else
+    else if(type == "uint64")
     {
         // this part is not strictly required since type will be deduced
         // correctly but most compilers produce warning when literal
         // representing large number is used without `UL` prefix
-        const auto v = string_to_number_or_throw<unsigned long long>(
-            str,
-            "{}: cannot convert `{}` to `unsigned long long`",
-            location,
-            str);
+        const auto v = string_to_number<std::uint64_t>(value);
         static constexpr auto max_signed_literal = 9223372036854775807;
         if(v > max_signed_literal)
         {
-            return fmt::format("{}UL", str);
+            return fmt::format("{}UL", value);
         }
-        return std::string{str};
     }
+
+    return std::string{value};
 }
 
 inline std::string get_compiled_header_top_comment()
@@ -368,15 +351,10 @@ inline std::string make_char_constant(
     return fmt::format("'{}'", constant_value);
 }
 
-inline std::optional<std::string> numeric_literal_to_value(
-    const std::optional<std::string>& value,
-    const std::string_view type,
-    const source_location& location)
+inline std::string numeric_literal_to_value(
+    const std::string_view value, const std::string_view type)
 {
-    if(!value)
-    {
-        return {};
-    }
+    assert(!value.empty());
 
     if((type == "float") || (type == "double"))
     {
@@ -393,10 +371,10 @@ inline std::optional<std::string> numeric_literal_to_value(
             return fmt::format("-::std::numeric_limits<{}>::infinity()", type);
         }
 
-        return value;
+        return std::string{value};
     }
 
-    return utils::to_integer_literal(*value, location);
+    return utils::to_integer_literal(value, type);
 }
 
 inline const sbe::composite_element*

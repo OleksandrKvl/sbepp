@@ -117,8 +117,8 @@ private:
                 *t.constant_value, t.length, t.location);
         }
 
-        return *utils::numeric_literal_to_value(
-            t.constant_value, t.primitive_type, t.location);
+        return utils::numeric_literal_to_value(
+            *t.constant_value, t.primitive_type);
     }
 
     std::string get_const_type(const sbe::type& t) const
