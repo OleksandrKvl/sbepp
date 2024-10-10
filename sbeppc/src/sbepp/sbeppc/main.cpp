@@ -8,8 +8,8 @@
 #include <sbepp/sbeppc/sbe_error.hpp>
 #include <sbepp/sbeppc/schema_compiler.hpp>
 #include <sbepp/sbeppc/build_info.hpp>
-#include <sbepp/sbeppc/sbe_checker.hpp>
-#include <sbepp/sbeppc/cpp_validator.hpp>
+#include <sbepp/sbeppc/sbe_schema_validator.hpp>
+#include <sbepp/sbeppc/sbe_schema_cpp_validator.hpp>
 #include <sbepp/sbeppc/context_manager.hpp>
 
 #include <fmt/core.h>
@@ -18,7 +18,7 @@
 #include <string_view>
 #include <optional>
 
-namespace sbepp::sbeppc
+namespace
 {
 char* get_option_value(const int argc, char** argv, int option_index)
 {
@@ -29,7 +29,7 @@ char* get_option_value(const int argc, char** argv, int option_index)
     }
 
     // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-    throw_error("no value for option `{}`", argv[option_index]);
+    sbepp::sbeppc::throw_error("no value for option `{}`", argv[option_index]);
 }
 
 [[noreturn]] void print_help_and_exit()
@@ -55,7 +55,8 @@ Options:
 
 [[noreturn]] void print_version_and_exit()
 {
-    fmt::print("sbeppc version: {}\n", build_info::get_version());
+    fmt::print(
+        "sbeppc version: {}\n", sbepp::sbeppc::build_info::get_version());
     std::exit(0);
 }
 
@@ -113,7 +114,7 @@ sbeppc_config parse_command_line(int argc, char** argv)
         // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
         else if(arg[0] == '-')
         {
-            throw_error("unknown argument: `{}`", arg);
+            sbepp::sbeppc::throw_error("unknown argument: `{}`", arg);
             break;
         }
         else
@@ -124,11 +125,11 @@ sbeppc_config parse_command_line(int argc, char** argv)
 
     if(i == argc)
     {
-        throw_error("missing filename");
+        sbepp::sbeppc::throw_error("missing filename");
     }
     else if(argc - i != 1)
     {
-        throw_error("too many arguments");
+        sbepp::sbeppc::throw_error("too many arguments");
     }
 
     // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
@@ -136,7 +137,7 @@ sbeppc_config parse_command_line(int argc, char** argv)
 
     return config;
 }
-} // namespace sbepp::sbeppc
+} // namespace
 
 int main(int argc, char** argv)
 {
@@ -147,24 +148,19 @@ int main(int argc, char** argv)
 
     try
     {
-        const auto config = sbepp::sbeppc::parse_command_line(argc, argv);
+        const auto config = parse_command_line(argc, argv);
+
         schema_parser parser{config.schema_file, reporter, fs_provider};
         parser.parse_schema();
         const auto& schema = parser.get_message_schema();
+
         context_manager ctx_manager;
-        sbe_checker checker;
-        checker.check(schema, ctx_manager);
+        sbe_schema_validator sbe_validator;
+        sbe_validator.validate(schema, ctx_manager);
 
-        // TODO: should we hide this inside some class?
-        ctx_manager.create(schema).name =
-            config.schema_name.value_or(schema.package);
+        sbe_schema_cpp_validator cpp_validator{reporter, ctx_manager};
+        cpp_validator.validate(schema, config.schema_name);
 
-        // C++ related checks
-        // TODO: better names
-        cpp_validator cpp_checker{reporter, ctx_manager};
-        cpp_checker.validate(schema);
-
-        // now we can generate C++ code
         schema_compiler::compile(
             config.output_dir,
             config.inject_include,
@@ -172,7 +168,6 @@ int main(int argc, char** argv)
             ctx_manager,
             fs_provider);
     }
-    // TODO: catch more basic `std::exception`?
     catch(const sbe_error& e)
     {
         reporter.error(e.what());

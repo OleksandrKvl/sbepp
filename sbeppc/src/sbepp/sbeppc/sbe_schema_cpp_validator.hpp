@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <sbepp/sbeppc/sbe_checker.hpp>
+#include <sbepp/sbeppc/sbe_schema_validator.hpp>
 #include <sbepp/sbeppc/source_location.hpp>
 #include <sbepp/sbeppc/throw_error.hpp>
 #include <sbepp/sbeppc/ireporter.hpp>
@@ -17,16 +17,17 @@
 
 namespace sbepp::sbeppc
 {
-class cpp_validator
+class sbe_schema_cpp_validator
 {
 public:
-    cpp_validator(ireporter& reporter, context_manager& ctx_manager)
+    sbe_schema_cpp_validator(ireporter& reporter, context_manager& ctx_manager)
         : reporter{&reporter}, ctx_manager{&ctx_manager}
     {
     }
 
-    // TODO: test
-    void validate(const sbe::message_schema& schema)
+    void validate(
+        const sbe::message_schema& schema,
+        const std::optional<std::string>& custom_schema_name)
     {
         this->schema = &schema;
 
@@ -34,7 +35,7 @@ public:
         // `sbe_checker::is_sbe_symbolic_name` so they have valid C++ name
         // format but we still need to check them against reserved C++ names or
         // keywords
-        validate_schema_name();
+        validate_schema_name(custom_schema_name);
         validate_type_names();
         validate_message_names();
     }
@@ -137,13 +138,16 @@ private:
         }
     }
 
-    void validate_schema_name()
+    void validate_schema_name(
+        const std::optional<std::string>& custom_schema_name)
     {
+        auto& context = ctx_manager->create(*schema);
+        context.name = custom_schema_name.value_or(schema->package);
         // TODO: should we provide different error message for custom or
         // XML name?
-        const auto& name = ctx_manager->get(*schema).name;
-        if(!sbe_checker::is_sbe_symbolic_name(name) || is_cpp_keyword(name)
-           || is_reserved_cpp_namespace(name))
+        const auto& name = context.name;
+        if(!sbe_schema_validator::is_sbe_symbolic_name(name)
+           || is_cpp_keyword(name) || is_reserved_cpp_namespace(name))
         {
             throw_error(
                 "{}: schema name `{}` is not a valid C++ namespace. Change "
