@@ -23,12 +23,11 @@
 
 namespace sbepp::sbeppc
 {
-// TODO: is "checker" a good name? Maybe verifier/validator is better?
-// performs complete SBE schema correctness check
-class sbe_checker
+class sbe_schema_validator
 {
 public:
-    void check(const sbe::message_schema& schema, context_manager& ctx_manager)
+    void validate(
+        const sbe::message_schema& schema, context_manager& ctx_manager)
     {
         this->schema = &schema;
         this->ctx_manager = &ctx_manager;
