@@ -630,15 +630,7 @@ private:
     template<typename T>
     static bool can_be_parsed_as(const std::string_view str)
     {
-        T value{};
-        const auto last = str.data() + str.size();
-        auto res = std::from_chars(str.data(), last, value);
-        if((res.ec == std::errc{}) && (res.ptr == last))
-        {
-            return true;
-        }
-
-        return false;
+        return utils::string_to_number<T>(str).has_value();
     }
 
     template<typename T>
