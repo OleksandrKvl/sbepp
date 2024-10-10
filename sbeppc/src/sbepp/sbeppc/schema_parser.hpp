@@ -208,7 +208,7 @@ private:
         return get_optional_numeric_attribute<offset_t>(root, "offset");
     }
 
-    std::string get_primitive_type(const pugi::xml_node root)
+    std::string get_primitive_type(const pugi::xml_node root) const
     {
         return get_required_non_empty_string(root, "primitiveType");
     }
@@ -243,7 +243,7 @@ private:
             .value_or(1);
     }
 
-    sbe::type parse_type_encoding(const pugi::xml_node root)
+    sbe::type parse_type_encoding(const pugi::xml_node root) const
     {
         sbe::type t{};
         t.location = locations.find(root.offset_debug());
@@ -300,7 +300,7 @@ private:
         return root.attribute("semanticType").as_string();
     }
 
-    std::string get_required_node_content(const pugi::xml_node root)
+    std::string get_required_node_content(const pugi::xml_node root) const
     {
         const auto content = root.text();
         if(content.empty())
@@ -313,7 +313,7 @@ private:
         return content.get();
     }
 
-    sbe::enum_valid_value get_enum_valid_value(const pugi::xml_node root)
+    sbe::enum_valid_value get_enum_valid_value(const pugi::xml_node root) const
     {
         sbe::enum_valid_value value{};
 
@@ -329,7 +329,7 @@ private:
     }
 
     std::vector<sbe::enum_valid_value>
-        get_enum_valid_values(const pugi::xml_node root)
+        get_enum_valid_values(const pugi::xml_node root) const
     {
         std::vector<sbe::enum_valid_value> values;
         unique_set<std::string> unique_value_names;
@@ -349,7 +349,7 @@ private:
         return values;
     }
 
-    sbe::enumeration parse_enum_encoding(const pugi::xml_node root)
+    sbe::enumeration parse_enum_encoding(const pugi::xml_node root) const
     {
         sbe::enumeration e{};
         e.location = locations.find(root.offset_debug());
@@ -365,7 +365,7 @@ private:
         return e;
     }
 
-    choice_index_t get_choice_index(const pugi::xml_node root)
+    choice_index_t get_choice_index(const pugi::xml_node root) const
     {
         const auto content = get_required_node_content(root);
 
@@ -376,7 +376,7 @@ private:
             content);
     }
 
-    sbe::set_choice get_choice(const pugi::xml_node root)
+    sbe::set_choice get_choice(const pugi::xml_node root) const
     {
         sbe::set_choice choice{};
 
@@ -391,7 +391,8 @@ private:
         return choice;
     }
 
-    std::vector<sbe::set_choice> get_set_choices(const pugi::xml_node root)
+    std::vector<sbe::set_choice>
+        get_set_choices(const pugi::xml_node root) const
     {
         std::vector<sbe::set_choice> choices;
         unique_set<std::string> unique_choice_names;
@@ -410,7 +411,7 @@ private:
         return choices;
     }
 
-    sbe::set parse_set_encoding(const pugi::xml_node root)
+    sbe::set parse_set_encoding(const pugi::xml_node root) const
     {
         sbe::set s{};
 
@@ -427,7 +428,7 @@ private:
         return s;
     }
 
-    sbe::ref parse_ref_encoding(const pugi::xml_node root)
+    sbe::ref parse_ref_encoding(const pugi::xml_node root) const
     {
         sbe::ref r{};
 
@@ -443,7 +444,7 @@ private:
     }
 
     std::vector<sbe::composite_element>
-        parse_composite_elements(const pugi::xml_node root)
+        parse_composite_elements(const pugi::xml_node root) const
     {
         std::vector<sbe::composite_element> elements;
         unique_set<std::string> unique_element_names;
@@ -493,7 +494,7 @@ private:
         return elements;
     }
 
-    sbe::composite parse_composite_encoding(const pugi::xml_node root)
+    sbe::composite parse_composite_encoding(const pugi::xml_node root) const
     {
         sbe::composite c{};
         c.location = locations.find(root.offset_debug());
@@ -572,17 +573,18 @@ private:
     }
 
     template<typename Id>
-    Id get_id(const pugi::xml_node root)
+    Id get_id(const pugi::xml_node root) const
     {
         return get_required_numeric_attribute<Id>(root, "id");
     }
 
-    message_id_t get_message_id(const pugi::xml_node root)
+    message_id_t get_message_id(const pugi::xml_node root) const
     {
         return get_id<message_id_t>(root);
     }
 
-    std::optional<block_length_t> get_block_length(const pugi::xml_node root)
+    std::optional<block_length_t>
+        get_block_length(const pugi::xml_node root) const
     {
         return get_optional_numeric_attribute<block_length_t>(
             root, "blockLength");
@@ -613,12 +615,12 @@ private:
             name, "{}: member with name `{}` already exists", location, name);
     }
 
-    member_id_t get_field_id(const pugi::xml_node root)
+    member_id_t get_field_id(const pugi::xml_node root) const
     {
         return get_id<member_id_t>(root);
     }
 
-    sbe::field parse_field_member(const pugi::xml_node root)
+    sbe::field parse_field_member(const pugi::xml_node root) const
     {
         sbe::field f{};
         f.location = locations.find(root.offset_debug());
@@ -642,7 +644,7 @@ private:
             .value_or("groupSizeEncoding");
     }
 
-    sbe::group parse_group_member(const pugi::xml_node root)
+    sbe::group parse_group_member(const pugi::xml_node root) const
     {
         sbe::group g{};
 
@@ -661,7 +663,7 @@ private:
         return g;
     }
 
-    sbe::data parse_data_member(const pugi::xml_node root)
+    sbe::data parse_data_member(const pugi::xml_node root) const
     {
         sbe::data d{};
         d.location = locations.find(root.offset_debug());
@@ -676,7 +678,7 @@ private:
         return d;
     }
 
-    sbe::level_members get_level_members(const pugi::xml_node root)
+    sbe::level_members get_level_members(const pugi::xml_node root) const
     {
         // does NOT verify member IDs since their uniqueness scope is not
         // specified
@@ -779,7 +781,7 @@ private:
         }
     }
 
-    pugi::xml_node get_message_schema_node(const pugi::xml_node root)
+    pugi::xml_node get_message_schema_node(const pugi::xml_node root) const
     {
         for(const auto child : root)
         {
@@ -816,17 +818,17 @@ private:
         }
     }
 
-    schema_id_t get_schema_id(const pugi::xml_node root)
+    schema_id_t get_schema_id(const pugi::xml_node root) const
     {
         return get_id<schema_id_t>(root);
     }
 
-    version_t get_schema_version(const pugi::xml_node root)
+    version_t get_schema_version(const pugi::xml_node root) const
     {
         return get_required_numeric_attribute<version_t>(root, "version");
     }
 
-    sbe::message_schema parse_message_schema(const pugi::xml_node root)
+    sbe::message_schema parse_message_schema(const pugi::xml_node root) const
     {
         sbe::message_schema res{};
 
@@ -843,7 +845,7 @@ private:
         return res;
     }
 
-    sbe::byte_order_kind get_byte_order(const pugi::xml_node root)
+    sbe::byte_order_kind get_byte_order(const pugi::xml_node root) const
     {
         const auto value = get_optional_string_attribute(root, "byteOrder")
                                .value_or("littleEndian");
@@ -886,7 +888,7 @@ private:
         const std::string_view lhs_name,
         const version_t rhs,
         const std::string_view rhs_name,
-        const source_location& location)
+        const source_location& location) const
     {
         if(lhs > rhs)
         {
@@ -901,7 +903,7 @@ private:
     }
 
     template<typename T>
-    void validate_versions(const T& entity)
+    void validate_versions(const T& entity) const
     {
         warn_about_greater_version(
             entity.added_since,
