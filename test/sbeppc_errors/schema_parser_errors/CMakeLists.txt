@@ -100,11 +100,6 @@ sbeppc_error_test(
 )
 
 sbeppc_error_test(
-    NAME "wrong_primitive_type"
-    ERROR "primitiveType `uint33` is not a valid primitive type"
-)
-
-sbeppc_error_test(
     NAME "no_constant_value"
     ERROR "either `valueRef` or value must be provided for constant `constant`"
 )

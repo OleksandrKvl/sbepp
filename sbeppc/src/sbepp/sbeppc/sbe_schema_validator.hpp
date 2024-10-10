@@ -898,6 +898,14 @@ private:
     {
         validate_name(t);
 
+        if(!utils::is_primitive_type(t.primitive_type))
+        {
+            throw_error(
+                "{}: primitiveType `{}` is not a valid primitive type",
+                t.location,
+                t.primitive_type);
+        }
+
         if(t.presence == field_presence::constant)
         {
             validate_constant_value(t);
