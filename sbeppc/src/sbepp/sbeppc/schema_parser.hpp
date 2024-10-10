@@ -23,8 +23,8 @@
 
 namespace sbepp::sbeppc
 {
-// SBE schema parser, performs some basic XML checks but not related to C++ (or
-// any other language) codegen
+// SBE schema parser, performs some basic XML structure checks but not the ones
+// related to C++ (or any other language) codegen
 class schema_parser
 {
 public:
@@ -159,7 +159,7 @@ private:
         return value;
     }
 
-    std::string get_required_name(const pugi::xml_node root)
+    std::string get_required_name(const pugi::xml_node root) const
     {
         return get_required_non_empty_string(root, "name");
     }
@@ -180,7 +180,7 @@ private:
         return {};
     }
 
-    field_presence get_presence(const pugi::xml_node root)
+    field_presence get_presence(const pugi::xml_node root) const
     {
         const auto value = get_optional_string_attribute(root, "presence")
                                .value_or("required");
@@ -210,15 +210,7 @@ private:
 
     std::string get_primitive_type(const pugi::xml_node root)
     {
-        const auto type = get_required_non_empty_string(root, "primitiveType");
-        if(!utils::is_primitive_type(type))
-        {
-            throw_error(
-                "{}: primitiveType `{}` is not a valid primitive type",
-                locations.find(root.offset_debug()),
-                type);
-        }
-        return type;
+        return get_required_non_empty_string(root, "primitiveType");
     }
 
     std::optional<version_t>

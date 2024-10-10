@@ -388,3 +388,8 @@ non_sbe_name_test("field")
 non_sbe_name_test("group")
 non_sbe_name_test("data")
 non_sbe_name_test("message")
+
+sbeppc_error_test(
+    NAME "wrong_primitive_type"
+    ERROR "primitiveType `uint33` is not a valid primitive type"
+)
