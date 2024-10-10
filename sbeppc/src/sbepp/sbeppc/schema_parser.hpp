@@ -529,6 +529,13 @@ private:
             {
                 add_unique_type(parse_set_encoding(child));
             }
+            else
+            {
+                reporter->warning(
+                    "{}: unhandled XML node `{}`",
+                    locations.find(child.offset_debug()),
+                    child.name());
+            }
         }
     }
 
@@ -716,6 +723,13 @@ private:
                     unique_member_names, d.name, d.location);
                 members.data.emplace_back(std::move(d));
             }
+            else
+            {
+                reporter->warning(
+                    "{}: unhandled XML node `{}`",
+                    locations.find(child.offset_debug()),
+                    child.name());
+            }
         }
 
         return members;
@@ -821,7 +835,7 @@ private:
         res.version = get_schema_version(root);
         res.semantic_version = root.attribute("semanticVersion").as_string();
         res.byte_order = get_byte_order(root);
-        res.description = root.attribute("description").as_string();
+        res.description = get_description(root);
         res.header_type =
             root.attribute("headerType").as_string("messageHeader");
         res.location = locations.find(root.offset_debug());
