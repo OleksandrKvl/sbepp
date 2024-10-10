@@ -925,15 +925,10 @@ private:
     static T string_to_number_or_throw(
         const std::string_view str, const Format& format, Args&&... args)
     {
-        if(!str.empty())
+        const auto v = utils::string_to_number<T>(str);
+        if(v)
         {
-            T value{};
-            const auto str_end = str.data() + str.size();
-            auto res = std::from_chars(str.data(), str_end, value);
-            if((res.ec == std::errc{}) && (res.ptr == str_end))
-            {
-                return value;
-            }
+            return *v;
         }
 
         throw_error(format, std::forward<Args>(args)...);
