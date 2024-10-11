@@ -251,16 +251,6 @@ private:
         t.description = get_description(root);
         t.presence = get_presence(root);
         t.null_value = get_optional_string_attribute(root, "nullValue");
-
-        if(t.null_value && (t.presence != field_presence::optional))
-        {
-            reporter->warning(
-                "{}: nullValue is ignored for type `{}` because `presence` is "
-                "not `optional`",
-                locations.find(root.offset_debug()),
-                t.name);
-        }
-
         t.min_value = get_optional_string_attribute(root, "minValue");
         t.max_value = get_optional_string_attribute(root, "maxValue");
         t.length = get_type_length(root);
@@ -269,7 +259,6 @@ private:
         t.semantic_type = get_semantic_type(root);
         t.added_since = get_added_since(root);
         t.deprecated_since = get_deprecated_since(root);
-        validate_versions(t);
         t.character_encoding =
             get_optional_string_attribute(root, "characterEncoding");
 
@@ -277,14 +266,6 @@ private:
         {
             t.value_ref = get_optional_string_attribute(root, "valueRef");
             t.constant_value = get_optional_node_content(root);
-            if(t.value_ref.has_value() == t.constant_value.has_value())
-            {
-                throw_error(
-                    "{}: either `valueRef` or value must be provided for "
-                    "constant `{}`",
-                    locations.find(root.offset_debug()),
-                    t.name);
-            }
 
             if((t.primitive_type == "char") && root.attribute("length").empty())
             {
@@ -322,7 +303,6 @@ private:
         value.description = get_description(root);
         value.added_since = get_added_since(root);
         value.deprecated_since = get_deprecated_since(root);
-        validate_versions(value);
         value.value = get_required_node_content(root);
 
         return value;
@@ -358,7 +338,6 @@ private:
         e.type = get_required_non_empty_string(root, "encodingType");
         e.added_since = get_added_since(root);
         e.deprecated_since = get_deprecated_since(root);
-        validate_versions(e);
         e.offset = get_offset(root);
         e.valid_values = get_enum_valid_values(root);
 
@@ -385,7 +364,6 @@ private:
         choice.description = get_description(root);
         choice.added_since = get_added_since(root);
         choice.deprecated_since = get_deprecated_since(root);
-        validate_versions(choice);
         choice.value = get_choice_index(root);
 
         return choice;
@@ -421,7 +399,6 @@ private:
         s.type = get_required_non_empty_string(root, "encodingType");
         s.added_since = get_added_since(root);
         s.deprecated_since = get_deprecated_since(root);
-        validate_versions(s);
         s.offset = get_offset(root);
         s.choices = get_set_choices(root);
 
@@ -438,7 +415,6 @@ private:
         r.offset = get_offset(root);
         r.added_since = get_added_since(root);
         r.deprecated_since = get_deprecated_since(root);
-        validate_versions(r);
 
         return r;
     }
@@ -504,7 +480,6 @@ private:
         c.semantic_type = get_semantic_type(root);
         c.added_since = get_added_since(root);
         c.deprecated_since = get_deprecated_since(root);
-        validate_versions(c);
         c.elements = parse_composite_elements(root);
 
         return c;
@@ -633,7 +608,6 @@ private:
         f.value_ref = get_optional_string_attribute(root, "valueRef");
         f.added_since = get_added_since(root);
         f.deprecated_since = get_deprecated_since(root);
-        validate_versions(f);
 
         return f;
     }
@@ -657,7 +631,6 @@ private:
         g.semantic_type = get_semantic_type(root);
         g.added_since = get_added_since(root);
         g.deprecated_since = get_deprecated_since(root);
-        validate_versions(g);
         g.members = get_level_members(root);
 
         return g;
@@ -673,7 +646,6 @@ private:
         d.type = get_required_non_empty_string(root, "type");
         d.added_since = get_added_since(root);
         d.deprecated_since = get_deprecated_since(root);
-        validate_versions(d);
 
         return d;
     }
@@ -749,7 +721,6 @@ private:
         m.semantic_type = get_semantic_type(root);
         m.added_since = get_added_since(root);
         m.deprecated_since = get_deprecated_since(root);
-        validate_versions(m);
         m.members = get_level_members(root);
 
         add_unique_message(std::move(m));
@@ -881,52 +852,6 @@ private:
         }
 
         return false;
-    }
-
-    void warn_about_greater_version(
-        const version_t lhs,
-        const std::string_view lhs_name,
-        const version_t rhs,
-        const std::string_view rhs_name,
-        const source_location& location) const
-    {
-        if(lhs > rhs)
-        {
-            reporter->warning(
-                "{}: {} version ({}) is greater than {} version (`{}`)",
-                location,
-                lhs_name,
-                lhs,
-                rhs_name,
-                rhs);
-        }
-    }
-
-    template<typename T>
-    void validate_versions(const T& entity) const
-    {
-        warn_about_greater_version(
-            entity.added_since,
-            "sinceVersion",
-            message_schema.version,
-            "schema",
-            entity.location);
-
-        if(entity.deprecated_since)
-        {
-            warn_about_greater_version(
-                *entity.deprecated_since,
-                "deprecated",
-                message_schema.version,
-                "schema",
-                entity.location);
-            warn_about_greater_version(
-                entity.added_since,
-                "sinceVersion",
-                *entity.deprecated_since,
-                "deprecated",
-                entity.location);
-        }
     }
 
     template<typename T, typename Format, typename... Args>

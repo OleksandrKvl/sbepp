@@ -9,6 +9,7 @@
 #include <sbepp/sbeppc/throw_error.hpp>
 #include <sbepp/sbeppc/utils.hpp>
 #include <sbepp/sbeppc/context_manager.hpp>
+#include <sbepp/sbeppc/ireporter.hpp>
 
 #include <string>
 #include <string_view>
@@ -26,6 +27,10 @@ namespace sbepp::sbeppc
 class sbe_schema_validator
 {
 public:
+    explicit sbe_schema_validator(ireporter& reporter) : reporter{&reporter}
+    {
+    }
+
     void validate(
         const sbe::message_schema& schema, context_manager& ctx_manager)
     {
@@ -56,6 +61,7 @@ public:
     }
 
 private:
+    ireporter* reporter{};
     const sbe::message_schema* schema{};
     context_manager* ctx_manager{};
 
@@ -417,6 +423,7 @@ private:
         for(const auto& f : members.fields)
         {
             validate_name(f);
+            validate_versions(f);
             auto& context = ctx_manager->create(f);
             field_presence actual_presence{};
             if(!utils::is_primitive_type(f.type))
@@ -430,7 +437,8 @@ private:
                         f.type);
                 }
 
-                // TODO: refactor?
+                // TODO: refactor, we're visiting encoding twice, to get size
+                // and actual presence
                 context.size = std::visit(
                     [this](const auto& type)
                     {
@@ -464,6 +472,7 @@ private:
         for(const auto& g : members.groups)
         {
             validate_name(g);
+            validate_versions(g);
             ctx_manager->create(g);
             validate_group_header(g);
             validate_members(g);
@@ -472,6 +481,7 @@ private:
         for(const auto& d : members.data)
         {
             validate_name(d);
+            validate_versions(d);
             validate_data_header(d);
         }
     }
@@ -479,6 +489,7 @@ private:
     void validate_message(const sbe::message& m)
     {
         validate_name(m);
+        validate_versions(m);
         ctx_manager->create(m);
         validate_members(m);
     }
@@ -821,7 +832,14 @@ private:
 
     void validate_constant_value(const sbe::type& t)
     {
-        assert(t.value_ref || t.constant_value);
+        if(t.value_ref.has_value() == t.constant_value.has_value())
+        {
+            throw_error(
+                "{}: either `valueRef` or value must be provided for "
+                "constant `{}`",
+                t.location,
+                t.name);
+        }
 
         if(t.value_ref)
         {
@@ -897,6 +915,7 @@ private:
     void validate_encoding(const sbe::type& t)
     {
         validate_name(t);
+        validate_versions(t);
 
         if(!utils::is_primitive_type(t.primitive_type))
         {
@@ -927,6 +946,15 @@ private:
                 validate_optional_value(
                     t.null_value, t.primitive_type, t.location);
             }
+            else if(t.null_value)
+            {
+                reporter->warning(
+                    "{}: nullValue is ignored for type `{}` because `presence` "
+                    "is "
+                    "not `optional`",
+                    t.location,
+                    t.name);
+            }
         }
 
         ctx_manager->create(t).size =
@@ -940,6 +968,7 @@ private:
         for(const auto& value : valid_values)
         {
             validate_name(value);
+            validate_versions(value);
             // strict: SBE char has strictly defined range
             const auto has_wrong_char_value =
                 ((primitive_type == "char") && (value.value.size() != 1));
@@ -973,6 +1002,7 @@ private:
     void validate_encoding(const sbe::enumeration& e)
     {
         validate_name(e);
+        validate_versions(e);
         std::string_view primitive_type;
 
         if(utils::is_primitive_type(e.type))
@@ -1044,6 +1074,7 @@ private:
         for(const auto& choice : choices)
         {
             validate_name(choice);
+            validate_versions(choice);
 
             if(choice.value > bit_length)
             {
@@ -1059,6 +1090,7 @@ private:
     void validate_encoding(const sbe::set& s)
     {
         validate_name(s);
+        validate_versions(s);
         std::string_view primitive_type;
 
         if(utils::is_primitive_type(s.type))
@@ -1109,6 +1141,7 @@ private:
     void validate_encoding(const sbe::ref& r)
     {
         validate_name(r);
+        validate_versions(r);
 
         const auto enc = get_encoding(r.type);
         if(!enc)
@@ -1188,6 +1221,7 @@ private:
     void validate_encoding(const sbe::composite& c)
     {
         validate_name(c);
+        validate_versions(c);
 
         offset_t offset{};
 
@@ -1246,6 +1280,54 @@ private:
                 "{}: `{}` is not a valid SBE name",
                 entity.location,
                 entity.name);
+        }
+    }
+
+    void warn_about_greater_version(
+        const version_t lhs,
+        const std::string_view lhs_name,
+        const version_t rhs,
+        const std::string_view rhs_name,
+        const source_location& location) const
+    {
+        if(lhs > rhs)
+        {
+            reporter->warning(
+                "{}: {} version ({}) is greater than {} version (`{}`)",
+                location,
+                lhs_name,
+                lhs,
+                rhs_name,
+                rhs);
+        }
+    }
+
+    template<typename T>
+    void validate_versions(const T& entity) const
+    {
+        // strict: instead of warning, treat it as error
+
+        warn_about_greater_version(
+            entity.added_since,
+            "sinceVersion",
+            schema->version,
+            "schema",
+            entity.location);
+
+        if(entity.deprecated_since)
+        {
+            warn_about_greater_version(
+                *entity.deprecated_since,
+                "deprecated",
+                schema->version,
+                "schema",
+                entity.location);
+            warn_about_greater_version(
+                entity.added_since,
+                "sinceVersion",
+                *entity.deprecated_since,
+                "deprecated",
+                entity.location);
         }
     }
 };

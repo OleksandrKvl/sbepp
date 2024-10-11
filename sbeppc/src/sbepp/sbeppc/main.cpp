@@ -155,7 +155,7 @@ int main(int argc, char** argv)
         const auto& schema = parser.get_message_schema();
 
         context_manager ctx_manager;
-        sbe_schema_validator sbe_validator;
+        sbe_schema_validator sbe_validator{reporter};
         sbe_validator.validate(schema, ctx_manager);
 
         sbe_schema_cpp_validator cpp_validator{reporter, ctx_manager};

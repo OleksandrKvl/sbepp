@@ -100,11 +100,6 @@ sbeppc_error_test(
 )
 
 sbeppc_error_test(
-    NAME "no_constant_value"
-    ERROR "either `valueRef` or value must be provided for constant `constant`"
-)
-
-sbeppc_error_test(
     NAME "no_valid_value_content"
     ERROR "required node content is empty"
 )
