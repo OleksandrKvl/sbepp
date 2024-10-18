@@ -85,44 +85,14 @@ private:
     void validate_data_element_type(const sbe::composite& c)
     {
         static constexpr std::string_view element_name = "varData";
-        // TODO: deduplicate
-        const auto element = utils::find_composite_element(c, element_name);
-        if(!element)
-        {
-            throw_error(
-                "{}: data header `{}` doesn't have required `{}` element",
-                c.location,
-                c.name,
-                element_name);
-        }
+        const auto& [t, element_location] =
+            get_level_header_element(c, "data", "varData");
 
-        const sbe::type* t = std::get_if<sbe::type>(element);
-        if(!t)
-        {
-            const auto r = std::get_if<sbe::ref>(element);
-            if(!r)
-            {
-                throw_error(
-                    "{}: data header element `{}` must be a type or a ref",
-                    utils::get_location(*element),
-                    element_name);
-            }
-
-            t = std::get_if<sbe::type>(get_encoding(r->type));
-            if(!t)
-            {
-                throw_error(
-                    "{}: data header element `{}` must refer to a type",
-                    r->location,
-                    element_name);
-            }
-        }
-
-        if(t->length != 0)
+        if(t.length != 0)
         {
             throw_error(
                 "{}: data header element `{}` must have length equal to 0",
-                utils::get_location(*element),
+                element_location,
                 element_name);
         }
 
@@ -209,6 +179,10 @@ private:
                 },
                 [&f](const sbe::composite&)
                 {
+                    // although here we allow any presence for composites,
+                    // `validate_constant_field` will throw if composite is
+                    // declared as constant. Optional composites don't any sense
+                    // and sbeppc doesn't treat them in any special way.
                     return f.presence;
                 },
                 [&f](const sbe::enumeration&)
@@ -504,7 +478,7 @@ private:
         }
     }
 
-    void validate_level_header_element(
+    std::pair<const sbe::type&, source_location> get_level_header_element(
         const sbe::composite& c,
         const std::string_view level_name,
         const std::string_view name) const
@@ -544,22 +518,34 @@ private:
             }
         }
 
+        // preserve location of an actual composite element, not the final type
+        return {*t, utils::get_location(*element)};
+    }
+
+    void validate_level_header_element(
+        const sbe::composite& c,
+        const std::string_view level_name,
+        const std::string_view name) const
+    {
+        const auto& [t, element_location] =
+            get_level_header_element(c, level_name, name);
+
         // strict: SBE requires underlying type to be unsigned integer
 
-        if(t->length != 1)
+        if(t.length != 1)
         {
             throw_error(
                 "{}: {} header element `{}` must be a non-array type",
-                utils::get_location(*element),
+                element_location,
                 level_name,
                 name);
         }
 
-        if(t->presence == field_presence::constant)
+        if(t.presence == field_presence::constant)
         {
             throw_error(
                 "{}: {} header element `{}` cannot be a constant",
-                utils::get_location(*element),
+                element_location,
                 level_name,
                 name);
         }
