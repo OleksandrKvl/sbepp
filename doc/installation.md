@@ -29,8 +29,7 @@ Available CMake options (`name = default_value`):
 - `SBEPP_BUILD_BENCHMARK = OFF`, requires `SBEPP_DEV_MODE=ON`, controls whether
 benchmarks should be built. If
 `ON`, requires [benchmark](https://github.com/google/benchmark)
-- `SBEPP_BUILD_TESTS = OFF`, requires `SBEPP_DEV_MODE=ON`, controls whether
-tests should be built. If `ON`,
+- `SBEPP_BUILD_TESTS = OFF`, controls whether tests should be built. If `ON`,
 requires [googletest](https://github.com/google/googletest) and
 [fmt](https://github.com/fmtlib/fmt)
 - `SBEPP_BUILD_DOCS = OFF`, controls whether documentation should be built. If
