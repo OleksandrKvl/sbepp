@@ -33,7 +33,7 @@ STATIC_ASSERT_V(std::is_trivially_move_constructible<iterator_t>);
 STATIC_ASSERT_V(std::is_trivially_move_assignable<iterator_t>);
 STATIC_ASSERT_V(std::is_trivially_destructible<iterator_t>);
 
-#if __cpp_concepts >= 201907L
+#if __cpp_lib_concepts >= 202002L
 STATIC_ASSERT(std::input_iterator<iterator_t>);
 #endif
 
