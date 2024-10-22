@@ -1,0 +1,11 @@
+{% set compiler, compiler_version = os.getenv("CC").split('-') %}
+
+[settings]
+arch=x86_64
+build_type=Debug
+compiler={{ compiler }}
+compiler.libcxx={{ os.getenv("LIBCXX") }}
+compiler.version={{ compiler_version }}
+os=Linux
+
+tools.build:compiler_executables={'c': '{{ os.getenv("CC") }}', 'cpp': '{{ os.getenv("CXX") }}'}
