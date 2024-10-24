@@ -130,7 +130,7 @@ constexpr auto constexpr_test()
 {
     std::array<byte_type, 100> buf{};
     entry_t e1;
-    e1 = entry_t{&*std::begin(buf), &*std::end(buf), 0};
+    e1 = entry_t{buf.data(), buf.data() + buf.size(), 0};
     e1 = entry_t{buf.data(), buf.size(), 0};
     auto e2 = e1;
     entry_t e3{std::move(e2)};
