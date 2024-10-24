@@ -370,13 +370,17 @@ R"(
     {
         // for empty group entries we generate a special cursor constructor to
         // advance cursor to `block_length` because there are no other fields
-        // to do this
+        // to do this. Default constructor is declared explicitly only to
+        // workaround MSVC bug that fails to find inherited default constructor
+        // if class declares another non-default one.
         if(members.fields.empty() && members.groups.empty()
            && members.data.empty())
         {
             return fmt::format(
                 // clang-format off
 R"(
+    {class_name}() = default;
+
     template<typename Byte2,
         typename = ::sbepp::detail::enable_if_convertible_t<Byte2, Byte>>
     SBEPP_CPP14_CONSTEXPR {class_name}(
