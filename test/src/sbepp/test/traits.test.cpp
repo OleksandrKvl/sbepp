@@ -64,8 +64,7 @@ constexpr auto g_custom_offset = 20;
 
 // `description` is a common static function for all the traits
 template<
-    template<typename>
-    class Trait,
+    template<typename> class Trait,
     typename Tag,
     typename = sbepp::test::utils::void_t<>>
 struct has_description : std::false_type
@@ -450,7 +449,7 @@ TEST(MessageTraitsTest, ProvidesTheSameValuesAsSchemaXml)
     ASSERT_STREQ(traits::name(), "msg_1");
     ASSERT_STREQ(traits::description(), "message description");
     ASSERT_EQ(traits::id(), 1);
-    ASSERT_EQ(traits::semantic_type(), "message semantic type");
+    ASSERT_STREQ(traits::semantic_type(), "message semantic type");
     IS_SAME_TYPE(
         traits::value_type<char>, traits_test_schema::messages::msg_1<char>);
     IS_SAME_TYPE(traits::schema_tag, traits_test_schema::schema);
