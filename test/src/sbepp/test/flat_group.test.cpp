@@ -89,11 +89,13 @@ TEST_F(FlatGroupTest, DefaultConstructedToNullptr)
 
 TEST_F(FlatGroupTest, CanBeConstructedFromBeginEndPointers)
 {
+    group_t g{&*std::begin(buf), &*std::end(buf)};
+
     ASSERT_EQ(sbepp::addressof(g), buf.data());
     STATIC_ASSERT_V(std::is_nothrow_constructible<
                     group_t,
-                    decltype(std::begin(buf)),
-                    decltype(std::end(buf))>);
+                    decltype(&*std::begin(buf)),
+                    decltype(&*std::end(buf))>);
 }
 
 TEST_F(FlatGroupTest, CanBeConstructedFromPointerAndSize)

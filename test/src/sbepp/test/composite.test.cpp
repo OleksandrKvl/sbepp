@@ -61,13 +61,13 @@ TEST_F(CompositeTest, DefaultConstructedToNullptr)
 
 TEST_F(CompositeTest, CanBeConstructedFromBeginEndPointers)
 {
-    composite_t c{std::begin(buf), std::end(buf)};
+    composite_t c{&*std::begin(buf), &*std::end(buf)};
 
     ASSERT_EQ(sbepp::addressof(c), buf.data());
     STATIC_ASSERT_V(std::is_nothrow_constructible<
                     composite_t,
-                    decltype(std::begin(buf)),
-                    decltype(std::end(buf))>);
+                    decltype(&*std::begin(buf)),
+                    decltype(&*std::end(buf))>);
 }
 
 TEST_F(CompositeTest, CanBeConstructedFromPointerAndSize)

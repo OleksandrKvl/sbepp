@@ -94,11 +94,13 @@ TEST_F(DynamicArrayRefTest, DefaultConstructedToNullptr)
 
 TEST_F(DynamicArrayRefTest, CanBeConstructedFromBeginEndPointers)
 {
+    array_t a{&*std::begin(buf), &*std::end(buf)};
+
     ASSERT_EQ(sbepp::addressof(a), buf.data());
     STATIC_ASSERT_V(std::is_nothrow_constructible<
                     array_t,
-                    decltype(std::begin(buf)),
-                    decltype(std::end(buf))>);
+                    decltype(&*std::begin(buf)),
+                    decltype(&*std::end(buf))>);
 }
 
 TEST_F(DynamicArrayRefTest, CanBeConstructedFromPointerAndSize)
@@ -1006,7 +1008,7 @@ TEST_F(DynamicArrayRefTest, Assign2NotAvailableForConstByteTypes)
 
 TEST_F(DynamicArrayRefDeathTest, Assign2TerminatesIfNotEnoughMemory)
 {
-    ASSERT_DEATH({ a.assign(std::begin(buf), std::end(buf)); }, ".*");
+    ASSERT_DEATH({ a.assign(&*std::begin(buf), &*std::end(buf)); }, ".*");
 }
 
 TEST_F(DynamicArrayRefDeathTest, Assign2TerminatesIfHoldsNullptr)

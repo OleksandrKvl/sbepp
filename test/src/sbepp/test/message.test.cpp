@@ -68,13 +68,13 @@ TEST_F(MessageTest, DefaultConstructedToNullptr)
 
 TEST_F(MessageTest, CanBeConstructedFromBeginEndPointers)
 {
-    message_t m{std::begin(buf), std::end(buf)};
+    message_t m{&*std::begin(buf), &*std::end(buf)};
 
     ASSERT_EQ(sbepp::addressof(m), buf.data());
     STATIC_ASSERT_V(std::is_nothrow_constructible<
                     message_t,
-                    decltype(std::begin(buf)),
-                    decltype(std::end(buf))>);
+                    decltype(&*std::begin(buf)),
+                    decltype(&*std::end(buf))>);
 }
 
 TEST_F(MessageTest, CanBeConstructedFromPointerAndSize)
@@ -126,7 +126,8 @@ TEST_F(MessageTest, CanBeConstructedFromLessConstType)
 
 TEST_F(MessageTest, SizeBytesReturnsMessageSize)
 {
-    test_schema::messages::msg8<byte_type> m{std::begin(buf), std::end(buf)};
+    test_schema::messages::msg8<byte_type> m{
+        &*std::begin(buf), &*std::end(buf)};
     sbepp::fill_message_header(m);
     auto c2 = m.composite2();
 
@@ -139,7 +140,8 @@ TEST_F(MessageTest, SizeBytesReturnsMessageSize)
 
 TEST_F(MessageTest, SizeBytesTakesBlockLengthIntoAccount)
 {
-    test_schema::messages::msg8<byte_type> m{std::begin(buf), std::end(buf)};
+    test_schema::messages::msg8<byte_type> m{
+        &*std::begin(buf), &*std::end(buf)};
     auto header = sbepp::fill_message_header(m);
     auto c2 = m.composite2();
 
@@ -156,7 +158,8 @@ TEST_F(MessageTest, SizeBytesTakesBlockLengthIntoAccount)
 
 TEST_F(MessageTest, SizeBytesIncludesGroupsAndDataSizes)
 {
-    test_schema::messages::msg2<byte_type> m{std::begin(buf), std::end(buf)};
+    test_schema::messages::msg2<byte_type> m{
+        &*std::begin(buf), &*std::end(buf)};
     auto header = sbepp::fill_message_header(m);
     auto group = m.group();
     sbepp::fill_group_header(group, 0);
