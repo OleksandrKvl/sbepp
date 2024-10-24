@@ -87,13 +87,13 @@ TEST_F(StaticArrayRefTest, DefaultConstructedToNullptr)
 
 TEST_F(StaticArrayRefTest, CanBeConstructedFromBeginEndPointers)
 {
-    array_t a{&*std::begin(buf), &*std::end(buf)};
+    array_t a{buf.data(), buf.data() + buf.size()};
 
     ASSERT_EQ(sbepp::addressof(a), buf.data());
     STATIC_ASSERT_V(std::is_nothrow_constructible<
                     array_t,
-                    decltype(&*std::begin(buf)),
-                    decltype(&*std::end(buf))>);
+                    decltype(buf.data()),
+                    decltype(buf.data())>);
 }
 
 TEST_F(StaticArrayRefTest, CanBeConstructedFromPointerAndSize)
@@ -649,7 +649,7 @@ TEST_F(StaticArrayRefDeathTest, Assign3TerminatesIfListIsTooLong)
 {
     using array_t = static_array_ref<byte_type, value_type, 2>;
     std::array<byte_type, array_t::size()> buf{};
-    array_t a{&*buf.begin(), &*buf.end()};
+    array_t a{buf.data(), buf.size()};
     std::initializer_list<char> list{'a', 'b', 'c'};
     ASSERT_GT(list.size(), a.size());
 

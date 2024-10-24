@@ -49,14 +49,14 @@ TEST_F(EntryTest, DefaultConstructedToNullptr)
 
 TEST_F(EntryTest, CanBeConstructedFromBeginEndPointersAndBlockLength)
 {
-    entry_t e{&*std::begin(buf), &*std::end(buf), g_block_length};
+    entry_t e{buf.data(), buf.data() + buf.size(), g_block_length};
 
     ASSERT_EQ(sbepp::addressof(e), buf.data());
     ASSERT_EQ(e(sbepp::detail::get_block_length_tag{}), g_block_length);
     STATIC_ASSERT_V(std::is_nothrow_constructible<
                     entry_t,
-                    decltype(&*std::begin(buf)),
-                    decltype(&*std::end(buf)),
+                    decltype(buf.data()),
+                    decltype(buf.data()),
                     decltype(g_block_length)>);
 }
 
