@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.11)
 
 project(sbepp
-    VERSION 1.4.1
+    VERSION 1.4.2
     LANGUAGES CXX
 )
 
@@ -21,7 +21,14 @@ option(SBEPP_DEV_MODE "Developer mode" OFF)
 
 cmake_dependent_option(SBEPP_BUILD_TESTS
     "Build sbepp tests" OFF
-    "SBEPP_DEV_MODE;BUILD_TESTING;CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR"
+    "BUILD_TESTING;CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR"
+    OFF
+)
+
+# used primarily to speed up CI by running all unit tests as a single binary
+cmake_dependent_option(SBEPP_SEPARATE_TESTS
+    "Treat each unit test separately in CTest" ON
+    "SBEPP_BUILD_TESTS"
     OFF
 )
 

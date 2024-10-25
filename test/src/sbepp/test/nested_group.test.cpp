@@ -84,11 +84,13 @@ TEST_F(NestedGroupTest, DefaultConstructedToNullptr)
 
 TEST_F(NestedGroupTest, CanBeConstructedFromBeginEndPointers)
 {
+    group_t g{buf.data(), buf.data() + buf.size()};
+
     ASSERT_EQ(sbepp::addressof(g), buf.data());
     STATIC_ASSERT_V(std::is_nothrow_constructible<
                     group_t,
-                    decltype(std::begin(buf)),
-                    decltype(std::end(buf))>);
+                    decltype(buf.data()),
+                    decltype(buf.data())>);
 }
 
 TEST_F(NestedGroupTest, CanBeConstructedFromPointerAndSize)

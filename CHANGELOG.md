@@ -1,3 +1,15 @@
+# 1.4.2
+
+- add build and test GitHub action
+- fix wrong usage of `template` keyword when calling dependent template function
+without template arguments (e.g. `obj.template f()`) in Visit API
+- generate explicitly defaulted constructor for empty group entry classes
+- make `SBEPP_BUILD_TESTS` CMake option independent of `SBEPP_DEV_MODE`
+- add `SBEPP_SEPARATE_TESTS` CMake option
+- fix minor errors in tests detected by CI
+
+---
+
 # 1.4.1
 
 - fixed `sbepp::size_bytes_checked` example

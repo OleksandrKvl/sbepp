@@ -636,7 +636,7 @@ public:
             if(!std::get<0>(visit_info).empty())
             {
                 res.push_back(fmt::format(
-                    "v.template {visitor}(this->{name}(), {tag}{{}})",
+                    "v.{visitor}(this->{name}(), {tag}{{}})",
                     fmt::arg("visitor", std::get<0>(visit_info)),
                     fmt::arg("name", std::get<1>(visit_info)),
                     fmt::arg("tag", std::get<2>(visit_info))));
@@ -775,7 +775,7 @@ public:
     constexpr bool operator()(
         ::sbepp::detail::visit_tag, Visitor& v, Cursor&) const
     {{
-        return v.template on_composite(*this, {tag}{{}});
+        return v.on_composite(*this, {tag}{{}});
     }}
 
 {visit_children_impl}
