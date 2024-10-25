@@ -32,6 +32,8 @@ benchmarks should be built. If
 - `SBEPP_BUILD_TESTS = OFF`, controls whether tests should be built. If `ON`,
 requires [googletest](https://github.com/google/googletest) and
 [fmt](https://github.com/fmtlib/fmt)
+- `SBEPP_SEPARATE_TESTS = ON`, requires `SBEPP_BUILD_TESTS=ON`, controls whether
+each unit test is treated separately in CTest
 - `SBEPP_BUILD_DOCS = OFF`, controls whether documentation should be built. If
 `ON` requires [Doxygen](https://doxygen.nl/)
 

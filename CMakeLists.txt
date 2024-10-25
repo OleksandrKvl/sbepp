@@ -25,9 +25,8 @@ cmake_dependent_option(SBEPP_BUILD_TESTS
     OFF
 )
 
-# TODO: better name?
 # used primarily to speed up CI by running all unit tests as a single binary
-cmake_dependent_option(SBEPP_DISCOVER_TESTS
+cmake_dependent_option(SBEPP_SEPARATE_TESTS
     "Treat each unit test separately in CTest" ON
     "SBEPP_BUILD_TESTS"
     OFF

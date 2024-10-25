@@ -90,7 +90,7 @@ function(add_test_binary name_suffix cpp_version)
 
     sbepp_set_strict_compiler_options(${test_name})
 
-    if(SBEPP_DISCOVER_TESTS)
+    if(SBEPP_SEPARATE_TESTS)
         gtest_discover_tests(${test_name} TEST_PREFIX "${test_name}.")
     else()
         add_test(NAME "${test_name}" COMMAND "${test_name}")
