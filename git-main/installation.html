@@ -124,7 +124,8 @@ CMake</h1>
 <li><code>SBEPP_BUILD_SBEPPC = ON</code>, controls whether <code>sbeppc</code> should be built</li>
 <li><code>SBEPP_DEV_MODE = OFF</code>, enables developer mode.</li>
 <li><code>SBEPP_BUILD_BENCHMARK = OFF</code>, requires <code>SBEPP_DEV_MODE=ON</code>, controls whether benchmarks should be built. If <code>ON</code>, requires <a href="https://github.com/google/benchmark">benchmark</a></li>
-<li><code>SBEPP_BUILD_TESTS = OFF</code>, requires <code>SBEPP_DEV_MODE=ON</code>, controls whether tests should be built. If <code>ON</code>, requires <a href="https://github.com/google/googletest">googletest</a> and <a href="https://github.com/fmtlib/fmt">fmt</a></li>
+<li><code>SBEPP_BUILD_TESTS = OFF</code>, controls whether tests should be built. If <code>ON</code>, requires <a href="https://github.com/google/googletest">googletest</a> and <a href="https://github.com/fmtlib/fmt">fmt</a></li>
+<li><code>SBEPP_SEPARATE_TESTS = ON</code>, requires <code>SBEPP_BUILD_TESTS=ON</code>, controls whether each unit test is treated separately in CTest</li>
 <li><code>SBEPP_BUILD_DOCS = OFF</code>, controls whether documentation should be built. If <code>ON</code> requires <a href="https://doxygen.nl/">Doxygen</a></li>
 </ul>
 <p>There's a <code>conanfile.txt</code> which can be used to simplify dependency management.</p>
