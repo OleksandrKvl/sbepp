@@ -370,9 +370,8 @@ R"(
     {
         // for empty group entries we generate a special cursor constructor to
         // advance cursor to `block_length` because there are no other fields
-        // to do this. Default constructor is declared explicitly only to
-        // workaround MSVC bug that fails to find inherited default constructor
-        // if class declares another non-default one.
+        // to do this. Default constructor is declared explicitly because old
+        // compilers don't support inheriting it from the base class.
         if(members.fields.empty() && members.groups.empty()
            && members.data.empty())
         {
