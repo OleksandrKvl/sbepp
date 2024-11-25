@@ -203,7 +203,51 @@ private:
             enc);
     }
 
-    // TODO: deduplicate
+    std::pair<const sbe::enumeration&, const sbe::enum_valid_value&>
+        find_value_ref(
+            const std::string_view value_ref, const source_location& location)
+    {
+        const auto parsed = utils::parse_value_ref(value_ref);
+        if(parsed.enum_name.empty() || parsed.enumerator.empty())
+        {
+            throw_error(
+                "{}: `{}` is not a valid `valueRef`", location, value_ref);
+        }
+
+        const auto enc = get_encoding(parsed.enum_name);
+        if(!enc)
+        {
+            throw_error(
+                "{}: encoding `{}` doesn't exist", location, parsed.enum_name);
+        }
+
+        const auto e = std::get_if<sbe::enumeration>(enc);
+        if(!e)
+        {
+            throw_error(
+                "{}: encoding `{}` is not an enum", location, parsed.enum_name);
+        }
+
+        const auto& values = e->valid_values;
+        const auto search = std::find_if(
+            std::begin(values),
+            std::end(values),
+            [&parsed](const auto& value)
+            {
+                return (value.name == parsed.enumerator);
+            });
+        if(search == std::end(values))
+        {
+            throw_error(
+                "{}: enum `{}` doesn't have valid value `{}`",
+                location,
+                parsed.enum_name,
+                parsed.enumerator);
+        }
+
+        return {*e, *search};
+    }
+
     void validate_value_ref2(const sbe::field& f)
     {
         if(!f.value_ref)
@@ -212,60 +256,20 @@ private:
         }
 
         const auto& value_ref = *f.value_ref;
-        const auto parsed = utils::parse_value_ref(value_ref);
-        if(parsed.enum_name.empty() || parsed.enumerator.empty())
-        {
-            throw_error(
-                "{}: `{}` is not a valid `valueRef`", f.location, value_ref);
-        }
+        const auto& [ref_enum, ref_valid_value] =
+            find_value_ref(value_ref, f.location);
 
-        const auto enc = get_encoding(parsed.enum_name);
-        if(!enc)
-        {
-            throw_error(
-                "{}: encoding `{}` doesn't exist",
-                f.location,
-                parsed.enum_name);
-        }
-
-        const auto e = std::get_if<sbe::enumeration>(enc);
-        if(!e)
-        {
-            throw_error(
-                "{}: encoding `{}` is not an enum",
-                f.location,
-                parsed.enum_name);
-        }
-
-        const auto& values = e->valid_values;
-        const auto search = std::find_if(
-            std::begin(values),
-            std::end(values),
-            [&parsed](const auto& value)
-            {
-                return (value.name == parsed.enumerator);
-            });
-        if(search == std::end(values))
-        {
-            throw_error(
-                "{}: enum `{}` doesn't have valid value `{}`",
-                f.location,
-                parsed.enum_name,
-                parsed.enumerator);
-        }
-
-        if(!value_fits_into_type(search->value, f.type))
+        if(!value_fits_into_type(ref_valid_value.value, f.type))
         {
             throw_error(
                 "{}: valueRef `{}` ({}) cannot be represented by type `{}`",
                 f.location,
                 value_ref,
-                search->value,
+                ref_valid_value.value,
                 f.type);
         }
     }
 
-    // TODO: deduplicate
     void validate_value_ref3(const sbe::field& f)
     {
         if(!f.value_ref)
@@ -274,56 +278,16 @@ private:
         }
 
         const auto& value_ref = *f.value_ref;
-        const auto parsed = utils::parse_value_ref(value_ref);
-        if(parsed.enum_name.empty() || parsed.enumerator.empty())
-        {
-            throw_error(
-                "{}: `{}` is not a valid `valueRef`", f.location, value_ref);
-        }
-
-        const auto enc = get_encoding(parsed.enum_name);
-        if(!enc)
-        {
-            throw_error(
-                "{}: encoding `{}` doesn't exist",
-                f.location,
-                parsed.enum_name);
-        }
-
-        const auto e = std::get_if<sbe::enumeration>(enc);
-        if(!e)
-        {
-            throw_error(
-                "{}: encoding `{}` is not an enum",
-                f.location,
-                parsed.enum_name);
-        }
-
-        const auto& values = e->valid_values;
-        const auto search = std::find_if(
-            std::begin(values),
-            std::end(values),
-            [&parsed](const auto& value)
-            {
-                return (value.name == parsed.enumerator);
-            });
-        if(search == std::end(values))
-        {
-            throw_error(
-                "{}: enum `{}` doesn't have valid value `{}`",
-                f.location,
-                parsed.enum_name,
-                parsed.enumerator);
-        }
-
+        const auto& [ref_enum, ref_valid_value] =
+            find_value_ref(value_ref, f.location);
         const auto lowered_field_type = utils::to_lower(f.type);
-        const auto lowered_enum_type = utils::to_lower(parsed.enum_name);
+        const auto lowered_enum_type = utils::to_lower(ref_enum.name);
         if(lowered_field_type != lowered_enum_type)
         {
             throw_error(
                 "{}: enum constant type `{}` should match field type `{}`",
                 f.location,
-                parsed.enum_name,
+                ref_enum.name,
                 f.type);
         }
     }
@@ -763,55 +727,16 @@ private:
     void validate_value_ref(const sbe::type& t)
     {
         const auto& value_ref = *t.value_ref;
-        const auto parsed = utils::parse_value_ref(value_ref);
-        if(parsed.enum_name.empty() || parsed.enumerator.empty())
-        {
-            throw_error(
-                "{}: `{}` is not a valid valueRef", t.location, value_ref);
-        }
+        const auto& [ref_enum, ref_valid_value] =
+            find_value_ref(value_ref, t.location);
 
-        const auto enc = get_encoding(parsed.enum_name);
-        if(!enc)
-        {
-            throw_error(
-                "{}: encoding `{}` doesn't exist",
-                t.location,
-                parsed.enum_name);
-        }
-
-        const auto e = std::get_if<sbe::enumeration>(enc);
-        if(!e)
-        {
-            throw_error(
-                "{}: encoding `{}` is not an enum",
-                t.location,
-                parsed.enum_name);
-        }
-
-        const auto& values = e->valid_values;
-        const auto search = std::find_if(
-            std::begin(values),
-            std::end(values),
-            [&parsed](const auto& value)
-            {
-                return (value.name == parsed.enumerator);
-            });
-        if(search == std::end(values))
-        {
-            throw_error(
-                "{}: enum `{}` doesn't have valid value `{}`",
-                t.location,
-                parsed.enum_name,
-                parsed.enumerator);
-        }
-
-        if(!value_fits_into_type(search->value, t.primitive_type))
+        if(!value_fits_into_type(ref_valid_value.value, t.primitive_type))
         {
             throw_error(
                 "{}: valueRef `{}` ({}) cannot be represented by type `{}`",
                 t.location,
                 value_ref,
-                search->value,
+                ref_valid_value.value,
                 t.primitive_type);
         }
     }
