@@ -143,8 +143,7 @@ private:
     {
         auto& context = ctx_manager->create(*schema);
         context.name = custom_schema_name.value_or(schema->package);
-        // TODO: should we provide different error message for custom or
-        // XML name?
+        // TODO: provide different error message for custom or XML name?
         const auto& name = context.name;
         if(!sbe_schema_validator::is_sbe_symbolic_name(name)
            || is_cpp_keyword(name) || is_reserved_cpp_namespace(name))
