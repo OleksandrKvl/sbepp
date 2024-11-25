@@ -917,29 +917,34 @@ private:
         }
         else
         {
-            if((t.length != 1) && !is_single_byte_type(t.primitive_type))
+            if(t.length == 1)
+            {
+                validate_optional_value(
+                    t.min_value, t.primitive_type, t.location);
+                validate_optional_value(
+                    t.max_value, t.primitive_type, t.location);
+                // strict: min_value should be less than max_value
+
+                if(t.presence == field_presence::optional)
+                {
+                    validate_optional_value(
+                        t.null_value, t.primitive_type, t.location);
+                }
+                else if(t.null_value)
+                {
+                    reporter->warning(
+                        "{}: nullValue is ignored for type `{}` because "
+                        "`presence` "
+                        "is "
+                        "not `optional`",
+                        t.location,
+                        t.name);
+                }
+            }
+            else if(!is_single_byte_type(t.primitive_type))
             {
                 throw_error(
                     "{}: arrays must have a single-byte type", t.location);
-            }
-
-            validate_optional_value(t.min_value, t.primitive_type, t.location);
-            validate_optional_value(t.max_value, t.primitive_type, t.location);
-            // strict: min_value should be less than max_value
-
-            if(t.presence == field_presence::optional)
-            {
-                validate_optional_value(
-                    t.null_value, t.primitive_type, t.location);
-            }
-            else if(t.null_value)
-            {
-                reporter->warning(
-                    "{}: nullValue is ignored for type `{}` because `presence` "
-                    "is "
-                    "not `optional`",
-                    t.location,
-                    t.name);
             }
         }
 

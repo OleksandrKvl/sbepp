@@ -398,3 +398,60 @@ sbeppc_error_test(
     NAME "no_constant_value"
     ERROR "either `valueRef` or value must be provided for constant `constant`"
 )
+
+foreach(type IN ITEMS "int8" "int16" "int32" "int64" "uint8" "uint16" "uint32" "uint64" "float" "double")
+    sbeppc_error_test(
+        NAME "wrong_min_value_${type}"
+        ERROR "cannot be represented by type `${type}`"
+    )
+
+    sbeppc_error_test(
+        NAME "wrong_max_value_${type}"
+        ERROR "cannot be represented by type `${type}`"
+    )
+
+    sbeppc_error_test(
+        NAME "wrong_null_value_${type}"
+        ERROR "cannot be represented by type `${type}`"
+    )
+endforeach()
+
+sbeppc_error_test(
+    NAME "wrong_fp_value_format1"
+    ERROR "value `` cannot be represented by type `float`"
+)
+
+sbeppc_error_test(
+    NAME "wrong_fp_value_format2"
+    ERROR "value ` 123` cannot be represented by type `float`"
+)
+
+sbeppc_error_test(
+    NAME "wrong_fp_value_format3"
+    ERROR "value `0x123` cannot be represented by type `float`"
+)
+
+sbeppc_error_test(
+    NAME "wrong_fp_value_format4"
+    ERROR "value `\\+0X123` cannot be represented by type `float`"
+)
+
+sbeppc_error_test(
+    NAME "wrong_fp_value_format5"
+    ERROR "value `-0x123` cannot be represented by type `float`"
+)
+
+sbeppc_error_test(
+    NAME "wrong_fp_value_format6"
+    ERROR "value `\\+NaN` cannot be represented by type `float`"
+)
+
+sbeppc_error_test(
+    NAME "wrong_fp_value_format7"
+    ERROR "value `-NaN` cannot be represented by type `float`"
+)
+
+sbeppc_error_test(
+    NAME "wrong_fp_value_format8"
+    ERROR "value `Inf` cannot be represented by type `float`"
+)
