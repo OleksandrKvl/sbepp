@@ -1066,11 +1066,8 @@ public:
                 make_templated_traits_tag(context.public_type, context.tag)));
     }
 
-    // TODO: can't we just pass `field_context` instead of `sbe::field`?
-    std::string make_field_value_type(const sbe::field& f) const
+    std::string make_field_value_type(const field_context& context) const
     {
-        const auto& context = ctx_manager->get(f);
-
         if((context.actual_presence == field_presence::constant)
            || (!context.is_template))
         {
@@ -1082,10 +1079,8 @@ public:
         }
     }
 
-    std::string make_field_value_type_tag(const sbe::field& f) const
+    std::string make_field_value_type_tag(const field_context& context) const
     {
-        const auto& context = ctx_manager->get(f);
-
         if(context.actual_presence != field_presence::constant)
         {
             return utils::make_type_alias(
@@ -1147,8 +1142,8 @@ public:
                 "presence", utils::presence_to_string(context.actual_presence)),
             fmt::arg("offset_impl", make_offset_impl(context.level_offset)),
             fmt::arg("since_version", f.added_since),
-            fmt::arg("value_type", make_field_value_type(f)),
-            fmt::arg("value_type_tag", make_field_value_type_tag(f)),
+            fmt::arg("value_type", make_field_value_type(context)),
+            fmt::arg("value_type_tag", make_field_value_type_tag(context)),
             fmt::arg("deprecated_impl", make_deprecated(f.deprecated_since)));
     }
 
