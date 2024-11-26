@@ -1150,10 +1150,29 @@ R"(
             fmt::arg("absolute_offset", absolute_offset));
     }
 
+    std::vector<const sbe::field*>
+        get_non_const_fields(const std::vector<sbe::field>& fields)
+    {
+        std::vector<const sbe::field*> res;
+        res.reserve(fields.size());
+
+        for(const auto& f : fields)
+        {
+            if(ctx_manager->get(f).actual_presence != field_presence::constant)
+            {
+                res.push_back(&f);
+            }
+        }
+
+        return res;
+    }
+
     std::string make_fields_cursor_accessors(
         const std::vector<sbe::field>& fields, const std::size_t header_size)
     {
-        if(fields.empty())
+        const auto non_const_fields = get_non_const_fields(fields);
+
+        if(non_const_fields.empty())
         {
             return {};
         }
@@ -1162,16 +1181,11 @@ R"(
         std::size_t absolute_offset{};
 
         std::for_each(
-            std::cbegin(fields),
-            std::cend(fields) - 1,
-            [&res, this, &absolute_offset, header_size](const auto& f)
+            std::cbegin(non_const_fields),
+            std::cend(non_const_fields) - 1,
+            [&res, this, &absolute_offset, header_size](const auto pf)
             {
-                if(ctx_manager->get(f).actual_presence
-                   == field_presence::constant)
-                {
-                    return;
-                }
-
+                const auto& f = *pf;
                 // TODO: this can be simplified if use `get_level_tag` and
                 // offsets which don't include header size
                 const auto prev_field_end = absolute_offset;
@@ -1213,14 +1227,7 @@ R"(
                 }
             });
 
-        const auto& last = fields.back();
-
-        if(ctx_manager->get(last).actual_presence == field_presence::constant)
-        {
-            // TODO: what's going on here?
-            return res;
-        }
-
+        const auto& last = *non_const_fields.back();
         const auto prev_field_end = absolute_offset;
         absolute_offset = utils::get_valid_offset(
             last.offset, absolute_offset, last.location);
