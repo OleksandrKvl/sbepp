@@ -248,6 +248,23 @@ private:
         return {*e, *search};
     }
 
+    static bool value_ref_fits_into_type(
+        const sbe::enumeration& e,
+        const sbe::enum_valid_value& valid_value,
+        const std::string_view type)
+    {
+        if(e.type == "char")
+        {
+            const auto underlying_value =
+                std::to_string(static_cast<int>(valid_value.value[0]));
+            return value_fits_into_type(underlying_value, type);
+        }
+        else
+        {
+            return value_fits_into_type(valid_value.value, type);
+        }
+    }
+
     void validate_value_ref2(const sbe::field& f)
     {
         if(!f.value_ref)
@@ -259,7 +276,7 @@ private:
         const auto& [ref_enum, ref_valid_value] =
             find_value_ref(value_ref, f.location);
 
-        if(!value_fits_into_type(ref_valid_value.value, f.type))
+        if(!value_ref_fits_into_type(ref_enum, ref_valid_value, f.type))
         {
             throw_error(
                 "{}: valueRef `{}` ({}) cannot be represented by type `{}`",
@@ -730,7 +747,8 @@ private:
         const auto& [ref_enum, ref_valid_value] =
             find_value_ref(value_ref, t.location);
 
-        if(!value_fits_into_type(ref_valid_value.value, t.primitive_type))
+        if(!value_ref_fits_into_type(
+               ref_enum, ref_valid_value, t.primitive_type))
         {
             throw_error(
                 "{}: valueRef `{}` ({}) cannot be represented by type `{}`",
