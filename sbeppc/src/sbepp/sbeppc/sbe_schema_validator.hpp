@@ -369,6 +369,16 @@ private:
         }
     }
 
+    std::size_t get_encoding_size(const sbe::encoding& enc)
+    {
+        return std::visit(
+            [this](const auto& type)
+            {
+                return ctx_manager->get(type).size;
+            },
+            enc);
+    }
+
     template<typename MessageOrGroup>
     void validate_members(const MessageOrGroup& level)
     {
@@ -392,14 +402,7 @@ private:
                         f.type);
                 }
 
-                // TODO: refactor, we're visiting encoding twice, to get size
-                // and actual presence
-                context.size = std::visit(
-                    [this](const auto& type)
-                    {
-                        return ctx_manager->get(type).size;
-                    },
-                    *enc);
+                context.size = get_encoding_size(*enc);
                 actual_presence = get_actual_presence(f, *enc);
             }
             else
