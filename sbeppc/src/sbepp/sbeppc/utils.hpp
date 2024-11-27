@@ -16,7 +16,6 @@
 #include <cctype>
 #include <iterator>
 #include <charconv>
-#include <stdexcept>
 #include <string_view>
 #include <unordered_set>
 #include <unordered_map>
