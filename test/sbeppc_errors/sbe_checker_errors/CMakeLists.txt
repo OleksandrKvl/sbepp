@@ -12,7 +12,7 @@ sbeppc_error_test(
 
 sbeppc_error_test(
     NAME "invalid_value_ref"
-    ERROR "`wrong-ref` is not a valid valueRef"
+    ERROR "`wrong-ref` is not a valid `valueRef`"
 )
 
 sbeppc_error_test(
