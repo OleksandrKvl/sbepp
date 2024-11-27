@@ -293,15 +293,28 @@ R"(
         return {};
     }
 
-    std::string_view get_block_length_type(const sbe::composite& c) const
+    const sbe::type& get_header_element(
+        const sbe::composite& header, const std::string_view element_name) const
     {
-        // TODO: support `ref`, see also
-        // `sbe_checker::validate_message_header_element`
-        const auto t = std::get_if<sbe::type>(
-            utils::find_composite_element(c, "blockLength"));
+        const auto element =
+            utils::find_composite_element(header, element_name);
+        const auto* t = std::get_if<sbe::type>(element);
+        if(!t)
+        {
+            const auto r = std::get_if<sbe::ref>(element);
+            assert(r);
+            t = &utils::get_schema_encoding_as<sbe::type>(*schema, r->type);
+        }
         assert(t);
 
-        return ctx_manager->get(*t).underlying_type;
+        return *t;
+    }
+
+    std::string_view get_block_length_type(const sbe::composite& c) const
+    {
+        const auto& t = get_header_element(c, "blockLength");
+
+        return ctx_manager->get(t).underlying_type;
     }
 
     static std::string make_entry_cursor_constructor(
@@ -431,11 +444,9 @@ public:
 
     std::string_view get_num_in_group_type(const sbe::composite& c) const
     {
-        const auto t = std::get_if<sbe::type>(
-            utils::find_composite_element(c, "numInGroup"));
-        assert(t);
+        const auto& t = get_header_element(c, "numInGroup");
 
-        return ctx_manager->get(*t).impl_type;
+        return ctx_manager->get(t).impl_type;
     }
 
     std::string make_group_header_filler(const sbe::group& g)
@@ -587,8 +598,7 @@ R"(
         // TODO: a weird place to insert a dependency
         dependencies.emplace(c.name);
 
-        const auto& t =
-            std::get<sbe::type>(*utils::find_composite_element(c, "length"));
+        const auto& t = get_header_element(c, "length");
 
         return t;
     }
@@ -597,8 +607,7 @@ R"(
     {
         const auto& c =
             utils::get_schema_encoding_as<sbe::composite>(*schema, d.type);
-        const auto& t =
-            std::get<sbe::type>(*utils::find_composite_element(c, "varData"));
+        const auto& t = get_header_element(c, "varData");
 
         return ctx_manager->get(t).underlying_type;
     }

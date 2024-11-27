@@ -478,7 +478,7 @@ private:
                 name);
         }
 
-        const sbe::type* t = std::get_if<sbe::type>(element);
+        const auto* t = std::get_if<sbe::type>(element);
         if(!t)
         {
             const auto r = std::get_if<sbe::ref>(element);
