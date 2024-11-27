@@ -66,8 +66,7 @@ private:
     std::string_view schema_name;
     sbe::byte_order_kind byte_order;
     on_public_type_cb_t on_public_type_cb;
-    // TODO: better name
-    std::unordered_map<std::string_view, bool> compiled;
+    std::unordered_map<std::string_view, bool> compiled_types;
     std::vector<std::unordered_set<std::string>> dependencies;
 
     static std::string get_min_value(const sbe::type& t)
@@ -547,8 +546,6 @@ public:
                 *t.constant_value, t.length, t.location);
         }
 
-        // TODO: check that constant_value exist? it should already be checked
-        // by `sbe_checker`
         return utils::numeric_literal_to_value(
             *t.constant_value, t.primitive_type);
     }
@@ -818,11 +815,11 @@ public:
         assert(!dependencies.empty());
         dependencies.back().emplace(name);
 
-        if(!compiled[name])
+        if(!compiled_types[name])
         {
             dependencies.emplace_back();
             const auto implementation = compile_encoding(enc);
-            compiled[name] = true;
+            compiled_types[name] = true;
             const auto alias = make_alias(enc);
             const auto traits = traits_gen->make_type_traits(enc);
             on_public_type_cb(

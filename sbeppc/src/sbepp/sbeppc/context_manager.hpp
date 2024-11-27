@@ -14,7 +14,6 @@
 
 namespace sbepp::sbeppc
 {
-// TODO: explain context values
 // TODO: extract context types into separate headers?
 struct type_context
 {
@@ -115,7 +114,6 @@ struct group_context
 struct data_context
 {
     std::string tag;
-    // TODO: do we really need it?
     const sbe::type* length_type;
     std::string impl_type;
 };
@@ -205,7 +203,6 @@ struct context_type<sbe::message>
 };
 
 class context_manager
-
 {
 public:
     // `create` and `get` separation is required to avoid bugs when accidentally

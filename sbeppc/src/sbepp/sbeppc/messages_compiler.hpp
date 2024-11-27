@@ -57,34 +57,6 @@ private:
     std::size_t group_entry_index{};
     std::unordered_set<std::string> dependencies;
 
-    bool is_const_field(const sbe::field& f)
-    {
-        // TODO: use context.actual_presence here
-        if(!utils::is_primitive_type(f.type))
-        {
-            const auto& enc = utils::get_schema_encoding(*schema, f.type);
-            if(auto t = std::get_if<sbe::type>(&enc))
-            {
-                // inherits presence from user-provided type
-                return (t->presence == field_presence::constant);
-            }
-            else if(std::holds_alternative<sbe::enumeration>(enc))
-            {
-                assert(
-                    (f.presence != field_presence::constant)
-                    || f.value_ref.has_value());
-                return (f.presence == field_presence::constant);
-            }
-        }
-        else if(f.presence == field_presence::constant)
-        {
-            assert(f.value_ref.has_value());
-            return true;
-        }
-
-        return false;
-    }
-
     std::string value_ref_to_enumerator(const std::string_view value_ref) const
     {
         const auto parsed = utils::parse_value_ref(value_ref);
@@ -153,11 +125,6 @@ private:
                     context.value_type,
                     value_ref_to_enumerator(*f.value_ref));
             }
-
-            // TODO:  check if it's possible now
-            // throw_error(
-            //     "{}: only types and enums can represent field constants",
-            //     f.location);
         }
 
         context.value_type = utils::primitive_type_to_cpp_type(f.type);
@@ -678,7 +645,6 @@ R"(::sbepp::detail::dynamic_array_ref<
             fmt::arg("endian", utils::byte_order_to_endian(schema->byte_order)),
             fmt::arg(
                 "length_type",
-                // TODO: refactor
                 ctx_manager->get(*ctx_manager->get(d).length_type)
                     .public_type));
     }
