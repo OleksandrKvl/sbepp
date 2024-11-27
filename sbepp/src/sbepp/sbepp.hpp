@@ -3303,10 +3303,6 @@ template<typename Byte, typename Value, typename Length, endian E>
 class dynamic_array_ref : public detail::byte_range<Byte>
 {
 public:
-    static_assert(
-        std::is_unsigned<typename Length::value_type>::value,
-        "Length must be unsigned");
-
     //! @brief final element type. `value_type` with the same cv-qualifiers as
     //!     `Byte`
     using element_type = detail::apply_cv_qualifiers_t<Byte, Value>;

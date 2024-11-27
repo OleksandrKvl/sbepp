@@ -6,20 +6,19 @@
 #include <sbepp/sbeppc/reporter.hpp>
 #include <sbepp/sbeppc/schema_parser.hpp>
 #include <sbepp/sbeppc/sbe_error.hpp>
-#include <sbepp/sbeppc/types_compiler.hpp>
-#include <sbepp/sbeppc/messages_compiler.hpp>
-#include <sbepp/sbeppc/traits_generator.hpp>
 #include <sbepp/sbeppc/schema_compiler.hpp>
 #include <sbepp/sbeppc/build_info.hpp>
+#include <sbepp/sbeppc/sbe_schema_validator.hpp>
+#include <sbepp/sbeppc/sbe_schema_cpp_validator.hpp>
+#include <sbepp/sbeppc/context_manager.hpp>
 
 #include <fmt/core.h>
 
-#include <cstdint>
 #include <string>
 #include <string_view>
 #include <optional>
 
-namespace sbepp::sbeppc
+namespace
 {
 char* get_option_value(const int argc, char** argv, int option_index)
 {
@@ -30,7 +29,7 @@ char* get_option_value(const int argc, char** argv, int option_index)
     }
 
     // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-    throw_error("no value for option `{}`", argv[option_index]);
+    sbepp::sbeppc::throw_error("no value for option `{}`", argv[option_index]);
 }
 
 [[noreturn]] void print_help_and_exit()
@@ -56,7 +55,8 @@ Options:
 
 [[noreturn]] void print_version_and_exit()
 {
-    fmt::print("sbeppc version: {}\n", build_info::get_version());
+    fmt::print(
+        "sbeppc version: {}\n", sbepp::sbeppc::build_info::get_version());
     std::exit(0);
 }
 
@@ -114,7 +114,7 @@ sbeppc_config parse_command_line(int argc, char** argv)
         // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
         else if(arg[0] == '-')
         {
-            throw_error("unknown argument: `{}`", arg);
+            sbepp::sbeppc::throw_error("unknown argument: `{}`", arg);
             break;
         }
         else
@@ -125,11 +125,11 @@ sbeppc_config parse_command_line(int argc, char** argv)
 
     if(i == argc)
     {
-        throw_error("missing filename");
+        sbepp::sbeppc::throw_error("missing filename");
     }
     else if(argc - i != 1)
     {
-        throw_error("too many arguments");
+        sbepp::sbeppc::throw_error("too many arguments");
     }
 
     // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
@@ -137,7 +137,7 @@ sbeppc_config parse_command_line(int argc, char** argv)
 
     return config;
 }
-} // namespace sbepp::sbeppc
+} // namespace
 
 int main(int argc, char** argv)
 {
@@ -148,21 +148,24 @@ int main(int argc, char** argv)
 
     try
     {
-        const auto config = sbepp::sbeppc::parse_command_line(argc, argv);
+        const auto config = parse_command_line(argc, argv);
+
         schema_parser parser{config.schema_file, reporter, fs_provider};
         parser.parse_schema();
-        auto schema = parser.get_message_schema();
-        auto types = parser.get_types();
-        auto messages = parser.get_messages();
-        schema.name = config.schema_name.value_or(schema.package);
-        utils::validate_schema_name(schema, reporter);
+        const auto& schema = parser.get_message_schema();
+
+        context_manager ctx_manager;
+        sbe_schema_validator sbe_validator{reporter};
+        sbe_validator.validate(schema, ctx_manager);
+
+        sbe_schema_cpp_validator cpp_validator{reporter, ctx_manager};
+        cpp_validator.validate(schema, config.schema_name);
 
         schema_compiler::compile(
             config.output_dir,
             config.inject_include,
             schema,
-            types,
-            messages,
+            ctx_manager,
             fs_provider);
     }
     catch(const sbe_error& e)

@@ -1,13 +1,9 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2023, Oleksandr Koval
 
-#ifdef USE_TOP_FILE
-#    include <test_schema/test_schema.hpp>
-#else
-#    include <test_schema/messages/msg2.hpp>
-#    include <test_schema/messages/msg3.hpp>
-#    include <test_schema/messages/msg10.hpp>
-#endif
+#include <test_schema/messages/msg2.hpp>
+#include <test_schema/messages/msg3.hpp>
+#include <test_schema/messages/msg10.hpp>
 
 #include <sbepp/test/utils.hpp>
 
@@ -36,12 +32,13 @@ class entry_wrapper
 public:
     using base_t = sbepp::group_traits<
         test_schema::schema::messages::msg2::group>::entry_type<Byte>;
+
     constexpr entry_wrapper(Byte* ptr, const std::size_t size)
         : base_t{
-            ptr,
-            size,
-            sbepp::group_traits<
-                test_schema::schema::messages::msg2::group>::block_length()}
+              ptr,
+              size,
+              sbepp::group_traits<
+                  test_schema::schema::messages::msg2::group>::block_length()}
     {
     }
 };

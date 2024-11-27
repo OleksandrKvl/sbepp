@@ -1,51 +1,43 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2023, Oleksandr Koval
 
-#ifdef USE_SINGLE_FILE
-#    include <test_schema.hpp>
-#    include <big_endian_schema.hpp>
-#elif defined(USE_TOP_FILE)
-#    include <test_schema/test_schema.hpp>
-#    include <big_endian_schema/big_endian_schema.hpp>
-#else
-#    include <test_schema/types/composite_1.hpp>
-#    include <test_schema/types/composite_2.hpp>
-#    include <test_schema/types/composite_3.hpp>
-#    include <test_schema/types/composite_4.hpp>
-#    include <test_schema/types/composite_5.hpp>
-#    include <test_schema/types/composite_6.hpp>
-#    include <test_schema/types/composite_7.hpp>
-#    include <test_schema/types/composite_8.hpp>
-#    include <test_schema/types/composite_9.hpp>
-#    include <test_schema/types/composite_10.hpp>
-#    include <test_schema/types/composite_11.hpp>
-#    include <test_schema/types/composite_12.hpp>
-#    include <test_schema/types/composite_13.hpp>
-#    include <test_schema/types/composite_14.hpp>
-#    include <test_schema/types/composite_15.hpp>
-#    include <test_schema/types/composite_16.hpp>
-#    include <test_schema/types/composite_17.hpp>
-#    include <test_schema/types/composite_18.hpp>
-#    include <test_schema/messages/msg14.hpp>
-#    include <test_schema/messages/msg15.hpp>
-#    include <test_schema/messages/msg16.hpp>
-#    include <test_schema/messages/msg17.hpp>
-#    include <test_schema/messages/msg18.hpp>
-#    include <test_schema/messages/msg19.hpp>
-#    include <test_schema/messages/msg20.hpp>
-#    include <test_schema/messages/msg21.hpp>
-#    include <test_schema/messages/msg22.hpp>
-#    include <test_schema/messages/msg23.hpp>
-#    include <test_schema/messages/msg24.hpp>
-#    include <test_schema/messages/msg25.hpp>
+#include <test_schema/types/composite_1.hpp>
+#include <test_schema/types/composite_2.hpp>
+#include <test_schema/types/composite_3.hpp>
+#include <test_schema/types/composite_4.hpp>
+#include <test_schema/types/composite_5.hpp>
+#include <test_schema/types/composite_6.hpp>
+#include <test_schema/types/composite_7.hpp>
+#include <test_schema/types/composite_8.hpp>
+#include <test_schema/types/composite_9.hpp>
+#include <test_schema/types/composite_10.hpp>
+#include <test_schema/types/composite_11.hpp>
+#include <test_schema/types/composite_12.hpp>
+#include <test_schema/types/composite_13.hpp>
+#include <test_schema/types/composite_14.hpp>
+#include <test_schema/types/composite_15.hpp>
+#include <test_schema/types/composite_16.hpp>
+#include <test_schema/types/composite_17.hpp>
+#include <test_schema/types/composite_18.hpp>
+#include <test_schema/messages/msg14.hpp>
+#include <test_schema/messages/msg15.hpp>
+#include <test_schema/messages/msg16.hpp>
+#include <test_schema/messages/msg17.hpp>
+#include <test_schema/messages/msg18.hpp>
+#include <test_schema/messages/msg19.hpp>
+#include <test_schema/messages/msg20.hpp>
+#include <test_schema/messages/msg21.hpp>
+#include <test_schema/messages/msg22.hpp>
+#include <test_schema/messages/msg23.hpp>
+#include <test_schema/messages/msg24.hpp>
+#include <test_schema/messages/msg25.hpp>
 
-#    include <big_endian_schema/types/composite_1.hpp>
-#    include <big_endian_schema/types/composite_2.hpp>
-#    include <big_endian_schema/types/composite_3.hpp>
-#    include <big_endian_schema/types/composite_4.hpp>
-#    include <big_endian_schema/types/composite_5.hpp>
-#    include <big_endian_schema/messages/msg1.hpp>
-#endif
+#include <big_endian_schema/types/composite_1.hpp>
+#include <big_endian_schema/types/composite_2.hpp>
+#include <big_endian_schema/types/composite_3.hpp>
+#include <big_endian_schema/types/composite_4.hpp>
+#include <big_endian_schema/types/composite_5.hpp>
+#include <big_endian_schema/messages/msg1.hpp>
 
 #include <algorithm>
 #include <gtest/gtest.h>

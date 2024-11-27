@@ -6,6 +6,9 @@
 #include <sbepp/sbeppc/ifs_provider.hpp>
 #include <sbepp/sbeppc/throw_error.hpp>
 
+// for `std::filesystem::path` formatting
+#include <fmt/std.h>
+
 #include <string>
 #include <fstream>
 
@@ -38,7 +41,7 @@ public:
         std::ofstream output_stream{path, std::ios::binary | std::ios::out};
         if(!output_stream)
         {
-            throw_error("can't open file {}", path);
+            throw_error("can't open file: `{}`", path);
         }
         output_stream << data;
     }

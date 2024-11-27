@@ -1,11 +1,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2023, Oleksandr Koval
 
-#ifdef USE_TOP_FILE
-#    include <test_schema/test_schema.hpp>
-#else
-#    include <test_schema/types/uint32_req.hpp>
-#endif
+#include <test_schema/types/uint32_req.hpp>
 
 #include <sbepp/test/utils.hpp>
 
@@ -157,7 +153,7 @@ TEST(RequiredTest, HasValueBasedComparisonOps)
 
 #if defined(__cpp_impl_three_way_comparison) \
     && defined(__cpp_lib_three_way_comparison)
-#    if(__cpp_impl_three_way_comparison >= 201907L) \
+#    if (__cpp_impl_three_way_comparison >= 201907L) \
         && (__cpp_lib_three_way_comparison >= 201907L)
 TEST(RequiredTest, SupportsThreeWayComparisons)
 {

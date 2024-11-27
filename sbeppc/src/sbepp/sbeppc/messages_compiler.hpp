@@ -5,12 +5,11 @@
 
 #include <sbepp/sbepp.hpp>
 #include <sbepp/sbeppc/throw_error.hpp>
-#include <sbepp/sbeppc/type_manager.hpp>
-#include <sbepp/sbeppc/message_manager.hpp>
 #include <sbepp/sbeppc/sbe.hpp>
 #include <sbepp/sbeppc/utils.hpp>
 #include <sbepp/sbeppc/traits_generator.hpp>
 #include <sbepp/sbeppc/normal_accessors.hpp>
+#include <sbepp/sbeppc/context_manager.hpp>
 
 #include <fmt/core.h>
 #include <fmt/ranges.h>
@@ -34,13 +33,9 @@ public:
 
     messages_compiler(
         const sbe::message_schema& schema,
-        const type_manager& types,
-        message_manager& messages,
-        traits_generator& traits_gen)
-        : schema{&schema},
-          types{&types},
-          messages{&messages},
-          traits_gen{&traits_gen}
+        traits_generator& traits_gen,
+        context_manager& ctx_manager)
+        : schema{&schema}, traits_gen{&traits_gen}, ctx_manager{&ctx_manager}
     {
     }
 
@@ -48,75 +43,34 @@ public:
     {
         on_message_cb = std::move(cb);
 
-        messages->for_each(
-            [this](auto& m)
-            {
-                compile_message(m);
-            });
+        for(const auto& m : schema->messages)
+        {
+            compile_message(m);
+        }
     }
 
 private:
-    const sbe::message_schema* schema;
-    const type_manager* types;
-    message_manager* messages;
-    traits_generator* traits_gen;
+    const sbe::message_schema* schema{};
+    traits_generator* traits_gen{};
+    context_manager* ctx_manager{};
     on_message_cb_t on_message_cb;
     std::size_t group_entry_index{};
     std::unordered_set<std::string> dependencies;
 
-    bool is_const_field(const sbe::field& f)
-    {
-        if(!utils::is_primitive_type(f.type))
-        {
-            const auto& enc = types->get_or_throw(
-                f.type, "{}: encoding `{}` doesn't exist", f.location, f.type);
-            if(auto t = std::get_if<sbe::type>(&enc))
-            {
-                // inherits presence from user-provided type
-                return (t->presence == field_presence::constant);
-            }
-            else if(std::holds_alternative<sbe::enumeration>(enc))
-            {
-                assert(
-                    (f.presence != field_presence::constant)
-                    || f.value_ref.has_value());
-                return (f.presence == field_presence::constant);
-            }
-        }
-        else if(f.presence == field_presence::constant)
-        {
-            assert(f.value_ref.has_value());
-            return true;
-        }
-
-        return false;
-    }
-
-    std::string value_ref_to_enumerator(
-        const std::string_view value_ref, const source_location& location) const
+    std::string value_ref_to_enumerator(const std::string_view value_ref) const
     {
         const auto parsed = utils::parse_value_ref(value_ref);
-        if(parsed.enum_name.empty() || parsed.enumerator.empty())
-        {
-            throw_error(
-                "{}: `{}` is not a valid valueRef", location, value_ref);
-        }
+        const auto& e = utils::get_schema_encoding_as<sbe::enumeration>(
+            *schema, parsed.enum_name);
 
-        const auto& e = types->get_as_or_throw<sbe::enumeration>(
-            parsed.enum_name,
-            "{}: encoding `{}` doesn't exist or it's not an enum",
-            location,
-            parsed.enum_name);
-
-        return fmt::format("{}::{}", e.impl_type, parsed.enumerator);
+        return fmt::format(
+            "{}::{}", ctx_manager->get(e).impl_type, parsed.enumerator);
     }
 
-    std::string value_ref_to_enum_value(
-        const std::string_view value_ref, const source_location& location) const
+    std::string value_ref_to_enum_value(const std::string_view value_ref) const
     {
         return fmt::format(
-            "::sbepp::to_underlying({})",
-            value_ref_to_enumerator(value_ref, location));
+            "::sbepp::to_underlying({})", value_ref_to_enumerator(value_ref));
     }
 
     std::string get_const_value(const sbe::type& t)
@@ -126,7 +80,7 @@ private:
         assert(t.value_ref || t.constant_value);
         if(t.value_ref)
         {
-            return value_ref_to_enum_value(*t.value_ref, t.location);
+            return value_ref_to_enum_value(*t.value_ref);
         }
 
         if(t.primitive_type == "char")
@@ -135,147 +89,103 @@ private:
                 *t.constant_value, t.length, t.location);
         }
 
-        return *utils::numeric_literal_to_value(
-            t.constant_value, t.primitive_type, t.location);
+        return utils::numeric_literal_to_value(
+            *t.constant_value, t.primitive_type);
     }
 
-    static std::string get_const_type(const sbe::type& t)
+    std::string get_const_type(const sbe::type& t) const
     {
+        const auto& context = ctx_manager->get(t);
         if(t.length != 1)
         {
-            return t.public_type;
+            return context.public_type;
         }
-        return t.underlying_type;
+        return context.underlying_type;
     }
 
-    static void throw_if_has_no_value_ref(const sbe::field& f)
+    std::string make_const_field_accessor(const sbe::field& f)
     {
-        if(!f.value_ref)
-        {
-            throw_error("{}: required `valueRef` doesn't exist", f.location);
-        }
-    }
+        auto& context = ctx_manager->get(f);
 
-    std::string make_const_field_accessor(sbe::field& f)
-    {
         if(!utils::is_primitive_type(f.type))
         {
-            const auto& enc = types->get_or_throw(
-                f.type, "{}: encoding `{}` doesn't exist", f.location, f.type);
+            const auto& enc = utils::get_schema_encoding(*schema, f.type);
             dependencies.emplace(utils::get_encoding_name(enc));
             if(auto t = std::get_if<sbe::type>(&enc))
             {
-                f.value_type = get_const_type(*t);
+                context.value_type = get_const_type(*t);
                 return normal_accessors::make_constant_accessor(
-                    f.name, f.value_type, get_const_value(*t));
+                    f.name, context.value_type, get_const_value(*t));
             }
             else if(auto e = std::get_if<sbe::enumeration>(&enc))
             {
-                throw_if_has_no_value_ref(f);
-                f.value_type = e->public_type;
+                context.value_type = ctx_manager->get(*e).public_type;
                 return normal_accessors::make_constant_accessor(
                     f.name,
-                    f.value_type,
-                    value_ref_to_enumerator(*f.value_ref, f.location));
+                    context.value_type,
+                    value_ref_to_enumerator(*f.value_ref));
             }
-
-            throw_error(
-                "{}: only types and enums can represent field constants",
-                f.location);
         }
 
-        throw_if_has_no_value_ref(f);
-        f.value_type = utils::primitive_type_to_cpp_type(f.type);
+        context.value_type = utils::primitive_type_to_cpp_type(f.type);
 
         return normal_accessors::make_constant_accessor(
-            f.name,
-            f.value_type,
-            value_ref_to_enum_value(*f.value_ref, f.location));
-    }
-
-    static field_presence get_actual_presence(
-        const sbe::encoding& enc, field_presence schema_presence)
-    {
-        return std::visit(
-            utils::overloaded{
-                [](const sbe::type& t)
-                {
-                    return t.presence;
-                },
-                [schema_presence](const sbe::composite&)
-                {
-                    // optional composite don't have a special meaning in
-                    // `sbepp` but we still should return correct value
-                    return schema_presence;
-                },
-                [](const auto& /*enum or set*/)
-                {
-                    return field_presence::required;
-                }},
-            enc);
+            f.name, context.value_type, value_ref_to_enum_value(*f.value_ref));
     }
 
     std::string make_field_accessors(
-        std::vector<sbe::field>& fields, const std::size_t header_size)
+        const std::vector<sbe::field>& fields, const std::size_t header_size)
     {
         std::string res;
-        offset_t offset{};
 
-        for(auto& f : fields)
+        for(const auto& f : fields)
         {
-            f.is_template = false;
-            if(is_const_field(f))
+            auto& context = ctx_manager->get(f);
+            context.is_template = false;
+            if(context.actual_presence == field_presence::constant)
             {
-                f.actual_presence = field_presence::constant;
                 res += make_const_field_accessor(f);
                 continue;
             }
 
-            offset = utils::get_valid_offset(f.offset, offset, f.location);
-            f.actual_offset = offset;
             if(utils::is_primitive_type(f.type))
             {
-                f.actual_presence = f.presence;
-                f.value_type =
+                context.value_type =
                     utils::primitive_type_to_wrapper_type(f.type, f.presence);
-                f.value_type_tag = f.value_type;
-                f.size = utils::get_underlying_size(
-                    utils::primitive_type_to_cpp_type(f.type));
+                context.value_type_tag = context.value_type;
+
                 res += normal_accessors::make_type_accessor(
                     f.name,
-                    f.value_type,
-                    offset + header_size,
+                    context.value_type,
+                    context.level_offset + header_size,
                     schema->byte_order);
             }
             else
             {
-                const auto& enc = types->get_or_throw(
-                    f.type, "{}: type `{}` doesn't exist", f.location, f.type);
-                f.actual_presence = get_actual_presence(enc, f.presence);
+                const auto& enc = utils::get_schema_encoding(*schema, f.type);
                 if(const auto t = std::get_if<sbe::type>(&enc);
                    (t && t->length != 1)
                    || std::holds_alternative<sbe::composite>(enc))
                 {
-                    f.is_template = true;
+                    context.is_template = true;
                 }
 
                 res += std::visit(
-                    [&offset, &f, this, header_size](const auto& enc)
+                    [&f, &context, this, header_size](const auto& enc)
                     {
-                        f.value_type = enc.public_type;
-                        f.value_type_tag = enc.tag;
-                        f.size = enc.size;
+                        const auto& enc_context = ctx_manager->get(enc);
+                        context.value_type = enc_context.public_type;
+                        context.value_type_tag = enc_context.tag;
                         dependencies.emplace(enc.name);
                         return normal_accessors::make_accessor(
                             enc,
-                            offset + header_size,
+                            context.level_offset + header_size,
                             f.name,
                             schema->byte_order,
-                            true);
+                            enc_context);
                     },
                     enc);
             }
-            offset += f.size;
         }
 
         return res;
@@ -349,17 +259,28 @@ R"(
         return {};
     }
 
-    static std::string_view get_block_length_type(const sbe::composite& c)
+    const sbe::type& get_header_element(
+        const sbe::composite& header, const std::string_view element_name) const
     {
-        const auto t = std::get_if<sbe::type>(
-            utils::find_composite_element(c, "blockLength"));
-        if(t)
+        const auto element =
+            utils::find_composite_element(header, element_name);
+        const auto* t = std::get_if<sbe::type>(element);
+        if(!t)
         {
-            return t->underlying_type;
+            const auto r = std::get_if<sbe::ref>(element);
+            assert(r);
+            t = &utils::get_schema_encoding_as<sbe::type>(*schema, r->type);
         }
+        assert(t);
 
-        throw_error(
-            "{}: `blockLength` is not found or it's not a type", c.location);
+        return *t;
+    }
+
+    std::string_view get_block_length_type(const sbe::composite& c) const
+    {
+        const auto& t = get_header_element(c, "blockLength");
+
+        return ctx_manager->get(t).underlying_type;
     }
 
     static std::string make_entry_cursor_constructor(
@@ -408,20 +329,20 @@ R"(
         return {};
     }
 
-    std::string make_group_entry(sbe::group& g)
+    std::string make_group_entry(const sbe::group& g)
     {
-        const auto& dimension_type = types->get_as_or_throw<sbe::composite>(
-            g.dimension_type,
-            "{}: type `{}` doesn't exist or it's not a composite",
-            g.location,
-            g.dimension_type);
+        const auto& dimension_type =
+            utils::get_schema_encoding_as<sbe::composite>(
+                *schema, g.dimension_type);
         const auto groups_impl = make_groups(g.members.groups);
         // entry should not take header size into account
         const auto accessors = make_level_accessors(g.members, 0);
 
         const auto class_name = make_next_group_entry_name(g.members);
-        g.entry_impl_type =
-            fmt::format("::{}::detail::messages::{}", schema->name, class_name);
+        ctx_manager->get(g).entry_impl_type = fmt::format(
+            "::{}::detail::messages::{}",
+            ctx_manager->get(*schema).name,
+            class_name);
         const auto size_bytes_impl = make_level_size_bytes_impl(
             is_flat_level(g.members), get_last_member(g.members), 0);
         const auto block_length_type = get_block_length_type(dimension_type);
@@ -456,7 +377,7 @@ public:
 )",
             // clang-format on
             fmt::arg("name", class_name),
-            fmt::arg("dimension", dimension_type.public_type),
+            fmt::arg("dimension", ctx_manager->get(dimension_type).public_type),
             fmt::arg("accessors", accessors),
             fmt::arg("size_bytes_impl", size_bytes_impl),
             fmt::arg("base_class", base_class),
@@ -487,64 +408,22 @@ public:
         return "nested_group_base";
     }
 
-    static std::string_view get_num_in_group_type(const sbe::composite& c)
+    std::string_view get_num_in_group_type(const sbe::composite& c) const
     {
-        const auto t = std::get_if<sbe::type>(
-            utils::find_composite_element(c, "numInGroup"));
-        if(t)
-        {
-            return t->impl_type;
-        }
+        const auto& t = get_header_element(c, "numInGroup");
 
-        throw_error(
-            "{}: `numInGroup` is not found or it's not a type", c.location);
+        return ctx_manager->get(t).impl_type;
     }
 
-    static block_length_t
-        calculate_block_length(const std::vector<sbe::field>& fields)
+    std::string make_group_header_filler(const sbe::group& g)
     {
-        const auto last_non_const = std::find_if(
-            std::rbegin(fields),
-            std::rend(fields),
-            [](const auto& f)
-            {
-                return (f.actual_presence != field_presence::constant);
-            });
-
-        if(last_non_const != std::rend(fields))
-        {
-            return last_non_const->actual_offset + last_non_const->size;
-        }
-
-        return {};
-    }
-
-    std::string make_group_header_filler(sbe::group& g)
-    {
-        const auto& header = types->get_as_or_throw<sbe::composite>(
-            g.dimension_type,
-            "{}: encoding `{}` doesn't exist or it's not a composite");
+        const auto& header = utils::get_schema_encoding_as<sbe::composite>(
+            *schema, g.dimension_type);
         dependencies.emplace(header.name);
-        const auto calculated_block_length =
-            calculate_block_length(g.members.fields);
-
-        const auto block_length =
-            g.block_length.value_or(calculated_block_length);
-        if(block_length < calculated_block_length)
-        {
-            throw_error(
-                "{}: provided `blockLength` ({}) is less than the calculated "
-                "one ({})",
-                g.location,
-                block_length,
-                calculated_block_length);
-        }
-        g.actual_block_length = block_length;
 
         return fmt::format(
             // clang-format off
 R"(
-    // this is implementation detail, don't use it directly
     template<
         typename T = void,
         typename = ::sbepp::detail::enable_if_writable_t<Byte, T>>
@@ -562,9 +441,9 @@ R"(
     }}
 )",
             // clang-format on
-            fmt::arg("header_type", header.public_type),
+            fmt::arg("header_type", ctx_manager->get(header).public_type),
             fmt::arg("size_type", get_num_in_group_type(header)),
-            fmt::arg("block_length", block_length),
+            fmt::arg("block_length", ctx_manager->get(g).actual_block_length),
             fmt::arg(
                 "num_groups_setter",
                 make_num_groups_setter(header, g.members.groups.size())),
@@ -574,18 +453,20 @@ R"(
                     header, g.members.data.size())));
     }
 
-    std::string make_group(sbe::group& g)
+    std::string make_group(const sbe::group& g)
     {
         const auto entry_impl = make_group_entry(g);
+        auto& context = ctx_manager->get(g);
 
-        g.impl_type = fmt::format(
-            "::{}::detail::messages::{}", schema->name, g.impl_name);
-        const auto& dimension_encoding = types->get_as_or_throw<sbe::composite>(
-            g.dimension_type,
-            "{}: encoding `{}` doesn't exist or it's not a composite",
-            g.location,
-            g.dimension_type);
-        const auto& dimension_type = dimension_encoding.public_type;
+        context.impl_type = fmt::format(
+            "::{}::detail::messages::{}",
+            ctx_manager->get(*schema).name,
+            context.impl_name);
+        const auto& dimension_encoding =
+            utils::get_schema_encoding_as<sbe::composite>(
+                *schema, g.dimension_type);
+        const auto& dimension_type =
+            ctx_manager->get(dimension_encoding).public_type;
         const auto base_class = get_group_base_class(is_flat_group(g));
 
         return fmt::format(
@@ -619,16 +500,16 @@ public:
 }};
 )",
             // clang-format on
-            fmt::arg("name", g.impl_name),
+            fmt::arg("name", context.impl_name),
             fmt::arg("dimension", dimension_type),
-            fmt::arg("entry", g.entry_impl_type),
+            fmt::arg("entry", context.entry_impl_type),
             fmt::arg("base_class", base_class),
             fmt::arg("header_filler", make_group_header_filler(g)),
             fmt::arg("entry_impl", entry_impl),
             fmt::arg("public_name", g.name));
     }
 
-    static std::string make_group_accessors(std::vector<sbe::group>& groups)
+    std::string make_group_accessors(const std::vector<sbe::group>& groups)
     {
         std::string res;
         bool is_first = true;
@@ -636,6 +517,7 @@ public:
 
         for(auto& g : groups)
         {
+            const auto& context = ctx_manager->get(g);
             if(is_first)
             {
                 is_first = false;
@@ -650,7 +532,7 @@ R"(
 )",
                     // clang-format on
                     fmt::arg("name", g.name),
-                    fmt::arg("type", g.impl_type));
+                    fmt::arg("type", context.impl_type));
             }
             else
             {
@@ -664,7 +546,7 @@ R"(
 )",
                     // clang-format on
                     fmt::arg("name", g.name),
-                    fmt::arg("type", g.impl_type),
+                    fmt::arg("type", context.impl_type),
                     fmt::arg("prev_group", prev_group_name));
             }
 
@@ -676,44 +558,29 @@ R"(
 
     const sbe::type& find_data_length_type(const sbe::data& d)
     {
-        const auto& c = types->get_as_or_throw<sbe::composite>(
-            d.type,
-            "{}: length encoding `{}` doesn't exist or it's not a composite",
-            d.location,
-            d.type);
+        const auto& c =
+            utils::get_schema_encoding_as<sbe::composite>(*schema, d.type);
+        // TODO: a weird place to insert a dependency
         dependencies.emplace(c.name);
 
-        const auto t =
-            std::get_if<sbe::type>(utils::find_composite_element(c, "length"));
-        if(t)
-        {
-            return *t;
-        }
+        const auto& t = get_header_element(c, "length");
 
-        throw_error("{}: `length` is not found or it's not a type", c.location);
+        return t;
     }
 
     std::string_view get_data_value_type(const sbe::data& d)
     {
-        const auto& c = types->get_as_or_throw<sbe::composite>(
-            d.type,
-            "{}: length encoding `{}` doesn't exist or it's not a composite",
-            d.location,
-            d.type);
+        const auto& c =
+            utils::get_schema_encoding_as<sbe::composite>(*schema, d.type);
+        const auto& t = get_header_element(c, "varData");
 
-        const auto t =
-            std::get_if<sbe::type>(utils::find_composite_element(c, "varData"));
-        if(t)
-        {
-            return t->underlying_type;
-        }
-
-        throw_error("{}: no `varData` element or it's not a type", c.location);
+        return ctx_manager->get(t).underlying_type;
     }
 
-    static std::string make_first_data_accessor(
-        const sbe::data& d, const std::vector<sbe::group>& groups)
+    std::string make_first_data_accessor(
+        const sbe::data& d, const std::vector<sbe::group>& groups) const
     {
+        const auto& context = ctx_manager->get(d);
         const auto has_groups = !groups.empty();
         if(has_groups)
         {
@@ -729,7 +596,7 @@ R"(
                 // clang-format on
                 fmt::arg("name", d.name),
                 fmt::arg("last_group", groups.back().name),
-                fmt::arg("impl_type", d.impl_type));
+                fmt::arg("impl_type", context.impl_type));
         }
         else
         {
@@ -744,12 +611,12 @@ R"(
 )",
                 // clang-format on
                 fmt::arg("name", d.name),
-                fmt::arg("impl_type", d.impl_type));
+                fmt::arg("impl_type", context.impl_type));
         }
     }
 
-    static std::string make_data_accessor(
-        const sbe::data& d, const std::string_view prev_data_member)
+    std::string make_data_accessor(
+        const sbe::data& d, const std::string_view prev_data_member) const
     {
         return fmt::format(
             // clang-format off
@@ -763,7 +630,7 @@ R"(
             // clang-format on
             fmt::arg("name", d.name),
             fmt::arg("prev_data", prev_data_member),
-            fmt::arg("impl_type", d.impl_type));
+            fmt::arg("impl_type", ctx_manager->get(d).impl_type));
     }
 
     std::string make_data_impl_type(const sbe::data& d)
@@ -775,10 +642,13 @@ R"(::sbepp::detail::dynamic_array_ref<
             // clang-format on
             fmt::arg("value_type", get_data_value_type(d)),
             fmt::arg("endian", utils::byte_order_to_endian(schema->byte_order)),
-            fmt::arg("length_type", d.length_type->public_type));
+            fmt::arg(
+                "length_type",
+                ctx_manager->get(*ctx_manager->get(d).length_type)
+                    .public_type));
     }
 
-    std::string make_data_accessors(sbe::level_members& members)
+    std::string make_data_accessors(const sbe::level_members& members)
     {
         std::string res;
         bool is_first = true;
@@ -786,8 +656,9 @@ R"(::sbepp::detail::dynamic_array_ref<
 
         for(auto& d : members.data)
         {
-            d.length_type = &find_data_length_type(d);
-            d.impl_type = make_data_impl_type(d);
+            auto& context = ctx_manager->get(d);
+            context.length_type = &find_data_length_type(d);
+            context.impl_type = make_data_impl_type(d);
             if(is_first)
             {
                 is_first = false;
@@ -922,33 +793,37 @@ R"(
     }
 
     std::string make_cursor_accessors(
-        const sbe::type& enc,
+        const sbe::type& t,
         const std::string_view name,
         const offset_t offset,
         const offset_t absolute_offset) const
     {
-        if(enc.length == 1)
+        const auto& context = ctx_manager->get(t);
+
+        if(t.length == 1)
         {
             return make_type_cursor_accessors(
                 name,
-                enc.public_type,
+                context.public_type,
                 offset,
-                enc.size,
+                context.size,
                 absolute_offset,
-                enc.underlying_type);
+                context.underlying_type);
         }
         return make_array_cursor_accessors(
-            name, enc.public_type, offset, absolute_offset);
+            name, context.public_type, offset, absolute_offset);
     }
 
     std::string make_cursor_accessors(
-        const sbe::enumeration& enc,
+        const sbe::enumeration& e,
         const std::string_view name,
         const offset_t offset,
         const offset_t absolute_offset) const
     {
+        const auto& context = ctx_manager->get(e);
+
         return make_primitive_cursor_accessors(
-            name, enc.public_type, offset, enc.size, absolute_offset);
+            name, context.public_type, offset, context.size, absolute_offset);
     }
 
     std::string make_cursor_accessors(
@@ -957,6 +832,8 @@ R"(
         const offset_t offset,
         const offset_t absolute_offset) const
     {
+        const auto& context = ctx_manager->get(s);
+
         return fmt::format(
             // clang-format off
 R"(
@@ -984,20 +861,20 @@ R"(
 )",
             // clang-format on
             fmt::arg("name", name),
-            fmt::arg("type", s.public_type),
+            fmt::arg("type", context.public_type),
             fmt::arg("offset", offset),
-            fmt::arg("size", s.size),
+            fmt::arg("size", context.size),
             fmt::arg("absolute_offset", absolute_offset),
-            fmt::arg("underlying_type", s.underlying_type),
+            fmt::arg("underlying_type", context.underlying_type),
             fmt::arg(
                 "endian", utils::byte_order_to_endian(schema->byte_order)));
     }
 
-    static std::string make_cursor_accessors(
+    std::string make_cursor_accessors(
         const sbe::composite& c,
         const std::string_view name,
         const offset_t offset,
-        const offset_t absolute_offset)
+        const offset_t absolute_offset) const
     {
         return fmt::format(
             // clang-format off
@@ -1016,7 +893,7 @@ R"(
 )",
             // clang-format on
             fmt::arg("name", name),
-            fmt::arg("type", c.public_type),
+            fmt::arg("type", ctx_manager->get(c).public_type),
             fmt::arg("offset", offset),
             fmt::arg("absolute_offset", absolute_offset));
     }
@@ -1134,35 +1011,41 @@ R"(
     }
 
     std::string make_last_cursor_accessors(
-        const sbe::type& enc,
+        const sbe::type& t,
         const std::string_view name,
         const offset_t offset,
         const std::size_t header_size,
         const offset_t absolute_offset) const
     {
-        if(enc.length == 1)
+        const auto& context = ctx_manager->get(t);
+
+        if(t.length == 1)
         {
             return make_last_type_cursor_accessors(
                 name,
                 offset,
-                enc.public_type,
+                context.public_type,
                 header_size,
                 absolute_offset,
-                enc.underlying_type);
+                context.underlying_type);
         }
         return make_last_array_cursor_accessor(
-            name, enc.public_type, offset, header_size, absolute_offset);
+            name, context.public_type, offset, header_size, absolute_offset);
     }
 
     std::string make_last_cursor_accessors(
-        const sbe::enumeration& enc,
+        const sbe::enumeration& e,
         const std::string_view name,
         const offset_t offset,
         const std::size_t header_size,
         const offset_t absolute_offset) const
     {
         return make_last_primitive_cursor_accessors(
-            name, enc.public_type, offset, header_size, absolute_offset);
+            name,
+            ctx_manager->get(e).public_type,
+            offset,
+            header_size,
+            absolute_offset);
     }
 
     std::string make_last_cursor_accessors(
@@ -1172,6 +1055,8 @@ R"(
         const std::size_t header_size,
         const offset_t absolute_offset) const
     {
+        const auto& context = ctx_manager->get(s);
+
         return fmt::format(
             // clang-format off
 R"(
@@ -1198,21 +1083,21 @@ R"(
 )",
             // clang-format on
             fmt::arg("name", name),
-            fmt::arg("type", s.public_type),
+            fmt::arg("type", context.public_type),
             fmt::arg("offset", offset),
             fmt::arg("header_size", header_size),
             fmt::arg("absolute_offset", absolute_offset),
-            fmt::arg("underlying_type", s.underlying_type),
+            fmt::arg("underlying_type", context.underlying_type),
             fmt::arg(
                 "endian", utils::byte_order_to_endian(schema->byte_order)));
     }
 
-    static std::string make_last_cursor_accessors(
+    std::string make_last_cursor_accessors(
         const sbe::composite& c,
         const std::string_view name,
         const offset_t offset,
         const std::size_t header_size,
-        const offset_t absolute_offset)
+        const offset_t absolute_offset) const
     {
         return fmt::format(
             // clang-format off
@@ -1232,16 +1117,35 @@ R"(
 )",
             // clang-format on
             fmt::arg("name", name),
-            fmt::arg("type", c.public_type),
+            fmt::arg("type", ctx_manager->get(c).public_type),
             fmt::arg("offset", offset),
             fmt::arg("header_size", header_size),
             fmt::arg("absolute_offset", absolute_offset));
     }
 
+    std::vector<const sbe::field*>
+        get_non_const_fields(const std::vector<sbe::field>& fields)
+    {
+        std::vector<const sbe::field*> res;
+        res.reserve(fields.size());
+
+        for(const auto& f : fields)
+        {
+            if(ctx_manager->get(f).actual_presence != field_presence::constant)
+            {
+                res.push_back(&f);
+            }
+        }
+
+        return res;
+    }
+
     std::string make_fields_cursor_accessors(
         const std::vector<sbe::field>& fields, const std::size_t header_size)
     {
-        if(fields.empty())
+        const auto non_const_fields = get_non_const_fields(fields);
+
+        if(non_const_fields.empty())
         {
             return {};
         }
@@ -1250,15 +1154,11 @@ R"(
         std::size_t absolute_offset{};
 
         std::for_each(
-            std::cbegin(fields),
-            std::cend(fields) - 1,
-            [&res, this, &absolute_offset, header_size](const auto& f)
+            std::cbegin(non_const_fields),
+            std::cend(non_const_fields) - 1,
+            [&res, this, &absolute_offset, header_size](const auto pf)
             {
-                if(f.actual_presence == field_presence::constant)
-                {
-                    return;
-                }
-
+                const auto& f = *pf;
                 // TODO: this can be simplified if use `get_level_tag` and
                 // offsets which don't include header size
                 const auto prev_field_end = absolute_offset;
@@ -1293,24 +1193,14 @@ R"(
                                 f.name,
                                 relative_offset,
                                 absolute_offset + header_size);
-                            absolute_offset += enc.size;
+                            absolute_offset += ctx_manager->get(enc).size;
                             return res;
                         },
-                        types->get_or_throw(
-                            f.type,
-                            "{}: encoding `{}` doesn't exist",
-                            f.location,
-                            f.type));
+                        utils::get_schema_encoding(*schema, f.type));
                 }
             });
 
-        const auto& last = fields.back();
-
-        if(last.actual_presence == field_presence::constant)
-        {
-            return res;
-        }
-
+        const auto& last = *non_const_fields.back();
         const auto prev_field_end = absolute_offset;
         absolute_offset = utils::get_valid_offset(
             last.offset, absolute_offset, last.location);
@@ -1340,11 +1230,7 @@ R"(
                         absolute_offset + header_size);
                     return res;
                 },
-                types->get_or_throw(
-                    last.type,
-                    "{}: encoding `{}` doesn't exist",
-                    last.location,
-                    last.type));
+                utils::get_schema_encoding(*schema, last.type));
         }
 
         return res;
@@ -1353,13 +1239,9 @@ R"(
     std::string make_first_group_cursor_accessor(const sbe::group& g)
     {
         const auto group_header_size =
-            types
-                ->get_as_or_throw<sbe::composite>(
-                    g.dimension_type,
-                    "{}: group encoding `{}` doesn't exist or it's not a "
-                    "composite",
-                    g.location,
-                    g.dimension_type)
+            ctx_manager
+                ->get(utils::get_schema_encoding_as<sbe::composite>(
+                    *schema, g.dimension_type))
                 .size;
 
         return fmt::format(
@@ -1379,20 +1261,16 @@ R"(
 )",
             // clang-format on
             fmt::arg("name", g.name),
-            fmt::arg("type", g.impl_type),
+            fmt::arg("type", ctx_manager->get(g).impl_type),
             fmt::arg("group_header_size", group_header_size));
     }
 
     std::string make_group_cursor_accessor(const sbe::group& g)
     {
         const auto group_header_size =
-            types
-                ->get_as_or_throw<sbe::composite>(
-                    g.dimension_type,
-                    "{}: group encoding `{}` doesn't exist or it's not a "
-                    "composite",
-                    g.location,
-                    g.dimension_type)
+            ctx_manager
+                ->get(utils::get_schema_encoding_as<sbe::composite>(
+                    *schema, g.dimension_type))
                 .size;
 
         return fmt::format(
@@ -1413,7 +1291,7 @@ R"(
 )",
             // clang-format on
             fmt::arg("name", g.name),
-            fmt::arg("type", g.impl_type),
+            fmt::arg("type", ctx_manager->get(g).impl_type),
             fmt::arg("group_header_size", group_header_size));
     }
 
@@ -1465,7 +1343,9 @@ R"(
 )",
             // clang-format on
             fmt::arg("name", d.name),
-            fmt::arg("length_type", d.length_type->public_type),
+            fmt::arg(
+                "length_type",
+                ctx_manager->get(*ctx_manager->get(d).length_type).public_type),
             fmt::arg("value_type", get_data_value_type(d)),
             fmt::arg(
                 "endian", utils::byte_order_to_endian(schema->byte_order)));
@@ -1495,7 +1375,9 @@ R"(
 )",
             // clang-format on
             fmt::arg("name", d.name),
-            fmt::arg("length_type", d.length_type->public_type),
+            fmt::arg(
+                "length_type",
+                ctx_manager->get(*ctx_manager->get(d).length_type).public_type),
             fmt::arg("value_type", get_data_value_type(d)),
             fmt::arg(
                 "endian", utils::byte_order_to_endian(schema->byte_order)));
@@ -1533,7 +1415,7 @@ R"(
     }
 
     std::string make_level_accessors(
-        sbe::level_members& members, const std::size_t header_size)
+        const sbe::level_members& members, const std::size_t header_size)
     {
         std::string res;
 
@@ -1613,29 +1495,11 @@ R"(header.numVarDataFields({{{}}});
         return {};
     }
 
-    std::string make_message_header_filler(sbe::message& m)
+    std::string make_message_header_filler(const sbe::message& m)
     {
-        const auto& header = types->get_as_or_throw<sbe::composite>(
-            schema->header_type,
-            "{}: message header type `{}` doesn't exist or it's not a "
-            "composite",
-            m.location,
-            schema->header_type);
+        const auto& header = utils::get_schema_encoding_as<sbe::composite>(
+            *schema, schema->header_type);
         dependencies.emplace(header.name);
-        const auto calculated_block_length =
-            calculate_block_length(m.members.fields);
-
-        const auto block_length =
-            m.block_length.value_or(calculated_block_length);
-        if(block_length < calculated_block_length)
-        {
-            throw_error(
-                "{}: custom blockLength `{}` is less than the minimal one `{}`",
-                m.location,
-                block_length,
-                calculated_block_length);
-        }
-        m.actual_block_length = block_length;
 
         return fmt::format(
             // clang-format off
@@ -1657,11 +1521,11 @@ R"(
     }}
 )",
             // clang-format on
-            fmt::arg("header_type", header.public_type),
+            fmt::arg("header_type", ctx_manager->get(header).public_type),
             fmt::arg("schema_id", schema->id),
             fmt::arg("template_id", m.id),
             fmt::arg("schema_version", schema->version),
-            fmt::arg("block_length", block_length),
+            fmt::arg("block_length", ctx_manager->get(m).actual_block_length),
             fmt::arg(
                 "num_groups_setter",
                 make_num_groups_setter(header, m.members.groups.size())),
@@ -1671,7 +1535,7 @@ R"(
                     header, m.members.data.size())));
     }
 
-    std::string make_groups(std::vector<sbe::group>& groups)
+    std::string make_groups(const std::vector<sbe::group>& groups)
     {
         std::string res;
 
@@ -1682,13 +1546,14 @@ R"(
         return res;
     }
 
-    static std::string make_alias(const sbe::message& m)
+    std::string make_alias(const sbe::message& m) const
     {
-        return utils::make_alias_template(m.name, m.impl_type);
+        return utils::make_alias_template(
+            m.name, ctx_manager->get(m).impl_type);
     }
 
-    static std::vector<std::string>
-        make_member_visit_calls(const sbe::level_members& members)
+    std::vector<std::string>
+        make_member_visit_calls(const sbe::level_members& members) const
     {
         std::vector<std::string> res;
         res.reserve(
@@ -1697,7 +1562,8 @@ R"(
 
         for(const auto& f : members.fields)
         {
-            if(f.actual_presence == field_presence::constant)
+            const auto& context = ctx_manager->get(f);
+            if(context.actual_presence == field_presence::constant)
             {
                 continue;
             }
@@ -1705,7 +1571,7 @@ R"(
             res.push_back(fmt::format(
                 "v.on_field(this->{name}(c), {tag}{{}})",
                 fmt::arg("name", f.name),
-                fmt::arg("tag", f.tag)));
+                fmt::arg("tag", context.tag)));
         }
 
         for(const auto& g : members.groups)
@@ -1713,7 +1579,7 @@ R"(
             res.push_back(fmt::format(
                 "v.on_group(this->{name}(c), c, {tag}{{}})",
                 fmt::arg("name", g.name),
-                fmt::arg("tag", g.tag)));
+                fmt::arg("tag", ctx_manager->get(g).tag)));
         }
 
         for(const auto& d : members.data)
@@ -1721,13 +1587,13 @@ R"(
             res.push_back(fmt::format(
                 "v.on_data(this->{name}(c), {tag}{{}})",
                 fmt::arg("name", d.name),
-                fmt::arg("tag", d.tag)));
+                fmt::arg("tag", ctx_manager->get(d).tag)));
         }
 
         return res;
     }
 
-    static std::string make_visit_children(const sbe::level_members& members)
+    std::string make_visit_children(const sbe::level_members& members) const
     {
         std::string res;
         auto member_visit_calls = make_member_visit_calls(members);
@@ -1752,26 +1618,29 @@ R"(
         return res;
     }
 
-    void compile_message(sbe::message& m)
+    void compile_message(const sbe::message& m)
     {
         dependencies.clear();
 
-        const auto& header = types->get_as_or_throw<sbe::composite>(
-            schema->header_type,
-            "{}: message header type `{}` doesn't exist or it's not a "
-            "composite",
-            m.location,
-            schema->header_type);
-
+        const auto& header = utils::get_schema_encoding_as<sbe::composite>(
+            *schema, schema->header_type);
+        const auto& header_context = ctx_manager->get(header);
+        auto& message_context = ctx_manager->get(m);
         const auto groups = make_groups(m.members.groups);
-        const auto accessors = make_level_accessors(m.members, header.size);
+        const auto accessors =
+            make_level_accessors(m.members, header_context.size);
+        const auto& schema_name = ctx_manager->get(*schema).name;
 
-        m.impl_type = fmt::format(
-            "::{}::detail::messages::{}", schema->name, m.impl_name);
+        message_context.impl_type = fmt::format(
+            "::{}::detail::messages::{}",
+            schema_name,
+            message_context.impl_name);
 
-        const auto& header_type = header.public_type;
+        const auto& header_type = header_context.public_type;
         const auto size_bytes_impl = make_level_size_bytes_impl(
-            is_flat_level(m.members), get_last_member(m.members), header.size);
+            is_flat_level(m.members),
+            get_last_member(m.members),
+            header_context.size);
         const auto visit_children_impl = make_visit_children(m.members);
 
         // it's not possible to make `operator()(visit_tag)` `constexpr` because
@@ -1806,18 +1675,18 @@ public:
 }};
 )",
             // clang-format on
-            fmt::arg("name", m.impl_name),
+            fmt::arg("name", message_context.impl_name),
             fmt::arg("header_type", header_type),
             fmt::arg("accessors", accessors),
             fmt::arg("size_getter", size_bytes_impl),
             fmt::arg("header_filler", make_message_header_filler(m)),
             fmt::arg("groups", groups),
             fmt::arg("visit_children_impl", visit_children_impl),
-            fmt::arg("tag", m.tag));
+            fmt::arg("tag", message_context.tag));
 
-        m.public_type = fmt::format(
+        message_context.public_type = fmt::format(
             "::{schema}::messages::{name}",
-            fmt::arg("schema", schema->name),
+            fmt::arg("schema", schema_name),
             fmt::arg("name", m.name));
 
         const auto alias = make_alias(m);

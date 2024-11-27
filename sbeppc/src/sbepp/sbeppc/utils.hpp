@@ -16,7 +16,6 @@
 #include <cctype>
 #include <iterator>
 #include <charconv>
-#include <stdexcept>
 #include <string_view>
 #include <unordered_set>
 #include <unordered_map>
@@ -171,21 +170,6 @@ inline offset_t get_valid_offset(
     return min_offset;
 }
 
-inline bool is_constant(const sbe::encoding& encoding)
-{
-    return std::visit(
-        utils::overloaded{
-            [](const sbe::type& t)
-            {
-                return t.presence == field_presence::constant;
-            },
-            [](const auto&)
-            {
-                return false;
-            }},
-        encoding);
-}
-
 inline std::string_view byte_order_to_endian(const sbe::byte_order_kind order)
 {
     if(order == sbe::byte_order_kind::big_endian)
@@ -211,100 +195,6 @@ inline std::string_view presence_to_string(const field_presence presence)
     }
 }
 
-inline bool is_reserved_cpp_identifier(const std::string_view str)
-{
-    if(str.find("__") != std::string_view::npos)
-    {
-        return true;
-    }
-
-    if((str.size() > 1) && (str[0] == '_')
-       && (std::isupper(static_cast<unsigned char>(str[1]))))
-    {
-        return true;
-    }
-
-    return false;
-}
-
-inline bool is_reserved_cpp_namespace(const std::string_view str)
-{
-    return (str == "std") || (str == "posix");
-}
-
-inline bool is_cpp_keyword(const std::string_view str)
-{
-    static const std::unordered_set<std::string_view> cpp_keywords{
-        "alignas",       "alignof",     "and",
-        "and_eq",        "asm",         "auto",
-        "bitand",        "bitor",       "bool",
-        "break",         "case",        "catch",
-        "char",          "char8_t",     "char16_t",
-        "char32_t",      "class",       "compl",
-        "concept",       "const",       "consteval",
-        "constexpr",     "constinit",   "const_cast",
-        "continue",      "co_await",    "co_return",
-        "co_yield",      "decltype",    "default",
-        "delete",        "do",          "double",
-        "dynamic_cast",  "else",        "enum",
-        "explicit",      "export",      "extern",
-        "false",         "float",       "for",
-        "friend",        "goto",        "if",
-        "inline",        "int",         "long",
-        "mutable",       "namespace",   "new",
-        "noexcept",      "not",         "not_eq",
-        "nullptr",       "operator",    "or",
-        "or_eq",         "private",     "protected",
-        "public",        "register",    "reinterpret_cast",
-        "requires",      "return",      "short",
-        "signed",        "sizeof",      "static",
-        "static_assert", "static_cast", "struct",
-        "switch",        "template",    "this",
-        "thread_local",  "throw",       "true",
-        "try",           "typedef",     "typeid",
-        "typename",      "union",       "unsigned",
-        "using",         "virtual",     "void",
-        "volatile",      "wchar_t",     "while",
-        "xor",           "xor_eq"};
-
-    return cpp_keywords.count(str);
-}
-
-inline bool is_sbe_symbolic_name(const std::string_view name)
-{
-    // SBE also sets maximum name length to 64 but it doesn't make sense to me
-    if(name.empty() || std::isdigit(static_cast<unsigned char>(name[0])))
-    {
-        return false;
-    }
-
-    auto search = std::find_if_not(
-        std::begin(name),
-        std::end(name),
-        [](unsigned char ch)
-        {
-            return std::isalnum(ch) || (ch == '_');
-        });
-    return (search == std::end(name));
-}
-
-inline bool is_valid_name(const std::string_view name)
-{
-    return is_sbe_symbolic_name(name) && !is_cpp_keyword(name);
-}
-
-inline void warn_about_reserved_identifier(
-    const std::string_view name,
-    const source_location& location,
-    ireporter& reporter)
-{
-    if(is_reserved_cpp_identifier(name))
-    {
-        reporter.warning(
-            "{}: name `{}` is a reserved C++ identifier\n", location, name);
-    }
-}
-
 inline std::string to_lower(const std::string_view str)
 {
     std::string res;
@@ -320,83 +210,56 @@ inline std::string to_lower(const std::string_view str)
     return res;
 }
 
-template<typename T, typename Format, typename... Args>
-T string_to_number_or_throw(
-    const std::string_view str, const Format& format, Args&&... args)
+template<typename T>
+std::optional<T> string_to_number(const std::string_view str)
 {
     if(!str.empty())
     {
         T value{};
-        auto res = std::from_chars(str.data(), str.data() + str.size(), value);
-        if(res.ec == std::errc{})
+        const auto str_end = str.data() + str.size();
+        auto res = std::from_chars(str.data(), str_end, value);
+        if((res.ec == std::errc{}) && (res.ptr == str_end))
         {
             return value;
         }
     }
 
-    throw_error(format, std::forward<Args>(args)...);
+    return {};
 }
 
-// should NOT be used for floating point types
 inline std::string to_integer_literal(
-    const std::string_view str, const source_location& location)
+    const std::string_view value, const std::string_view type)
 {
-    if(str.empty())
-    {
-        throw_error("{}: can't convert empty string to number", location);
-    }
+    assert(!value.empty() && (type != "float") && (type != "double"));
 
-    if(str[0] == '-')
+    if((type == "int64") && (value[0] == '-'))
     {
-        const auto v = string_to_number_or_throw<signed long long>(
-            str,
-            "{}: cannot convert `{}` to `signed long long`",
-            location,
-            str);
+        const auto v = string_to_number<std::int64_t>(value);
+        assert(v);
         static constexpr auto min_signed_literal = -9223372036854775807;
-        if(v < min_signed_literal)
+        if(*v < min_signed_literal)
         {
-            // that difference is going to be negative, no need for sign in
-            // the format string
+            // the difference is going to be negative, no need for a sign in the
+            // format string
             return fmt::format(
-                "{} {}", min_signed_literal, (v - min_signed_literal));
+                "{} {}", min_signed_literal, (*v - min_signed_literal));
         }
-        return std::string{str};
     }
-    else
+    else if(type == "uint64")
     {
         // this part is not strictly required since type will be deduced
         // correctly but most compilers produce warning when literal
         // representing large number is used without `UL` prefix
-        const auto v = string_to_number_or_throw<unsigned long long>(
-            str,
-            "{}: cannot convert `{}` to `unsigned long long`",
-            location,
-            str);
+        const auto v = string_to_number<std::uint64_t>(value);
+        assert(v);
         static constexpr auto max_signed_literal = 9223372036854775807;
-        if(v > max_signed_literal)
+        if(*v > max_signed_literal)
         {
-            return fmt::format("{}UL", str);
+            return fmt::format("{}UL", value);
         }
-        return std::string{str};
     }
-}
 
-inline void
-    validate_schema_name(const sbe::message_schema& schema, ireporter& reporter)
-{
-    if(!utils::is_valid_name(schema.name)
-       || utils::is_reserved_cpp_namespace(schema.name))
-    {
-        throw_error(
-            "{}: schema namespace `{}` is not valid. Change "
-            "`messageSchema.package` attribute or provide a custom name with "
-            "`--schema-name`",
-            schema.location,
-            schema.name);
-    }
-    utils::warn_about_reserved_identifier(
-        schema.name, schema.location, reporter);
+    return std::string{value};
 }
 
 inline std::string get_compiled_header_top_comment()
@@ -404,7 +267,7 @@ inline std::string get_compiled_header_top_comment()
     static std::string str = fmt::format(
         // clang-format off
 R"(// SPDX-License-Identifier: MIT
-// Copyright (c) 2023, Oleksandr Koval
+// Copyright (c) 2024, Oleksandr Koval
 
 // This file was generated by sbeppc {})",
         // clang-format on
@@ -415,15 +278,14 @@ R"(// SPDX-License-Identifier: MIT
 
 struct parsed_value_ref
 {
-    std::string enum_name;
-    std::string enumerator;
+    std::string_view enum_name;
+    std::string_view enumerator;
 };
 
 inline parsed_value_ref parse_value_ref(const std::string_view value_ref)
 {
     const auto dot_pos = value_ref.find('.');
-    if((dot_pos == std::string_view::npos) || (value_ref.size() < 3)
-       || (dot_pos == 0) || (dot_pos == (value_ref.size() - 1)))
+    if(dot_pos == std::string_view::npos)
     {
         return {};
     }
@@ -494,34 +356,30 @@ inline std::string make_char_constant(
     return fmt::format("'{}'", constant_value);
 }
 
-inline std::optional<std::string> numeric_literal_to_value(
-    const std::optional<std::string>& value,
-    const std::string_view type,
-    const source_location& location)
+inline std::string numeric_literal_to_value(
+    const std::string_view value, const std::string_view type)
 {
-    if(!value)
-    {
-        return value;
-    }
+    assert(!value.empty());
 
     if((type == "float") || (type == "double"))
     {
-        static std::string_view nan{"nan"};
-        if(std::equal(
-               std::begin(*value),
-               std::end(*value),
-               std::begin(nan),
-               [](const auto lhs, const auto rhs)
-               {
-                   return std::tolower(lhs) == rhs;
-               }))
+        if(value == "NaN")
         {
             return fmt::format("::std::numeric_limits<{}>::quiet_NaN()", type);
         }
-        return value;
+        else if((value == "INF") || (value == "+INF"))
+        {
+            return fmt::format("::std::numeric_limits<{}>::infinity()", type);
+        }
+        else if(value == "-INF")
+        {
+            return fmt::format("-::std::numeric_limits<{}>::infinity()", type);
+        }
+
+        return std::string{value};
     }
 
-    return utils::to_integer_literal(*value, location);
+    return utils::to_integer_literal(value, type);
 }
 
 inline const sbe::composite_element*
@@ -541,5 +399,20 @@ inline const sbe::composite_element*
     }
 
     return {};
+}
+
+// returns existing encoding using case-insensitive search
+inline const sbe::encoding& get_schema_encoding(
+    const sbe::message_schema& schema, std::string_view name)
+{
+    const auto lowered_name = utils::to_lower(name);
+    return schema.types.at(lowered_name);
+}
+
+template<typename T>
+const T& get_schema_encoding_as(
+    const sbe::message_schema& schema, std::string_view name)
+{
+    return std::get<T>(get_schema_encoding(schema, name));
 }
 } // namespace sbepp::sbeppc::utils

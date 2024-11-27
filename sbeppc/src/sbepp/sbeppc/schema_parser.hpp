@@ -9,8 +9,6 @@
 #include <sbepp/sbeppc/ireporter.hpp>
 #include <sbepp/sbeppc/ifs_provider.hpp>
 #include <sbepp/sbeppc/sbe.hpp>
-#include <sbepp/sbeppc/type_manager.hpp>
-#include <sbepp/sbeppc/message_manager.hpp>
 #include <sbepp/sbeppc/throw_error.hpp>
 #include <sbepp/sbeppc/unique_set.hpp>
 #include <sbepp/sbepp.hpp>
@@ -25,6 +23,8 @@
 
 namespace sbepp::sbeppc
 {
+// SBE schema parser, performs some basic XML structure checks but not the ones
+// related to C++ (or any other language) codegen
 class schema_parser
 {
 public:
@@ -55,24 +55,14 @@ public:
         return message_schema;
     }
 
-    const type_manager& get_types() const
-    {
-        return types;
-    }
-
-    const message_manager& get_messages() const
-    {
-        return messages;
-    }
-
 private:
     ireporter* reporter;
     ifs_provider* fs_provider;
     location_manager locations;
     pugi::xml_document xml_doc;
     sbe::message_schema message_schema;
-    type_manager types;
-    message_manager messages;
+    unique_set<std::string> unique_message_names;
+    unique_set<message_id_t> unique_message_ids;
 
     enum class ordered_member_type
     {
@@ -95,14 +85,62 @@ private:
         return attribute;
     }
 
+    void add_unique_type(sbe::encoding e)
+    {
+        // SBE requires type lookup to be case insensitive
+        auto name = utils::to_lower(utils::get_encoding_name(e));
+        const auto [it, inserted] =
+            message_schema.types.try_emplace(std::move(name), std::move(e));
+
+        if(!inserted)
+        {
+            throw_error(
+                "{}: encoding `{}` already exists at {}",
+                utils::get_location(e),
+                utils::get_encoding_name(e),
+                utils::get_location(it->second));
+        }
+    }
+
+    void
+        merge_types(const std::unordered_map<std::string, sbe::encoding>& types)
+    {
+        for(const auto& [name, enc] : types)
+        {
+            add_unique_type(enc);
+        }
+    }
+
+    void add_unique_message(sbe::message m)
+    {
+        unique_message_names.add_or_throw(
+            m.name,
+            "{}: message with name `{}` already exists",
+            m.location,
+            m.name);
+        unique_message_ids.add_or_throw(
+            m.id, "{}: message with id `{}` already exists", m.location, m.id);
+
+        message_schema.messages.push_back(std::move(m));
+    }
+
+    void merge_messages(const std::vector<sbe::message>& messages)
+    {
+        for(const auto& m : messages)
+        {
+            add_unique_message(m);
+        }
+    }
+
     void parse_include(const pugi::xml_node root)
     {
         const auto path = get_required_non_empty_string(root, "href");
         auto parser = schema_parser{path, *reporter, *fs_provider};
         parser.parse_schema_content();
 
-        types.merge(parser.get_types());
-        messages.merge(parser.get_messages());
+        const auto& schema = parser.get_message_schema();
+        merge_types(schema.types);
+        merge_messages(schema.messages);
     }
 
     std::string get_required_non_empty_string(
@@ -115,24 +153,15 @@ private:
             throw_error(
                 "{}: `{}` attribute is empty",
                 locations.find(root.offset_debug()),
-                value);
+                name);
         }
 
         return value;
     }
 
-    std::string get_required_name(const pugi::xml_node root)
+    std::string get_required_name(const pugi::xml_node root) const
     {
-        auto name = get_required_non_empty_string(root, "name");
-
-        const auto location = locations.find(root.offset_debug());
-        if(!utils::is_valid_name(name))
-        {
-            throw_error("{}: invalid name `{}`", location, name);
-        }
-        utils::warn_about_reserved_identifier(name, location, *reporter);
-
-        return name;
+        return get_required_non_empty_string(root, "name");
     }
 
     static std::string get_description(const pugi::xml_node root)
@@ -151,7 +180,7 @@ private:
         return {};
     }
 
-    field_presence get_presence(const pugi::xml_node root)
+    field_presence get_presence(const pugi::xml_node root) const
     {
         const auto value = get_optional_string_attribute(root, "presence")
                                .value_or("required");
@@ -179,18 +208,9 @@ private:
         return get_optional_numeric_attribute<offset_t>(root, "offset");
     }
 
-    std::string get_primitive_type(const pugi::xml_node root)
+    std::string get_primitive_type(const pugi::xml_node root) const
     {
-        const auto type =
-            get_required_attribute(root, "primitiveType").as_string();
-        if(!utils::is_primitive_type(type))
-        {
-            throw_error(
-                "{}: primitiveType `{}` is not valid primitive type",
-                locations.find(root.offset_debug()),
-                type);
-        }
-        return type;
+        return get_required_non_empty_string(root, "primitiveType");
     }
 
     std::optional<version_t>
@@ -223,7 +243,7 @@ private:
             .value_or(1);
     }
 
-    sbe::type parse_type_encoding(const pugi::xml_node root)
+    sbe::type parse_type_encoding(const pugi::xml_node root) const
     {
         sbe::type t{};
         t.location = locations.find(root.offset_debug());
@@ -231,16 +251,6 @@ private:
         t.description = get_description(root);
         t.presence = get_presence(root);
         t.null_value = get_optional_string_attribute(root, "nullValue");
-
-        if(t.null_value && (t.presence != field_presence::optional))
-        {
-            reporter->warning(
-                "{}: nullValue is ignored for type `{}` because `presence` is "
-                "not `optional`",
-                locations.find(root.offset_debug()),
-                t.name);
-        }
-
         t.min_value = get_optional_string_attribute(root, "minValue");
         t.max_value = get_optional_string_attribute(root, "maxValue");
         t.length = get_type_length(root);
@@ -249,7 +259,6 @@ private:
         t.semantic_type = get_semantic_type(root);
         t.added_since = get_added_since(root);
         t.deprecated_since = get_deprecated_since(root);
-        validate_versions(t);
         t.character_encoding =
             get_optional_string_attribute(root, "characterEncoding");
 
@@ -257,14 +266,6 @@ private:
         {
             t.value_ref = get_optional_string_attribute(root, "valueRef");
             t.constant_value = get_optional_node_content(root);
-            if(t.value_ref.has_value() == t.constant_value.has_value())
-            {
-                throw_error(
-                    "{}: either `valueRef` or value must be provided for "
-                    "constant `{}`",
-                    locations.find(root.offset_debug()),
-                    t.name);
-            }
 
             if((t.primitive_type == "char") && root.attribute("length").empty())
             {
@@ -280,7 +281,7 @@ private:
         return root.attribute("semanticType").as_string();
     }
 
-    std::string get_required_node_content(const pugi::xml_node root)
+    std::string get_required_node_content(const pugi::xml_node root) const
     {
         const auto content = root.text();
         if(content.empty())
@@ -293,7 +294,7 @@ private:
         return content.get();
     }
 
-    sbe::enum_valid_value get_enum_valid_value(const pugi::xml_node root)
+    sbe::enum_valid_value get_enum_valid_value(const pugi::xml_node root) const
     {
         sbe::enum_valid_value value{};
 
@@ -302,14 +303,13 @@ private:
         value.description = get_description(root);
         value.added_since = get_added_since(root);
         value.deprecated_since = get_deprecated_since(root);
-        validate_versions(value);
         value.value = get_required_node_content(root);
 
         return value;
     }
 
     std::vector<sbe::enum_valid_value>
-        get_enum_valid_values(const pugi::xml_node root)
+        get_enum_valid_values(const pugi::xml_node root) const
     {
         std::vector<sbe::enum_valid_value> values;
         unique_set<std::string> unique_value_names;
@@ -319,7 +319,7 @@ private:
             auto valid_value = get_enum_valid_value(child);
             unique_value_names.add_or_throw(
                 valid_value.name,
-                "{}: duplicated validValue `name`: {}",
+                "{}: duplicate validValue name: `{}`",
                 valid_value.location,
                 valid_value.name);
 
@@ -329,7 +329,7 @@ private:
         return values;
     }
 
-    sbe::enumeration parse_enum_encoding(const pugi::xml_node root)
+    sbe::enumeration parse_enum_encoding(const pugi::xml_node root) const
     {
         sbe::enumeration e{};
         e.location = locations.find(root.offset_debug());
@@ -338,25 +338,24 @@ private:
         e.type = get_required_non_empty_string(root, "encodingType");
         e.added_since = get_added_since(root);
         e.deprecated_since = get_deprecated_since(root);
-        validate_versions(e);
         e.offset = get_offset(root);
         e.valid_values = get_enum_valid_values(root);
 
         return e;
     }
 
-    choice_index_t get_choice_index(const pugi::xml_node root)
+    choice_index_t get_choice_index(const pugi::xml_node root) const
     {
         const auto content = get_required_node_content(root);
 
-        return utils::string_to_number_or_throw<choice_index_t>(
+        return string_to_number_or_throw<choice_index_t>(
             content,
             "{}: node's value `{}` doesn't represent choice_index_t",
             locations.find(root.offset_debug()),
             content);
     }
 
-    sbe::set_choice get_choice(const pugi::xml_node root)
+    sbe::set_choice get_choice(const pugi::xml_node root) const
     {
         sbe::set_choice choice{};
 
@@ -365,13 +364,13 @@ private:
         choice.description = get_description(root);
         choice.added_since = get_added_since(root);
         choice.deprecated_since = get_deprecated_since(root);
-        validate_versions(choice);
         choice.value = get_choice_index(root);
 
         return choice;
     }
 
-    std::vector<sbe::set_choice> get_set_choices(const pugi::xml_node root)
+    std::vector<sbe::set_choice>
+        get_set_choices(const pugi::xml_node root) const
     {
         std::vector<sbe::set_choice> choices;
         unique_set<std::string> unique_choice_names;
@@ -381,7 +380,7 @@ private:
             auto choice = get_choice(child);
             unique_choice_names.add_or_throw(
                 choice.name,
-                "{}: duplicated choice `name`: {}",
+                "{}: duplicate choice name: `{}`",
                 choice.location,
                 choice.name);
             choices.push_back(std::move(choice));
@@ -390,7 +389,7 @@ private:
         return choices;
     }
 
-    sbe::set parse_set_encoding(const pugi::xml_node root)
+    sbe::set parse_set_encoding(const pugi::xml_node root) const
     {
         sbe::set s{};
 
@@ -400,14 +399,13 @@ private:
         s.type = get_required_non_empty_string(root, "encodingType");
         s.added_since = get_added_since(root);
         s.deprecated_since = get_deprecated_since(root);
-        validate_versions(s);
         s.offset = get_offset(root);
         s.choices = get_set_choices(root);
 
         return s;
     }
 
-    sbe::ref parse_ref_encoding(const pugi::xml_node root)
+    sbe::ref parse_ref_encoding(const pugi::xml_node root) const
     {
         sbe::ref r{};
 
@@ -417,13 +415,12 @@ private:
         r.offset = get_offset(root);
         r.added_since = get_added_since(root);
         r.deprecated_since = get_deprecated_since(root);
-        validate_versions(r);
 
         return r;
     }
 
     std::vector<sbe::composite_element>
-        parse_composite_elements(const pugi::xml_node root)
+        parse_composite_elements(const pugi::xml_node root) const
     {
         std::vector<sbe::composite_element> elements;
         unique_set<std::string> unique_element_names;
@@ -463,7 +460,7 @@ private:
 
             unique_element_names.add_or_throw(
                 utils::get_encoding_name(element),
-                "{}: duplicated composite element `{}`",
+                "{}: duplicate composite element: `{}`",
                 utils::get_location(element),
                 utils::get_encoding_name(element));
 
@@ -473,7 +470,7 @@ private:
         return elements;
     }
 
-    sbe::composite parse_composite_encoding(const pugi::xml_node root)
+    sbe::composite parse_composite_encoding(const pugi::xml_node root) const
     {
         sbe::composite c{};
         c.location = locations.find(root.offset_debug());
@@ -483,7 +480,6 @@ private:
         c.semantic_type = get_semantic_type(root);
         c.added_since = get_added_since(root);
         c.deprecated_since = get_deprecated_since(root);
-        validate_versions(c);
         c.elements = parse_composite_elements(root);
 
         return c;
@@ -495,19 +491,26 @@ private:
         {
             if(is_node_name_equal_to(child.name(), "type"))
             {
-                types.add_unique(parse_type_encoding(child));
+                add_unique_type(parse_type_encoding(child));
             }
             else if(is_node_name_equal_to(child.name(), "composite"))
             {
-                types.add_unique(parse_composite_encoding(child));
+                add_unique_type(parse_composite_encoding(child));
             }
             else if(is_node_name_equal_to(child.name(), "enum"))
             {
-                types.add_unique(parse_enum_encoding(child));
+                add_unique_type(parse_enum_encoding(child));
             }
             else if(is_node_name_equal_to(child.name(), "set"))
             {
-                types.add_unique(parse_set_encoding(child));
+                add_unique_type(parse_set_encoding(child));
+            }
+            else
+            {
+                reporter->warning(
+                    "{}: unhandled XML node `{}`",
+                    locations.find(child.offset_debug()),
+                    child.name());
             }
         }
     }
@@ -517,7 +520,7 @@ private:
         const pugi::xml_node root, const std::string_view attr_name) const
     {
         const auto as_str = get_required_non_empty_string(root, attr_name);
-        return utils::string_to_number_or_throw<T>(
+        return string_to_number_or_throw<T>(
             as_str,
             "{}: cannot convert `{}` value ({}) to its underlying numeric type",
             locations.find(root.offset_debug()),
@@ -532,9 +535,10 @@ private:
         const auto as_str = get_optional_string_attribute(root, attr_name);
         if(as_str)
         {
-            return utils::string_to_number_or_throw<T>(
+            return string_to_number_or_throw<T>(
                 *as_str,
-                "{}: cannot convert `{}` value ({}) to underlying numeric type",
+                "{}: cannot convert `{}` value ({}) to its underlying numeric "
+                "type",
                 locations.find(root.offset_debug()),
                 attr_name,
                 *as_str);
@@ -544,17 +548,18 @@ private:
     }
 
     template<typename Id>
-    Id get_id(const pugi::xml_node root)
+    Id get_id(const pugi::xml_node root) const
     {
         return get_required_numeric_attribute<Id>(root, "id");
     }
 
-    message_id_t get_message_id(const pugi::xml_node root)
+    message_id_t get_message_id(const pugi::xml_node root) const
     {
         return get_id<message_id_t>(root);
     }
 
-    std::optional<block_length_t> get_block_length(const pugi::xml_node root)
+    std::optional<block_length_t>
+        get_block_length(const pugi::xml_node root) const
     {
         return get_optional_numeric_attribute<block_length_t>(
             root, "blockLength");
@@ -569,7 +574,7 @@ private:
         if(current < previous)
         {
             throw_error(
-                "{}: member `{}` in unexpected here , valid order is fields, "
+                "{}: member `{}` is unexpected here, valid order is fields, "
                 "groups, data",
                 location,
                 name);
@@ -585,12 +590,12 @@ private:
             name, "{}: member with name `{}` already exists", location, name);
     }
 
-    member_id_t get_field_id(const pugi::xml_node root)
+    member_id_t get_field_id(const pugi::xml_node root) const
     {
         return get_id<member_id_t>(root);
     }
 
-    sbe::field parse_field_member(const pugi::xml_node root)
+    sbe::field parse_field_member(const pugi::xml_node root) const
     {
         sbe::field f{};
         f.location = locations.find(root.offset_debug());
@@ -603,7 +608,6 @@ private:
         f.value_ref = get_optional_string_attribute(root, "valueRef");
         f.added_since = get_added_since(root);
         f.deprecated_since = get_deprecated_since(root);
-        validate_versions(f);
 
         return f;
     }
@@ -614,7 +618,7 @@ private:
             .value_or("groupSizeEncoding");
     }
 
-    sbe::group parse_group_member(const pugi::xml_node root)
+    sbe::group parse_group_member(const pugi::xml_node root) const
     {
         sbe::group g{};
 
@@ -627,13 +631,12 @@ private:
         g.semantic_type = get_semantic_type(root);
         g.added_since = get_added_since(root);
         g.deprecated_since = get_deprecated_since(root);
-        validate_versions(g);
         g.members = get_level_members(root);
 
         return g;
     }
 
-    sbe::data parse_data_member(const pugi::xml_node root)
+    sbe::data parse_data_member(const pugi::xml_node root) const
     {
         sbe::data d{};
         d.location = locations.find(root.offset_debug());
@@ -643,12 +646,11 @@ private:
         d.type = get_required_non_empty_string(root, "type");
         d.added_since = get_added_since(root);
         d.deprecated_since = get_deprecated_since(root);
-        validate_versions(d);
 
         return d;
     }
 
-    sbe::level_members get_level_members(const pugi::xml_node root)
+    sbe::level_members get_level_members(const pugi::xml_node root) const
     {
         // does NOT verify member IDs since their uniqueness scope is not
         // specified
@@ -687,15 +689,20 @@ private:
             else if(is_node_name_equal_to(child.name(), "data"))
             {
                 auto d = parse_data_member(child);
-                throw_if_unexpected_member_type(
-                    ordered_member_type::data,
-                    prev_member_type,
-                    d.name,
-                    d.location);
+                // no need to use `throw_if_unexpected_member_type` here because
+                // data members can appear after any other member type, they
+                // can never trigger an error on their own
                 prev_member_type = ordered_member_type::data;
                 throw_if_not_unique_member_name(
                     unique_member_names, d.name, d.location);
                 members.data.emplace_back(std::move(d));
+            }
+            else
+            {
+                reporter->warning(
+                    "{}: unhandled XML node `{}`",
+                    locations.find(child.offset_debug()),
+                    child.name());
             }
         }
 
@@ -714,10 +721,9 @@ private:
         m.semantic_type = get_semantic_type(root);
         m.added_since = get_added_since(root);
         m.deprecated_since = get_deprecated_since(root);
-        validate_versions(m);
         m.members = get_level_members(root);
 
-        messages.add_unique(std::move(m));
+        add_unique_message(std::move(m));
     }
 
     void parse_schema_content(const pugi::xml_node root)
@@ -746,7 +752,7 @@ private:
         }
     }
 
-    pugi::xml_node get_message_schema_node(const pugi::xml_node root)
+    pugi::xml_node get_message_schema_node(const pugi::xml_node root) const
     {
         for(const auto child : root)
         {
@@ -779,21 +785,21 @@ private:
         {
             const auto location = locations.find(result.offset);
             throw_error(
-                "{}: XML parsing error: {}", location, result.description());
+                "{}: XML parsing error: `{}`", location, result.description());
         }
     }
 
-    schema_id_t get_schema_id(const pugi::xml_node root)
+    schema_id_t get_schema_id(const pugi::xml_node root) const
     {
         return get_id<schema_id_t>(root);
     }
 
-    version_t get_schema_version(const pugi::xml_node root)
+    version_t get_schema_version(const pugi::xml_node root) const
     {
         return get_required_numeric_attribute<version_t>(root, "version");
     }
 
-    sbe::message_schema parse_message_schema(const pugi::xml_node root)
+    sbe::message_schema parse_message_schema(const pugi::xml_node root) const
     {
         sbe::message_schema res{};
 
@@ -802,7 +808,7 @@ private:
         res.version = get_schema_version(root);
         res.semantic_version = root.attribute("semanticVersion").as_string();
         res.byte_order = get_byte_order(root);
-        res.description = root.attribute("description").as_string();
+        res.description = get_description(root);
         res.header_type =
             root.attribute("headerType").as_string("messageHeader");
         res.location = locations.find(root.offset_debug());
@@ -810,7 +816,7 @@ private:
         return res;
     }
 
-    sbe::byte_order_kind get_byte_order(const pugi::xml_node root)
+    sbe::byte_order_kind get_byte_order(const pugi::xml_node root) const
     {
         const auto value = get_optional_string_attribute(root, "byteOrder")
                                .value_or("littleEndian");
@@ -825,7 +831,7 @@ private:
         }
 
         throw_error(
-            "{}: Unknown byteOrder ({})",
+            "{}: unknown byteOrder value: `{}`",
             locations.find(root.offset_debug()),
             value);
     }
@@ -848,50 +854,17 @@ private:
         return false;
     }
 
-    void warn_about_greater_version(
-        const version_t lhs,
-        const std::string_view lhs_name,
-        const version_t rhs,
-        const std::string_view rhs_name,
-        const source_location& location)
+    template<typename T, typename Format, typename... Args>
+    static T string_to_number_or_throw(
+        const std::string_view str, const Format& format, Args&&... args)
     {
-        if(lhs > rhs)
+        const auto v = utils::string_to_number<T>(str);
+        if(v)
         {
-            reporter->warning(
-                "{}: {} version (`{}`) is greater than {} version (`{}`)",
-                location,
-                lhs_name,
-                lhs,
-                rhs_name,
-                rhs);
+            return *v;
         }
-    }
 
-    template<typename T>
-    void validate_versions(const T& entity)
-    {
-        warn_about_greater_version(
-            entity.added_since,
-            "sinceVersion",
-            message_schema.version,
-            "schema",
-            entity.location);
-
-        if(entity.deprecated_since)
-        {
-            warn_about_greater_version(
-                *entity.deprecated_since,
-                "deprecated",
-                message_schema.version,
-                "schema",
-                entity.location);
-            warn_about_greater_version(
-                entity.added_since,
-                "sinceVersion",
-                *entity.deprecated_since,
-                "deprecated",
-                entity.location);
-        }
+        throw_error(format, std::forward<Args>(args)...);
     }
 };
 } // namespace sbepp::sbeppc

@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <sbepp/sbeppc/sbe.hpp>
 #include <sbepp/sbeppc/ifs_provider.hpp>
 #include <sbepp/sbeppc/throw_error.hpp>
 #include <sbepp/sbeppc/utils.hpp>
@@ -10,6 +11,7 @@
 #include <sbepp/sbeppc/messages_compiler.hpp>
 #include <sbepp/sbeppc/traits_generator.hpp>
 #include <sbepp/sbeppc/tags_generator.hpp>
+#include <sbepp/sbeppc/context_manager.hpp>
 
 #include <fmt/core.h>
 #include <fmt/std.h>
@@ -26,22 +28,24 @@ public:
     static void compile(
         const std::filesystem::path& output_dir,
         const std::optional<std::string>& inject_include,
-        sbe::message_schema& schema,
-        type_manager& types,
-        message_manager& messages,
+        const sbe::message_schema& schema,
+        context_manager& ctx_manager,
         ifs_provider& fs_provider)
     {
-        create_dirs(output_dir, schema.name, fs_provider);
+        create_dirs(output_dir, ctx_manager.get(schema).name, fs_provider);
 
-        tags_generator tags_gen{schema, types, messages};
+        tags_generator tags_gen{schema, ctx_manager};
         const auto& tags = tags_gen.get();
-        traits_generator traits_gen{schema, types};
+
+        traits_generator traits_gen{schema, ctx_manager};
+
+        const auto& schema_name = ctx_manager.get(schema).name;
 
         // types
         std::vector<std::string> type_includes;
-        types_compiler tc{schema.name, schema.byte_order, types, traits_gen};
+        types_compiler tc{schema, traits_gen, ctx_manager};
         tc.compile(
-            [&type_includes, &output_dir, &schema, &fs_provider](
+            [&type_includes, &output_dir, &fs_provider, &schema_name](
                 const auto name,
                 const auto implementation,
                 const auto alias,
@@ -52,7 +56,7 @@ public:
                     std::filesystem::path{"types"} / name += ".hpp";
                 type_includes.push_back(
                     fmt::format("#include \"{}\"", include_path.string()));
-                const auto file_path = output_dir / schema.name / include_path;
+                const auto file_path = output_dir / schema_name / include_path;
 
                 fs_provider.write_file(
                     file_path,
@@ -92,7 +96,7 @@ namespace sbepp
 SBEPP_WARNINGS_ON();
 )",
                         // clang-format on
-                        fmt::arg("schema", schema.name),
+                        fmt::arg("schema", schema_name),
                         fmt::arg(
                             "dependency_includes",
                             make_local_includes(dependencies)),
@@ -108,14 +112,11 @@ SBEPP_WARNINGS_ON();
         // schema traits must be generated after types compilation because they
         // need message header type to be compiled
         const auto schema_traits = traits_gen.make_schema_traits();
-        const auto& header_type = types.get_as_or_throw<sbe::composite>(
-            schema.header_type,
-            "{}: type `{}` doesn't exist or it's not a composite",
-            schema.location,
-            schema.header_type);
+        const auto& header_type = utils::get_schema_encoding_as<sbe::composite>(
+            schema, schema.header_type);
 
         fs_provider.write_file(
-            output_dir / schema.name / "schema" / "schema.hpp",
+            output_dir / schema_name / "schema" / "schema.hpp",
             fmt::format(
                 // clang-format off
 R"({top_comment}
@@ -148,12 +149,12 @@ namespace sbepp
 SBEPP_WARNINGS_ON();
 )",
                 // clang-format on
-                fmt::arg("schema", schema.name),
+                fmt::arg("schema", schema_name),
                 fmt::arg("tags", tags),
                 fmt::arg("schema_traits", schema_traits),
                 // can't use `header_type.name` here because it's an alias and
                 // it's not possible to forward declare it
-                fmt::arg("header_type", header_type.impl_name),
+                fmt::arg("header_type", ctx_manager.get(header_type).impl_name),
                 fmt::arg(
                     "top_comment", utils::get_compiled_header_top_comment()),
                 fmt::arg(
@@ -162,9 +163,9 @@ SBEPP_WARNINGS_ON();
 
         // messages
         std::vector<std::string> message_includes;
-        messages_compiler mc{schema, types, messages, traits_gen};
+        messages_compiler mc{schema, traits_gen, ctx_manager};
         mc.compile(
-            [&message_includes, &output_dir, &schema, &fs_provider](
+            [&message_includes, &output_dir, &schema_name, &fs_provider](
                 const auto name,
                 const auto implementation,
                 const auto alias,
@@ -175,7 +176,7 @@ SBEPP_WARNINGS_ON();
                     std::filesystem::path{"messages"} / name += ".hpp";
                 message_includes.push_back(
                     fmt::format("#include \"{}\"", include_path.string()));
-                const auto file_path = output_dir / schema.name / include_path;
+                const auto file_path = output_dir / schema_name / include_path;
 
                 fs_provider.write_file(
                     file_path,
@@ -215,7 +216,7 @@ namespace sbepp
 SBEPP_WARNINGS_ON();
 )",
                         // clang-format on
-                        fmt::arg("schema", schema.name),
+                        fmt::arg("schema", schema_name),
                         fmt::arg(
                             "dependency_includes",
                             make_type_dependency_includes(dependencies)),
@@ -229,7 +230,7 @@ SBEPP_WARNINGS_ON();
 
         // top level header
         fs_provider.write_file(
-            output_dir / schema.name / schema.name += ".hpp",
+            output_dir / schema_name / schema_name += ".hpp",
             fmt::format(
                 // clang-format off
 R"({top_comment}
