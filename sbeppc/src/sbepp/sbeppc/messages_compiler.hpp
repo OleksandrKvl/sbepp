@@ -424,7 +424,6 @@ public:
         return fmt::format(
             // clang-format off
 R"(
-    // this is implementation detail, don't use it directly
     template<
         typename T = void,
         typename = ::sbepp::detail::enable_if_writable_t<Byte, T>>

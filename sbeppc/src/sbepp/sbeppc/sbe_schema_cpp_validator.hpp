@@ -126,7 +126,6 @@ private:
 
     void validate_type_names()
     {
-        // iterate over all public/private types and their children
         for(const auto& [name, enc] : schema->types)
         {
             std::visit(
