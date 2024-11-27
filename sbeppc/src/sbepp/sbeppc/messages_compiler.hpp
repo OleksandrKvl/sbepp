@@ -215,7 +215,6 @@ private:
                             context.level_offset + header_size,
                             f.name,
                             schema->byte_order,
-                            true,
                             enc_context);
                     },
                     enc);

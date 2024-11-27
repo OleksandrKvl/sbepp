@@ -673,7 +673,6 @@ R"(
                                     ctx_manager->get(r).offset_in_composite,
                                     r.name,
                                     byte_order,
-                                    false,
                                     ctx_manager->get(enc));
                             },
                             enc);
@@ -695,7 +694,6 @@ R"(
                             *context.offset_in_composite,
                             t.name,
                             byte_order,
-                            false,
                             context);
                     },
                     [this, &inline_types_impl](auto& enc)
@@ -708,7 +706,6 @@ R"(
                             *context.offset_in_composite,
                             enc.name,
                             byte_order,
-                            false,
                             context);
                     }},
                 e);
