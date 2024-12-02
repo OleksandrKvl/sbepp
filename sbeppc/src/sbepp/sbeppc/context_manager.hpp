@@ -26,6 +26,7 @@ struct type_context
     std::string public_type;
     std::string underlying_type;
     std::string impl_type;
+    std::optional<std::string> mangled_name;
 };
 
 struct composite_context
@@ -36,6 +37,7 @@ struct composite_context
     std::string impl_name;
     std::string impl_type;
     std::string public_type;
+    std::optional<std::string> mangled_name;
 };
 
 struct ref_context
@@ -45,6 +47,7 @@ struct ref_context
     // is not optional
     offset_t offset_in_composite;
     std::string tag;
+    std::optional<std::string> mangled_name;
 };
 
 struct enum_valid_value_context
@@ -62,6 +65,7 @@ struct enumeration_context
     std::string public_type;
     std::string impl_type;
     std::string underlying_type;
+    std::optional<std::string> mangled_name;
 };
 
 struct set_choice_context
@@ -79,6 +83,7 @@ struct set_context
     std::string public_type;
     std::string impl_type;
     std::string underlying_type;
+    std::optional<std::string> mangled_name;
 };
 
 struct message_context
@@ -88,6 +93,7 @@ struct message_context
     std::string impl_type;
     std::string public_type;
     block_length_t actual_block_length;
+    std::optional<std::string> mangled_name;
 };
 
 struct field_context
@@ -109,6 +115,8 @@ struct group_context
     std::string entry_impl_type;
     std::string impl_type;
     block_length_t actual_block_length;
+    std::optional<std::string> mangled_name;
+    std::string entry_name;
 };
 
 struct data_context
@@ -122,6 +130,8 @@ struct message_schema_context
 {
     std::string name;
     std::string tag;
+    std::optional<std::string> mangled_tag_types_name;
+    std::optional<std::string> mangled_tag_messages_name;
 };
 
 template<typename T>
