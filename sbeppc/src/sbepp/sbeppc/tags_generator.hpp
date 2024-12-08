@@ -11,6 +11,7 @@
 #include <fmt/core.h>
 #include <fmt/ranges.h>
 
+#include <utility>
 #include <vector>
 #include <string>
 #include <unordered_map>
@@ -32,146 +33,20 @@ public:
         return generated;
     }
 
+    // TODO: add static function, make all other functions private
+
 private:
     const sbe::message_schema* schema{};
     context_manager* ctx_manager{};
     std::string generated;
-    std::unordered_map<std::string_view, bool> processed_types;
-    std::string detail;
-    std::size_t type_index{};
-    std::size_t enum_index{};
-    std::size_t set_index{};
-    std::size_t composite_index{};
-    std::size_t message_index{};
-    std::size_t group_index{};
+    std::unordered_map<std::string, bool> processed_types;
+    std::string detail_types;
+    std::string public_types;
+    std::string detail_messages;
+    std::string public_messages;
+    std::vector<std::string> path;
 
-    std::string make_next_type_name()
-    {
-        type_index++;
-        return fmt::format("type_{}", type_index);
-    }
-
-    std::string make_next_enum_name(const sbe::enumeration& e)
-    {
-        enum_index++;
-        auto name = fmt::format("enum_{}", enum_index);
-
-        // in C++ `enum class` can contain enumerator with the same name as enum
-        // itself but `struct` cannot, e.g. `struct S{ struct S{}; };` is not
-        // allowed. `struct`s are used for tags generation so enumerator names
-        // should be taken into account
-        std::unordered_set<std::string> names;
-        for(const auto& value : e.valid_values)
-        {
-            names.emplace(value.name);
-        }
-
-        std::size_t minor_index{};
-        while(names.count(name))
-        {
-            minor_index++;
-            name = fmt::format("enum_{}_{}", enum_index, minor_index);
-        }
-        return name;
-    }
-
-    std::string make_next_set_name(const sbe::set& s)
-    {
-        set_index++;
-        auto name = fmt::format("set_{}", set_index);
-
-        std::unordered_set<std::string> names;
-        for(const auto& choice : s.choices)
-        {
-            names.emplace(choice.name);
-        }
-
-        std::size_t minor_index{};
-        while(names.count(name))
-        {
-            minor_index++;
-            name = fmt::format("set_{}_{}", set_index, minor_index);
-        }
-        return name;
-    }
-
-    std::string make_next_composite_name(const sbe::composite& c)
-    {
-        composite_index++;
-        auto name = fmt::format("composite_{}", composite_index);
-
-        std::unordered_set<std::string> names;
-        for(const auto& e : c.elements)
-        {
-            names.emplace(utils::get_encoding_name(e));
-        }
-
-        std::size_t minor_index{};
-        while(names.count(name))
-        {
-            minor_index++;
-            name = fmt::format("composite_{}_{}", composite_index, minor_index);
-        }
-        return name;
-    }
-
-    static std::unordered_set<std::string>
-        get_member_names(const sbe::level_members& members)
-    {
-        std::unordered_set<std::string> res;
-
-        for(const auto& f : members.fields)
-        {
-            res.insert(f.name);
-        }
-
-        for(const auto& g : members.groups)
-        {
-            res.insert(g.name);
-        }
-
-        for(const auto& d : members.data)
-        {
-            res.insert(d.name);
-        }
-
-        return res;
-    }
-
-    std::string make_next_group_name(const sbe::level_members& members)
-    {
-        group_index++;
-        auto name = fmt::format("group_{}", group_index);
-
-        const auto member_names = get_member_names(members);
-        std::size_t minor_index{};
-        while(member_names.count(name))
-        {
-            minor_index++;
-            name = fmt::format("group_{}_{}", group_index, minor_index);
-        }
-
-        return name;
-    }
-
-    std::string make_next_message_name(const sbe::level_members& members)
-    {
-        message_index++;
-        auto name = fmt::format("message_{}", message_index);
-
-        const auto member_names = get_member_names(members);
-        std::size_t minor_index{};
-        while(member_names.count(name))
-        {
-            minor_index++;
-            name = fmt::format("message_{}_{}", message_index, minor_index);
-        }
-
-        return name;
-    }
-
-    std::string make_public_tag(
-        const std::vector<std::string>& path, const std::string_view last) const
+    std::string make_public_tag(const std::string_view last) const
     {
         return fmt::format(
             "::{}::schema::{}::{}",
@@ -180,84 +55,83 @@ private:
             last);
     }
 
-    std::string make_impl_path(const std::string_view impl_name) const
+    std::string make_type_impl_path(const std::string_view impl_name) const
     {
-        // no need for `types/messages` here because in `detail` we have only
-        // `impl_name`s which cannot conflict with each other
         return fmt::format(
-            "::{}::detail::schema::{}",
+            "::{}::detail::schema::types::{}",
             ctx_manager->get(*schema).name,
             impl_name);
     }
 
-    std::string make_tag(const sbe::type& t, std::vector<std::string>& path)
+    std::string make_message_impl_path(const std::string_view impl_name) const
     {
-        auto& context = ctx_manager->get(t);
-        context.impl_name = make_next_type_name();
-        context.tag = make_public_tag(path, t.name);
-
-        return fmt::format("struct {}{{}};\n", context.impl_name);
+        return fmt::format(
+            "::{}::detail::schema::messages::{}",
+            ctx_manager->get(*schema).name,
+            impl_name);
     }
 
-    std::string make_enum_value_tags(
-        const sbe::enumeration& e, std::vector<std::string>& path)
+    std::string make_tag(const sbe::type& t)
+    {
+        auto& context = ctx_manager->get(t);
+        context.tag = make_public_tag(t.name);
+
+        return fmt::format(
+            "struct {}{{}};\n", context.mangled_name.value_or(t.name));
+    }
+
+    std::string make_enum_value_tags(const sbe::enumeration& e)
     {
         std::string res;
         for(auto& value : e.valid_values)
         {
             res += fmt::format("    struct {}{{}};\n", value.name);
-            ctx_manager->create(value).tag = make_public_tag(path, value.name);
+            ctx_manager->create(value).tag = make_public_tag(value.name);
         }
         return res;
     }
 
-    std::string
-        make_tag(const sbe::enumeration& e, std::vector<std::string>& path)
+    std::string make_tag(const sbe::enumeration& e)
     {
         auto& context = ctx_manager->get(e);
-        context.impl_name = make_next_enum_name(e);
-        context.tag = make_public_tag(path, e.name);
-
+        context.tag = make_public_tag(e.name);
         path.push_back(e.name);
+        const auto valid_value_tags = make_enum_value_tags(e);
+        path.pop_back();
 
-        auto res = fmt::format(
+        return fmt::format(
             // clang-format off
 R"(struct {name}
 {{
-{enum_value_tags}
+{valid_value_tags}
 }};
 )",
             // clang-format on
-            fmt::arg("name", context.impl_name),
-            fmt::arg("enum_value_tags", make_enum_value_tags(e, path)));
-
-        path.pop_back();
-
-        return res;
+            fmt::arg("name", context.mangled_name.value_or(e.name)),
+            fmt::arg("valid_value_tags", valid_value_tags));
     }
 
-    std::string
-        make_set_choice_tags(const sbe::set& s, std::vector<std::string>& path)
+    std::string make_set_choice_tags(const sbe::set& s)
     {
         std::string res;
         for(auto& choice : s.choices)
         {
             res += fmt::format("    struct {}{{}};\n", choice.name);
-            ctx_manager->create(choice).tag =
-                make_public_tag(path, choice.name);
+            ctx_manager->create(choice).tag = make_public_tag(choice.name);
         }
 
         return res;
     }
 
-    std::string make_tag(const sbe::set& s, std::vector<std::string>& path)
+    std::string make_tag(const sbe::set& s)
     {
         auto& context = ctx_manager->get(s);
-        context.impl_name = make_next_set_name(s);
-        context.tag = make_public_tag(path, s.name);
+        context.tag = make_public_tag(s.name);
         path.push_back(s.name);
+        const auto choice_tags = make_set_choice_tags(s);
+        path.pop_back();
 
-        auto res = fmt::format(
+        return fmt::format(
             // clang-format off
 R"(struct {name}
 {{
@@ -265,51 +139,55 @@ R"(struct {name}
 }};
 )",
             // clang-format on
-            fmt::arg("name", context.impl_name),
-            fmt::arg("choice_tags", make_set_choice_tags(s, path)));
-
-        path.pop_back();
-
-        return res;
+            fmt::arg("name", context.mangled_name.value_or(s.name)),
+            fmt::arg("choice_tags", choice_tags));
     }
 
-    std::string make_composite_element_tags(
-        const sbe::composite& c, std::vector<std::string>& path)
+    std::string make_composite_element_tags(const sbe::composite& c)
     {
         std::string res;
 
         for(auto& member : c.elements)
         {
-            res += std::visit(
+            std::visit(
                 utils::overloaded{
-                    [&path, this](const sbe::ref& r)
+                    [this, &res](const sbe::ref& r)
                     {
-                        return make_tag(r, path);
+                        res += make_tag(r);
                     },
-                    [&path, this](auto& enc)
+                    [this, &res](const auto& enc)
                     {
-                        detail += make_tag(enc, path);
-                        return fmt::format(
-                            "using {} = {};\n",
-                            enc.name,
-                            make_impl_path(ctx_manager->get(enc).impl_name));
+                        const auto& ctx = ctx_manager->get(enc);
+                        const auto tag = make_tag(enc);
+                        if(ctx.mangled_name)
+                        {
+                            detail_types += tag;
+                            res += utils::make_type_alias(
+                                enc.name,
+                                make_type_impl_path(*ctx.mangled_name));
+                        }
+                        else
+                        {
+                            res += tag;
+                        }
                     }},
                 member);
+            res += '\n';
         }
 
         return res;
     }
 
-    std::string
-        make_tag(const sbe::composite& c, std::vector<std::string>& path)
+    std::string make_tag(const sbe::composite& c)
     {
         auto& context = ctx_manager->get(c);
-        context.impl_name = make_next_composite_name(c);
-        context.tag = make_public_tag(path, c.name);
+        context.tag = make_public_tag(c.name);
 
         path.push_back(c.name);
+        const auto element_tags = make_composite_element_tags(c);
+        path.pop_back();
 
-        auto res = fmt::format(
+        return fmt::format(
             // clang-format off
 R"(struct {name}
 {{
@@ -317,54 +195,78 @@ R"(struct {name}
 }};
 )",
             // clang-format on
-            fmt::arg("name", context.impl_name),
-            fmt::arg("element_tags", make_composite_element_tags(c, path)));
-
-        path.pop_back();
-
-        return res;
+            fmt::arg("name", context.mangled_name.value_or(c.name)),
+            fmt::arg("element_tags", element_tags));
     }
 
-    std::string_view get_impl_name(const sbe::encoding& enc) const
+    std::optional<std::string> get_nested_type_name(const sbe::encoding& enc)
     {
         return std::visit(
-            [this](const auto& e) -> std::string_view
-            {
-                return ctx_manager->get(e).impl_name;
-            },
+            utils::overloaded{
+                [](const sbe::type&) -> std::optional<std::string>
+                {
+                    return {};
+                },
+                [this](const auto& nested_type) -> std::optional<std::string>
+                {
+                    return ctx_manager->get(nested_type)
+                        .mangled_name.value_or(nested_type.name);
+                }},
             enc);
     }
 
-    std::string make_tag(const sbe::ref& r, std::vector<std::string>& path)
+    std::string make_tag(const sbe::ref& r)
     {
         auto& enc = utils::get_schema_encoding(*schema, r.type);
         handle_public_encoding(enc);
 
-        ctx_manager->get(r).tag = make_public_tag(path, r.name);
+        ctx_manager->get(r).tag = make_public_tag(r.name);
 
-        return fmt::format(
-            "struct {name} : {type}{{}};\n",
-            fmt::arg("name", r.name),
-            fmt::arg("type", get_impl_name(enc)));
+        const auto referred_type_name = get_nested_type_name(enc);
+        if(referred_type_name)
+        {
+            // referred type has nested elements so use inheritance
+            return fmt::format(
+                "struct {name} : {referred_type}{{}};\n",
+                fmt::arg("name", r.name),
+                fmt::arg(
+                    "referred_type", make_type_impl_path(*referred_type_name)));
+        }
+        else
+        {
+            return fmt::format("struct {}{{}};\n", r.name);
+        }
     }
 
     void handle_public_encoding(const sbe::encoding& encoding)
     {
-        std::vector<std::string> path;
+        // always start with empty path
+        auto prev_path = std::exchange(path, {});
         path.emplace_back("types");
 
-        const auto name = utils::get_encoding_name(encoding);
+        const auto name = utils::to_lower(utils::get_encoding_name(encoding));
         if(!processed_types[name])
         {
-            detail += std::visit(
-                [&path, this](const auto& enc)
+            std::visit(
+                [this](const auto& enc)
                 {
-                    return make_tag(enc, path);
+                    const auto tag = make_tag(enc);
+                    // public types always go into detail
+                    detail_types += tag;
+                    // add alias to public_types whether it's mangled or not
+                    public_types += utils::make_type_alias(
+                        enc.name,
+                        make_type_impl_path(
+                            ctx_manager->get(enc).mangled_name.value_or(
+                                enc.name)));
+                    public_types += '\n';
                 },
                 encoding);
 
             processed_types[name] = true;
         }
+
+        std::swap(path, prev_path);
     }
 
     void make_type_tags_impl()
@@ -375,33 +277,44 @@ R"(struct {name}
         }
     }
 
-    const sbe::composite* try_get_composite(const std::string& type_name) const
+    std::optional<std::string>
+        get_nested_type_tag(const std::string_view type_name)
     {
         if(!utils::is_primitive_type(type_name))
         {
-            return std::get_if<sbe::composite>(
-                &utils::get_schema_encoding(*schema, type_name));
+            const auto& enc = utils::get_schema_encoding(*schema, type_name);
+            return std::visit(
+                utils::overloaded{
+                    [](const sbe::type&) -> std::optional<std::string>
+                    {
+                        return {};
+                    },
+                    [this](const auto& actual_enc) -> std::optional<std::string>
+                    {
+                        return make_type_impl_path(
+                            ctx_manager->get(actual_enc)
+                                .mangled_name.value_or(actual_enc.name));
+                    }},
+                enc);
         }
+
         return {};
     }
 
-    std::string make_field_tags(
-        const std::vector<sbe::field>& fields, std::vector<std::string>& path)
+    std::string make_field_tags(const std::vector<sbe::field>& fields)
     {
         std::string res;
 
         for(auto& field : fields)
         {
-            ctx_manager->get(field).tag = make_public_tag(path, field.name);
+            ctx_manager->get(field).tag = make_public_tag(field.name);
 
-            if(const auto c = try_get_composite(field.type))
+            if(const auto type_tag = get_nested_type_tag(field.type))
             {
                 res += fmt::format(
-                    "    struct {name} : {impl}{{}};\n",
+                    "    struct {name} : {type_tag}{{}};\n",
                     fmt::arg("name", field.name),
-                    fmt::arg(
-                        "impl",
-                        make_impl_path(ctx_manager->get(*c).impl_name)));
+                    fmt::arg("type_tag", *type_tag));
             }
             else
             {
@@ -412,19 +325,17 @@ R"(struct {name}
         return res;
     }
 
-    std::string make_group_tags(
-        const std::vector<sbe::group>& groups, std::vector<std::string>& path)
+    std::string make_group_tags(const std::vector<sbe::group>& groups)
     {
         std::string res;
 
         for(auto& g : groups)
         {
             auto& context = ctx_manager->get(g);
-            context.impl_name = make_next_group_name(g.members);
-            context.tag = make_public_tag(path, g.name);
+            context.tag = make_public_tag(g.name);
             path.push_back(g.name);
 
-            detail += fmt::format(
+            auto group_tag = fmt::format(
                 // clang-format off
 R"(struct {group}
 {{
@@ -432,55 +343,58 @@ R"(struct {group}
 }};
 )",
                 // clang-format on
-                fmt::arg("group", context.impl_name),
-                fmt::arg("members", make_member_tags(g.members, path)));
-
-            res += fmt::format(
-                "    using {} = {};\n",
-                g.name,
-                make_impl_path(context.impl_name));
+                fmt::arg("group", context.mangled_name.value_or(g.name)),
+                fmt::arg("members", make_member_tags(g.members)));
             path.pop_back();
+
+            if(context.mangled_name)
+            {
+                detail_messages += group_tag;
+                res += fmt::format(
+                    "    using {} = {};\n",
+                    g.name,
+                    make_message_impl_path(*context.mangled_name));
+            }
+            else
+            {
+                res += group_tag;
+            }
         }
 
         return res;
     }
 
-    std::string make_data_tags(
-        const std::vector<sbe::data>& data_members,
-        const std::vector<std::string>& path)
+    std::string make_data_tags(const std::vector<sbe::data>& data_members)
     {
         std::string res;
 
         for(auto& data : data_members)
         {
-            ctx_manager->create(data).tag = make_public_tag(path, data.name);
+            ctx_manager->create(data).tag = make_public_tag(data.name);
             res += fmt::format("    struct {}{{}};\n", data.name);
         }
 
         return res;
     }
 
-    std::string make_member_tags(
-        const sbe::level_members& members, std::vector<std::string>& path)
+    std::string make_member_tags(const sbe::level_members& members)
     {
         std::string res;
 
-        res += make_field_tags(members.fields, path);
-        res += make_group_tags(members.groups, path);
-        res += make_data_tags(members.data, path);
+        res += make_field_tags(members.fields);
+        res += make_group_tags(members.groups);
+        res += make_data_tags(members.data);
 
         return res;
     }
 
-    std::string
-        make_message_tag(const sbe::message& m, std::vector<std::string>& path)
+    std::string make_message_tag(const sbe::message& m)
     {
         auto& context = ctx_manager->get(m);
-        context.impl_name = make_next_message_name(m.members);
-        context.tag = make_public_tag(path, m.name);
+        context.tag = make_public_tag(m.name);
         path.push_back(m.name);
 
-        auto res = fmt::format(
+        auto message_tag = fmt::format(
             // clang-format off
 R"(struct {name}
 {{
@@ -488,98 +402,34 @@ R"(struct {name}
 }};
 )",
             // clang-format on
-            fmt::arg("name", context.impl_name),
-            fmt::arg("members", make_member_tags(m.members, path)));
+            fmt::arg("name", context.mangled_name.value_or(m.name)),
+            fmt::arg("members", make_member_tags(m.members)));
 
         path.pop_back();
 
-        return res;
+        if(context.mangled_name)
+        {
+            detail_messages += message_tag;
+            return utils::make_type_alias(
+                m.name, make_message_impl_path(*context.mangled_name));
+        }
+        else
+        {
+            return message_tag;
+        }
     }
 
     void make_message_tags_impl()
     {
-        std::vector<std::string> path;
         path.emplace_back("messages");
 
         for(const auto& m : schema->messages)
         {
-            detail += make_message_tag(m, path);
-        }
-    }
-
-    std::string make_type_aliases()
-    {
-        std::string res;
-        for(const auto& [name, enc] : schema->types)
-        {
-            res += std::visit(
-                [this](const auto& enc)
-                {
-                    return fmt::format(
-                        "    using {} = {};\n",
-                        enc.name,
-                        make_impl_path(ctx_manager->get(enc).impl_name));
-                },
-                enc);
+            public_messages += make_message_tag(m);
+            public_messages += '\n';
         }
 
-        return res;
-    }
-
-    std::string make_message_aliases()
-    {
-        std::string res;
-        for(const auto& m : schema->messages)
-        {
-            res += fmt::format(
-                "    using {} = {};\n",
-                m.name,
-                make_impl_path(ctx_manager->get(m).impl_name));
-        }
-
-        return res;
-    }
-
-    std::string make_types_struct_name() const
-    {
-        std::size_t index{};
-
-        auto name = fmt::format("types_{}", index);
-        while(schema->types.count(name))
-        {
-            index++;
-            name = fmt::format("types_{}", index);
-        }
-
-        return name;
-    }
-
-    std::string make_messages_struct_name() const
-    {
-        std::size_t index{};
-
-        auto name = fmt::format("messages_{}", index);
-        // TODO: refactor
-        const auto contains = [this](const auto& name)
-        {
-            const auto search = std::find_if(
-                std::begin(schema->messages),
-                std::end(schema->messages),
-                [&name](const auto& m)
-                {
-                    return m.name == name;
-                });
-
-            return search != std::end(schema->messages);
-        };
-
-        while(contains(name))
-        {
-            index++;
-            name = fmt::format("messages_{}", index);
-        }
-
-        return name;
+        path.pop_back();
     }
 
     std::string generate()
@@ -587,49 +437,146 @@ R"(struct {name}
         make_type_tags_impl();
         make_message_tags_impl();
 
-        // names `types/messages` cannot be just hard-coded here because
-        // there could be type or message with the same name.
-        const auto types_struct_name = make_types_struct_name();
-        const auto messages_struct_name = make_messages_struct_name();
-
         auto& context = ctx_manager->get(*schema);
         context.tag = fmt::format("::{}::schema", context.name);
 
-        return fmt::format(
+        std::string res;
+
+        if(!detail_types.empty() || !detail_messages.empty()
+           || context.mangled_tag_types_name
+           || context.mangled_tag_messages_name)
+        {
             // clang-format off
+            res +=
 R"(namespace detail
-{{
+{
 namespace schema
-{{
-{detail}
+{
+)";
+            // clang-format on
 
-struct {types_struct_name}
+            if(!detail_types.empty())
+            {
+                res += fmt::format(
+                    // clang-format off
+R"(namespace types
 {{
-{type_aliases}
-}};
+{detail_types}
+}} // namespace types
+)"
+,
+                    // clang-format on
+                    fmt::arg("detail_types", detail_types));
+            }
 
-struct {messages_struct_name}
+            if(!detail_messages.empty())
+            {
+                res += fmt::format(
+                    // clang-format off
+R"(namespace messages
 {{
-{message_aliases}
-}};
-}} // namespace schema
-}} // namespace detail
+{detail_messages}
+}} // namespace types
+)"
+,
+                    // clang-format on
+                    fmt::arg("detail_messages", detail_messages));
+            }
 
-struct schema
+            if(context.mangled_tag_types_name)
+            {
+                res += fmt::format(
+                    // clang-format off
+R"(struct {mangled_tag_types_name}
 {{
-    using types = {types_struct_path};
-    using messages = {messages_struct_path};
+{public_types}
 }};
 )",
+                    // clang-format on
+                    fmt::arg(
+                        "mangled_tag_types_name",
+                        *context.mangled_tag_types_name),
+                    fmt::arg("public_types", public_types));
+            }
+
+            if(context.mangled_tag_messages_name)
+            {
+                res += fmt::format(
+                    // clang-format off
+R"(struct {mangled_tag_messages_name}
+{{
+{public_messages}
+}};
+)",
+                    // clang-format on
+                    fmt::arg(
+                        "mangled_tag_messages_name",
+                        *context.mangled_tag_messages_name),
+                    fmt::arg("public_messages", public_messages));
+            }
+
+            // clang-format off
+            res +=
+R"(} //namespace schema
+} // namespace detail
+)";
             // clang-format on
-            fmt::arg("detail", detail),
-            fmt::arg("types_struct_name", types_struct_name),
-            fmt::arg("messages_struct_name", messages_struct_name),
-            fmt::arg("types_struct_path", make_impl_path(types_struct_name)),
-            fmt::arg(
-                "messages_struct_path", make_impl_path(messages_struct_name)),
-            fmt::arg("type_aliases", make_type_aliases()),
-            fmt::arg("message_aliases", make_message_aliases()));
+        }
+
+        // clang-format off
+        res +=
+R"(struct schema
+{
+)";
+        // clang-format on
+
+        if(context.mangled_tag_types_name)
+        {
+            res += fmt::format(
+                "using types = ::{}::detail::schema::{};\n",
+                context.name,
+                *context.mangled_tag_types_name);
+        }
+        else
+        {
+            res += fmt::format(
+                // clang-format off
+R"(struct types
+{{
+{public_types}
+}};
+)",
+                // clang-format on
+                fmt::arg("public_types", public_types));
+        }
+
+        if(context.mangled_tag_messages_name)
+        {
+            res += fmt::format(
+                "using messages = ::{}::detail::schema::{};\n",
+                context.name,
+                *context.mangled_tag_messages_name);
+        }
+        else
+        {
+            res += fmt::format(
+                // clang-format off
+R"(struct messages
+{{
+{public_messages}
+}};
+)",
+                // clang-format on
+                fmt::arg("public_messages", public_messages));
+        }
+
+        // clang-format off
+        res +=
+R"(};
+)";
+        // clang-format on
+
+        return res;
     }
 };
 } // namespace sbepp::sbeppc

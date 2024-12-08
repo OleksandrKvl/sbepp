@@ -21,7 +21,6 @@ struct type_context
     // here and below, set only if encoding is located inside a composite
     std::optional<offset_t> offset_in_composite;
     std::string tag;
-    std::string impl_name;
     bool is_template;
     std::string public_type;
     std::string underlying_type;
@@ -34,7 +33,6 @@ struct composite_context
     std::size_t size;
     std::optional<offset_t> offset_in_composite;
     std::string tag;
-    std::string impl_name;
     std::string impl_type;
     std::string public_type;
     std::optional<std::string> mangled_name;
@@ -47,7 +45,6 @@ struct ref_context
     // is not optional
     offset_t offset_in_composite;
     std::string tag;
-    std::optional<std::string> mangled_name;
 };
 
 struct enum_valid_value_context
@@ -61,7 +58,6 @@ struct enumeration_context
     std::optional<offset_t> offset_in_composite;
     std::string primitive_type;
     std::string tag;
-    std::string impl_name;
     std::string public_type;
     std::string impl_type;
     std::string underlying_type;
@@ -79,7 +75,6 @@ struct set_context
     std::optional<offset_t> offset_in_composite;
     std::string primitive_type;
     std::string tag;
-    std::string impl_name;
     std::string public_type;
     std::string impl_type;
     std::string underlying_type;
@@ -89,7 +84,6 @@ struct set_context
 struct message_context
 {
     std::string tag;
-    std::string impl_name;
     std::string impl_type;
     std::string public_type;
     block_length_t actual_block_length;
@@ -111,7 +105,6 @@ struct field_context
 struct group_context
 {
     std::string tag;
-    std::string impl_name;
     std::string entry_impl_type;
     std::string impl_type;
     block_length_t actual_block_length;

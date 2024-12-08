@@ -47,8 +47,8 @@ public:
         tc.compile(
             [&type_includes, &output_dir, &fs_provider, &schema_name](
                 const auto name,
-                const auto implementation,
-                const auto alias,
+                const auto detail_type,
+                const auto public_type,
                 const auto& dependencies,
                 const auto traits)
             {
@@ -78,20 +78,21 @@ namespace detail
 {{
 namespace types
 {{
-{implementation}
+// TODO: don't add this part when type is not mangled
+{detail_type}
 }} // namespace types
 }} // namespace detail
 
 namespace types
 {{
-{alias}
+{public_type}
 }} // namespace types
 }} // namespace {schema}
 
 namespace sbepp
 {{
 {traits}
-}}  // namespace sbepp
+}} // namespace sbepp
 
 SBEPP_WARNINGS_ON();
 )",
@@ -100,8 +101,8 @@ SBEPP_WARNINGS_ON();
                         fmt::arg(
                             "dependency_includes",
                             make_local_includes(dependencies)),
-                        fmt::arg("implementation", implementation),
-                        fmt::arg("alias", alias),
+                        fmt::arg("detail_type", detail_type),
+                        fmt::arg("public_type", public_type),
                         fmt::arg("traits", traits),
                         fmt::arg(
                             "top_comment",
@@ -131,20 +132,13 @@ namespace {schema}
 {{
 {tags}
 
-namespace detail
-{{
-namespace types
-{{
-template<typename Byte>
-class {header_type};
-}} // namespace types
-}} // namespace detail
+{header_forward_decl}
 }} // namespace {schema}
 
 namespace sbepp
 {{
 {schema_traits}
-}}  // namespace sbepp
+}} // namespace sbepp
 
 SBEPP_WARNINGS_ON();
 )",
@@ -152,14 +146,15 @@ SBEPP_WARNINGS_ON();
                 fmt::arg("schema", schema_name),
                 fmt::arg("tags", tags),
                 fmt::arg("schema_traits", schema_traits),
-                // can't use `header_type.name` here because it's an alias and
-                // it's not possible to forward declare it
-                fmt::arg("header_type", ctx_manager.get(header_type).impl_name),
                 fmt::arg(
                     "top_comment", utils::get_compiled_header_top_comment()),
                 fmt::arg(
-                    "injected_include",
-                    make_injected_include(inject_include))));
+                    "injected_include", make_injected_include(inject_include)),
+                fmt::arg(
+                    "header_forward_decl",
+                    make_schema_header_forward_declaration(
+                        header_type.name,
+                        ctx_manager.get(header_type).mangled_name))));
 
         // messages
         std::vector<std::string> message_includes;
@@ -167,8 +162,8 @@ SBEPP_WARNINGS_ON();
         mc.compile(
             [&message_includes, &output_dir, &schema_name, &fs_provider](
                 const auto name,
-                const auto implementation,
-                const auto alias,
+                const auto detail_message,
+                const auto public_message,
                 const auto& dependencies,
                 const auto traits)
             {
@@ -198,20 +193,21 @@ namespace detail
 {{
 namespace messages
 {{
-{implementation}
+// TODO: remove it if `detail_message` is empty
+{detail_message}
 }} // namespace messages
 }} // namespace detail
 
 namespace messages
 {{
-{alias}
+{public_message}
 }} // namespace messages
 }} // namespace {schema}
 
 namespace sbepp
 {{
 {traits}
-}}  // namespace sbepp
+}} // namespace sbepp
 
 SBEPP_WARNINGS_ON();
 )",
@@ -220,15 +216,15 @@ SBEPP_WARNINGS_ON();
                         fmt::arg(
                             "dependency_includes",
                             make_type_dependency_includes(dependencies)),
-                        fmt::arg("implementation", implementation),
-                        fmt::arg("alias", alias),
+                        fmt::arg("detail_message", detail_message),
+                        fmt::arg("public_message", public_message),
                         fmt::arg("traits", traits),
                         fmt::arg(
                             "top_comment",
                             utils::get_compiled_header_top_comment())));
             });
 
-        // top level header
+        // top-level header
         fs_provider.write_file(
             output_dir / schema_name / schema_name += ".hpp",
             fmt::format(
@@ -291,6 +287,39 @@ private:
         }
 
         return {};
+    }
+
+    static std::string make_schema_header_forward_declaration(
+        const std::string_view public_name,
+        const std::optional<std::string>& mangled_name)
+    {
+        if(mangled_name)
+        {
+            return fmt::format(
+                // clang-format off
+R"(namespace detail
+{{
+namespace types
+{{
+template<typename Byte>
+class {impl_name};
+}} // namespace types
+}} // namespace detail)",
+                // clang-format on
+                fmt::arg("impl_name", *mangled_name));
+        }
+        else
+        {
+            return fmt::format(
+                // clang-format off
+R"(namespace types
+{{
+template<typename Byte>
+class {impl_name};
+}} // namespace types)",
+                // clang-format on
+                fmt::arg("impl_name", public_name));
+        }
     }
 };
 } // namespace sbepp::sbeppc

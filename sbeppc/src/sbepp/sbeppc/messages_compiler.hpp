@@ -26,8 +26,8 @@ class messages_compiler
 public:
     using on_message_cb_t = std::function<void(
         const std::string_view name,
-        const std::string_view implementation,
-        const std::string_view alias,
+        const std::string_view detail_message,
+        const std::string_view public_message,
         const std::unordered_set<std::string>& dependencies,
         const std::string_view traits)>;
 
@@ -461,7 +461,7 @@ R"(
         context.impl_type = fmt::format(
             "::{}::detail::messages::{}",
             ctx_manager->get(*schema).name,
-            context.impl_name);
+            context.mangled_name.value_or(g.name));
         const auto& dimension_encoding =
             utils::get_schema_encoding_as<sbe::composite>(
                 *schema, g.dimension_type);
@@ -500,7 +500,7 @@ public:
 }};
 )",
             // clang-format on
-            fmt::arg("name", context.impl_name),
+            fmt::arg("name", context.mangled_name.value_or(g.name)),
             fmt::arg("dimension", dimension_type),
             fmt::arg("entry", context.entry_impl_type),
             fmt::arg("base_class", base_class),
@@ -1631,10 +1631,23 @@ R"(
             make_level_accessors(m.members, header_context.size);
         const auto& schema_name = ctx_manager->get(*schema).name;
 
-        message_context.impl_type = fmt::format(
-            "::{}::detail::messages::{}",
-            schema_name,
-            message_context.impl_name);
+        if(message_context.mangled_name)
+        {
+            message_context.impl_type = fmt::format(
+                "::{}::detail::messages::{}",
+                schema_name,
+                *message_context.mangled_name);
+        }
+        else
+        {
+            message_context.impl_type =
+                fmt::format("::{}::messages::{}", schema_name, m.name);
+        }
+
+        message_context.public_type = fmt::format(
+            "::{schema}::messages::{name}",
+            fmt::arg("schema", schema_name),
+            fmt::arg("name", m.name));
 
         const auto& header_type = header_context.public_type;
         const auto size_bytes_impl = make_level_size_bytes_impl(
@@ -1648,8 +1661,6 @@ R"(
         const auto implementation = fmt::format(
             // clang-format off
 R"(
-{groups}
-
 template<typename Byte>
 class {name} : public ::sbepp::detail::message_base<
     Byte, {header_type}<Byte>>
@@ -1675,23 +1686,31 @@ public:
 }};
 )",
             // clang-format on
-            fmt::arg("name", message_context.impl_name),
+            fmt::arg("name", message_context.mangled_name.value_or((m.name))),
             fmt::arg("header_type", header_type),
             fmt::arg("accessors", accessors),
             fmt::arg("size_getter", size_bytes_impl),
             fmt::arg("header_filler", make_message_header_filler(m)),
-            fmt::arg("groups", groups),
             fmt::arg("visit_children_impl", visit_children_impl),
             fmt::arg("tag", message_context.tag));
 
-        message_context.public_type = fmt::format(
-            "::{schema}::messages::{name}",
-            fmt::arg("schema", schema_name),
-            fmt::arg("name", m.name));
-
-        const auto alias = make_alias(m);
         const auto traits = traits_gen->make_message_traits(m);
-        on_message_cb(m.name, implementation, alias, dependencies, traits);
+
+        if(message_context.mangled_name)
+        {
+            on_message_cb(
+                m.name,
+                groups + implementation,
+                make_alias(m),
+                dependencies,
+                traits);
+        }
+        else
+        {
+            on_message_cb(m.name, groups, implementation, dependencies, traits);
+        }
+
+        // TODO: check message context impl_type, is it needed?
     }
 };
 } // namespace sbepp::sbeppc

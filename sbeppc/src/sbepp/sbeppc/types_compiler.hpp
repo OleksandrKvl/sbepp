@@ -29,8 +29,8 @@ class types_compiler
 public:
     using on_public_type_cb_t = std::function<void(
         const std::string_view name,
-        const std::string_view implementation,
-        const std::string_view alias,
+        const std::string_view detail_type,
+        const std::string_view public_type,
         const std::unordered_set<std::string>& dependencies,
         const std::string_view traits)>;
 
@@ -62,12 +62,19 @@ private:
     const sbe::message_schema* schema{};
     traits_generator* traits_gen{};
     context_manager* ctx_manager{};
-
     std::string_view schema_name;
     sbe::byte_order_kind byte_order;
     on_public_type_cb_t on_public_type_cb;
-    std::unordered_map<std::string_view, bool> compiled_types;
+    std::unordered_map<std::string, bool> compiled_types;
     std::vector<std::unordered_set<std::string>> dependencies;
+
+    struct compiled_composite
+    {
+        // for anonymous types defined inside the composite
+        std::string detail;
+        // for the composite itself
+        std::string impl;
+    };
 
     static std::string get_min_value(const sbe::type& t)
     {
@@ -155,7 +162,7 @@ using {type_name} = ::sbepp::detail::static_array_ref<
     const char, {element_type}, {length}, {tag}>;
 )",
                 // clang-format on
-                fmt::arg("type_name", context.impl_name),
+                fmt::arg("type_name", context.mangled_name.value_or(t.name)),
                 fmt::arg("element_type", context.underlying_type),
                 fmt::arg("length", t.length),
                 fmt::arg("tag", context.tag));
@@ -163,7 +170,9 @@ using {type_name} = ::sbepp::detail::static_array_ref<
         else
         {
             return fmt::format(
-                "using {} = {};\n", context.impl_name, context.underlying_type);
+                "using {} = {};\n",
+                context.mangled_name.value_or(t.name),
+                context.underlying_type);
         }
     }
 
@@ -180,7 +189,7 @@ using {type_name} = ::sbepp::detail::static_array_ref<
     Byte, {element_type}, {length}, {tag}>;
 )",
             // clang-format on
-            fmt::arg("type_name", context.impl_name),
+            fmt::arg("type_name", context.mangled_name.value_or(t.name)),
             fmt::arg("element_type", context.underlying_type),
             fmt::arg("length", t.length),
             fmt::arg("tag", context.tag));
@@ -213,7 +222,7 @@ public:
 }};
 )",
             // clang-format on
-            fmt::arg("type_name", context.impl_name),
+            fmt::arg("type_name", context.mangled_name.value_or(t.name)),
             fmt::arg("underlying_type", context.underlying_type),
             fmt::arg("min_value", get_min_value(t)),
             fmt::arg("max_value", get_max_value(t)));
@@ -251,19 +260,48 @@ public:
 }};
 )",
             // clang-format on
-            fmt::arg("type_name", context.impl_name),
+            fmt::arg("type_name", context.mangled_name.value_or(t.name)),
             fmt::arg("underlying_type", context.underlying_type),
             fmt::arg("min_value", get_min_value(t)),
             fmt::arg("max_value", get_max_value(t)),
             fmt::arg("null_value", get_null_value(t)));
     }
 
-    std::string compile_encoding(const sbe::type& t)
+    template<typename Context>
+    void set_impl_and_public_types(
+        const std::string& public_name, const bool is_public, Context& context)
+    {
+        // TODO: do we need separate public and impl types?
+        if(!is_public)
+        {
+            context.impl_type = fmt::format(
+                "::{}::detail::types::{}",
+                schema_name,
+                context.mangled_name.value_or(public_name));
+            context.public_type = context.impl_type;
+        }
+        else
+        {
+            context.public_type =
+                fmt::format("::{}::types::{}", schema_name, public_name);
+            if(context.mangled_name)
+            {
+                context.impl_type = fmt::format(
+                    "::{}::detail::types::{}",
+                    schema_name,
+                    *context.mangled_name);
+            }
+            else
+            {
+                context.impl_type = context.public_type;
+            }
+        }
+    }
+
+    std::string compile_encoding(const sbe::type& t, const bool is_public)
     {
         auto& context = ctx_manager->get(t);
-        context.impl_type = fmt::format(
-            "::{}::detail::types::{}", schema_name, context.impl_name);
-        context.public_type = context.impl_type;
+        set_impl_and_public_types(t.name, is_public, context);
         context.is_template = false;
         context.underlying_type =
             utils::primitive_type_to_cpp_type(t.primitive_type);
@@ -329,7 +367,7 @@ R"(case {enum_type}::{enumerator}:
         visitor.on_enum_value(e, {tag}{{}});
         break;)",
                 // clang-format on
-                fmt::arg("enum_type", context.impl_name),
+                fmt::arg("enum_type", context.mangled_name.value_or(e.name)),
                 fmt::arg("enumerator", valid_value.name),
                 fmt::arg("tag", ctx_manager->get(valid_value).tag)));
         }
@@ -349,16 +387,15 @@ SBEPP_CPP14_CONSTEXPR void tag_invoke(
 }}
 )",
             // clang-format on
-            fmt::arg("enum", context.impl_name),
+            fmt::arg("enum", context.mangled_name.value_or(e.name)),
             fmt::arg("switch_cases", fmt::join(switch_cases, "\n    ")));
     }
 
-    std::string compile_encoding(const sbe::enumeration& e)
+    std::string
+        compile_encoding(const sbe::enumeration& e, const bool is_public)
     {
         auto& context = ctx_manager->get(e);
-        context.impl_type = fmt::format(
-            "::{}::detail::types::{}", schema_name, context.impl_name);
-        context.public_type = context.impl_type;
+        set_impl_and_public_types(e.name, is_public, context);
         context.underlying_type =
             utils::primitive_type_to_cpp_type(context.primitive_type);
 
@@ -375,20 +412,10 @@ enum class {name} : {type}
 {enum_visit_impl}
 )",
             // clang-format on
-            fmt::arg("name", context.impl_name),
+            fmt::arg("name", context.mangled_name.value_or(e.name)),
             fmt::arg("type", context.underlying_type),
             fmt::arg("enumerators", enumerators),
             fmt::arg("enum_visit_impl", make_enum_visit_impl(e)));
-    }
-
-    static bool is_unsigned(const std::string_view type)
-    {
-        static const std::unordered_set<std::string_view> unsigned_types{
-            "::std::uint8_t",
-            "::std::uint16_t",
-            "::std::uint32_t",
-            "::std::uint64_t"};
-        return unsigned_types.count(type);
     }
 
     std::string make_set_accessors(const sbe::set& s) const
@@ -415,7 +442,7 @@ R"(
                 // clang-format on
                 fmt::arg("name", choice.name),
                 fmt::arg("index", choice.value),
-                fmt::arg("class_name", context.impl_name));
+                fmt::arg("class_name", context.mangled_name.value_or(s.name)));
         }
 
         return res;
@@ -474,12 +501,10 @@ SBEPP_CPP14_CONSTEXPR void operator()(
             fmt::arg("visitors", fmt::join(visitors, "\n    ")));
     }
 
-    std::string compile_encoding(const sbe::set& s)
+    std::string compile_encoding(const sbe::set& s, const bool is_public)
     {
         auto& context = ctx_manager->get(s);
-        context.impl_type = fmt::format(
-            "::{}::detail::types::{}", schema_name, context.impl_name);
-        context.public_type = context.impl_type;
+        set_impl_and_public_types(s.name, is_public, context);
         context.underlying_type =
             utils::primitive_type_to_cpp_type(context.primitive_type);
 
@@ -498,7 +523,7 @@ public:
 }};
 )",
             // clang-format on
-            fmt::arg("name", context.impl_name),
+            fmt::arg("name", context.mangled_name.value_or(s.name)),
             fmt::arg("type", context.underlying_type),
             fmt::arg("accessors", make_set_accessors(s)),
             fmt::arg("visit_set_impl", make_visit_set_impl(s)),
@@ -676,7 +701,7 @@ R"(
                     },
                     [this, &inline_types_impl](const sbe::type& t)
                     {
-                        inline_types_impl += compile_encoding(t);
+                        inline_types_impl += compile_encoding(t, false);
                         if(t.presence == field_presence::constant)
                         {
                             return normal_accessors::make_constant_accessor(
@@ -693,9 +718,23 @@ R"(
                             byte_order,
                             context);
                     },
+                    [this, &inline_types_impl](const sbe::composite& c)
+                    {
+                        auto compiled = compile_encoding(c, false);
+                        inline_types_impl += compiled.detail;
+                        inline_types_impl += compiled.impl;
+
+                        const auto& context = ctx_manager->get(c);
+                        return normal_accessors::make_accessor(
+                            c,
+                            *context.offset_in_composite,
+                            c.name,
+                            byte_order,
+                            context);
+                    },
                     [this, &inline_types_impl](auto& enc)
                     {
-                        inline_types_impl += compile_encoding(enc);
+                        inline_types_impl += compile_encoding(enc, false);
 
                         const auto& context = ctx_manager->get(enc);
                         return normal_accessors::make_accessor(
@@ -711,20 +750,18 @@ R"(
         return {accessors, inline_types_impl};
     }
 
-    std::string compile_encoding(const sbe::composite& c)
+    compiled_composite
+        compile_encoding(const sbe::composite& c, const bool is_public)
     {
         auto& context = ctx_manager->get(c);
-        context.impl_type = fmt::format(
-            "::{}::detail::types::{}", schema_name, context.impl_name);
-        context.public_type = context.impl_type;
+        set_impl_and_public_types(c.name, is_public, context);
 
-        const auto accessors = make_element_accessors(c);
-
-        return fmt::format(
+        auto accessors = make_element_accessors(c);
+        compiled_composite res;
+        res.detail = std::move(accessors.second);
+        res.impl = fmt::format(
             // clang-format off
 R"(
-{inline_types_impl}
-
 template<typename Byte>
 class {name} : public ::sbepp::detail::composite_base<Byte>
 {{
@@ -751,27 +788,13 @@ public:
 }};
 )",
             // clang-format on
-            fmt::arg("name", context.impl_name),
+            fmt::arg("name", context.mangled_name.value_or(c.name)),
             fmt::arg("accessors", accessors.first),
             fmt::arg("size", context.size),
-            fmt::arg("inline_types_impl", accessors.second),
             fmt::arg("visit_children_impl", make_visit_children(c.elements)),
             fmt::arg("tag", context.tag));
-    }
 
-    std::string compile_encoding(const sbe::encoding& enc)
-    {
-        return std::visit(
-            [this](auto& enc)
-            {
-                return compile_encoding(enc);
-            },
-            enc);
-    }
-
-    std::string make_public_type(const std::string_view name)
-    {
-        return fmt::format("::{}::types::{}", schema_name, name);
+        return res;
     }
 
     std::string make_alias(const sbe::encoding& enc)
@@ -781,14 +804,12 @@ public:
                 [this](const sbe::composite& c)
                 {
                     auto& context = ctx_manager->get(c);
-                    context.public_type = make_public_type(c.name);
                     return utils::make_alias_template(
                         c.name, context.impl_type);
                 },
                 [this](const sbe::type& t)
                 {
                     auto& context = ctx_manager->get(t);
-                    context.public_type = make_public_type(t.name);
                     if(context.is_template)
                     {
                         return utils::make_alias_template(
@@ -803,7 +824,6 @@ public:
                 [this](const auto& e)
                 {
                     auto& context = ctx_manager->get(e);
-                    context.public_type = make_public_type(e.name);
                     return utils::make_type_alias(e.name, context.impl_type);
                 }},
             enc);
@@ -812,18 +832,59 @@ public:
     void compile_public_encoding(const sbe::encoding& enc)
     {
         const auto name = utils::get_encoding_name(enc);
+        const auto lowered_name = utils::to_lower(name);
         assert(!dependencies.empty());
         dependencies.back().emplace(name);
 
-        if(!compiled_types[name])
+        if(!compiled_types[lowered_name])
         {
             dependencies.emplace_back();
-            const auto implementation = compile_encoding(enc);
-            compiled_types[name] = true;
-            const auto alias = make_alias(enc);
+            std::string detail_type;
+            std::string public_type;
+            bool needs_alias{};
+
+            std::visit(
+                utils::overloaded{
+                    [this, &detail_type, &public_type, &needs_alias](
+                        const sbe::composite& c)
+                    {
+                        auto compiled = compile_encoding(c, true);
+                        detail_type = std::move(compiled.detail);
+                        const auto& ctx = ctx_manager->get(c);
+                        if(ctx.mangled_name)
+                        {
+                            detail_type += compiled.impl;
+                            needs_alias = true;
+                        }
+                        else
+                        {
+                            public_type = std::move(compiled.impl);
+                        }
+                    },
+                    [this, &detail_type, &public_type, &needs_alias](
+                        const auto& enc)
+                    {
+                        auto impl = compile_encoding(enc, true);
+                        if(ctx_manager->get(enc).mangled_name)
+                        {
+                            detail_type = std::move(impl);
+                            needs_alias = true;
+                        }
+                        else
+                        {
+                            public_type = std::move(impl);
+                        }
+                    }},
+                enc);
+
+            compiled_types[lowered_name] = true;
+            if(needs_alias)
+            {
+                public_type = make_alias(enc);
+            }
             const auto traits = traits_gen->make_type_traits(enc);
             on_public_type_cb(
-                name, implementation, alias, dependencies.back(), traits);
+                name, detail_type, public_type, dependencies.back(), traits);
             dependencies.pop_back();
         }
     }

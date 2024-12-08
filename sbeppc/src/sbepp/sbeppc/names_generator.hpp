@@ -4,6 +4,7 @@
 #include <sbepp/sbeppc/throw_error.hpp>
 #include <sbepp/sbeppc/context_manager.hpp>
 #include <sbepp/sbeppc/sbe.hpp>
+#include <sbepp/sbeppc/utils.hpp>
 
 #include <fmt/format.h>
 
@@ -104,12 +105,6 @@ private:
         return members;
     }
 
-    static std::unordered_set<std::string> get_member_names(const sbe::ref&)
-    {
-        // ref-s never have any direct members
-        return {};
-    }
-
     template<typename... UnorderedSets>
     static std::string make_mangled_name(
         const std::string_view original_name,
@@ -158,39 +153,50 @@ private:
             // since implementation types are in the same enclosing namespace
 
             std::visit(
-                [this](const auto& actual_enc)
-                {
-                    const auto members = get_member_names(actual_enc);
-                    static constexpr auto is_ref =
-                        std::is_same_v<decltype(actual_enc), const sbe::ref&>;
-                    // composite elements (except ref-s) are implemented in
-                    // `detail::types` namespace
-                    if(members.count(actual_enc.name)
-                       || (!is_ref
-                           && mangled_type_names.count(actual_enc.name)))
+                utils::overloaded{
+                    [](const sbe::ref&)
                     {
-                        const auto mangled_name = make_mangled_name(
-                            actual_enc.name,
-                            actual_enc.location,
-                            members,
-                            mangled_type_names,
-                            non_mangled_type_names);
-                        mangled_type_names.insert(mangled_name);
-                        ctx_manager->get(actual_enc).mangled_name =
-                            mangled_name;
-                    }
-                    else
+                        // ref tag is always located directly inside composite
+                        // and it doesn't have any implementation type
+                    },
+                    [this](const auto& actual_enc)
                     {
-                        mangled_type_names.insert(actual_enc.name);
-                    }
+                        const auto members = get_member_names(actual_enc);
+                        // composite elements (except ref-s) are implemented in
+                        // `detail::types` namespace
 
-                    if constexpr(std::is_same_v<
-                                     decltype(actual_enc),
-                                     const sbe::composite&>)
-                    {
-                        handle_composite_elements(actual_enc.elements);
-                    }
-                },
+                        // should not clash with its members
+                        if(members.count(actual_enc.name)
+                           // should not clash with other mangled types.
+                           // Composite elements except ref-s are implemented in
+                           // `detail::types` namespace. Although their tags may
+                           // be put directly inside the composite's tag, we
+                           // want tags and implementation types to have the
+                           // same name.
+                           || mangled_type_names.count(actual_enc.name))
+                        {
+                            const auto mangled_name = make_mangled_name(
+                                actual_enc.name,
+                                actual_enc.location,
+                                members,
+                                mangled_type_names,
+                                non_mangled_type_names);
+                            mangled_type_names.insert(mangled_name);
+                            ctx_manager->get(actual_enc).mangled_name =
+                                mangled_name;
+                        }
+                        else
+                        {
+                            mangled_type_names.insert(actual_enc.name);
+                        }
+
+                        if constexpr(std::is_same_v<
+                                         decltype(actual_enc),
+                                         const sbe::composite&>)
+                        {
+                            handle_composite_elements(actual_enc.elements);
+                        }
+                    }},
                 e);
         }
     }
