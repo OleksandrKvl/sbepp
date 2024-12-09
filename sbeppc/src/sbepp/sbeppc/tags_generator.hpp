@@ -39,7 +39,7 @@ private:
     const sbe::message_schema* schema{};
     context_manager* ctx_manager{};
     std::string generated;
-    std::unordered_map<std::string, bool> processed_types;
+    std::unordered_map<std::string_view, bool> processed_types;
     std::string detail_types;
     std::string public_types;
     std::string detail_messages;
@@ -244,11 +244,10 @@ R"(struct {name}
         auto prev_path = std::exchange(path, {});
         path.emplace_back("types");
 
-        const auto name = utils::to_lower(utils::get_encoding_name(encoding));
-        if(!processed_types[name])
-        {
-            std::visit(
-                [this](const auto& enc)
+        std::visit(
+            [this](const auto& enc)
+            {
+                if(!processed_types[enc.name])
                 {
                     const auto tag = make_tag(enc);
                     // public types always go into detail
@@ -260,11 +259,11 @@ R"(struct {name}
                             ctx_manager->get(enc).mangled_name.value_or(
                                 enc.name)));
                     public_types += '\n';
-                },
-                encoding);
 
-            processed_types[name] = true;
-        }
+                    processed_types[enc.name] = true;
+                }
+            },
+            encoding);
 
         std::swap(path, prev_path);
     }

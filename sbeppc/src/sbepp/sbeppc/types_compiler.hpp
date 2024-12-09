@@ -65,7 +65,7 @@ private:
     std::string_view schema_name;
     sbe::byte_order_kind byte_order;
     on_public_type_cb_t on_public_type_cb;
-    std::unordered_map<std::string, bool> compiled_types;
+    std::unordered_map<std::string_view, bool> compiled_types;
     std::vector<std::unordered_set<std::string>> dependencies;
 
     struct compiled_composite
@@ -832,11 +832,10 @@ public:
     void compile_public_encoding(const sbe::encoding& enc)
     {
         const auto name = utils::get_encoding_name(enc);
-        const auto lowered_name = utils::to_lower(name);
         assert(!dependencies.empty());
         dependencies.back().emplace(name);
 
-        if(!compiled_types[lowered_name])
+        if(!compiled_types[name])
         {
             dependencies.emplace_back();
             std::string detail_type;
@@ -877,7 +876,7 @@ public:
                     }},
                 enc);
 
-            compiled_types[lowered_name] = true;
+            compiled_types[name] = true;
             if(needs_alias)
             {
                 public_type = make_alias(enc);
