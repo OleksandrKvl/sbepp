@@ -154,7 +154,8 @@ SBEPP_WARNINGS_ON();
                     "header_forward_decl",
                     make_schema_header_forward_declaration(
                         header_type.name,
-                        ctx_manager.get(header_type).mangled_name))));
+                        ctx_manager.get(header_type).mangled_name,
+                        schema_name))));
 
         // messages
         std::vector<std::string> message_includes;
@@ -291,7 +292,8 @@ private:
 
     static std::string make_schema_header_forward_declaration(
         const std::string_view public_name,
-        const std::optional<std::string>& mangled_name)
+        const std::optional<std::string>& mangled_name,
+        const std::string_view schema_name)
     {
         if(mangled_name)
         {
@@ -304,9 +306,18 @@ namespace types
 template<typename Byte>
 class {impl_name};
 }} // namespace types
-}} // namespace detail)",
+}} // namespace detail
+
+namespace types
+{{
+// TODO: test
+template<typename Byte>
+using {public_name} = ::{schema_name}::detail::types::{impl_name};
+}} // namespace types)",
                 // clang-format on
-                fmt::arg("impl_name", *mangled_name));
+                fmt::arg("impl_name", *mangled_name),
+                fmt::arg("public_name", public_name),
+                fmt::arg("schema_name", schema_name));
         }
         else
         {
@@ -315,10 +326,10 @@ class {impl_name};
 R"(namespace types
 {{
 template<typename Byte>
-class {impl_name};
+class {public_name};
 }} // namespace types)",
                 // clang-format on
-                fmt::arg("impl_name", public_name));
+                fmt::arg("public_name", public_name));
         }
     }
 };

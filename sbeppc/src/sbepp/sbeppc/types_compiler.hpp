@@ -551,7 +551,7 @@ public:
 
         return fmt::format(
             "::sbepp::to_underlying({}::{})",
-            ctx_manager->get(e).impl_type,
+            ctx_manager->get(e).public_type,
             parsed.enumerator);
     }
 

@@ -84,7 +84,7 @@ public:
             fmt::arg(
                 "header_type",
                 utils::make_alias_template(
-                    "header_type", header_context.impl_type)),
+                    "header_type", header_context.public_type)),
             fmt::arg(
                 "header_type_tag",
                 utils::make_type_alias("header_type_tag", header_context.tag)));

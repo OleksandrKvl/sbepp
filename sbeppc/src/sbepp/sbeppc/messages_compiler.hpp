@@ -64,7 +64,7 @@ private:
             *schema, parsed.enum_name);
 
         return fmt::format(
-            "{}::{}", ctx_manager->get(e).impl_type, parsed.enumerator);
+            "{}::{}", ctx_manager->get(e).public_type, parsed.enumerator);
     }
 
     std::string value_ref_to_enum_value(const std::string_view value_ref) const
@@ -412,7 +412,7 @@ public:
     {
         const auto& t = get_header_element(c, "numInGroup");
 
-        return ctx_manager->get(t).impl_type;
+        return ctx_manager->get(t).public_type;
     }
 
     std::string make_group_header_filler(const sbe::group& g)
