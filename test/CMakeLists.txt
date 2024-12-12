@@ -102,3 +102,4 @@ foreach(version IN LISTS cpp_versions)
 endforeach()
 
 add_subdirectory(sbeppc_errors)
+add_subdirectory(naming_test)

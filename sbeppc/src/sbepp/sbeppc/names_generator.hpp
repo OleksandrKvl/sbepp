@@ -18,7 +18,7 @@ namespace sbepp::sbeppc
 // (if possible) names for types and messages. If non-mangled name is not
 // possible, it tries to preserve the original name by adding a numerical suffix
 // to it. The main goal is to keep names in compiler error messages
-// understandable for a user.
+// understandable to a user.
 class names_generator
 {
 public:
@@ -40,7 +40,7 @@ private:
     std::unordered_set<std::string> non_mangled_type_names;
     // mangled public and anonymous (defined within composites) type names
     std::unordered_set<std::string> mangled_type_names;
-    // these are similar to the above one but are message-related
+    // these are similar to the above ones but are message-related
     std::unordered_set<std::string> non_mangled_message_names;
     std::unordered_set<std::string> mangled_message_names;
 
@@ -111,7 +111,6 @@ private:
         const source_location& location,
         const UnorderedSets&... reserved_names)
     {
-        // TODO: should we start from `2`?
         for(std::size_t n = 0; n != std::numeric_limits<std::size_t>::max();
             n++)
         {
@@ -304,7 +303,6 @@ private:
         const std::unordered_set<std::string>& entry_members,
         const UnorderedSets&... reserved_names)
     {
-        // TODO: should we start from `2`?
         for(std::size_t n = 0; n != std::numeric_limits<std::size_t>::max();
             n++)
         {
