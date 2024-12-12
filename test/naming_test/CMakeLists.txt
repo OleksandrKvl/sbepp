@@ -40,6 +40,11 @@ add_naming_test_schema("public_private_type_name_clash" "naming_test_schemas")
 add_naming_test_schema("mangled_type_name_clash" "naming_test_schemas")
 add_naming_test_schema("types_type" "naming_test_schemas")
 
+add_naming_test_schema("message_member_name_clash" "naming_test_schemas")
+add_naming_test_schema("mangled_message_name_clash" "naming_test_schemas")
+add_naming_test_schema("messages_message" "naming_test_schemas")
+add_naming_test_schema("mangled_message_header_name" "naming_test_schemas")
+
 set(target_name "naming_test")
 
 create_naming_test_target("${target_name}" "${naming_test_schemas}")

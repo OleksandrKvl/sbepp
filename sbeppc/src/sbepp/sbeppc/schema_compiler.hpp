@@ -310,9 +310,8 @@ class {impl_name};
 
 namespace types
 {{
-// TODO: test
 template<typename Byte>
-using {public_name} = ::{schema_name}::detail::types::{impl_name};
+using {public_name} = ::{schema_name}::detail::types::{impl_name}<Byte>;
 }} // namespace types)",
                 // clang-format on
                 fmt::arg("impl_name", *mangled_name),
