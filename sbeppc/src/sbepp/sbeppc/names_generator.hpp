@@ -346,6 +346,10 @@ private:
             // groups and their entries are implemented in the same namespace as
             // mangled messages so their names should not clash
             if(mangled_message_names.count(g.name)
+               // at the moment mangled message name cannot match entry name
+               // because mangled names end with `_N` while entry names end with
+               // `_entry` but I prefer to keep this check to show the intent
+               // and in case mangling approach changes in the future
                || mangled_message_names.count(entry_name)
                || entry_members.count(entry_name)
                // group name should not clash with entry members because their

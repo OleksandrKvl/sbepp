@@ -54,7 +54,6 @@ private:
     traits_generator* traits_gen{};
     context_manager* ctx_manager{};
     on_message_cb_t on_message_cb;
-    std::size_t group_entry_index{};
     std::unordered_set<std::string> dependencies;
 
     std::string value_ref_to_enumerator(const std::string_view value_ref) const
@@ -191,22 +190,6 @@ private:
         return res;
     }
 
-    std::string make_next_group_entry_name(const sbe::level_members& members)
-    {
-        group_entry_index++;
-        auto name = fmt::format("entry_{}", group_entry_index);
-
-        const auto member_names = get_member_names(members);
-        std::size_t minor_index{};
-        while(member_names.count(name))
-        {
-            minor_index++;
-            name = fmt::format("entry_{}_{}", group_entry_index, minor_index);
-        }
-
-        return name;
-    }
-
     static std::string make_level_size_bytes_impl(
         const bool is_flat,
         const std::string_view last_member,
@@ -338,8 +321,9 @@ R"(
         // entry should not take header size into account
         const auto accessors = make_level_accessors(g.members, 0);
 
-        const auto class_name = make_next_group_entry_name(g.members);
-        ctx_manager->get(g).entry_impl_type = fmt::format(
+        auto& group_context = ctx_manager->get(g);
+        const auto& class_name = group_context.entry_name;
+        group_context.entry_impl_type = fmt::format(
             "::{}::detail::messages::{}",
             ctx_manager->get(*schema).name,
             class_name);

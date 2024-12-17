@@ -44,6 +44,10 @@ add_naming_test_schema("message_member_name_clash" "naming_test_schemas")
 add_naming_test_schema("mangled_message_name_clash" "naming_test_schemas")
 add_naming_test_schema("messages_message" "naming_test_schemas")
 add_naming_test_schema("mangled_message_header_name" "naming_test_schemas")
+add_naming_test_schema("group_member_name_clash" "naming_test_schemas")
+add_naming_test_schema("entry_name_clash" "naming_test_schemas")
+add_naming_test_schema("mangled_group_name_clash" "naming_test_schemas")
+add_naming_test_schema("mangled_entry_name_clash" "naming_test_schemas")
 
 set(target_name "naming_test")
 
