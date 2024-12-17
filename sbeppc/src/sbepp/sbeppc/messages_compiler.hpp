@@ -1693,8 +1693,6 @@ public:
         {
             on_message_cb(m.name, groups, implementation, dependencies, traits);
         }
-
-        // TODO: check message context impl_type, is it needed?
     }
 };
 } // namespace sbepp::sbeppc

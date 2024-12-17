@@ -271,7 +271,6 @@ public:
     void set_impl_and_public_types(
         const std::string& public_name, const bool is_public, Context& context)
     {
-        // TODO: do we need separate public and impl types?
         if(!is_public)
         {
             context.impl_type = fmt::format(
