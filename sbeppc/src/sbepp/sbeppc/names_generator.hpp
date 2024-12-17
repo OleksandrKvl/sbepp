@@ -14,23 +14,19 @@
 
 namespace sbepp::sbeppc
 {
-// This class is responsible for checking and generating mangled or non-mangled
-// (if possible) names for types and messages. If non-mangled name is not
-// possible, it tries to preserve the original name by adding a numerical suffix
-// to it. The main goal is to keep names in compiler error messages
-// understandable to a user.
+// This class is responsible for checking and generating mangled or keeping
+// non-mangled (if possible) names for types and messages. If non-mangled name
+// is not possible, it tries to preserve the original name by adding a numerical
+// suffix to it.
 class names_generator
 {
 public:
-    void generate(
+    static void generate(
         const sbe::message_schema& schema, context_manager& ctx_manager)
     {
-        this->schema = &schema;
-        this->ctx_manager = &ctx_manager;
-        // TODO: clear all data members
-
-        generate_type_names();
-        generate_message_names();
+        names_generator generator{schema, ctx_manager};
+        generator.generate_type_names();
+        generator.generate_message_names();
     }
 
 private:
@@ -43,6 +39,12 @@ private:
     // these are similar to the above ones but are message-related
     std::unordered_set<std::string> non_mangled_message_names;
     std::unordered_set<std::string> mangled_message_names;
+
+    names_generator(
+        const sbe::message_schema& schema, context_manager& ctx_manager)
+        : schema{&schema}, ctx_manager{&ctx_manager}
+    {
+    }
 
     static std::unordered_set<std::string> get_member_names(const sbe::type& t)
     {
@@ -161,17 +163,10 @@ private:
                     [this](const auto& actual_enc)
                     {
                         const auto members = get_member_names(actual_enc);
-                        // composite elements (except ref-s) are implemented in
-                        // `detail::types` namespace
 
                         // should not clash with its members
                         if(members.count(actual_enc.name)
-                           // should not clash with other mangled types.
-                           // Composite elements except ref-s are implemented in
-                           // `detail::types` namespace. Although their tags may
-                           // be put directly inside the composite's tag, we
-                           // want tags and implementation types to have the
-                           // same name.
+                           // should not clash with other mangled types
                            || mangled_type_names.count(actual_enc.name))
                         {
                             const auto mangled_name = make_mangled_name(
@@ -203,9 +198,9 @@ private:
     void generate_type_names()
     {
         // collect all non-mangled names to avoid matching of mangled and
-        // non-mangled names. Although such a match won't lead to an error
+        // non-mangled names. Although such a match won't lead to error
         // because those names will be in different namespaces, it will be just
-        // confusing
+        // confusing to generate mangled name that matches non-mangled one.
         collect_non_mangled_type_names();
 
         for(const auto& [name, enc] : schema->types)
@@ -214,11 +209,9 @@ private:
                 [this](const auto& actual_enc)
                 {
                     const auto members = get_member_names(actual_enc);
+                    // should not clash with a member name
                     if(members.count(actual_enc.name))
                     {
-                        // encoding's name clashes with one of its members
-                        // (either in implementation class or in tag structure)
-                        // so we need a mangled name for it
                         const auto mangled_name = make_mangled_name(
                             actual_enc.name,
                             actual_enc.location,
@@ -230,7 +223,6 @@ private:
                             mangled_name;
                     }
 
-                    // TODO: refactor?
                     if constexpr(std::is_same_v<
                                      decltype(actual_enc),
                                      const sbe::composite&>)
@@ -241,10 +233,8 @@ private:
                 enc);
         }
 
-        // implementation types are located inside `types` namespace but tags
-        // are inside `types` structure and it's not possible to have a child
-        // structure for a tag with the same name so we need a mangled name for
-        // it
+        // non-mangled type tags are located in `types` structure, it's not
+        // possible to have a child structure within it with the same name
         if(non_mangled_type_names.count("types"))
         {
             const auto mangled_tag_types_name = make_mangled_name(
@@ -333,24 +323,18 @@ private:
 
         for(const auto& g : members.groups)
         {
-            // group introduces a new level, although its name is preserved on
-            // the enclosing level, it and its entry needs a mangled name
-
             // group implementation type itself doesn't have any named members
             const auto entry_members = get_member_names(g.members);
             const auto entry_name = make_group_entry_name(g.name);
 
-            // we want to preserve group name in both its implementation type
-            // and its entry type
-
-            // groups and their entries are implemented in the same namespace as
-            // mangled messages so their names should not clash
+            // should not clash with another mangled message-related name
             if(mangled_message_names.count(g.name)
                // at the moment mangled message name cannot match entry name
                // because mangled names end with `_N` while entry names end with
                // `_entry` but I prefer to keep this check to show the intent
                // and in case mangling approach changes in the future
                || mangled_message_names.count(entry_name)
+               // entry name should not clash with entry members
                || entry_members.count(entry_name)
                // group name should not clash with entry members because their
                // tags are located directly within the group's one
@@ -379,7 +363,7 @@ private:
         }
 
         // similar to fields, data tags are never mangled. They don't have
-        // implementation type name, it's always `dynamic_array_ref`.
+        // implementation class name, it's always `dynamic_array_ref`.
     }
 
     void generate_message_names()
@@ -391,8 +375,6 @@ private:
             const auto members = get_member_names(m.members);
             if(members.count(m.name))
             {
-                // message name clashes with its member so we need a mangled
-                // name for it
                 const auto mangled_name = make_mangled_name(
                     m.name,
                     m.location,
@@ -403,15 +385,11 @@ private:
                 ctx_manager->get(m).mangled_name = mangled_name;
             }
 
-            // handle message levels recursively, their names always go into
-            // mangled_message_names.
             handle_message_level(m.members);
         }
 
-        // implementation types are located inside `messages` namespace but tags
-        // are inside `messages` structure and it's not possible to have a child
-        // structure for a tag with the same name so we need a mangled name for
-        // it
+        // similar to types, all message tags are located within `messages`
+        // structure and there should be no clash between them
         if(non_mangled_message_names.count("messages"))
         {
             const auto mangled_tag_messages_name = make_mangled_name(

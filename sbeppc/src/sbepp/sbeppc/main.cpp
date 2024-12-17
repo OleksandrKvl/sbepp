@@ -162,8 +162,7 @@ int main(int argc, char** argv)
         sbe_schema_cpp_validator cpp_validator{reporter, ctx_manager};
         cpp_validator.validate(schema, config.schema_name);
 
-        names_generator names_gen;
-        names_gen.generate(schema, ctx_manager);
+        names_generator::generate(schema, ctx_manager);
 
         schema_compiler::compile(
             config.output_dir,
