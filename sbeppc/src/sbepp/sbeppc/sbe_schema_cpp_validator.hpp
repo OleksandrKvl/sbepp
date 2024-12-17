@@ -20,30 +20,35 @@ namespace sbepp::sbeppc
 class sbe_schema_cpp_validator
 {
 public:
-    sbe_schema_cpp_validator(ireporter& reporter, context_manager& ctx_manager)
-        : reporter{&reporter}, ctx_manager{&ctx_manager}
-    {
-    }
-
-    void validate(
+    static void validate(
         const sbe::message_schema& schema,
-        const std::optional<std::string>& custom_schema_name)
+        const std::optional<std::string>& custom_schema_name,
+        context_manager& ctx_manager,
+        ireporter& reporter)
     {
-        this->schema = &schema;
+        sbe_schema_cpp_validator validator{schema, ctx_manager, reporter};
 
         // at this point all names except schema one satisfy
         // `sbe_checker::is_sbe_symbolic_name` so they have valid C++ name
         // format but we still need to check them against reserved C++ names or
         // keywords
-        validate_schema_name(custom_schema_name);
-        validate_type_names();
-        validate_message_names();
+        validator.validate_schema_name(custom_schema_name);
+        validator.validate_type_names();
+        validator.validate_message_names();
     }
 
 private:
-    ireporter* reporter{};
-    context_manager* ctx_manager{};
     const sbe::message_schema* schema{};
+    context_manager* ctx_manager{};
+    ireporter* reporter{};
+
+    sbe_schema_cpp_validator(
+        const sbe::message_schema& schema,
+        context_manager& ctx_manager,
+        ireporter& reporter)
+        : schema{&schema}, ctx_manager{&ctx_manager}, reporter{&reporter}
+    {
+    }
 
     void validate_level_members(const sbe::level_members& members)
     {

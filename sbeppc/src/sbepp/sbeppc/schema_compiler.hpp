@@ -32,14 +32,12 @@ public:
         context_manager& ctx_manager,
         ifs_provider& fs_provider)
     {
-        create_dirs(output_dir, ctx_manager.get(schema).name, fs_provider);
-
-        tags_generator tags_gen{schema, ctx_manager};
-        const auto& tags = tags_gen.get();
-
-        traits_generator traits_gen{schema, ctx_manager};
-
+        // TODO: refactor this whole class? It's a 200 lines function
         const auto& schema_name = ctx_manager.get(schema).name;
+        create_dirs(output_dir, schema_name, fs_provider);
+
+        const auto& tags = tags_generator::generate(schema, ctx_manager);
+        traits_generator traits_gen{schema, ctx_manager};
 
         // types
         std::vector<std::string> type_includes;
@@ -74,14 +72,7 @@ SBEPP_WARNINGS_OFF();
 
 namespace {schema}
 {{
-namespace detail
-{{
-namespace types
-{{
-// TODO: don't add this part when type is not mangled
 {detail_type}
-}} // namespace types
-}} // namespace detail
 
 namespace types
 {{
@@ -101,7 +92,7 @@ SBEPP_WARNINGS_ON();
                         fmt::arg(
                             "dependency_includes",
                             make_local_includes(dependencies)),
-                        fmt::arg("detail_type", detail_type),
+                        fmt::arg("detail_type", make_type_detail(detail_type)),
                         fmt::arg("public_type", public_type),
                         fmt::arg("traits", traits),
                         fmt::arg(
@@ -190,14 +181,7 @@ SBEPP_WARNINGS_OFF();
 
 namespace {schema}
 {{
-namespace detail
-{{
-namespace messages
-{{
-// TODO: remove it if `detail_message` is empty
 {detail_message}
-}} // namespace messages
-}} // namespace detail
 
 namespace messages
 {{
@@ -217,7 +201,9 @@ SBEPP_WARNINGS_ON();
                         fmt::arg(
                             "dependency_includes",
                             make_type_dependency_includes(dependencies)),
-                        fmt::arg("detail_message", detail_message),
+                        fmt::arg(
+                            "detail_message",
+                            make_message_detail(detail_message)),
                         fmt::arg("public_message", public_message),
                         fmt::arg("traits", traits),
                         fmt::arg(
@@ -330,6 +316,46 @@ class {public_name};
                 // clang-format on
                 fmt::arg("public_name", public_name));
         }
+    }
+
+    static std::string make_message_detail(const std::string_view content)
+    {
+        if(content.empty())
+        {
+            return {};
+        }
+
+        return fmt::format(
+            // clang-format off
+R"(namespace detail
+{{
+namespace messages
+{{
+{content}
+}} // namespace messages
+}} // namespace detail)",
+            // clang-format on
+            fmt::arg("content", content));
+    }
+
+    static std::string make_type_detail(const std::string_view content)
+    {
+        if(content.empty())
+        {
+            return {};
+        }
+
+        return fmt::format(
+            // clang-format off
+R"(namespace detail
+{{
+namespace types
+{{
+{content}
+}} // namespace types
+}} // namespace detail)",
+            // clang-format on
+            fmt::arg("content", content));
     }
 };
 } // namespace sbepp::sbeppc

@@ -21,30 +21,28 @@ namespace sbepp::sbeppc
 class tags_generator
 {
 public:
-    tags_generator(
+    static std::string generate(
         const sbe::message_schema& schema, context_manager& ctx_manager)
-        : schema{&schema}, ctx_manager{&ctx_manager}
     {
-        generated = generate();
+        tags_generator generator{schema, ctx_manager};
+        return generator.generate();
     }
-
-    const std::string& get() const
-    {
-        return generated;
-    }
-
-    // TODO: add static function, make all other functions private
 
 private:
     const sbe::message_schema* schema{};
     context_manager* ctx_manager{};
-    std::string generated;
     std::unordered_map<std::string_view, bool> processed_types;
     std::string detail_types;
     std::string public_types;
     std::string detail_messages;
     std::string public_messages;
     std::vector<std::string> path;
+
+    tags_generator(
+        const sbe::message_schema& schema, context_manager& ctx_manager)
+        : schema{&schema}, ctx_manager{&ctx_manager}
+    {
+    }
 
     std::string make_public_tag(const std::string_view last) const
     {
