@@ -119,6 +119,11 @@ $(function(){initNavTree('representation.html',''); initResizable(true); });
   </li>
   <li class="level1">
     <a href="#autotoc_md17">Schema names</a>
+    <ul>
+      <li class="level2">
+        <a href="#names-mangling">Names mangling</a>
+      </li>
+    </ul>
   </li>
   <li class="level1">
     <a href="#autotoc_md19">Semantics</a>
@@ -225,7 +230,13 @@ Namespaces</h1>
 <hr  />
 <h1><a class="anchor" id="autotoc_md17"></a>
 Schema names</h1>
-<p><code>sbepp</code> preserves names of all schema entities without any modification. It means that messages, types, fields, etc. will have the same type/function names in the generated code. Of course standard C++ naming rules are still applied and usually you'll get an error from <code>sbeppc</code> if schema uses wrong name.</p>
+<p><code>sbepp</code> preserves names of all schema entities without any modification. It means that messages, types, fields, etc. will have the same class/function names in the <em>public</em> part of the generated code. Of course standard C++ naming rules are still applied and usually you'll get an error from <code>sbeppc</code> if schema uses wrong name.</p>
+<h2><a class="anchor" id="names-mangling"></a>
+Names mangling</h2>
+<dl class="section note"><dt>Note</dt><dd>Things described below are implementation details and are only provided to simplify understanding of compiler error messages. Don't rely on them directly.</dd></dl>
+<p>Although original names are preserved in public interface, sometimes underlying implementation is located in <code>detail</code> and a public alias is provided for it. Names from <code>detail</code> should never be used explicitly but in case of error, compiler usually uses them in error message so it's useful to know how they are formed.</p>
+<p><code>sbepp</code> tries to preserve schema names for everything but when it's not possible, class name is mangled like <code>&lt;original_name&gt;_&lt;N&gt;</code> where <code>N</code> is a number. Group entries have class names like <code>&lt;group_name&gt;_entry</code> where <code>group_name</code> is a potentially mangled group name. Tag types can be mangled as well and their names always match those of the corresponding implementation types.</p>
+<p>For example, public encoding <code>User</code> is always accessible as <code>schema_name::types::User</code> but can actually be an alias to <code>schema_name::detail::types::User_0</code>. Similar, its tag is <code>schema_name::schema::types::User</code> but it can be an alias to <code>schema_name::detail::schema::types::User_0</code>. When schema doesn't have a lot of repetitive names, looking at the trailing class name is enough to understand which schema entity it represents.</p>
 <hr  />
 <h1><a class="anchor" id="autotoc_md19"></a>
 Semantics</h1>
