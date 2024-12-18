@@ -69,11 +69,11 @@ private:
         types_compiler tc{*schema, traits_gen, *ctx_manager};
         tc.compile(
             [this](
-                const auto name,
-                const auto detail_type,
-                const auto public_type,
-                const auto& dependencies,
-                const auto traits)
+                const std::string_view name,
+                const std::string_view detail_type,
+                const std::string_view public_type,
+                const std::unordered_set<std::string>& dependencies,
+                const std::string_view traits)
             {
                 const auto include_path =
                     std::filesystem::path{"types"} / name += ".hpp";
@@ -182,11 +182,11 @@ SBEPP_WARNINGS_ON();
         messages_compiler mc{*schema, traits_gen, *ctx_manager};
         mc.compile(
             [this](
-                const auto name,
-                const auto detail_message,
-                const auto public_message,
-                const auto& dependencies,
-                const auto traits)
+                const std::string_view name,
+                const std::string_view detail_message,
+                const std::string_view public_message,
+                const std::unordered_set<std::string>& dependencies,
+                const std::string_view traits)
             {
                 const auto include_path =
                     std::filesystem::path{"messages"} / name += ".hpp";
