@@ -1,9 +1,9 @@
 var searchData=
 [
   ['a_20message_0',['Estimating buffer size to encode a message',['../examples.html#example-size-bytes',1,'']]],
-  ['a_20message_20using_20cursor_20based_20accessors_1',['A message using cursor based accessors',['../examples.html#autotoc_md55',1,'Decoding a message using cursor-based accessors'],['../examples.html#autotoc_md51',1,'Encoding a message using cursor-based accessors']]],
-  ['a_20message_20using_20normal_20accessors_2',['A message using normal accessors',['../examples.html#autotoc_md53',1,'Decoding a message using normal accessors'],['../examples.html#autotoc_md49',1,'Encoding a message using normal accessors']]],
-  ['accessors_3',['Accessors',['../representation.html#cursor-accessors',1,'Cursor-based accessors'],['../examples.html#autotoc_md55',1,'Decoding a message using cursor-based accessors'],['../examples.html#autotoc_md53',1,'Decoding a message using normal accessors'],['../examples.html#autotoc_md51',1,'Encoding a message using cursor-based accessors'],['../examples.html#autotoc_md49',1,'Encoding a message using normal accessors'],['../representation.html#accessors',1,'Field accessors']]],
+  ['a_20message_20using_20cursor_20based_20accessors_1',['a message using cursor based accessors',['../examples.html#autotoc_md55',1,'Decoding a message using cursor-based accessors'],['../examples.html#autotoc_md51',1,'Encoding a message using cursor-based accessors']]],
+  ['a_20message_20using_20normal_20accessors_2',['a message using normal accessors',['../examples.html#autotoc_md53',1,'Decoding a message using normal accessors'],['../examples.html#autotoc_md49',1,'Encoding a message using normal accessors']]],
+  ['accessors_3',['accessors',['../representation.html#cursor-accessors',1,'Cursor-based accessors'],['../examples.html#autotoc_md55',1,'Decoding a message using cursor-based accessors'],['../examples.html#autotoc_md53',1,'Decoding a message using normal accessors'],['../examples.html#autotoc_md51',1,'Encoding a message using cursor-based accessors'],['../examples.html#autotoc_md49',1,'Encoding a message using normal accessors'],['../representation.html#accessors',1,'Field accessors']]],
   ['addressof_4',['addressof',['../namespacesbepp.html#a870241790cb5759575b9f57d654392c2',1,'sbepp']]],
   ['all_5',['all',['../namespacesbepp.html#a0ee177accf7d675a768848bb29e1512faa181a603769c1f98ad927e7367c7aa51',1,'sbepp']]],
   ['and_20compatibility_6',['Versioning and compatibility',['../integration.html#versioning',1,'']]],
