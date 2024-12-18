@@ -81,7 +81,7 @@ private:
                     fmt::format("#include \"{}\"", include_path.string()));
                 const auto file_path = output_dir / schema_name / include_path;
 
-                fs_provider->write_file(
+                this->fs_provider->write_file(
                     file_path,
                     fmt::format(
                         // clang-format off
@@ -194,7 +194,7 @@ SBEPP_WARNINGS_ON();
                     fmt::format("#include \"{}\"", include_path.string()));
                 const auto file_path = output_dir / schema_name / include_path;
 
-                fs_provider->write_file(
+                this->fs_provider->write_file(
                     file_path,
                     fmt::format(
                         // clang-format off
