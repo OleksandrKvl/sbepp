@@ -32,18 +32,43 @@ public:
         context_manager& ctx_manager,
         ifs_provider& fs_provider)
     {
-        // TODO: refactor this whole class? It's a 200 lines function
-        const auto& schema_name = ctx_manager.get(schema).name;
-        create_dirs(output_dir, schema_name, fs_provider);
+        schema_compiler compiler{
+            output_dir, inject_include, schema, ctx_manager, fs_provider};
+        compiler.compile();
+    }
 
-        const auto& tags = tags_generator::generate(schema, ctx_manager);
-        traits_generator traits_gen{schema, ctx_manager};
+private:
+    std::filesystem::path output_dir;
+    std::optional<std::string> inject_include;
+    const sbe::message_schema* schema{};
+    context_manager* ctx_manager{};
+    ifs_provider* fs_provider{};
+    std::string_view schema_name;
+    traits_generator traits_gen;
+    std::vector<std::string> type_includes;
+    std::vector<std::string> message_includes;
 
-        // types
-        std::vector<std::string> type_includes;
-        types_compiler tc{schema, traits_gen, ctx_manager};
+    schema_compiler(
+        const std::filesystem::path& output_dir,
+        const std::optional<std::string>& inject_include,
+        const sbe::message_schema& schema,
+        context_manager& ctx_manager,
+        ifs_provider& fs_provider)
+        : output_dir{output_dir},
+          inject_include{inject_include},
+          schema{&schema},
+          ctx_manager{&ctx_manager},
+          fs_provider{&fs_provider},
+          schema_name{ctx_manager.get(schema).name},
+          traits_gen{schema, ctx_manager}
+    {
+    }
+
+    void compile_types()
+    {
+        types_compiler tc{*schema, traits_gen, *ctx_manager};
         tc.compile(
-            [&type_includes, &output_dir, &fs_provider, &schema_name](
+            [this](
                 const auto name,
                 const auto detail_type,
                 const auto public_type,
@@ -56,7 +81,7 @@ public:
                     fmt::format("#include \"{}\"", include_path.string()));
                 const auto file_path = output_dir / schema_name / include_path;
 
-                fs_provider.write_file(
+                fs_provider->write_file(
                     file_path,
                     fmt::format(
                         // clang-format off
@@ -99,15 +124,18 @@ SBEPP_WARNINGS_ON();
                             "top_comment",
                             utils::get_compiled_header_top_comment())));
             });
+    }
 
+    void make_tags_header(const std::string_view tags)
+    {
         // schema/schema.hpp
         // schema traits must be generated after types compilation because they
         // need message header type to be compiled
         const auto schema_traits = traits_gen.make_schema_traits();
         const auto& header_type = utils::get_schema_encoding_as<sbe::composite>(
-            schema, schema.header_type);
+            *schema, schema->header_type);
 
-        fs_provider.write_file(
+        fs_provider->write_file(
             output_dir / schema_name / "schema" / "schema.hpp",
             fmt::format(
                 // clang-format off
@@ -145,14 +173,15 @@ SBEPP_WARNINGS_ON();
                     "header_forward_decl",
                     make_schema_header_forward_declaration(
                         header_type.name,
-                        ctx_manager.get(header_type).mangled_name,
+                        ctx_manager->get(header_type).mangled_name,
                         schema_name))));
+    }
 
-        // messages
-        std::vector<std::string> message_includes;
-        messages_compiler mc{schema, traits_gen, ctx_manager};
+    void compile_messages()
+    {
+        messages_compiler mc{*schema, traits_gen, *ctx_manager};
         mc.compile(
-            [&message_includes, &output_dir, &schema_name, &fs_provider](
+            [this](
                 const auto name,
                 const auto detail_message,
                 const auto public_message,
@@ -165,7 +194,7 @@ SBEPP_WARNINGS_ON();
                     fmt::format("#include \"{}\"", include_path.string()));
                 const auto file_path = output_dir / schema_name / include_path;
 
-                fs_provider.write_file(
+                fs_provider->write_file(
                     file_path,
                     fmt::format(
                         // clang-format off
@@ -210,9 +239,11 @@ SBEPP_WARNINGS_ON();
                             "top_comment",
                             utils::get_compiled_header_top_comment())));
             });
+    }
 
-        // top-level header
-        fs_provider.write_file(
+    void make_top_header()
+    {
+        fs_provider->write_file(
             output_dir / schema_name / schema_name += ".hpp",
             fmt::format(
                 // clang-format off
@@ -230,15 +261,24 @@ R"({top_comment}
                     "top_comment", utils::get_compiled_header_top_comment())));
     }
 
-private:
-    static void create_dirs(
-        const std::filesystem::path& output_dir,
-        const std::string_view schema_name,
-        ifs_provider& fs_provider)
+    void compile()
     {
-        fs_provider.create_directories(output_dir / schema_name / "schema");
-        fs_provider.create_directories(output_dir / schema_name / "types");
-        fs_provider.create_directories(output_dir / schema_name / "messages");
+        create_output_dirs();
+
+        // tags must be generated first because they are used by types compiler
+        const auto& tags = tags_generator::generate(*schema, *ctx_manager);
+
+        compile_types();
+        make_tags_header(tags);
+        compile_messages();
+        make_top_header();
+    }
+
+    void create_output_dirs()
+    {
+        fs_provider->create_directories(output_dir / schema_name / "schema");
+        fs_provider->create_directories(output_dir / schema_name / "types");
+        fs_provider->create_directories(output_dir / schema_name / "messages");
     }
 
     static std::string
