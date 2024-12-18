@@ -67,10 +67,36 @@ on schema names.
 ## Schema names
 
 `sbepp` preserves names of all schema entities without any modification. It
-means that messages, types, fields, etc. will have the same type/function names
-in the generated code. Of course standard
+means that messages, types, fields, etc. will have the same class/function names
+in the *public* part of the generated code. Of course standard
 C++ naming rules are still applied and usually you'll get an error from `sbeppc`
 if schema uses wrong name.
+
+### Names mangling {#names-mangling}
+
+\note Things described below are implementation details and are only provided to
+simplify understanding of compiler error messages. Don't rely on them directly.
+
+Although original names are preserved in public interface, sometimes underlying
+implementation is located in `detail` and a public alias is provided for it.
+Names from `detail` should never be used explicitly but in case of error,
+compiler usually uses them in error message so it's useful to know how they are
+formed.
+
+`sbepp` tries to preserve schema names for everything but when it's not
+possible, class name is mangled like `<original_name>_<N>` where `N` is a
+number. Group entries have class names like `<group_name>_entry` where
+`group_name` is a potentially mangled group name. Tag types can be mangled as
+well and their names always match those of the corresponding implementation
+types.
+
+For example, public encoding `User` is always accessible as
+`schema_name::types::User` but can actually be an alias to
+`schema_name::detail::types::User_0`. Similar, its tag is
+`schema_name::schema::types::User` but it can be an alias to
+`schema_name::detail::schema::types::User_0`. When schema doesn't have a lot of
+repetitive names, looking at the trailing class name is enough to understand
+which schema entity it represents.
 
 ---
 

@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sbe:messageSchema xmlns:sbe="http://fixprotocol.io/2016/sbe"
+                   xmlns:xi="http://www.w3.org/2001/XInclude"
+                   package="schema_name"
+                   id="1"
+                   version="0"
+                   semanticVersion="5.2"
+                   description="Example base schema which can be extended."
+                   byteOrder="littleEndian">
+    <types>
+        <composite name="messageHeader">
+            <type name="blockLength" primitiveType="uint16"/>
+            <type name="templateId" primitiveType="uint16"/>
+            <type name="schemaId" primitiveType="uint16"/>
+            <type name="version" primitiveType="uint16"/>
+        </composite>
+
+        <type name="max_value" primitiveType="uint32" presence="required"/>
+        <type name="min_value" primitiveType="uint32" presence="required"/>
+        <type name="null_value" primitiveType="uint32" presence="optional"/>
+
+        <type name="max_value_0" primitiveType="uint32" presence="required"/>
+        <type name="min_value_0" primitiveType="uint32" presence="required"/>
+        <type name="null_value_0" primitiveType="uint32" presence="optional"/>
+
+        <composite name="composite1">
+            <type name="max_value_1" primitiveType="uint32" presence="required"/>
+            <type name="min_value_1" primitiveType="uint32" presence="required"/>
+            <type name="null_value_1" primitiveType="uint32" presence="optional"/>
+        </composite>
+
+        <set name="set_name" encodingType="uint8">
+            <choice name="set_name">0</choice>
+            <choice name="set_name_0">1</choice>
+        </set>
+
+        <set name="set_name_1" encodingType="uint8"/>
+
+        <composite name="composite2">
+            <set name="set_name_2" encodingType="uint8"/>
+        </composite>
+
+        <enum name="enum_name" encodingType="uint8">
+            <validValue name="enum_name">1</validValue>
+            <validValue name="enum_name_0">2</validValue>
+        </enum>
+
+        <enum name="enum_name_1" encodingType="uint8"/>
+
+        <composite name="composite3">
+            <enum name="enum_name_2" encodingType="uint8"/>
+        </composite>
+
+        <composite name="composite_name">
+            <type name="composite_name" primitiveType="uint16"/>
+            <type name="composite_name_0" primitiveType="uint16"/>
+        </composite>
+
+        <composite name="composite_name_1"/>
+
+        <composite name="composite4">
+            <composite name="composite_name_2"/>
+        </composite>
+
+        <composite name="composite5">
+            <type name="max_value" primitiveType="uint32" presence="required"/>
+            <type name="min_value" primitiveType="uint32" presence="required"/>
+            <type name="null_value" primitiveType="uint32" presence="optional"/>
+
+            <type name="max_value_0" primitiveType="uint32" presence="required"/>
+            <type name="min_value_0" primitiveType="uint32" presence="required"/>
+            <type name="null_value_0" primitiveType="uint32" presence="optional"/>
+
+            <composite name="composite1">
+                <type name="max_value_1" primitiveType="uint32" presence="required"/>
+                <type name="min_value_1" primitiveType="uint32" presence="required"/>
+                <type name="null_value_1" primitiveType="uint32" presence="optional"/>
+            </composite>
+
+            <set name="set_name" encodingType="uint8">
+                <choice name="set_name">0</choice>
+                <choice name="set_name_0">1</choice>
+            </set>
+
+            <set name="set_name_1" encodingType="uint8"/>
+
+            <composite name="composite2">
+                <set name="set_name_2" encodingType="uint8"/>
+            </composite>
+
+            <enum name="enum_name" encodingType="uint8">
+                <validValue name="enum_name">1</validValue>
+                <validValue name="enum_name_0">2</validValue>
+            </enum>
+
+            <enum name="enum_name_1" encodingType="uint8"/>
+
+            <composite name="composite3">
+                <enum name="enum_name_2" encodingType="uint8"/>
+            </composite>
+
+            <composite name="composite_name">
+                <type name="composite_name" primitiveType="uint16"/>
+                <type name="composite_name_0" primitiveType="uint16"/>
+            </composite>
+
+            <composite name="composite_name_1"/>
+
+            <composite name="composite4">
+                <composite name="composite_name_2"/>
+            </composite>
+        </composite>
+    </types>
+</sbe:messageSchema>

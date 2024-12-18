@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sbe:messageSchema xmlns:sbe="http://fixprotocol.io/2016/sbe"
+                   xmlns:xi="http://www.w3.org/2001/XInclude"
+                   package="schema_name"
+                   id="1"
+                   version="0"
+                   semanticVersion="5.2"
+                   description="Example base schema which can be extended."
+                   byteOrder="littleEndian">
+    <types>
+        <composite name="messageHeader">
+            <type name="blockLength" primitiveType="uint16"/>
+            <type name="templateId" primitiveType="uint16"/>
+            <type name="schemaId" primitiveType="uint16"/>
+            <type name="version" primitiveType="uint16"/>
+        </composite>
+
+        <type name="max_value" primitiveType="uint32" presence="required"/>
+        <type name="min_value" primitiveType="uint32" presence="required"/>
+        <type name="null_value" primitiveType="uint32" presence="optional"/>
+
+        <set name="set_name" encodingType="uint8">
+            <choice name="set_name">0</choice>
+        </set>
+
+        <enum name="enum_name" encodingType="uint8">
+            <validValue name="enum_name">1</validValue>
+        </enum>
+
+        <composite name="composite_name1">
+            <type name="composite_name1" primitiveType="uint16"/>
+        </composite>
+
+        <composite name="composite_name2">
+            <set name="composite_name2" encodingType="uint8"/>
+        </composite>
+
+        <composite name="composite_name3">
+            <enum name="composite_name3" encodingType="uint8"/>
+        </composite>
+
+        <composite name="composite_name4">
+            <composite name="composite_name4"/>
+        </composite>
+
+        <composite name="composite_name5">
+            <ref name="composite_name5" type="set_name"/>
+        </composite>
+
+        <!-- same as above but for anonymous types -->
+        <composite name="parent_composite">
+            <type name="max_value" primitiveType="uint32" presence="required"/>
+            <type name="min_value" primitiveType="uint32" presence="required"/>
+            <type name="null_value" primitiveType="uint32" presence="optional"/>
+
+            <set name="set_name" encodingType="uint8">
+                <choice name="set_name">0</choice>
+            </set>
+
+            <enum name="enum_name" encodingType="uint8">
+                <validValue name="enum_name">1</validValue>
+            </enum>
+
+            <composite name="composite_name1">
+                <type name="composite_name1" primitiveType="uint16"/>
+            </composite>
+
+            <composite name="composite_name2">
+                <set name="composite_name2" encodingType="uint8"/>
+            </composite>
+
+            <composite name="composite_name3">
+                <enum name="composite_name3" encodingType="uint8"/>
+            </composite>
+
+            <composite name="composite_name4">
+                <composite name="composite_name4"/>
+            </composite>
+
+            <composite name="composite_name5">
+                <ref name="composite_name5" type="set_name"/>
+            </composite>
+        </composite>
+    </types>
+</sbe:messageSchema>

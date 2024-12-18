@@ -11,6 +11,7 @@
 #include <sbepp/sbeppc/sbe_schema_validator.hpp>
 #include <sbepp/sbeppc/sbe_schema_cpp_validator.hpp>
 #include <sbepp/sbeppc/context_manager.hpp>
+#include <sbepp/sbeppc/names_generator.hpp>
 
 #include <fmt/core.h>
 
@@ -155,11 +156,11 @@ int main(int argc, char** argv)
         const auto& schema = parser.get_message_schema();
 
         context_manager ctx_manager;
-        sbe_schema_validator sbe_validator{reporter};
-        sbe_validator.validate(schema, ctx_manager);
+        sbe_schema_validator::validate(schema, ctx_manager, reporter);
+        sbe_schema_cpp_validator::validate(
+            schema, config.schema_name, ctx_manager, reporter);
 
-        sbe_schema_cpp_validator cpp_validator{reporter, ctx_manager};
-        cpp_validator.validate(schema, config.schema_name);
+        names_generator::generate(schema, ctx_manager);
 
         schema_compiler::compile(
             config.output_dir,

@@ -27,18 +27,15 @@ namespace sbepp::sbeppc
 class sbe_schema_validator
 {
 public:
-    explicit sbe_schema_validator(ireporter& reporter) : reporter{&reporter}
+    static void validate(
+        const sbe::message_schema& schema,
+        context_manager& ctx_manager,
+        ireporter& reporter)
     {
-    }
+        sbe_schema_validator validator{schema, ctx_manager, reporter};
 
-    void validate(
-        const sbe::message_schema& schema, context_manager& ctx_manager)
-    {
-        this->schema = &schema;
-        this->ctx_manager = &ctx_manager;
-
-        validate_types();
-        validate_messages();
+        validator.validate_types();
+        validator.validate_messages();
     }
 
     static bool is_sbe_symbolic_name(const std::string_view name)
@@ -61,9 +58,9 @@ public:
     }
 
 private:
-    ireporter* reporter{};
     const sbe::message_schema* schema{};
     context_manager* ctx_manager{};
+    ireporter* reporter{};
 
     enum class processing_state
     {
@@ -74,6 +71,14 @@ private:
         encoding_processing_states;
     std::unordered_set<std::string> validated_group_headers;
     std::unordered_set<std::string> validated_data_headers;
+
+    sbe_schema_validator(
+        const sbe::message_schema& schema,
+        context_manager& ctx_manager,
+        ireporter& reporter)
+        : schema{&schema}, ctx_manager{&ctx_manager}, reporter{&reporter}
+    {
+    }
 
     static bool is_single_byte_type(const std::string_view type)
     {

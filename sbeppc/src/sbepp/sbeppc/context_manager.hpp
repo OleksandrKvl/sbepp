@@ -21,11 +21,11 @@ struct type_context
     // here and below, set only if encoding is located inside a composite
     std::optional<offset_t> offset_in_composite;
     std::string tag;
-    std::string impl_name;
     bool is_template;
     std::string public_type;
     std::string underlying_type;
     std::string impl_type;
+    std::optional<std::string> mangled_name;
 };
 
 struct composite_context
@@ -33,9 +33,9 @@ struct composite_context
     std::size_t size;
     std::optional<offset_t> offset_in_composite;
     std::string tag;
-    std::string impl_name;
     std::string impl_type;
     std::string public_type;
+    std::optional<std::string> mangled_name;
 };
 
 struct ref_context
@@ -58,10 +58,10 @@ struct enumeration_context
     std::optional<offset_t> offset_in_composite;
     std::string primitive_type;
     std::string tag;
-    std::string impl_name;
     std::string public_type;
     std::string impl_type;
     std::string underlying_type;
+    std::optional<std::string> mangled_name;
 };
 
 struct set_choice_context
@@ -75,19 +75,19 @@ struct set_context
     std::optional<offset_t> offset_in_composite;
     std::string primitive_type;
     std::string tag;
-    std::string impl_name;
     std::string public_type;
     std::string impl_type;
     std::string underlying_type;
+    std::optional<std::string> mangled_name;
 };
 
 struct message_context
 {
     std::string tag;
-    std::string impl_name;
     std::string impl_type;
     std::string public_type;
     block_length_t actual_block_length;
+    std::optional<std::string> mangled_name;
 };
 
 struct field_context
@@ -105,10 +105,11 @@ struct field_context
 struct group_context
 {
     std::string tag;
-    std::string impl_name;
     std::string entry_impl_type;
     std::string impl_type;
     block_length_t actual_block_length;
+    std::optional<std::string> mangled_name;
+    std::string entry_name;
 };
 
 struct data_context
@@ -122,6 +123,8 @@ struct message_schema_context
 {
     std::string name;
     std::string tag;
+    std::optional<std::string> mangled_tag_types_name;
+    std::optional<std::string> mangled_tag_messages_name;
 };
 
 template<typename T>

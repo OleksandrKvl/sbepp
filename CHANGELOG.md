@@ -1,3 +1,9 @@
+# 1.5.0
+
+- implement more user-friendly names mangling
+
+---
+
 # 1.4.2
 
 - add build and test GitHub action
