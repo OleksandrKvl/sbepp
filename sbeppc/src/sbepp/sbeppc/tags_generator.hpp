@@ -163,6 +163,7 @@ R"(struct {name}
                             res += utils::make_type_alias(
                                 enc.name,
                                 make_type_impl_path(*ctx.mangled_name));
+                            res += '\n';
                         }
                         else
                         {
@@ -170,7 +171,6 @@ R"(struct {name}
                         }
                     }},
                 member);
-            res += '\n';
         }
 
         return res;
