@@ -1,3 +1,9 @@
+# 1.5.1
+
+- fix `char`-based enumerators validation. Thanks to @dtiukalov.
+
+---
+
 # 1.5.0
 
 - implement more user-friendly names mangling

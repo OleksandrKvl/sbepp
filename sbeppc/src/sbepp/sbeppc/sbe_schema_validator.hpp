@@ -916,7 +916,7 @@ private:
             const auto has_wrong_char_value =
                 (is_char && (value.value.size() != 1));
             if(has_wrong_char_value
-               || (!is_char 
+               || (!is_char
                    && !value_fits_into_type(value.value, primitive_type)))
             {
                 throw_error(
