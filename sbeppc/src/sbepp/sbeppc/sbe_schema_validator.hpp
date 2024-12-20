@@ -615,12 +615,6 @@ private:
     template<typename T>
     static bool can_be_parsed_as(const std::string_view str)
     {
-        if constexpr (std::is_same_v<T, char>) {
-            if (str.size() == 1){
-                return true; // str contains a single letter
-            }
-        }
-        
         return utils::string_to_number<T>(str).has_value();
     }
 
@@ -918,10 +912,12 @@ private:
             validate_name(value);
             validate_versions(value);
             // strict: SBE char has strictly defined range
+            const auto is_char = (primitive_type == "char");
             const auto has_wrong_char_value =
-                ((primitive_type == "char") && (value.value.size() != 1));
+                (is_char && (value.value.size() != 1));
             if(has_wrong_char_value
-               || !value_fits_into_type(value.value, primitive_type))
+               || (!is_char 
+                   && !value_fits_into_type(value.value, primitive_type)))
             {
                 throw_error(
                     "{}: value `{}` cannot be represented by type `{}`",
