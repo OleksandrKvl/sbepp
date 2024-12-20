@@ -40,6 +40,16 @@
             <validValue name="Two">2</validValue>
         </enum>
 
+        <type name="Char" primitiveType="char"/>
+        
+        <enum name="char_enum" encodingType="char">
+            <validValue name="A">A</validValue>
+        </enum>
+
+        <enum name="char_enum_1" encodingType="Char">
+            <validValue name="B">B</validValue>
+        </enum>
+
         <set name="options_set" encodingType="uint8">
             <choice name="A">0</choice>
             <choice name="B">2</choice>
