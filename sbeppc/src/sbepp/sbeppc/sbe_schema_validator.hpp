@@ -615,6 +615,12 @@ private:
     template<typename T>
     static bool can_be_parsed_as(const std::string_view str)
     {
+        if constexpr (std::is_same_v<T, char>) {
+            if (str.size() == 1){
+                return true; // str contains a single letter
+            }
+        }
+        
         return utils::string_to_number<T>(str).has_value();
     }
 
