@@ -16,11 +16,10 @@ var searchData=
   ['enum_5fto_5fstring_13',['enum_to_string',['../namespacesbepp.html#a6b2d51af3f026b165fa40fe1d7ab19db',1,'sbepp']]],
   ['enum_5ftraits_14',['enum_traits',['../classsbepp_1_1enum__traits.html',1,'sbepp']]],
   ['enum_5fvalue_5ftraits_15',['enum_value_traits',['../classsbepp_1_1enum__value__traits.html',1,'sbepp']]],
-  ['enumeration_16',['enumeration',['../conceptsbepp_1_1enumeration.html',1,'sbepp']]],
-  ['enums_17',['Enums',['../representation.html#enums',1,'']]],
-  ['enums_20and_20sets_18',['Visiting enums and sets',['../visit-api.html#autotoc_md47',1,'']]],
-  ['eos_5fnull_19',['eos_null',['../namespacesbepp.html#a0ee177accf7d675a768848bb29e1512f',1,'sbepp']]],
-  ['erase_20',['erase',['../classsbepp_1_1detail_1_1dynamic__array__ref.html#ab4d76c7225c80d6e5158a7c9873ae8eb',1,'sbepp::detail::dynamic_array_ref::erase(iterator pos) const noexcept'],['../classsbepp_1_1detail_1_1dynamic__array__ref.html#a260941a7ccfcde104b5617538c447518',1,'sbepp::detail::dynamic_array_ref::erase(iterator first, iterator last) const noexcept']]],
-  ['estimating_20buffer_20size_20to_20encode_20a_20message_21',['Estimating buffer size to encode a message',['../examples.html#example-size-bytes',1,'']]],
-  ['examples_22',['Examples',['../examples.html',1,'']]]
+  ['enums_16',['Enums',['../representation.html#enums',1,'']]],
+  ['enums_20and_20sets_17',['Visiting enums and sets',['../visit-api.html#autotoc_md47',1,'']]],
+  ['eos_5fnull_18',['eos_null',['../namespacesbepp.html#a0ee177accf7d675a768848bb29e1512f',1,'sbepp']]],
+  ['erase_19',['erase',['../classsbepp_1_1detail_1_1dynamic__array__ref.html#ab4d76c7225c80d6e5158a7c9873ae8eb',1,'sbepp::detail::dynamic_array_ref::erase(iterator pos) const noexcept'],['../classsbepp_1_1detail_1_1dynamic__array__ref.html#a260941a7ccfcde104b5617538c447518',1,'sbepp::detail::dynamic_array_ref::erase(iterator first, iterator last) const noexcept']]],
+  ['estimating_20buffer_20size_20to_20encode_20a_20message_20',['Estimating buffer size to encode a message',['../examples.html#example-size-bytes',1,'']]],
+  ['examples_21',['Examples',['../examples.html',1,'']]]
 ];
