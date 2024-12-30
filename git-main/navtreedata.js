@@ -76,8 +76,9 @@ var NAVTREEINDEX =
 [
 "annotated.html",
 "classsbepp_1_1detail_1_1optional__base.html#a5bdb6d4fd37359ab7d45624be2487053",
-"namespacesbepp.html#a1ef75437d8fabab98acbec11d3702530aac67ede5a84eb5a1add7ff4440e9a485"
+"classsbepp_1_1type__traits.html#a4dc3777d81e9e0c4336dc6e5bf2cbc44",
+"structsbepp_1_1is__enum.html"
 ];
 
-var SYNCONMSG = 'click to disable panel synchronisation';
-var SYNCOFFMSG = 'click to enable panel synchronisation';
+var SYNCONMSG = 'click to disable panel synchronization';
+var SYNCOFFMSG = 'click to enable panel synchronization';

@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['data_0',['data',['../classsbepp_1_1detail_1_1static__array__ref.html#aee2ad1343a3cb7125a0f709823d49ce2',1,'sbepp::detail::static_array_ref::data()'],['../classsbepp_1_1detail_1_1dynamic__array__ref.html#ab19b5f01fb457ad735e8eb94576f1f42',1,'sbepp::detail::dynamic_array_ref::data()']]],
+  ['data_0',['data',['../conceptsbepp_1_1data.html',1,'sbepp'],['../classsbepp_1_1detail_1_1static__array__ref.html#aee2ad1343a3cb7125a0f709823d49ce2',1,'sbepp::detail::static_array_ref::data()'],['../classsbepp_1_1detail_1_1dynamic__array__ref.html#ab19b5f01fb457ad735e8eb94576f1f42',1,'sbepp::detail::dynamic_array_ref::data()']]],
   ['data_20members_1',['Data members',['../representation.html#autotoc_md28',1,'']]],
   ['data_5ftraits_2',['data_traits',['../classsbepp_1_1data__traits.html',1,'sbepp']]],
   ['decoding_3',['Encoding vs. decoding',['../representation.html#autotoc_md21',1,'']]],
