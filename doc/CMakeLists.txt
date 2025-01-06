@@ -22,7 +22,7 @@ set(DOXYGEN_WARN_IF_UNDOCUMENTED "NO")
 set(DOXYGEN_RECURSIVE "YES")
 set(DOXYGEN_USE_MDFILE_AS_MAINPAGE "overview.md")
 set(DOXYGEN_HTML_HEADER "header.html")
-set(DOXYGEN_HTML_EXTRA_STYLESHEET "doxygen-awesome-css/doxygen-awesome.css")
+# set(DOXYGEN_HTML_EXTRA_STYLESHEET "doxygen-awesome-css/doxygen-awesome.css")
 set(DOXYGEN_HTML_EXTRA_FILES
     "doxygen-awesome-css/doxygen-awesome-darkmode-toggle.js"
     "doxygen-awesome-css/doxygen-awesome-paragraph-link.js"
