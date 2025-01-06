@@ -1,0 +1,53 @@
+name: 'update-redirect-page'
+description: 'Updates redirect HTML page'
+inputs:
+  github_token:
+    description: 'GitHub token'
+    required: true
+  target_url:
+    description: 'Redirect target URL'
+  temp_dir:
+    description: 'Directory where redirect file will be generated'
+    required: false
+    default: 'redirect-dir'
+  file_name:
+    description: 'Generated file name'
+    required: false
+    default: 'index.html'
+  destination_dir:
+    description: 'Redirect file destination directory'
+    required: false
+    default: ''
+  docs_branch:
+    description: 'Documentation branch'
+    required: false
+    default: 'gh-pages'
+
+runs:
+  using: "composite"
+  steps:
+      - name: Generate redirect HTML
+        run: |
+          mkdir ${{ inputs.temp_dir }}
+          cat << EOF > ${{ inputs.temp_dir }}/${{ inputs.file_name }}
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+              <meta charset="UTF-8">
+              <meta http-equiv="refresh" content="0; url=${{ inputs.target_url }}">
+              <title>Redirecting...</title>
+          </head>
+          <body>
+              <p>If you are not redirected automatically, <a href="${{ inputs.target_url }}">click here</a>.</p>
+          </body>
+          </html>
+          EOF
+
+      - name: Deploy redirect page
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ inputs.github_token }}
+          publish_dir: ${{ inputs.temp_dir }}
+          destination_dir: ${{ inputs.destination_dir }}
+          publish_branch: ${{ inputs.docs_branch }}
+          keep_files: true

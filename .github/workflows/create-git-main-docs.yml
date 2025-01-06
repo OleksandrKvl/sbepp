@@ -1,0 +1,39 @@
+name: Create git-main docs
+
+permissions:
+  contents: write
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  create-git-main-docs:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build docs
+        id: build-docs
+        uses: ./.github/actions/build-docs
+        with:
+          cmake_target: 'doc'
+          docs_dir: 'doc/docs'
+          cmake_configure_args: '-DSBEPP_BUILD_SBEPPC=OFF -DSBEPP_BUILD_DOCS=ON'
+          destination_dir: git-main
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update version selector
+        id: update-version-selector
+        uses: ./.github/actions/update-version-selector
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create redirect page if there are no releases
+        if: ${{ steps.update-version-selector.outputs.versions_counter == 1}}
+        uses: ./.github/actions/update-redirect-page
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          target_url: git-main/index.html

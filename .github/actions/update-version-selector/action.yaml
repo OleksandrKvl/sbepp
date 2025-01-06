@@ -1,0 +1,55 @@
+name: 'update-version-selector'
+description: 'Updates version selector'
+inputs:
+  github_token:
+    description: 'GitHub token'
+    required: true
+  temp_dir:
+    description: 'Directory where version selector file will be generated'
+    required: false
+    default: 'selector-dir'
+  file_name:
+    description: 'Selector file name'
+    required: false
+    default: 'version_selector.html'
+  selector_id:
+    description: 'select element id'
+    required: false
+    default: 'versionSelector'
+  docs_branch:
+    description: 'Documentation branch'
+    required: false
+    default: 'gh-pages'
+outputs:
+  versions_counter:
+    description: "Number of existing versions"
+    value: ${{ steps.discover-versions.outputs.counter }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Discover versions
+      id: discover-versions
+      run: |
+        git fetch origin ${{ inputs.docs_branch }}
+        dirs=$(git ls-tree --name-only -d origin/${{ inputs.docs_branch }} | sort -rV)
+        echo "counter=$(echo "$dirs" | wc -l | xargs)" >> $GITHUB_OUTPUT
+
+        mkdir ${{ inputs.temp_dir }}
+        # Create HTML
+        echo '<select id="${{ inputs.selector_id }}">' > ${{ inputs.temp_dir }}/${{ inputs.file_name }}
+        for dir in $dirs; do
+            if [[ "$(basename "$dir")" != .* ]]; then
+                version=$(basename "$dir")
+                echo "    <option value=\"$version\">$version</option>" >> ${{ inputs.temp_dir }}/${{ inputs.file_name }}
+            fi
+        done
+        echo '</select>' >> ${{ inputs.temp_dir }}/${{ inputs.file_name }}
+
+    - name: Deploy version selector
+      uses: peaceiris/actions-gh-pages@v4
+      with:
+        github_token: ${{ inputs.github_token }}
+        publish_dir: ${{ inputs.temp_dir }}
+        publish_branch: ${{ inputs.docs_branch }}
+        keep_files: true
