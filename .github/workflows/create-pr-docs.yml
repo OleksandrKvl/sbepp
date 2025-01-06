@@ -1,0 +1,35 @@
+name: Create PR documentation
+
+permissions:
+  contents: write
+
+on:
+  pull_request:
+    types: [labeled, synchronize]
+    branches:
+      - main
+
+jobs:
+  create-pr-docs:
+    if: ${{ contains(github.event.pull_request.labels.*.name, 'documentation') }}
+    runs-on: ubuntu-22.04
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Build docs
+        id: build-docs
+        uses: ./.github/actions/build-docs
+        with:
+          cmake_target: 'doc'
+          docs_dir: 'doc/docs'
+          cmake_configure_args: '-DSBEPP_BUILD_SBEPPC=OFF -DSBEPP_BUILD_DOCS=ON'
+          destination_dir: PR-${{ github.event.pull_request.number }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update version selector
+        uses: ./.github/actions/update-version-selector
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}

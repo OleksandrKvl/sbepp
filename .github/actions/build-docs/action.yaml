@@ -1,0 +1,74 @@
+name: 'build-docs'
+description: 'Builds documentation using Doxygen'
+inputs:
+  cmake_target:
+    description: 'CMake documentation target'
+    required: true
+  docs_dir:
+    description: 'Path to documentation dir, relative to build_dir'
+    required: true
+  github_token:
+    description: 'GitHub token'
+    required: true
+  build_dir:
+    description: 'Build directory'
+    required: false
+    default: 'build'
+  cmake_configure_args:
+    description: 'Additional CMake configure arguments'
+    required: false
+    default: ''
+  destination_dir:
+    description: 'Directory name for deployed docs'
+    required: false
+    default: ''
+  docs_branch:
+    description: 'Documentation branch'
+    required: false
+    default: 'gh-pages'
+
+outputs:
+  version:
+    description: 'Version of the generated docs'
+    value: ${{ steps.get-docs-version.outputs.version }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Install deps
+      run:   |
+              sudo apt install -y cmake
+              sudo apt install -y wget
+              wget -nv https://www.doxygen.nl/files/doxygen-1.12.0.linux.bin.tar.gz
+              tar -xzf doxygen-1.12.0.linux.bin.tar.gz
+              echo "$(pwd)/doxygen-1.12.0/bin" >> $GITHUB_PATH
+
+    - name: CMake configuration
+      run:  cmake ${{ inputs.cmake_configure_args }} -B ${{ inputs.build_dir }}
+
+    - name: CMake build
+      run:  cmake --build ${{ inputs.build_dir }} --target ${{ inputs.cmake_target }}
+
+    - name: Get docs version
+      id: get-docs-version
+      run: |
+        subdir=$(basename $(find ${{ inputs.build_dir }}/${{ inputs.docs_dir }} -mindepth 1 -maxdepth 1 -type d | head -n 1))
+        echo "version=$subdir" >> $GITHUB_OUTPUT
+
+    - name: Deploy docs
+      if: ${{ inputs.destination_dir != '' }}
+      uses: peaceiris/actions-gh-pages@v4
+      with:
+        github_token: ${{ inputs.github_token }}
+        publish_dir: ${{ inputs.build_dir }}/${{ inputs.docs_dir }}/${{ steps.get-docs-version.outputs.version }}
+        destination_dir: ${{ inputs.destination_dir }}
+        publish_branch: ${{ inputs.docs_branch }}
+
+    - name: Deploy docs
+      if: ${{ inputs.destination_dir == '' }}
+      uses: peaceiris/actions-gh-pages@v4
+      with:
+        github_token: ${{ inputs.github_token }}
+        publish_dir: ${{ inputs.build_dir }}/${{ inputs.docs_dir }}/${{ steps.get-docs-version.outputs.version }}
+        destination_dir: ${{ steps.get-docs-version.outputs.version }}
+        publish_branch: ${{ inputs.docs_branch }}

@@ -1,0 +1,35 @@
+name: Create release documentation
+
+permissions:
+  contents: write
+
+on:
+  release:
+    types: [released]
+
+jobs:
+  create-release-docs:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build docs
+        id: build-docs
+        uses: ./.github/actions/build-docs
+        with:
+          cmake_target: 'doc'
+          docs_dir: 'doc/docs'
+          cmake_configure_args: '-DSBEPP_BUILD_SBEPPC=OFF -DSBEPP_BUILD_DOCS=ON'
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update redirect HTML
+        uses: ./.github/actions/update-redirect-page
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          target_url: ${{ steps.build-docs.outputs.version }}/index.html
+
+      - name: Update version selector
+        uses: ./.github/actions/update-version-selector
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}

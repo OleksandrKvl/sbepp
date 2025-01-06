@@ -1,0 +1,32 @@
+name: Remove PR documentation
+
+permissions:
+  contents: write
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - main
+
+jobs:
+  remove-pr-docs:
+    if: ${{ contains(github.event.pull_request.labels.*.name, 'documentation') }}
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Remove PR docs
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ${{ github.workspace }}
+          destination_dir: PR-${{ github.event.pull_request.number }}
+
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: .github
+
+      - name: Update version selector
+        uses: ./.github/actions/update-version-selector
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
