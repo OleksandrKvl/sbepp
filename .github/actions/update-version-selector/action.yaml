@@ -30,6 +30,7 @@ runs:
   steps:
     - name: Discover versions
       id: discover-versions
+      shell: bash
       run: |
         git fetch origin ${{ inputs.docs_branch }}
         dirs=$(git ls-tree --name-only -d origin/${{ inputs.docs_branch }} | sort -rV)

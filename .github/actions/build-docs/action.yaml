@@ -36,6 +36,7 @@ runs:
   using: "composite"
   steps:
     - name: Install deps
+      shell: bash
       run:   |
               sudo apt install -y cmake
               sudo apt install -y wget
@@ -44,13 +45,16 @@ runs:
               echo "$(pwd)/doxygen-1.12.0/bin" >> $GITHUB_PATH
 
     - name: CMake configuration
+      shell: bash
       run:  cmake ${{ inputs.cmake_configure_args }} -B ${{ inputs.build_dir }}
 
     - name: CMake build
+      shell: bash
       run:  cmake --build ${{ inputs.build_dir }} --target ${{ inputs.cmake_target }}
 
     - name: Get docs version
       id: get-docs-version
+      shell: bash
       run: |
         subdir=$(basename $(find ${{ inputs.build_dir }}/${{ inputs.docs_dir }} -mindepth 1 -maxdepth 1 -type d | head -n 1))
         echo "version=$subdir" >> $GITHUB_OUTPUT

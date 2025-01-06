@@ -27,6 +27,7 @@ runs:
   using: "composite"
   steps:
       - name: Generate redirect HTML
+        shell: bash
         run: |
           mkdir ${{ inputs.temp_dir }}
           cat << EOF > ${{ inputs.temp_dir }}/${{ inputs.file_name }}
