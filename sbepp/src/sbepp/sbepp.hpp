@@ -58,7 +58,7 @@ SBEPP_WARNINGS_OFF();
 #if !defined(SBEPP_HAS_THREE_WAY_COMPARISON)    \
     && defined(__cpp_impl_three_way_comparison) \
     && defined(__cpp_lib_three_way_comparison)
-#    if(__cpp_impl_three_way_comparison >= 201907L) \
+#    if (__cpp_impl_three_way_comparison >= 201907L) \
         && (__cpp_lib_three_way_comparison >= 201907L)
 #        define SBEPP_HAS_THREE_WAY_COMPARISON 1
 #        include <compare>
@@ -70,7 +70,7 @@ SBEPP_WARNINGS_OFF();
 
 //! @brief `1` if compiler supports concepts, `0` otherwise
 #if !defined(SBEPP_HAS_CONCEPTS) && defined(__cpp_concepts)
-#    if(__cpp_concepts >= 201907L)
+#    if (__cpp_concepts >= 201907L)
 #        define SBEPP_HAS_CONCEPTS 1
 #    endif
 #endif
@@ -80,7 +80,7 @@ SBEPP_WARNINGS_OFF();
 
 //! @brief `1` is compiler supports inline variables, `0` otherwise
 #if !defined(SBEPP_HAS_INLINE_VARS) && defined(__cpp_inline_variables)
-#    if(__cpp_inline_variables >= 201606L)
+#    if (__cpp_inline_variables >= 201606L)
 #        define SBEPP_HAS_INLINE_VARS 1
 #        define SBEPP_CPP17_INLINE_VAR inline
 #    endif
@@ -92,7 +92,7 @@ SBEPP_WARNINGS_OFF();
 
 //! @brief `1` if compiler supports `std::endian`, `0` otherwise
 #if !defined(SBEPP_HAS_ENDIAN) && defined(__cpp_lib_endian)
-#    if(__cpp_lib_endian >= 201907L)
+#    if (__cpp_lib_endian >= 201907L)
 #        define SBEPP_HAS_ENDIAN 1
 #        include <bit>
 #    endif
@@ -103,7 +103,7 @@ SBEPP_WARNINGS_OFF();
 
 //! @brief `1` if compiler supports `std::bitcast`, `0` otherwise
 #if !defined(SBEPP_HAS_BITCAST) && defined(__cpp_lib_bit_cast)
-#    if(__cpp_lib_bit_cast >= 201806L)
+#    if (__cpp_lib_bit_cast >= 201806L)
 #        define SBEPP_HAS_BITCAST 1
 #        include <bit>
 #    endif
@@ -114,7 +114,7 @@ SBEPP_WARNINGS_OFF();
 
 //! @brief `1` if compiler supports `std::byteswap`, `0` otherwise
 #if !defined(SBEPP_HAS_BYTESWAP) && defined(__cpp_lib_byteswap)
-#    if(__cpp_lib_byteswap >= 202110L)
+#    if (__cpp_lib_byteswap >= 202110L)
 #        define SBEPP_HAS_BYTESWAP 1
 #        include <bit>
 #    endif
@@ -126,7 +126,7 @@ SBEPP_WARNINGS_OFF();
 //! @brief `1` if compiler supports constexpr `std` algorithms, `0` otherwise
 #if !defined(SBEPP_HAS_CONSTEXPR_ALGORITHMS) \
     && defined(__cpp_lib_constexpr_algorithms)
-#    if(__cpp_lib_constexpr_algorithms >= 201806L)
+#    if (__cpp_lib_constexpr_algorithms >= 201806L)
 #        define SBEPP_HAS_CONSTEXPR_ALGORITHMS 1
 #    endif
 #endif
@@ -176,11 +176,11 @@ SBEPP_WARNINGS_OFF();
 #endif
 
 #ifdef __cpp_constexpr
-#    if(__cpp_constexpr >= 201304L)
+#    if (__cpp_constexpr >= 201304L)
 #        define SBEPP_CPP14_CONSTEXPR constexpr
 #    endif
 #else
-#    if(SBEPP_CPLUSPLUS >= 201402L)
+#    if (SBEPP_CPLUSPLUS >= 201402L)
 #        define SBEPP_CPP14_CONSTEXPR constexpr
 #    endif
 #endif
@@ -190,7 +190,7 @@ SBEPP_WARNINGS_OFF();
 
 //! @brief `1` if compiler supports ranges, `0` otherwise
 #if !defined(SBEPP_HAS_RANGES) && defined(__cpp_lib_ranges)
-#    if(__cpp_lib_ranges >= 201911L)
+#    if (__cpp_lib_ranges >= 201911L)
 #        define SBEPP_HAS_RANGES 1
 #        include <ranges>
 #    endif
@@ -371,6 +371,13 @@ static_assert(
     (endian::native == endian::little) || (endian::native == endian::big),
     "Mixed-endian is not supported");
 
+//! @brief An empty structure to represent a sequence of types
+//! @tparam Ts types
+template<typename... Ts>
+struct type_list
+{
+};
+
 //! @brief Namespace for various implementation details. Should not be used
 //!     directly
 namespace detail
@@ -421,14 +428,14 @@ inline std::uint16_t byteswap(std::uint16_t v) noexcept
     return _byteswap_ushort(v);
 }
 
-#    elif(                                                     \
+#    elif (                                                    \
         defined(__clang__) && __has_builtin(__builtin_bswap32) \
         && __has_builtin(__builtin_bswap64))                   \
         || (defined(__GNUC__)                                  \
             && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 3)))
 
-#        if(defined(__clang__) && __has_builtin(__builtin_bswap16)) \
-            || (defined(__GNUC__)                                   \
+#        if (defined(__clang__) && __has_builtin(__builtin_bswap16)) \
+            || (defined(__GNUC__)                                    \
                 && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 8)))
 
 inline std::uint16_t byteswap(std::uint16_t v) noexcept
@@ -4132,6 +4139,10 @@ public:
     using header_type = HeaderComposite<Byte>;
     //! @brief Message header composite tag. Can be used to access its traits.
     using header_type_tag = HeaderTypeTag;
+    //! @brief Public schema type tags, unordered
+    using type_tags = sbepp::type_list<TypeTags...>;
+    //! @brief Schema message tags in schema order
+    using message_tags = sbepp::type_list<MessageTags...>;
 };
 #endif
 
@@ -4169,6 +4180,8 @@ public:
     static constexpr version_t deprecated() noexcept;
     //! @brief Representation type
     using value_type = ScopedEnumType;
+    //! @brief Value tags in schema order
+    using value_tags = sbepp::type_list<ValueTags...>;
 };
 #endif
 
@@ -4236,6 +4249,8 @@ public:
     static constexpr offset_t offset() noexcept;
     //! @brief Representation type
     using value_type = SetType;
+    //! @brief Choice tags in schema order
+    using choice_tags = sbepp::type_list<ChoiceTags...>;
 };
 #endif
 
@@ -4310,6 +4325,8 @@ public:
     using value_type = CompositeType<Byte>;
     //! @brief Size of the composite in bytes
     static constexpr std::size_t size_bytes() noexcept;
+    //! @brief Element tags in schema order
+    using element_tags = sbepp::type_list<ElementTags...>;
 };
 #endif
 
@@ -4432,6 +4449,12 @@ public:
      *  schema version.
      */
     static constexpr std::size_t size_bytes(...) noexcept;
+    //! @brief Top-level field tags in schema order
+    using field_tags = sbepp::type_list<FieldTags...>;
+    //! @brief Top-level group tags in schema order
+    using group_tags = sbepp::type_list<GroupTags...>;
+    //! @brief Top-level data tags in schema order
+    using data_tags = sbepp::type_list<DataTags...>;
 };
 #endif
 
@@ -4551,6 +4574,12 @@ public:
      */
     static constexpr std::size_t
         size_bytes(const NumInGroupType num_in_group, ...) noexcept;
+    //! @brief Current-level field tags in schema order
+    using field_tags = sbepp::type_list<FieldTags...>;
+    //! @brief Current-level group tags in schema order
+    using group_tags = sbepp::type_list<GroupTags...>;
+    //! @brief Current-level data tags in schema order
+    using data_tags = sbepp::type_list<DataTags...>;
 };
 #endif
 

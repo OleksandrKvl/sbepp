@@ -71,6 +71,8 @@ public:
 
     {header_type}
     {header_type_tag}
+    {type_tags}
+    {message_tags}
 }};
 )",
             // clang-format on
@@ -87,7 +89,14 @@ public:
                     "header_type", header_context.public_type)),
             fmt::arg(
                 "header_type_tag",
-                utils::make_type_alias("header_type_tag", header_context.tag)));
+                utils::make_type_alias("header_type_tag", header_context.tag)),
+            fmt::arg(
+                "type_tags",
+                make_type_list_alias("type_tags", get_type_tags())),
+            fmt::arg(
+                "message_tags",
+                make_type_list_alias(
+                    "message_tags", get_tags(schema->messages))));
     }
 
     std::string make_message_traits(const sbe::message& m) const
@@ -307,6 +316,7 @@ public:
 
     {deprecated_impl}
     {value_type}
+    {value_tags}
 }};
 
 {traits_tag}
@@ -329,7 +339,10 @@ public:
             fmt::arg("deprecated_impl", make_deprecated(e.deprecated_since)),
             fmt::arg(
                 "traits_tag",
-                make_traits_tag(context.public_type, context.tag)));
+                make_traits_tag(context.public_type, context.tag)),
+            fmt::arg(
+                "value_tags",
+                make_type_list_alias("value_tags", get_tags(e.valid_values))));
     }
 
     std::string make_enum_value_traits(const sbe::enumeration& e) const
@@ -421,6 +434,7 @@ public:
 
     {deprecated_impl}
     {value_type}
+    {choice_tags}
 }};
 
 {traits_tag}
@@ -443,7 +457,10 @@ public:
             fmt::arg("deprecated_impl", make_deprecated(s.deprecated_since)),
             fmt::arg(
                 "traits_tag",
-                make_traits_tag(context.public_type, context.tag)));
+                make_traits_tag(context.public_type, context.tag)),
+            fmt::arg(
+                "choice_tags",
+                make_type_list_alias("choice_tags", get_tags(s.choices))));
     }
 
     std::string make_set_choice_traits(const sbe::set& s) const
@@ -543,6 +560,8 @@ public:
     {{
         return {size};
     }}
+
+    {element_tags}
 }};
 
 {traits_tag}
@@ -563,7 +582,11 @@ public:
             fmt::arg("deprecated_impl", make_deprecated(c.deprecated_since)),
             fmt::arg(
                 "traits_tag",
-                make_templated_traits_tag(context.public_type, context.tag)));
+                make_templated_traits_tag(context.public_type, context.tag)),
+            fmt::arg(
+                "element_tags",
+                make_type_list_alias(
+                    "element_tags", get_element_tags(c.elements))));
     }
 
     std::string make_traits(const sbe::composite& c) const
@@ -699,17 +722,19 @@ public:
         for(const auto& nested_group : g.members.groups)
         {
             const auto& context = ctx_manager->get(nested_group);
-            headers_sum.push_back(fmt::format(
-                "::sbepp::composite_traits<::sbepp::group_traits<{}"
-                ">::dimension_type_tag>::size_bytes()",
-                context.tag));
+            headers_sum.push_back(
+                fmt::format(
+                    "::sbepp::composite_traits<::sbepp::group_traits<{}"
+                    ">::dimension_type_tag>::size_bytes()",
+                    context.tag));
         }
 
         for(const auto& d : g.members.data)
         {
             const auto& context = ctx_manager->get(d);
-            headers_sum.push_back(fmt::format(
-                "::sbepp::data_traits<{}>::size_bytes(0)", context.tag));
+            headers_sum.push_back(
+                fmt::format(
+                    "::sbepp::data_traits<{}>::size_bytes(0)", context.tag));
         }
 
         if(!headers_sum.empty())
@@ -889,22 +914,26 @@ R"(static constexpr ::std::size_t size_bytes({params}) noexcept
                 g, path, param_names, param_types, has_nested_data_members);
             const auto params_added = param_names.size() - prev_size;
 
-            sum_terms.push_back(fmt::format(
-                "::sbepp::group_traits<{tag}>::size_bytes({params})",
-                fmt::arg("tag", ctx_manager->get(g).tag),
-                fmt::arg(
-                    "params",
-                    make_group_size_bytes_args(
-                        param_names, params_added, has_nested_data_members))));
+            sum_terms.push_back(
+                fmt::format(
+                    "::sbepp::group_traits<{tag}>::size_bytes({params})",
+                    fmt::arg("tag", ctx_manager->get(g).tag),
+                    fmt::arg(
+                        "params",
+                        make_group_size_bytes_args(
+                            param_names,
+                            params_added,
+                            has_nested_data_members))));
             has_data_members |= has_nested_data_members;
         }
 
         has_data_members |= !members.data.empty();
         for(const auto& d : members.data)
         {
-            sum_terms.push_back(fmt::format(
-                "::sbepp::data_traits<{}>::size_bytes(0)",
-                ctx_manager->get(d).tag));
+            sum_terms.push_back(
+                fmt::format(
+                    "::sbepp::data_traits<{}>::size_bytes(0)",
+                    ctx_manager->get(d).tag));
         }
     }
 
@@ -1040,6 +1069,9 @@ public:
     {value_type}
     {schema_tag}
     {size_bytes_impl}
+    {field_tags}
+    {group_tags}
+    {data_tags}
 }};
 
 {traits_tag}
@@ -1063,10 +1095,19 @@ public:
                     "schema_tag", ctx_manager->get(*schema).tag)),
             fmt::arg(
                 "traits_tag",
-                make_templated_traits_tag(context.public_type, context.tag)));
+                make_templated_traits_tag(context.public_type, context.tag)),
+            fmt::arg(
+                "field_tags",
+                make_type_list_alias("field_tags", get_tags(m.members.fields))),
+            fmt::arg(
+                "group_tags",
+                make_type_list_alias("group_tags", get_tags(m.members.groups))),
+            fmt::arg(
+                "data_tags",
+                make_type_list_alias("data_tags", get_tags(m.members.data))));
     }
 
-    std::string make_field_value_type(const field_context& context) const
+    static std::string make_field_value_type(const field_context& context)
     {
         if((context.actual_presence == field_presence::constant)
            || (!context.is_template))
@@ -1079,7 +1120,7 @@ public:
         }
     }
 
-    std::string make_field_value_type_tag(const field_context& context) const
+    static std::string make_field_value_type_tag(const field_context& context)
     {
         if(context.actual_presence != field_presence::constant)
         {
@@ -1211,6 +1252,9 @@ public:
     {dimension_type_tag}
     {entry_type}
     {size_bytes_impl}
+    {field_tags}
+    {group_tags}
+    {data_tags}
 }};
 
 {traits_tag}
@@ -1245,7 +1289,16 @@ public:
             fmt::arg(
                 "traits_tag",
                 make_templated_traits_tag(
-                    group_context.impl_type, group_context.tag)));
+                    group_context.impl_type, group_context.tag)),
+            fmt::arg(
+                "field_tags",
+                make_type_list_alias("field_tags", get_tags(g.members.fields))),
+            fmt::arg(
+                "group_tags",
+                make_type_list_alias("group_tags", get_tags(g.members.groups))),
+            fmt::arg(
+                "data_tags",
+                make_type_list_alias("data_tags", get_tags(g.members.data))));
     }
 
     std::string make_traits(const sbe::data& d) const
@@ -1318,6 +1371,69 @@ public:
         res += make_member_traits(members.groups);
         res += make_member_traits(members.data);
         return res;
+    }
+
+    static std::string make_type_list_alias(
+        const std::string_view alias,
+        const std::vector<std::string_view>& types)
+    {
+        return fmt::format(
+            "using {} = ::sbepp::type_list<{}>;",
+            alias,
+            fmt::join(types, ", "));
+    }
+
+    template<typename T>
+    std::vector<std::string_view> get_tags(const std::vector<T>& array) const
+    {
+        std::vector<std::string_view> tags;
+        tags.reserve(array.size());
+
+        for(const auto& value : array)
+        {
+            tags.push_back(ctx_manager->get(value).tag);
+        }
+
+        return tags;
+    }
+
+    std::vector<std::string_view> get_type_tags() const
+    {
+        std::vector<std::string_view> tags;
+        tags.reserve(schema->types.size());
+
+        for(const auto& t : schema->types)
+        {
+            tags.push_back(
+                std::visit(
+                    [this](const auto& t) -> std::string_view
+                    {
+                        return ctx_manager->get(t).tag;
+                    },
+                    t.second));
+        }
+
+        return tags;
+    }
+
+    std::vector<std::string_view> get_element_tags(
+        const std::vector<sbe::composite_element>& elements) const
+    {
+        std::vector<std::string_view> tags;
+        tags.reserve(elements.size());
+
+        for(const auto& e : elements)
+        {
+            tags.push_back(
+                std::visit(
+                    [this](const auto& enc) -> std::string_view
+                    {
+                        return ctx_manager->get(enc).tag;
+                    },
+                    e));
+        }
+
+        return tags;
     }
 };
 } // namespace sbepp::sbeppc
