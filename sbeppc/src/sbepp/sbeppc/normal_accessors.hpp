@@ -163,6 +163,26 @@ R"(    constexpr {type}<Byte> {name}() const noexcept
             fmt::arg("offset", offset));
     }
 
+    static std::string make_by_tag_accessor(
+        const std::string_view name, const std::string_view tag)
+    {
+        return fmt::format(
+            // clang-format off
+R"(    template<typename... Args>
+    SBEPP_CPP20_CONSTEXPR auto operator()(
+        ::sbepp::detail::access_by_tag_tag,
+        {tag},
+        Args&&... args) const noexcept
+        -> decltype({name}(std::forward<Args>(args)...))
+    {{
+        return {name}(std::forward<Args>(args)...);
+    }}
+)",
+            // clang-format on
+            fmt::arg("tag", tag),
+            fmt::arg("name", name));
+    }
+
 private:
     static std::string make_array_accessor(
         const std::string_view name,

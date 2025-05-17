@@ -671,6 +671,11 @@ struct visit_set_tag
     explicit visit_set_tag() = default;
 };
 
+struct access_by_tag_tag
+{
+    explicit access_by_tag_tag() = default;
+};
+
 template<typename T, typename U, endian E, typename View>
 SBEPP_CPP20_CONSTEXPR T
     get_value(const View view, const std::size_t offset) noexcept
@@ -5205,6 +5210,12 @@ using is_visitable_view = std::integral_constant<
         || is_composite<T>::value>;
 }
 
+// TODO: there's no reason to support cursor-based `visit` for composites,
+// cursor is not used for them. However, this would be a breaking change so
+// let's first just deprecate it. This would require distinct `visit` overload
+// for composites and change in `types_compiler.hpp` that generates the
+// implementation.
+
 /**
  * @brief Visit a view using given cursor
  *
@@ -5536,7 +5547,6 @@ struct size_bytes_checked_result
     std::size_t size;
 };
 
-// can be used with message/group
 /**
  * @brief Calculate `view` size with additional safety checks.
  *
@@ -5566,6 +5576,228 @@ SBEPP_CPP20_CONSTEXPR size_bytes_checked_result
     }
     return {};
 }
+
+/**
+ * @brief Gets view field or set choice by tag
+ *
+ * @tparam Tag field or set choice tag
+ * @param viewOrSet message, entry, composite view or set
+ * @return the result of the corresponding getter, e.g.
+ *  `viewOrSet.fieldOrChoiceName()`
+ */
+template<typename Tag, typename ViewOrSet>
+constexpr auto get_by_tag(ViewOrSet viewOrSet) noexcept
+    -> decltype(viewOrSet(detail::access_by_tag_tag{}, Tag{}))
+{
+    return viewOrSet(detail::access_by_tag_tag{}, Tag{});
+}
+
+/**
+ * @brief Gets view field by tag using given cursor
+ *
+ * @tparam Tag field tag
+ * @param view message or entry view
+ * @param c cursor
+ * @return the result of the corresponding getter, e.g. `view.fieldName(c)`
+ */
+template<typename Tag, typename View, typename Cursor>
+constexpr auto get_by_tag(View view, Cursor&& c) noexcept -> decltype(view(
+    detail::access_by_tag_tag{}, Tag{}, std::forward<Cursor>(c)))
+{
+    return view(detail::access_by_tag_tag{}, Tag{}, std::forward<Cursor>(c));
+}
+
+/**
+ * @brief Sets view field or set choice by tag
+ *
+ * @tparam Tag field or set choice tag
+ * @param viewOrSet message, entry, composite view or set
+ * @param value value to set
+ * @return the result of the corresponding setter, e.g.
+ *  `viewOrSet.fieldOrChoiceName(value)`
+ */
+template<typename Tag, typename ViewOrSet, typename Value>
+constexpr auto set_by_tag(ViewOrSet&& viewOrSet, Value&& value)
+    -> decltype(std::forward<ViewOrSet>(viewOrSet)(
+        detail::access_by_tag_tag{}, Tag{}, std::forward<Value>(value)))
+{
+    return std::forward<ViewOrSet>(viewOrSet)(
+        detail::access_by_tag_tag{}, Tag{}, std::forward<Value>(value));
+}
+
+/**
+ * @brief Sets view field by tag using given cursor
+ *
+ * @tparam Tag field tag
+ * @param view message or entry view
+ * @param value value to set
+ * @param c cursor
+ * @return the result of the corresponding setter, e.g.
+ *  `view.fieldName(value, c)`
+ */
+template<typename Tag, typename View, typename Value, typename Cursor>
+constexpr auto set_by_tag(View view, Value&& value, Cursor&& c)
+    -> decltype(view(
+        detail::access_by_tag_tag{},
+        Tag{},
+        std::forward<Value>(value),
+        std::forward<Cursor>(c)))
+{
+    return view(
+        detail::access_by_tag_tag{},
+        Tag{},
+        std::forward<Value>(value),
+        std::forward<Cursor>(c));
+}
+
+namespace detail
+{
+template<template<typename> class Trait, typename T, typename = void_t<>>
+struct has_traits : std::false_type
+{
+};
+
+template<template<typename> class Trait, typename T>
+struct has_traits<Trait, T, void_t<decltype(Trait<T>{})>> : std::true_type
+{
+};
+} // namespace detail
+
+//! @brief Checks if `Tag` is a type tag
+template<typename Tag>
+using is_type_tag = detail::has_traits<type_traits, Tag>;
+
+//! @brief Checks if `Tag` is an enum tag
+template<typename Tag>
+using is_enum_tag = detail::has_traits<enum_traits, Tag>;
+
+//! @brief Checks if `Tag` is an enum value tag
+template<typename Tag>
+using is_enum_value_tag = detail::has_traits<enum_value_traits, Tag>;
+
+//! @brief Checks if `Tag` is a set tag
+template<typename Tag>
+using is_set_tag = detail::has_traits<set_traits, Tag>;
+
+//! @brief Checks if `Tag` is a set choice tag
+template<typename Tag>
+using is_set_choice_tag = detail::has_traits<set_choice_traits, Tag>;
+
+//! @brief Checks if `Tag` is a composite tag
+template<typename Tag>
+using is_composite_tag = detail::has_traits<composite_traits, Tag>;
+
+//! @brief Checks if `Tag` is a field tag
+template<typename Tag>
+using is_field_tag = detail::has_traits<field_traits, Tag>;
+
+//! @brief Checks if `Tag` is a group tag
+template<typename Tag>
+using is_group_tag = detail::has_traits<group_traits, Tag>;
+
+//! @brief Checks if `Tag` is a data tag
+template<typename Tag>
+using is_data_tag = detail::has_traits<data_traits, Tag>;
+
+//! @brief Checks if `Tag` is a message tag
+template<typename Tag>
+using is_message_tag = detail::has_traits<message_traits, Tag>;
+
+//! @brief Checks if `Tag` is a schema tag
+template<typename Tag>
+using is_schema_tag = detail::has_traits<schema_traits, Tag>;
+
+#if SBEPP_HAS_INLINE_VARS
+//! @brief Shorthand for `sbepp::is_type_tag<Tag>::value`
+template<typename Tag>
+inline constexpr auto is_type_tag_v = is_type_tag<Tag>::value;
+
+//! @brief Shorthand for `sbepp::is_enum_tag<Tag>::value`
+template<typename Tag>
+inline constexpr auto is_enum_tag_v = is_enum_tag<Tag>::value;
+
+//! @brief Shorthand for `sbepp::is_enum_value_tag<Tag>::value`
+template<typename Tag>
+inline constexpr auto is_enum_value_tag_v = is_enum_value_tag<Tag>::value;
+
+//! @brief Shorthand for `sbepp::is_set_tag<Tag>::value`
+template<typename Tag>
+inline constexpr auto is_set_tag_v = is_set_tag<Tag>::value;
+
+//! @brief Shorthand for `sbepp::is_set_choice_tag<Tag>::value`
+template<typename Tag>
+inline constexpr auto is_set_choice_tag_v = is_set_choice_tag<Tag>::value;
+
+//! @brief Shorthand for `sbepp::is_composite_tag<Tag>::value`
+template<typename Tag>
+inline constexpr auto is_composite_tag_v = is_composite_tag<Tag>::value;
+
+//! @brief Shorthand for `sbepp::is_field_tag<Tag>::value`
+template<typename Tag>
+inline constexpr auto is_field_tag_v = is_field_tag<Tag>::value;
+
+//! @brief Shorthand for `sbepp::is_group_tag<Tag>::value`
+template<typename Tag>
+inline constexpr auto is_group_tag_v = is_group_tag<Tag>::value;
+
+//! @brief Shorthand for `sbepp::is_data_tag<Tag>::value`
+template<typename Tag>
+inline constexpr auto is_data_tag_v = is_data_tag<Tag>::value;
+
+//! @brief Shorthand for `sbepp::is_message_tag<Tag>::value`
+template<typename Tag>
+inline constexpr auto is_message_tag_v = is_message_tag<Tag>::value;
+
+//! @brief Shorthand for `sbepp::is_schema_tag<Tag>::value`
+template<typename Tag>
+inline constexpr auto is_schema_tag_v = is_schema_tag<Tag>::value;
+#endif
+
+#if SBEPP_HAS_CONCEPTS
+//! @brief Concept for `sbepp::is_type_tag<Tag>::value`
+template<typename Tag>
+concept type_tag = is_type_tag_v<Tag>;
+
+//! @brief Concept for `sbepp::is_enum_tag<Tag>::value`
+template<typename Tag>
+concept enum_tag = is_enum_tag_v<Tag>;
+
+//! @brief Concept for `sbepp::is_enum_value_tag<Tag>::value`
+template<typename Tag>
+concept enum_value_tag = is_enum_value_tag_v<Tag>;
+
+//! @brief Concept for `sbepp::is_set_tag<Tag>::value`
+template<typename Tag>
+concept set_tag = is_set_tag_v<Tag>;
+
+//! @brief Concept for `sbepp::is_set_choice_tag<Tag>::value`
+template<typename Tag>
+concept set_choice_tag = is_set_choice_tag_v<Tag>;
+
+//! @brief Concept for `sbepp::is_composite_tag<Tag>::value`
+template<typename Tag>
+concept composite_tag = is_composite_tag_v<Tag>;
+
+//! @brief Concept for `sbepp::is_field_tag<Tag>::value`
+template<typename Tag>
+concept field_tag = is_field_tag_v<Tag>;
+
+//! @brief Concept for `sbepp::is_group_tag<Tag>::value`
+template<typename Tag>
+concept group_tag = is_group_tag_v<Tag>;
+
+//! @brief Concept for `sbepp::is_data_tag<Tag>::value`
+template<typename Tag>
+concept data_tag = is_data_tag_v<Tag>;
+
+//! @brief Concept for `sbepp::is_message_tag<Tag>::value`
+template<typename Tag>
+concept message_tag = is_message_tag_v<Tag>;
+
+//! @brief Concept for `sbepp::is_schema_tag<Tag>::value`
+template<typename Tag>
+concept schema_tag = is_schema_tag_v<Tag>;
+#endif
 } // namespace sbepp
 
 #if SBEPP_HAS_RANGES && SBEPP_HAS_CONCEPTS

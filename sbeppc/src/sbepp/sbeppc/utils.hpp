@@ -310,8 +310,7 @@ inline std::string make_alias_template(
         // clang-format off
 R"(
     template<typename Byte>
-    using {} = {}<Byte>;
-)",
+    using {} = {}<Byte>;)",
         // clang-format on
         alias,
         type);

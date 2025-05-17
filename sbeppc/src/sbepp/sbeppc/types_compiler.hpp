@@ -336,16 +336,18 @@ public:
         {
             if(is_char_type)
             {
-                enumerators.push_back(fmt::format(
-                    "    {} = '{}'", valid_value.name, valid_value.value));
+                enumerators.push_back(
+                    fmt::format(
+                        "    {} = '{}'", valid_value.name, valid_value.value));
             }
             else
             {
-                enumerators.push_back(fmt::format(
-                    "    {} = {}",
-                    valid_value.name,
-                    utils::to_integer_literal(
-                        valid_value.value, context.primitive_type)));
+                enumerators.push_back(
+                    fmt::format(
+                        "    {} = {}",
+                        valid_value.name,
+                        utils::to_integer_literal(
+                            valid_value.value, context.primitive_type)));
             }
         }
 
@@ -360,15 +362,17 @@ public:
 
         for(const auto& valid_value : e.valid_values)
         {
-            switch_cases.push_back(fmt::format(
-                // clang-format off
+            switch_cases.push_back(
+                fmt::format(
+                    // clang-format off
 R"(case {enum_type}::{enumerator}:
         visitor.on_enum_value(e, {tag}{{}});
         break;)",
-                // clang-format on
-                fmt::arg("enum_type", context.mangled_name.value_or(e.name)),
-                fmt::arg("enumerator", valid_value.name),
-                fmt::arg("tag", ctx_manager->get(valid_value).tag)));
+                    // clang-format on
+                    fmt::arg(
+                        "enum_type", context.mangled_name.value_or(e.name)),
+                    fmt::arg("enumerator", valid_value.name),
+                    fmt::arg("tag", ctx_manager->get(valid_value).tag)));
         }
 
         return fmt::format(
@@ -437,11 +441,24 @@ R"(
         (*this)(::sbepp::detail::set_bit_tag{{}}, {index}, v);
         return *this;
     }}
+
+    constexpr bool operator()(
+        ::sbepp::detail::access_by_tag_tag, {tag}) const noexcept
+    {{
+        return {name}();
+    }}
+
+    SBEPP_CPP14_CONSTEXPR {class_name}& operator()(
+        ::sbepp::detail::access_by_tag_tag, {tag}, const bool v) noexcept
+    {{
+        return {name}(v);
+    }}
 )",
                 // clang-format on
                 fmt::arg("name", choice.name),
                 fmt::arg("index", choice.value),
-                fmt::arg("class_name", context.mangled_name.value_or(s.name)));
+                fmt::arg("class_name", context.mangled_name.value_or(s.name)),
+                fmt::arg("tag", ctx_manager->get(choice).tag));
         }
 
         return res;
@@ -454,9 +471,10 @@ R"(
 
         for(const auto& choice : s.choices)
         {
-            visitors.push_back(fmt::format(
-                "visitor(this->{choice_name}(), \"{choice_name}\");",
-                fmt::arg("choice_name", choice.name)));
+            visitors.push_back(
+                fmt::format(
+                    "visitor(this->{choice_name}(), \"{choice_name}\");",
+                    fmt::arg("choice_name", choice.name)));
         }
 
         return fmt::format(
@@ -480,10 +498,11 @@ SBEPP_CPP14_CONSTEXPR Visitor&& operator()(
 
         for(const auto& choice : s.choices)
         {
-            visitors.push_back(fmt::format(
-                "visitor.on_set_choice(this->{choice_name}(), {tag}{{}});",
-                fmt::arg("choice_name", choice.name),
-                fmt::arg("tag", ctx_manager->get(choice).tag)));
+            visitors.push_back(
+                fmt::format(
+                    "visitor.on_set_choice(this->{choice_name}(), {tag}{{}});",
+                    fmt::arg("choice_name", choice.name),
+                    fmt::arg("tag", ctx_manager->get(choice).tag)));
         }
 
         return fmt::format(
@@ -624,11 +643,12 @@ public:
 
             if(!std::get<0>(visit_info).empty())
             {
-                res.push_back(fmt::format(
-                    "v.{visitor}(this->{name}(), {tag}{{}})",
-                    fmt::arg("visitor", std::get<0>(visit_info)),
-                    fmt::arg("name", std::get<1>(visit_info)),
-                    fmt::arg("tag", std::get<2>(visit_info))));
+                res.push_back(
+                    fmt::format(
+                        "v.{visitor}(this->{name}(), {tag}{{}})",
+                        fmt::arg("visitor", std::get<0>(visit_info)),
+                        fmt::arg("name", std::get<1>(visit_info)),
+                        fmt::arg("tag", std::get<2>(visit_info))));
             }
         }
 
@@ -743,6 +763,14 @@ R"(
                             byte_order,
                             context);
                     }},
+                e);
+
+            accessors += std::visit(
+                [this](const auto& enc)
+                {
+                    return normal_accessors::make_by_tag_accessor(
+                        enc.name, ctx_manager->get(enc).tag);
+                },
                 e);
         }
 
