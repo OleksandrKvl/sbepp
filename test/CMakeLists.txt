@@ -70,6 +70,11 @@ function(add_test_binary cpp_version)
         ${src_dir}/stdbyte_adl.test.cpp
         ${src_dir}/built_in_types.test.cpp
         ${src_dir}/top_header_includes.test.cpp
+        ${src_dir}/handle_schema_message.test.cpp
+        ${src_dir}/get_by_name.test.cpp
+        ${src_dir}/nullify_optional_fields.test.cpp
+        ${src_dir}/tag_type.test.cpp
+        ${src_dir}/access_by_tag.test.cpp
     )
 
     target_include_directories(${test_name}
