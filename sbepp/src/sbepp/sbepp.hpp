@@ -5617,7 +5617,7 @@ constexpr auto get_by_tag(View view, Cursor&& c) noexcept -> decltype(view(
  *  `viewOrSet.fieldOrChoiceName(value)`
  */
 template<typename Tag, typename ViewOrSet, typename Value>
-constexpr auto set_by_tag(ViewOrSet&& viewOrSet, Value&& value)
+constexpr auto set_by_tag(ViewOrSet&& viewOrSet, Value&& value) noexcept
     -> decltype(std::forward<ViewOrSet>(viewOrSet)(
         detail::access_by_tag_tag{}, Tag{}, std::forward<Value>(value)))
 {
