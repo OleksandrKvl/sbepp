@@ -742,3 +742,32 @@ for them normal accessors work great.
 I recommend to use cursors only for messages with complex
 structure or when you did a benchmark and know for sure that you'll benefit from
 it.
+
+---
+
+## Tag-based accessors {#tag-based-accessors}
+
+It's possible to access fields and set choices using [tags](#tags) via
+`sbepp::get_by_tag` and `sbepp::set_by_tag`. Under the hood, they call
+the corresponding normal or cursor-based accessors and thus take and return the
+same types:
+
+```cpp
+using msg_tag = schema_name::schema::messages::msg;
+schema_name::messages::msg<char> m; // init somehow
+
+sbepp::get_by_tag<msg_tag::field>(m);    // same as `m.field()`
+sbepp::set_by_tag<msg_tag::field>(m, 1); // same as `m.field(1)`
+
+// works for reference semantics types as well
+auto g = sbepp::get_by_tag<msg_tag::group>(m); // same as `m.group()`
+
+using set_tag = schema_name::schema::types::bitset;
+schema_name::types::bitset s{};
+sbepp::get_by_tag<set_tag::A>(s); // same as `s.A()`
+sbepp::set_by_tag<set_tag::A>(s, true); // same as `s.A(true)`
+```
+
+In combination with various traits like
+`sbepp::message_traits::field_tags` they provide a powerful API for automation
+tasks. See the [examples](#tag-based-accessors-examples) page for demos.

@@ -720,10 +720,10 @@ auto value = get_by_name(msg, "fieldName");
 When creating a new SBE message, underlying memory buffer is often initialized
 with zeros. This is OK for `required` fields which by definition must be set
 explicitly. However, `optional` fields are different and zeros might not
-represent their null values (in fact, none of SBE built-in types except `char`
-have `0` as their null value). To avoid setting each of them manually, we can
-iterate over message field tags, check their `presence` and set `optional` ones
-to null (see the full example in `nullify_optional_fields.test.cpp`):
+represent their null values (in fact, none of the SBE built-in types except
+`char` have `0` as their null value). To avoid setting each of them manually, we
+can iterate over message field tags, check their `presence` and set `optional`
+ones to null (see the full example in `nullify_optional_fields.test.cpp`):
 
 ```cpp
 template<typename... FieldTags>
