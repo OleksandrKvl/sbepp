@@ -7,7 +7,7 @@ and other useful properties via traits mechanism.
 
 ## Tags {#tags}
 
-To access any trait you need a schema entity's *tag*. *Tag* is basically a path
+To access a trait you need a schema entity's *tag*. *Tag* is basically a path
 to an entity. The tag for a schema itself (for `sbepp::schema_traits`) is
 `<schema_name>::schema`. Tags for messages have form
 `<schema_name>::schema::messages::<msg_name>` and tags for types
@@ -70,6 +70,12 @@ For built-in types like `sbepp::char_t`, the type itself works as a tag, e.g.
 auto max_char = sbepp::type_traits<sbepp::char_t>::max_value();
 ```
 
+Implementation-wise, each tag is an empty `struct`, it's possible to test tag
+kind using `sbepp::is_message_tag` and similar helpers.
+
+@see @ref tag-based-accessors
+@see `sbepp::traits_tag`
+
 ---
 
 ## Using traits
@@ -79,9 +85,13 @@ Similar to `std::numeric_limits`, `sbepp` traits are accessed like
 
 ```cpp
 auto schema_version = sbepp::schema_traits<schema_name::schema>::version();
-auto null_value = sbepp::type_traits<schema_name::schema::types::optional>::null_value();
+auto null_value = sbepp::type_traits<
+    schema_name::schema::types::optional>::null_value();
 ```
 
 For the list of available traits see @ref traits-list.
 
-@see `sbepp::traits_tag`
+Note that there's no such thing as `sbepp::ref_traits` because `<ref>` fields
+always refer to another type. To access their properties, use traits
+corresponding to the referred type (e.g. `sbepp::set_traits` if `<ref>` refers
+to a `<set>`).
