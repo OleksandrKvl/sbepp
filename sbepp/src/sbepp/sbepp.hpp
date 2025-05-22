@@ -5663,47 +5663,91 @@ struct has_traits<Trait, T, void_t<decltype(Trait<T>{})>> : std::true_type
 };
 } // namespace detail
 
-//! @brief Checks if `Tag` is a type tag
+/**
+ * @brief Checks if `Tag` is a type tag
+ *
+ * Requires `Tag` traits to be available for correct behavior.
+ */
 template<typename Tag>
 using is_type_tag = detail::has_traits<type_traits, Tag>;
 
-//! @brief Checks if `Tag` is an enum tag
+/**
+ * @brief Checks if `Tag` is an enum tag
+ *
+ * Requires `Tag` traits to be available for correct behavior.
+ */
 template<typename Tag>
 using is_enum_tag = detail::has_traits<enum_traits, Tag>;
 
-//! @brief Checks if `Tag` is an enum value tag
+/**
+ * @brief Checks if `Tag` is an enum value tag
+ *
+ * Requires `Tag` traits to be available for correct behavior.
+ */
 template<typename Tag>
 using is_enum_value_tag = detail::has_traits<enum_value_traits, Tag>;
 
-//! @brief Checks if `Tag` is a set tag
+/**
+ * @brief Checks if `Tag` is a set tag
+ *
+ * Requires `Tag` traits to be available for correct behavior.
+ */
 template<typename Tag>
 using is_set_tag = detail::has_traits<set_traits, Tag>;
 
-//! @brief Checks if `Tag` is a set choice tag
+/**
+ * @brief Checks if `Tag` is a set choice tag
+ *
+ * Requires `Tag` traits to be available for correct behavior.
+ */
 template<typename Tag>
 using is_set_choice_tag = detail::has_traits<set_choice_traits, Tag>;
 
-//! @brief Checks if `Tag` is a composite tag
+/**
+ * @brief Checks if `Tag` is a composite tag
+ *
+ * Requires `Tag` traits to be available for correct behavior.
+ */
 template<typename Tag>
 using is_composite_tag = detail::has_traits<composite_traits, Tag>;
 
-//! @brief Checks if `Tag` is a field tag
+/**
+ * @brief Checks if `Tag` is a field tag
+ *
+ * Requires `Tag` traits to be available for correct behavior.
+ */
 template<typename Tag>
 using is_field_tag = detail::has_traits<field_traits, Tag>;
 
-//! @brief Checks if `Tag` is a group tag
+/**
+ * @brief Checks if `Tag` is a group tag
+ *
+ * Requires `Tag` traits to be available for correct behavior.
+ */
 template<typename Tag>
 using is_group_tag = detail::has_traits<group_traits, Tag>;
 
-//! @brief Checks if `Tag` is a data tag
+/**
+ * @brief Checks if `Tag` is a data tag
+ *
+ * Requires `Tag` traits to be available for correct behavior.
+ */
 template<typename Tag>
 using is_data_tag = detail::has_traits<data_traits, Tag>;
 
-//! @brief Checks if `Tag` is a message tag
+/**
+ * @brief Checks if `Tag` is a message tag
+ *
+ * Requires `Tag` traits to be available for correct behavior.
+ */
 template<typename Tag>
 using is_message_tag = detail::has_traits<message_traits, Tag>;
 
-//! @brief Checks if `Tag` is a schema tag
+/**
+ * @brief Checks if `Tag` is a schema tag
+ *
+ * Requires `Tag` traits to be available for correct behavior.
+ */
 template<typename Tag>
 using is_schema_tag = detail::has_traits<schema_traits, Tag>;
 
