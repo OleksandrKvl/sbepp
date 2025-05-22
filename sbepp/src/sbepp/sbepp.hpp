@@ -811,7 +811,7 @@ public:
     cursor() = default;
 
     /**
-     * @brief Construct from another cursor. Enabled only if `Byte2*` is
+     * @brief Constructs from another cursor. Enabled only if `Byte2*` is
      *  convertible to `Byte*`.
      *
      * @tparam Byte2 `other`'s byte type
@@ -826,7 +826,7 @@ public:
     }
 
     /**
-     * @brief Assign from another cursor. Enabled only if `Byte2*` is
+     * @brief Assigns from another cursor. Enabled only if `Byte2*` is
      *  convertible to `Byte`
      *
      * @tparam Byte2 `other`'s byte type
@@ -843,7 +843,7 @@ public:
     }
 
     /**
-     * @brief access underlying pointer. Might be useful in rare cases to
+     * @brief Returns underlying pointer. Might be useful in rare cases to
      *  initialize cursor with a particular value.
      *
      * @return a reference to underlying pointer
@@ -854,7 +854,7 @@ public:
     }
 
     /**
-     * @brief access underlying pointer
+     * @brief Returns underlying pointer
      *
      * @return underlying pointer
      */
@@ -1641,7 +1641,7 @@ constexpr auto addressof(T v) noexcept -> decltype(v(detail::addressof_tag{}))
 template<typename View>
 struct byte_type
 {
-    //! @brief holds `View`'s byte type
+    //! @brief Holds `View` byte type
     using type = typename std::remove_pointer<decltype(sbepp::addressof(
         std::declval<View>()))>::type;
 };
@@ -2299,7 +2299,7 @@ public:
         decltype(std::declval<Dimension>().numInGroup())>::type;
     //! @brief Raw size type
     using size_type = typename sbe_size_type::value_type;
-    //! @brief signed `size_type`
+    //! @brief Signed `size_type`
     using difference_type = typename std::make_signed<size_type>::type;
     //! @brief Random access iterator to `value_type`. Satisfies
     //!     `std::random_access_iterator`
@@ -2384,7 +2384,7 @@ public:
             (*this)(end_ptr_tag{})};
     }
 
-    //! @brief Access group entry at `pos`
+    //! @brief Returns group entry at `pos`
     //! @pre `pos < size()`
     SBEPP_CPP14_CONSTEXPR reference operator[](size_type pos) const noexcept
     {
@@ -2524,16 +2524,16 @@ template<typename Byte, typename Entry, typename Dimension>
 class nested_group_base : public byte_range<Byte>
 {
 public:
-    //! @brief entry type
+    //! @brief Entry type
     using value_type = Entry;
     //! @brief `value_type`
     using reference = value_type;
     //! @brief `numInGroup` value type
     using sbe_size_type = typename std::decay<
         decltype(std::declval<Dimension>().numInGroup())>::type;
-    //! @brief raw size type
+    //! @brief Raw size type
     using size_type = typename sbe_size_type::value_type;
-    //! @brief signed `size_type`
+    //! @brief Signed `size_type`
     using difference_type = typename std::make_signed<size_type>::type;
 
     //! @brief Forward iterator to `value_type`. Satisfies
@@ -2886,7 +2886,7 @@ SBEPP_CPP14_CONSTEXPR cursor<typename std::add_const<byte_type_t<View>>::type>
 }
 
 /**
- * @brief tag for `dynamic_array_ref::resize()`. Used to skip value
+ * @brief Tag for `dynamic_array_ref::resize()`. Used to skip value
  * initialization.
  */
 struct default_init_t
@@ -2895,7 +2895,7 @@ struct default_init_t
 };
 
 /**
- * @brief helper to pass `default_init_t` to `dynamic_array_ref::resize()`.
+ * @brief Helper to pass `default_init_t` to `dynamic_array_ref::resize()`.
  *
  * Example: `ref.resize(n, sbepp::default_init);`.
  */
@@ -2993,24 +2993,24 @@ template<typename Byte, typename Value, std::size_t N, typename Tag>
 class static_array_ref : public detail::byte_range<Byte>
 {
 public:
-    //! @brief final element type. `value_type` with the same cv-qualifiers as
+    //! @brief Final element type. `value_type` with the same cv-qualifiers as
     //!     `Byte`
     using element_type = detail::apply_cv_qualifiers_t<Byte, Value>;
-    //! @brief same as `Value`
+    //! @brief Same as `Value`
     using value_type = Value;
     //! @brief `std::size_t`
     using size_type = std::size_t;
     //! @brief `std::ptrdiff_t`
     using difference_type = std::ptrdiff_t;
-    //! @brief element reference type
+    //! @brief Element reference type
     using reference = element_type&;
-    //! @brief element pointer type
+    //! @brief Element pointer type
     using pointer = element_type*;
-    //! @brief iterator type. Satisfies `std::random_access_iterator`
+    //! @brief Iterator type. Satisfies `std::random_access_iterator`
     using iterator = pointer;
-    //! @brief reverse iterator type
+    //! @brief Reverse iterator type
     using reverse_iterator = std::reverse_iterator<iterator>;
-    //! @brief type tag
+    //! @brief Type tag
     using tag = Tag;
 
     using detail::byte_range<Byte>::byte_range;
@@ -3021,7 +3021,7 @@ public:
         return size();
     }
 
-    //! @brief Access element at `pos`
+    //! @brief Returns element at `pos`
     //! @pre `pos < size()`
     SBEPP_CPP14_CONSTEXPR reference operator[](size_type pos) const noexcept
     {
@@ -3029,19 +3029,19 @@ public:
         return data()[pos];
     }
 
-    //! @brief Access the first element
+    //! @brief Returns the first element
     constexpr reference front() const noexcept
     {
         return *data();
     }
 
-    //! @brief Access the last element
+    //! @brief Returns the last element
     constexpr reference back() const noexcept
     {
         return data()[size() - 1];
     }
 
-    //! @brief Direct access to the underlying array
+    //! @brief Returns pointer to the underlying array
     SBEPP_CPP14_CONSTEXPR pointer data() const noexcept
     {
         // it would be nice to use `reinterpret_cast` here but it's not allowed
@@ -3315,24 +3315,24 @@ template<typename Byte, typename Value, typename Length, endian E>
 class dynamic_array_ref : public detail::byte_range<Byte>
 {
 public:
-    //! @brief final element type. `value_type` with the same cv-qualifiers as
+    //! @brief Final element type. `value_type` with the same cv-qualifiers as
     //!     `Byte`
     using element_type = detail::apply_cv_qualifiers_t<Byte, Value>;
-    //! @brief same as `Value`
+    //! @brief Same as `Value`
     using value_type = Value;
     //! @brief `length` SBE representation of data's encoding
     using sbe_size_type = Length;
-    //! @brief raw size type
+    //! @brief Raw size type
     using size_type = typename sbe_size_type::value_type;
     //! @brief `std::ptrdiff_t`
     using difference_type = std::ptrdiff_t;
-    //! @brief element reference type
+    //! @brief Element reference type
     using reference = element_type&;
-    //! @brief element pointer type
+    //! @brief Element pointer type
     using pointer = element_type*;
-    //! @brief iterator type. Satisfies `std::random_access_iterator`
+    //! @brief Iterator type. Satisfies `std::random_access_iterator`
     using iterator = pointer;
-    //! @brief reverse iterator type
+    //! @brief Reverse iterator type
     using reverse_iterator = std::reverse_iterator<iterator>;
 
     using detail::byte_range<Byte>::byte_range;
@@ -3362,7 +3362,7 @@ public:
         return reverse_iterator{begin()};
     }
 
-    //! @brief Access the first element
+    //! @brief Returns the first element
     //! @pre `!empty()`
     SBEPP_CPP14_CONSTEXPR reference front() const noexcept
     {
@@ -3370,7 +3370,7 @@ public:
         return *data();
     }
 
-    //! @brief Access the last element
+    //! @brief Returns the last element
     //! @pre `!empty()`
     SBEPP_CPP20_CONSTEXPR reference back() const noexcept
     {
@@ -3379,7 +3379,7 @@ public:
     }
 
     /**
-     * @brief Direct access to the underlying array
+     * @brief Returns pointer to the underlying array
      *
      *  The pointer is such that range `[data(), data() + size())` is always a
      *  valid range, even if the container is empty (`data()` is not
@@ -3390,7 +3390,7 @@ public:
         return data_checked();
     }
 
-    //! @brief Access element at `pos`
+    //! @brief Returns element at `pos`
     //! @pre `pos < size()`
     SBEPP_CPP14_CONSTEXPR reference operator[](size_type pos) const noexcept
     {
@@ -3981,7 +3981,7 @@ private:
 } // namespace detail
 
 /**
- * @brief Fill message header
+ * @brief Fills message header
  *
  * Automatically fills these fields in message header:
  * - `schemaId`
@@ -4002,7 +4002,7 @@ constexpr auto fill_message_header(Message m) noexcept
 }
 
 /**
- * @brief Fill group header
+ * @brief Fills group header
  *
  * Automatically fills these fields in group header:
  * - `blockLength`
@@ -4328,7 +4328,7 @@ public:
      */
     template<typename Byte>
     using value_type = CompositeType<Byte>;
-    //! @brief Size of the composite in bytes
+    //! @brief Returns size of the composite in bytes
     static constexpr std::size_t size_bytes() noexcept;
     //! @brief Element tags in schema order
     using element_tags = sbepp::type_list<ElementTags...>;
@@ -4639,7 +4639,7 @@ public:
 /** @} */
 
 /**
- * @brief Maps representation type to its tag.
+ * @brief Maps representation type to its tag
  *
  * @tparam ValueType representation type
  *
@@ -4908,7 +4908,7 @@ SBEPP_BUILT_IN_IMPL(
 #undef SBEPP_BUILT_IN_IMPL
 
 /**
- * @brief Construct view from memory buffer.
+ * @brief Constructs view from memory buffer
  *
  * View will have the same byte type as provided buffer.
  * Example:
@@ -4931,7 +4931,7 @@ constexpr View<Byte> make_view(Byte* ptr, const std::size_t size) noexcept
 }
 
 /**
- * @brief Construct read-only view from memory buffer.
+ * @brief Constructs read-only view from memory buffer
  *
  * View's byte type will be a const-qualified buffer byte type.
  * Example:
@@ -5217,7 +5217,7 @@ using is_visitable_view = std::integral_constant<
 // implementation.
 
 /**
- * @brief Visit a view using given cursor
+ * @brief Visits a view using given cursor
  *
  * @tparam Visitor visitor type
  * @param view message, group, entry or composite view
@@ -5548,7 +5548,7 @@ struct size_bytes_checked_result
 };
 
 /**
- * @brief Calculate `view` size with additional safety checks.
+ * @brief Calculates `view` size with additional safety checks.
  *
  * Similar to `size_bytes()` but stops if `view` cannot fit into the given
  * `size`. Useful to check that incoming message is fully contained within given
@@ -5578,7 +5578,7 @@ SBEPP_CPP20_CONSTEXPR size_bytes_checked_result
 }
 
 /**
- * @brief Gets view field or set choice by tag
+ * @brief Gets field or set choice value by tag
  *
  * @tparam Tag field or set choice tag
  * @param viewOrSet message, entry, composite view or set
@@ -5593,7 +5593,7 @@ constexpr auto get_by_tag(ViewOrSet viewOrSet) noexcept
 }
 
 /**
- * @brief Gets view field by tag using given cursor
+ * @brief Gets field value by tag using given cursor
  *
  * @tparam Tag field tag
  * @param view message or entry view
@@ -5608,7 +5608,7 @@ constexpr auto get_by_tag(View view, Cursor&& c) noexcept -> decltype(view(
 }
 
 /**
- * @brief Sets view field or set choice by tag
+ * @brief Sets field or set choice value by tag
  *
  * @tparam Tag field or set choice tag
  * @param viewOrSet message, entry, composite view or set
@@ -5626,7 +5626,7 @@ constexpr auto set_by_tag(ViewOrSet&& viewOrSet, Value&& value) noexcept
 }
 
 /**
- * @brief Sets view field by tag using given cursor
+ * @brief Sets field value by tag using given cursor
  *
  * @tparam Tag field tag
  * @param view message or entry view
