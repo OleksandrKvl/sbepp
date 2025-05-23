@@ -1,6 +1,6 @@
 [requires]
 fmt/9.1.0
-pugixml/1.12.1
+pugixml/1.14
 benchmark/1.6.2
 gtest/1.12.1
 
