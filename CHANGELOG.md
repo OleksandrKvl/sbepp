@@ -1,3 +1,12 @@
+# 1.6.0
+
+- add children tag lists to various traits
+- add by-tag accessors
+- add tag classification traits
+- deprecate cursor-based composite visitation
+
+---
+
 # 1.5.1
 
 - fix `char`-based enumerators validation. Thanks to @dtiukalov.

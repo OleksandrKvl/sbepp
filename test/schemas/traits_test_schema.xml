@@ -154,8 +154,7 @@
     </sbe:message>
 
     <!-- size_bytes tests -->
-    <sbe:message name="msg_7" id="7">
-    </sbe:message>
+    <sbe:message name="msg_7" id="7"/>
 
     <sbe:message name="msg_8" id="8">
         <field name="field" id="1" type="uint32"/>
@@ -253,5 +252,27 @@
                 <data name="data" id="7" type="varDataEncoding"/>
             </group>
         </group>
+    </sbe:message>
+
+    <!-- member tags test -->
+    <sbe:message name="msg_17" id="17">
+        <field name="field_1" id="1" type="uint32"/>
+        <field name="field_2" id="2" type="uint32"/>
+
+        <group name="group_1" id="3">
+            <field name="field_1" id="7" type="uint32"/>
+            <field name="field_2" id="8" type="uint32"/>
+
+            <group name="group_1" id="9"/>
+            <group name="group_2" id="10"/>
+
+            <data name="data_1" id="11" type="varDataEncoding"/>
+            <data name="data_2" id="12" type="varDataEncoding"/>
+        </group>
+
+        <group name="group_2" id="4"/>
+
+        <data name="data_1" id="5" type="varDataEncoding"/>
+        <data name="data_2" id="6" type="varDataEncoding"/>
     </sbe:message>
 </sbe:messageSchema>

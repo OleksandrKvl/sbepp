@@ -1224,8 +1224,9 @@ R"(
     {
         const auto group_header_size =
             ctx_manager
-                ->get(utils::get_schema_encoding_as<sbe::composite>(
-                    *schema, g.dimension_type))
+                ->get(
+                    utils::get_schema_encoding_as<sbe::composite>(
+                        *schema, g.dimension_type))
                 .size;
 
         return fmt::format(
@@ -1253,8 +1254,9 @@ R"(
     {
         const auto group_header_size =
             ctx_manager
-                ->get(utils::get_schema_encoding_as<sbe::composite>(
-                    *schema, g.dimension_type))
+                ->get(
+                    utils::get_schema_encoding_as<sbe::composite>(
+                        *schema, g.dimension_type))
                 .size;
 
         return fmt::format(
@@ -1398,6 +1400,31 @@ R"(
         return res;
     }
 
+    std::string make_by_tag_accessors(const sbe::level_members& members) const
+    {
+        std::string res;
+
+        for(const auto& f : members.fields)
+        {
+            res += normal_accessors::make_by_tag_accessor(
+                f.name, ctx_manager->get(f).tag);
+        }
+
+        for(const auto& g : members.groups)
+        {
+            res += normal_accessors::make_by_tag_accessor(
+                g.name, ctx_manager->get(g).tag);
+        }
+
+        for(const auto& d : members.data)
+        {
+            res += normal_accessors::make_by_tag_accessor(
+                d.name, ctx_manager->get(d).tag);
+        }
+
+        return res;
+    }
+
     std::string make_level_accessors(
         const sbe::level_members& members, const std::size_t header_size)
     {
@@ -1410,6 +1437,8 @@ R"(
         res += make_fields_cursor_accessors(members.fields, header_size);
         res += make_groups_cursor_accessors(members.groups);
         res += make_data_cursor_accessors(members);
+
+        res += make_by_tag_accessors(members);
 
         return res;
     }
@@ -1552,26 +1581,29 @@ R"(
                 continue;
             }
 
-            res.push_back(fmt::format(
-                "v.on_field(this->{name}(c), {tag}{{}})",
-                fmt::arg("name", f.name),
-                fmt::arg("tag", context.tag)));
+            res.push_back(
+                fmt::format(
+                    "v.on_field(this->{name}(c), {tag}{{}})",
+                    fmt::arg("name", f.name),
+                    fmt::arg("tag", context.tag)));
         }
 
         for(const auto& g : members.groups)
         {
-            res.push_back(fmt::format(
-                "v.on_group(this->{name}(c), c, {tag}{{}})",
-                fmt::arg("name", g.name),
-                fmt::arg("tag", ctx_manager->get(g).tag)));
+            res.push_back(
+                fmt::format(
+                    "v.on_group(this->{name}(c), c, {tag}{{}})",
+                    fmt::arg("name", g.name),
+                    fmt::arg("tag", ctx_manager->get(g).tag)));
         }
 
         for(const auto& d : members.data)
         {
-            res.push_back(fmt::format(
-                "v.on_data(this->{name}(c), {tag}{{}})",
-                fmt::arg("name", d.name),
-                fmt::arg("tag", ctx_manager->get(d).tag)));
+            res.push_back(
+                fmt::format(
+                    "v.on_data(this->{name}(c), {tag}{{}})",
+                    fmt::arg("name", d.name),
+                    fmt::arg("tag", ctx_manager->get(d).tag)));
         }
 
         return res;

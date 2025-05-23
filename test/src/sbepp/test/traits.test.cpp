@@ -39,6 +39,7 @@
 #include <traits_test_schema/messages/msg_14.hpp>
 #include <traits_test_schema/messages/msg_15.hpp>
 #include <traits_test_schema/messages/msg_16.hpp>
+#include <traits_test_schema/messages/msg_17.hpp>
 
 #include <traits_test_schema2/schema/schema.hpp>
 
@@ -170,6 +171,73 @@ struct sbe_traits<
 {
 };
 
+template<typename ListIn, typename T, typename ListOut>
+struct remove_type_impl;
+
+template<typename T, typename... OutTypes>
+struct remove_type_impl<sbepp::type_list<>, T, sbepp::type_list<OutTypes...>>
+{
+    using type = sbepp::type_list<OutTypes...>;
+};
+
+template<typename Head, typename... Tail, typename T, typename... OutTypes>
+struct remove_type_impl<
+    sbepp::type_list<Head, Tail...>,
+    T,
+    sbepp::type_list<OutTypes...>>
+{
+    using type = typename remove_type_impl<
+        sbepp::type_list<Tail...>,
+        T,
+        sbepp::type_list<OutTypes..., Head>>::type;
+};
+
+template<typename... Tail, typename T, typename... OutTypes>
+struct remove_type_impl<
+    sbepp::type_list<T, Tail...>,
+    T,
+    sbepp::type_list<OutTypes...>>
+{
+    using type = sbepp::type_list<OutTypes..., Tail...>;
+};
+
+template<typename List, typename T>
+struct remove_type : remove_type_impl<List, T, sbepp::type_list<>>
+{
+};
+
+template<typename List, typename T>
+using remove_type_t = typename remove_type<List, T>::type;
+
+template<typename BaseList, typename RemovalList>
+struct set_difference;
+
+// removes all `RemovalList` types from the `BaseList`
+template<typename BaseList, typename RemovalList>
+using set_difference_t = typename set_difference<BaseList, RemovalList>::type;
+
+template<typename BaseList, typename Head, typename... Tail>
+struct set_difference<BaseList, sbepp::type_list<Head, Tail...>>
+{
+    using type = set_difference_t<
+        remove_type_t<BaseList, Head>,
+        sbepp::type_list<Tail...>>;
+};
+
+template<typename BaseList>
+struct set_difference<BaseList, sbepp::type_list<>>
+{
+    using type = BaseList;
+};
+
+// checks that two type lists have the same elements regardless of their order
+template<typename LhsList, typename RhsList>
+struct unordered_equal : std::is_same<
+                             set_difference_t<LhsList, RhsList>,
+                             set_difference_t<RhsList, LhsList>>
+{
+};
+
 TEST(SchemaTraitsTest, SchemaTraitsProvidesTheSameValuesAsSchemaXml)
 {
     using schema_tag = traits_test_schema::schema;
@@ -181,12 +249,14 @@ TEST(SchemaTraitsTest, SchemaTraitsProvidesTheSameValuesAsSchemaXml)
     ASSERT_STREQ(schema_traits::semantic_version(), "5.2");
     ASSERT_EQ(schema_traits::byte_order(), sbepp::endian::little);
     ASSERT_STREQ(schema_traits::description(), "schema description");
-    STATIC_ASSERT_V(std::is_same<
-                    schema_traits::header_type<char>,
-                    traits_test_schema::types::messageHeader<char>>);
-    STATIC_ASSERT_V(std::is_same<
-                    schema_traits::header_type_tag,
-                    schema_tag::types::messageHeader>);
+    STATIC_ASSERT_V(
+        std::is_same<
+            schema_traits::header_type<char>,
+            traits_test_schema::types::messageHeader<char>>);
+    STATIC_ASSERT_V(
+        std::is_same<
+            schema_traits::header_type_tag,
+            schema_tag::types::messageHeader>);
     IS_NOEXCEPT(schema_traits::package());
     IS_NOEXCEPT(schema_traits::id());
     IS_NOEXCEPT(schema_traits::version());
@@ -205,6 +275,68 @@ TEST(SchemaTraitsTest, SchemaTraitsProvidesEmptyStringsForOptionalAttributes)
     ASSERT_STREQ(schema_traits::description(), "");
 }
 
+TEST(SchemaTraitsTest, ProvidesTypeAndMessageTags)
+{
+    using schema_tag = traits_test_schema::schema;
+    using schema_traits = sbepp::schema_traits<schema_tag>;
+    using types = schema_tag::types;
+    using messages = schema_tag::messages;
+
+    STATIC_ASSERT_V(
+        unordered_equal<
+            schema_traits::type_tags,
+            sbepp::type_list<
+                types::messageHeader,
+                types::groupSizeEncoding,
+                types::customGroupSizeEncoding,
+                types::varDataEncoding,
+                types::enum_1,
+                types::enum_2,
+                types::composite_1,
+                types::set_1,
+                types::set_2,
+                types::composite_2,
+                types::composite_3,
+                types::composite_4,
+                types::composite_5,
+                types::composite_6,
+                types::composite_7,
+                types::composite_8,
+                types::str128,
+                types::str_const,
+                types::uint32_req,
+                types::uint32_opt,
+                types::uint32_const,
+                types::type_1>>);
+
+    STATIC_ASSERT_V(
+        std::is_same<
+            schema_traits::message_tags,
+            sbepp::type_list<
+                messages::msg_1,
+                messages::msg_2,
+                messages::msg_3,
+                messages::msg_4,
+                messages::msg_5,
+                messages::msg_6,
+                messages::msg_7,
+                messages::msg_8,
+                messages::msg_9,
+                messages::msg_10,
+                messages::msg_11,
+                messages::msg_12,
+                messages::msg_13,
+                messages::msg_14,
+                messages::msg_15,
+                messages::msg_16,
+                messages::msg_17>>);
+
+    STATIC_ASSERT_V(
+        std::is_same<
+            sbepp::schema_traits<traits_test_schema2::schema>::message_tags,
+            sbepp::type_list<>>);
+}
+
 TEST(EnumTraitsTest, ProvidesTheSameValuesAsSchemaXml)
 {
     using enum_tag = traits_test_schema::schema::types::enum_1;
@@ -216,6 +348,23 @@ TEST(EnumTraitsTest, ProvidesTheSameValuesAsSchemaXml)
     IS_SAME_TYPE(enum_traits::value_type, traits_test_schema::types::enum_1);
     IS_NOEXCEPT(enum_traits::name());
     IS_NOEXCEPT(enum_traits::description());
+}
+
+TEST(EnumTraitsTest, ProvidesValueTags)
+{
+    using enum_tag = traits_test_schema::schema::types::enum_1;
+    using enum_traits = sbepp::enum_traits<enum_tag>;
+
+    STATIC_ASSERT_V(
+        std::is_same<
+            enum_traits::value_tags,
+            sbepp::type_list<enum_tag::a, enum_tag::b>>);
+
+    STATIC_ASSERT_V(
+        std::is_same<
+            sbepp::enum_traits<
+                traits_test_schema::schema::types::enum_2>::value_tags,
+            sbepp::type_list<>>);
 }
 
 template<typename Tag>
@@ -386,6 +535,23 @@ TEST(SetTraitsTest, ProvidesTheSameValuesAsSchemaXml)
     IS_NOEXCEPT(traits::description());
 }
 
+TEST(SetTraitsTest, ProvidesChoiceTags)
+{
+    using set_tag = traits_test_schema::schema::types::set_1;
+    using traits = sbepp::set_traits<set_tag>;
+
+    STATIC_ASSERT_V(
+        std::is_same<
+            traits::choice_tags,
+            sbepp::type_list<set_tag::a, set_tag::b>>);
+
+    STATIC_ASSERT_V(
+        std::is_same<
+            sbepp::set_traits<
+                traits_test_schema::schema::types::set_2>::choice_tags,
+            sbepp::type_list<>>);
+}
+
 TEST(SetChoiceTraitsTest, ProvidesTheSameValuesAsSchemaXml)
 {
     using traits =
@@ -412,6 +578,27 @@ TEST(CompositeTraitsTest, ProvidesTheSameValuesAsSchemaXml)
     IS_NOEXCEPT(traits::name());
     IS_NOEXCEPT(traits::description());
     IS_NOEXCEPT(traits::semantic_type());
+}
+
+TEST(CompositeTraitsTest, ProvidesElementTags)
+{
+    using composite_tag = traits_test_schema::schema::types::composite_6;
+    using traits = sbepp::composite_traits<composite_tag>;
+
+    STATIC_ASSERT_V(
+        std::is_same<
+            traits::element_tags,
+            sbepp::type_list<
+                composite_tag::ref_1,
+                composite_tag::ref_2,
+                composite_tag::ref_3,
+                composite_tag::ref_4>>);
+
+    STATIC_ASSERT_V(
+        std::is_same<
+            sbepp::composite_traits<
+                traits_test_schema::schema::types::composite_4>::element_tags,
+            sbepp::type_list<>>);
 }
 
 using NoSemanticTypeTags = ::testing::Types<
@@ -449,6 +636,35 @@ TEST(MessageTraitsTest, ProvidesTheSameValuesAsSchemaXml)
     IS_NOEXCEPT(traits::description());
     IS_NOEXCEPT(traits::id());
     IS_NOEXCEPT(traits::semantic_type());
+}
+
+TEST(MessageTraitsTest, ProvidesMemberTags)
+{
+    using message_tag = traits_test_schema::schema::messages::msg_17;
+    using traits = sbepp::message_traits<message_tag>;
+
+    STATIC_ASSERT_V(
+        std::is_same<
+            traits::field_tags,
+            sbepp::type_list<message_tag::field_1, message_tag::field_2>>);
+    STATIC_ASSERT_V(
+        std::is_same<
+            traits::group_tags,
+            sbepp::type_list<message_tag::group_1, message_tag::group_2>>);
+    STATIC_ASSERT_V(
+        std::is_same<
+            traits::data_tags,
+            sbepp::type_list<message_tag::data_1, message_tag::data_2>>);
+
+    using empty_message_traits =
+        sbepp::message_traits<traits_test_schema::schema::messages::msg_7>;
+
+    STATIC_ASSERT_V(
+        std::is_same<empty_message_traits::field_tags, sbepp::type_list<>>);
+    STATIC_ASSERT_V(
+        std::is_same<empty_message_traits::group_tags, sbepp::type_list<>>);
+    STATIC_ASSERT_V(
+        std::is_same<empty_message_traits::data_tags, sbepp::type_list<>>);
 }
 
 TEST(MessageTraitsTest, DefaultBlockLengthIsSumOfFieldSizes)
@@ -602,6 +818,35 @@ TEST(GroupTraitsTest, ProvidesTheSameValuesAsSchemaXml)
     IS_NOEXCEPT(traits::id());
     IS_NOEXCEPT(traits::block_length());
     IS_NOEXCEPT(traits::semantic_type());
+}
+
+TEST(GroupTraitsTest, ProvidesMemberTags)
+{
+    using group_tag = traits_test_schema::schema::messages::msg_17::group_1;
+    using traits = sbepp::group_traits<group_tag>;
+
+    STATIC_ASSERT_V(
+        std::is_same<
+            traits::field_tags,
+            sbepp::type_list<group_tag::field_1, group_tag::field_2>>);
+    STATIC_ASSERT_V(
+        std::is_same<
+            traits::group_tags,
+            sbepp::type_list<group_tag::group_1, group_tag::group_2>>);
+    STATIC_ASSERT_V(
+        std::is_same<
+            traits::data_tags,
+            sbepp::type_list<group_tag::data_1, group_tag::data_2>>);
+
+    using empty_group_traits = sbepp::group_traits<
+        traits_test_schema::schema::messages::msg_17::group_2>;
+
+    STATIC_ASSERT_V(
+        std::is_same<empty_group_traits::field_tags, sbepp::type_list<>>);
+    STATIC_ASSERT_V(
+        std::is_same<empty_group_traits::group_tags, sbepp::type_list<>>);
+    STATIC_ASSERT_V(
+        std::is_same<empty_group_traits::data_tags, sbepp::type_list<>>);
 }
 
 TEST(GroupTraitsTest, DefaultDimensionIsGroupSizeEncoding)
@@ -964,8 +1209,9 @@ TEST(MessageTraitsTest, HasTrailingTotalDataSizeParameterIfHasDataAtAnyLevel2)
     STATIC_ASSERT(
         traits::size_bytes(group_1_size, group_1_group_2_size, total_data_size)
         == valid_size);
-    IS_NOEXCEPT(traits::size_bytes(
-        group_1_size, group_1_group_2_size, total_data_size));
+    IS_NOEXCEPT(
+        traits::size_bytes(
+            group_1_size, group_1_group_2_size, total_data_size));
 }
 
 TEST(MessageTraitsTest, HasTrailingTotalDataSizeParameterIfHasDataAtAnyLevel3)
@@ -992,8 +1238,9 @@ TEST(MessageTraitsTest, HasTrailingTotalDataSizeParameterIfHasDataAtAnyLevel3)
     STATIC_ASSERT(
         traits::size_bytes(group_1_size, group_1_group_2_size, total_data_size)
         == valid_size);
-    IS_NOEXCEPT(traits::size_bytes(
-        group_1_size, group_1_group_2_size, total_data_size));
+    IS_NOEXCEPT(
+        traits::size_bytes(
+            group_1_size, group_1_group_2_size, total_data_size));
 }
 
 TEST(MessageTraitsTest, AddsLevelDepthSuffixToAmbiguousSizeBytesParameters)

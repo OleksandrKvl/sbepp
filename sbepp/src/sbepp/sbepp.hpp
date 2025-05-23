@@ -58,7 +58,7 @@ SBEPP_WARNINGS_OFF();
 #if !defined(SBEPP_HAS_THREE_WAY_COMPARISON)    \
     && defined(__cpp_impl_three_way_comparison) \
     && defined(__cpp_lib_three_way_comparison)
-#    if(__cpp_impl_three_way_comparison >= 201907L) \
+#    if (__cpp_impl_three_way_comparison >= 201907L) \
         && (__cpp_lib_three_way_comparison >= 201907L)
 #        define SBEPP_HAS_THREE_WAY_COMPARISON 1
 #        include <compare>
@@ -70,7 +70,7 @@ SBEPP_WARNINGS_OFF();
 
 //! @brief `1` if compiler supports concepts, `0` otherwise
 #if !defined(SBEPP_HAS_CONCEPTS) && defined(__cpp_concepts)
-#    if(__cpp_concepts >= 201907L)
+#    if (__cpp_concepts >= 201907L)
 #        define SBEPP_HAS_CONCEPTS 1
 #    endif
 #endif
@@ -80,7 +80,7 @@ SBEPP_WARNINGS_OFF();
 
 //! @brief `1` is compiler supports inline variables, `0` otherwise
 #if !defined(SBEPP_HAS_INLINE_VARS) && defined(__cpp_inline_variables)
-#    if(__cpp_inline_variables >= 201606L)
+#    if (__cpp_inline_variables >= 201606L)
 #        define SBEPP_HAS_INLINE_VARS 1
 #        define SBEPP_CPP17_INLINE_VAR inline
 #    endif
@@ -92,7 +92,7 @@ SBEPP_WARNINGS_OFF();
 
 //! @brief `1` if compiler supports `std::endian`, `0` otherwise
 #if !defined(SBEPP_HAS_ENDIAN) && defined(__cpp_lib_endian)
-#    if(__cpp_lib_endian >= 201907L)
+#    if (__cpp_lib_endian >= 201907L)
 #        define SBEPP_HAS_ENDIAN 1
 #        include <bit>
 #    endif
@@ -103,7 +103,7 @@ SBEPP_WARNINGS_OFF();
 
 //! @brief `1` if compiler supports `std::bitcast`, `0` otherwise
 #if !defined(SBEPP_HAS_BITCAST) && defined(__cpp_lib_bit_cast)
-#    if(__cpp_lib_bit_cast >= 201806L)
+#    if (__cpp_lib_bit_cast >= 201806L)
 #        define SBEPP_HAS_BITCAST 1
 #        include <bit>
 #    endif
@@ -114,7 +114,7 @@ SBEPP_WARNINGS_OFF();
 
 //! @brief `1` if compiler supports `std::byteswap`, `0` otherwise
 #if !defined(SBEPP_HAS_BYTESWAP) && defined(__cpp_lib_byteswap)
-#    if(__cpp_lib_byteswap >= 202110L)
+#    if (__cpp_lib_byteswap >= 202110L)
 #        define SBEPP_HAS_BYTESWAP 1
 #        include <bit>
 #    endif
@@ -126,7 +126,7 @@ SBEPP_WARNINGS_OFF();
 //! @brief `1` if compiler supports constexpr `std` algorithms, `0` otherwise
 #if !defined(SBEPP_HAS_CONSTEXPR_ALGORITHMS) \
     && defined(__cpp_lib_constexpr_algorithms)
-#    if(__cpp_lib_constexpr_algorithms >= 201806L)
+#    if (__cpp_lib_constexpr_algorithms >= 201806L)
 #        define SBEPP_HAS_CONSTEXPR_ALGORITHMS 1
 #    endif
 #endif
@@ -176,11 +176,11 @@ SBEPP_WARNINGS_OFF();
 #endif
 
 #ifdef __cpp_constexpr
-#    if(__cpp_constexpr >= 201304L)
+#    if (__cpp_constexpr >= 201304L)
 #        define SBEPP_CPP14_CONSTEXPR constexpr
 #    endif
 #else
-#    if(SBEPP_CPLUSPLUS >= 201402L)
+#    if (SBEPP_CPLUSPLUS >= 201402L)
 #        define SBEPP_CPP14_CONSTEXPR constexpr
 #    endif
 #endif
@@ -190,7 +190,7 @@ SBEPP_WARNINGS_OFF();
 
 //! @brief `1` if compiler supports ranges, `0` otherwise
 #if !defined(SBEPP_HAS_RANGES) && defined(__cpp_lib_ranges)
-#    if(__cpp_lib_ranges >= 201911L)
+#    if (__cpp_lib_ranges >= 201911L)
 #        define SBEPP_HAS_RANGES 1
 #        include <ranges>
 #    endif
@@ -371,6 +371,13 @@ static_assert(
     (endian::native == endian::little) || (endian::native == endian::big),
     "Mixed-endian is not supported");
 
+//! @brief An empty structure to represent a sequence of types
+//! @tparam Ts types
+template<typename... Ts>
+struct type_list
+{
+};
+
 //! @brief Namespace for various implementation details. Should not be used
 //!     directly
 namespace detail
@@ -421,14 +428,14 @@ inline std::uint16_t byteswap(std::uint16_t v) noexcept
     return _byteswap_ushort(v);
 }
 
-#    elif(                                                     \
+#    elif (                                                    \
         defined(__clang__) && __has_builtin(__builtin_bswap32) \
         && __has_builtin(__builtin_bswap64))                   \
         || (defined(__GNUC__)                                  \
             && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 3)))
 
-#        if(defined(__clang__) && __has_builtin(__builtin_bswap16)) \
-            || (defined(__GNUC__)                                   \
+#        if (defined(__clang__) && __has_builtin(__builtin_bswap16)) \
+            || (defined(__GNUC__)                                    \
                 && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 8)))
 
 inline std::uint16_t byteswap(std::uint16_t v) noexcept
@@ -664,6 +671,11 @@ struct visit_set_tag
     explicit visit_set_tag() = default;
 };
 
+struct access_by_tag_tag
+{
+    explicit access_by_tag_tag() = default;
+};
+
 template<typename T, typename U, endian E, typename View>
 SBEPP_CPP20_CONSTEXPR T
     get_value(const View view, const std::size_t offset) noexcept
@@ -799,7 +811,7 @@ public:
     cursor() = default;
 
     /**
-     * @brief Construct from another cursor. Enabled only if `Byte2*` is
+     * @brief Constructs from another cursor. Enabled only if `Byte2*` is
      *  convertible to `Byte*`.
      *
      * @tparam Byte2 `other`'s byte type
@@ -814,7 +826,7 @@ public:
     }
 
     /**
-     * @brief Assign from another cursor. Enabled only if `Byte2*` is
+     * @brief Assigns from another cursor. Enabled only if `Byte2*` is
      *  convertible to `Byte`
      *
      * @tparam Byte2 `other`'s byte type
@@ -831,7 +843,7 @@ public:
     }
 
     /**
-     * @brief access underlying pointer. Might be useful in rare cases to
+     * @brief Returns underlying pointer. Might be useful in rare cases to
      *  initialize cursor with a particular value.
      *
      * @return a reference to underlying pointer
@@ -842,7 +854,7 @@ public:
     }
 
     /**
-     * @brief access underlying pointer
+     * @brief Returns underlying pointer
      *
      * @return underlying pointer
      */
@@ -1629,7 +1641,7 @@ constexpr auto addressof(T v) noexcept -> decltype(v(detail::addressof_tag{}))
 template<typename View>
 struct byte_type
 {
-    //! @brief holds `View`'s byte type
+    //! @brief Holds `View` byte type
     using type = typename std::remove_pointer<decltype(sbepp::addressof(
         std::declval<View>()))>::type;
 };
@@ -2287,7 +2299,7 @@ public:
         decltype(std::declval<Dimension>().numInGroup())>::type;
     //! @brief Raw size type
     using size_type = typename sbe_size_type::value_type;
-    //! @brief signed `size_type`
+    //! @brief Signed `size_type`
     using difference_type = typename std::make_signed<size_type>::type;
     //! @brief Random access iterator to `value_type`. Satisfies
     //!     `std::random_access_iterator`
@@ -2372,7 +2384,7 @@ public:
             (*this)(end_ptr_tag{})};
     }
 
-    //! @brief Access group entry at `pos`
+    //! @brief Returns group entry at `pos`
     //! @pre `pos < size()`
     SBEPP_CPP14_CONSTEXPR reference operator[](size_type pos) const noexcept
     {
@@ -2512,16 +2524,16 @@ template<typename Byte, typename Entry, typename Dimension>
 class nested_group_base : public byte_range<Byte>
 {
 public:
-    //! @brief entry type
+    //! @brief Entry type
     using value_type = Entry;
     //! @brief `value_type`
     using reference = value_type;
     //! @brief `numInGroup` value type
     using sbe_size_type = typename std::decay<
         decltype(std::declval<Dimension>().numInGroup())>::type;
-    //! @brief raw size type
+    //! @brief Raw size type
     using size_type = typename sbe_size_type::value_type;
-    //! @brief signed `size_type`
+    //! @brief Signed `size_type`
     using difference_type = typename std::make_signed<size_type>::type;
 
     //! @brief Forward iterator to `value_type`. Satisfies
@@ -2874,7 +2886,7 @@ SBEPP_CPP14_CONSTEXPR cursor<typename std::add_const<byte_type_t<View>>::type>
 }
 
 /**
- * @brief tag for `dynamic_array_ref::resize()`. Used to skip value
+ * @brief Tag for `dynamic_array_ref::resize()`. Used to skip value
  * initialization.
  */
 struct default_init_t
@@ -2883,7 +2895,7 @@ struct default_init_t
 };
 
 /**
- * @brief helper to pass `default_init_t` to `dynamic_array_ref::resize()`.
+ * @brief Helper to pass `default_init_t` to `dynamic_array_ref::resize()`.
  *
  * Example: `ref.resize(n, sbepp::default_init);`.
  */
@@ -2981,24 +2993,24 @@ template<typename Byte, typename Value, std::size_t N, typename Tag>
 class static_array_ref : public detail::byte_range<Byte>
 {
 public:
-    //! @brief final element type. `value_type` with the same cv-qualifiers as
+    //! @brief Final element type. `value_type` with the same cv-qualifiers as
     //!     `Byte`
     using element_type = detail::apply_cv_qualifiers_t<Byte, Value>;
-    //! @brief same as `Value`
+    //! @brief Same as `Value`
     using value_type = Value;
     //! @brief `std::size_t`
     using size_type = std::size_t;
     //! @brief `std::ptrdiff_t`
     using difference_type = std::ptrdiff_t;
-    //! @brief element reference type
+    //! @brief Element reference type
     using reference = element_type&;
-    //! @brief element pointer type
+    //! @brief Element pointer type
     using pointer = element_type*;
-    //! @brief iterator type. Satisfies `std::random_access_iterator`
+    //! @brief Iterator type. Satisfies `std::random_access_iterator`
     using iterator = pointer;
-    //! @brief reverse iterator type
+    //! @brief Reverse iterator type
     using reverse_iterator = std::reverse_iterator<iterator>;
-    //! @brief type tag
+    //! @brief Type tag
     using tag = Tag;
 
     using detail::byte_range<Byte>::byte_range;
@@ -3009,7 +3021,7 @@ public:
         return size();
     }
 
-    //! @brief Access element at `pos`
+    //! @brief Returns element at `pos`
     //! @pre `pos < size()`
     SBEPP_CPP14_CONSTEXPR reference operator[](size_type pos) const noexcept
     {
@@ -3017,19 +3029,19 @@ public:
         return data()[pos];
     }
 
-    //! @brief Access the first element
+    //! @brief Returns the first element
     constexpr reference front() const noexcept
     {
         return *data();
     }
 
-    //! @brief Access the last element
+    //! @brief Returns the last element
     constexpr reference back() const noexcept
     {
         return data()[size() - 1];
     }
 
-    //! @brief Direct access to the underlying array
+    //! @brief Returns pointer to the underlying array
     SBEPP_CPP14_CONSTEXPR pointer data() const noexcept
     {
         // it would be nice to use `reinterpret_cast` here but it's not allowed
@@ -3303,24 +3315,24 @@ template<typename Byte, typename Value, typename Length, endian E>
 class dynamic_array_ref : public detail::byte_range<Byte>
 {
 public:
-    //! @brief final element type. `value_type` with the same cv-qualifiers as
+    //! @brief Final element type. `value_type` with the same cv-qualifiers as
     //!     `Byte`
     using element_type = detail::apply_cv_qualifiers_t<Byte, Value>;
-    //! @brief same as `Value`
+    //! @brief Same as `Value`
     using value_type = Value;
     //! @brief `length` SBE representation of data's encoding
     using sbe_size_type = Length;
-    //! @brief raw size type
+    //! @brief Raw size type
     using size_type = typename sbe_size_type::value_type;
     //! @brief `std::ptrdiff_t`
     using difference_type = std::ptrdiff_t;
-    //! @brief element reference type
+    //! @brief Element reference type
     using reference = element_type&;
-    //! @brief element pointer type
+    //! @brief Element pointer type
     using pointer = element_type*;
-    //! @brief iterator type. Satisfies `std::random_access_iterator`
+    //! @brief Iterator type. Satisfies `std::random_access_iterator`
     using iterator = pointer;
-    //! @brief reverse iterator type
+    //! @brief Reverse iterator type
     using reverse_iterator = std::reverse_iterator<iterator>;
 
     using detail::byte_range<Byte>::byte_range;
@@ -3350,7 +3362,7 @@ public:
         return reverse_iterator{begin()};
     }
 
-    //! @brief Access the first element
+    //! @brief Returns the first element
     //! @pre `!empty()`
     SBEPP_CPP14_CONSTEXPR reference front() const noexcept
     {
@@ -3358,7 +3370,7 @@ public:
         return *data();
     }
 
-    //! @brief Access the last element
+    //! @brief Returns the last element
     //! @pre `!empty()`
     SBEPP_CPP20_CONSTEXPR reference back() const noexcept
     {
@@ -3367,7 +3379,7 @@ public:
     }
 
     /**
-     * @brief Direct access to the underlying array
+     * @brief Returns pointer to the underlying array
      *
      *  The pointer is such that range `[data(), data() + size())` is always a
      *  valid range, even if the container is empty (`data()` is not
@@ -3378,7 +3390,7 @@ public:
         return data_checked();
     }
 
-    //! @brief Access element at `pos`
+    //! @brief Returns element at `pos`
     //! @pre `pos < size()`
     SBEPP_CPP14_CONSTEXPR reference operator[](size_type pos) const noexcept
     {
@@ -3969,7 +3981,7 @@ private:
 } // namespace detail
 
 /**
- * @brief Fill message header
+ * @brief Fills message header
  *
  * Automatically fills these fields in message header:
  * - `schemaId`
@@ -3990,7 +4002,7 @@ constexpr auto fill_message_header(Message m) noexcept
 }
 
 /**
- * @brief Fill group header
+ * @brief Fills group header
  *
  * Automatically fills these fields in group header:
  * - `blockLength`
@@ -4132,6 +4144,10 @@ public:
     using header_type = HeaderComposite<Byte>;
     //! @brief Message header composite tag. Can be used to access its traits.
     using header_type_tag = HeaderTypeTag;
+    //! @brief Public schema type tags, unordered
+    using type_tags = sbepp::type_list<TypeTags...>;
+    //! @brief Schema message tags in schema order
+    using message_tags = sbepp::type_list<MessageTags...>;
 };
 #endif
 
@@ -4169,6 +4185,8 @@ public:
     static constexpr version_t deprecated() noexcept;
     //! @brief Representation type
     using value_type = ScopedEnumType;
+    //! @brief Value tags in schema order
+    using value_tags = sbepp::type_list<ValueTags...>;
 };
 #endif
 
@@ -4236,6 +4254,8 @@ public:
     static constexpr offset_t offset() noexcept;
     //! @brief Representation type
     using value_type = SetType;
+    //! @brief Choice tags in schema order
+    using choice_tags = sbepp::type_list<ChoiceTags...>;
 };
 #endif
 
@@ -4308,8 +4328,10 @@ public:
      */
     template<typename Byte>
     using value_type = CompositeType<Byte>;
-    //! @brief Size of the composite in bytes
+    //! @brief Returns size of the composite in bytes
     static constexpr std::size_t size_bytes() noexcept;
+    //! @brief Element tags in schema order
+    using element_tags = sbepp::type_list<ElementTags...>;
 };
 #endif
 
@@ -4432,6 +4454,12 @@ public:
      *  schema version.
      */
     static constexpr std::size_t size_bytes(...) noexcept;
+    //! @brief Top-level field tags in schema order
+    using field_tags = sbepp::type_list<FieldTags...>;
+    //! @brief Top-level group tags in schema order
+    using group_tags = sbepp::type_list<GroupTags...>;
+    //! @brief Top-level data tags in schema order
+    using data_tags = sbepp::type_list<DataTags...>;
 };
 #endif
 
@@ -4551,6 +4579,12 @@ public:
      */
     static constexpr std::size_t
         size_bytes(const NumInGroupType num_in_group, ...) noexcept;
+    //! @brief Current-level field tags in schema order
+    using field_tags = sbepp::type_list<FieldTags...>;
+    //! @brief Current-level group tags in schema order
+    using group_tags = sbepp::type_list<GroupTags...>;
+    //! @brief Current-level data tags in schema order
+    using data_tags = sbepp::type_list<DataTags...>;
 };
 #endif
 
@@ -4605,7 +4639,7 @@ public:
 /** @} */
 
 /**
- * @brief Maps representation type to its tag.
+ * @brief Maps representation type to its tag
  *
  * @tparam ValueType representation type
  *
@@ -4874,7 +4908,7 @@ SBEPP_BUILT_IN_IMPL(
 #undef SBEPP_BUILT_IN_IMPL
 
 /**
- * @brief Construct view from memory buffer.
+ * @brief Constructs view from memory buffer
  *
  * View will have the same byte type as provided buffer.
  * Example:
@@ -4897,7 +4931,7 @@ constexpr View<Byte> make_view(Byte* ptr, const std::size_t size) noexcept
 }
 
 /**
- * @brief Construct read-only view from memory buffer.
+ * @brief Constructs read-only view from memory buffer
  *
  * View's byte type will be a const-qualified buffer byte type.
  * Example:
@@ -5170,17 +5204,16 @@ concept data = is_data_v<T>;
 namespace detail
 {
 template<typename T>
-using is_visitable_view = std::integral_constant<
+using is_cursor_visitable_view = std::integral_constant<
     bool,
-    is_message<T>::value || is_group<T>::value || is_group_entry<T>::value
-        || is_composite<T>::value>;
+    is_message<T>::value || is_group<T>::value || is_group_entry<T>::value>;
 }
 
 /**
- * @brief Visit a view using given cursor
+ * @brief Visits a view using given cursor
  *
  * @tparam Visitor visitor type
- * @param view message, group, entry or composite view
+ * @param view message, group or entry view
  * @param c cursor, passed as is to `visitor`
  * @param visitor visitor
  * @return forwarded reference to `visitor`
@@ -5191,7 +5224,8 @@ template<
     typename Visitor,
     typename View,
     typename Cursor,
-    typename = detail::enable_if_t<detail::is_visitable_view<View>::value>>
+    typename =
+        detail::enable_if_t<detail::is_cursor_visitable_view<View>::value>>
 SBEPP_CPP14_CONSTEXPR Visitor&&
     visit(View view, Cursor& c, Visitor&& visitor = {})
 {
@@ -5200,10 +5234,10 @@ SBEPP_CPP14_CONSTEXPR Visitor&&
 }
 
 /**
- * @brief Visits a view
+ * @brief Visits a message, group or entry view
  *
  * @tparam Visitor visitor type
- * @param view message, group, entry or composite view
+ * @param view message, group or entry view
  * @param visitor visitor
  * @return forwarded reference to `visitor`
  *
@@ -5212,7 +5246,8 @@ SBEPP_CPP14_CONSTEXPR Visitor&&
 template<
     typename Visitor,
     typename View,
-    typename = detail::enable_if_t<detail::is_visitable_view<View>::value>>
+    typename =
+        detail::enable_if_t<detail::is_cursor_visitable_view<View>::value>>
 SBEPP_CPP14_CONSTEXPR Visitor&& visit(View view, Visitor&& visitor = {})
 {
     auto c = sbepp::init_cursor(view);
@@ -5220,11 +5255,13 @@ SBEPP_CPP14_CONSTEXPR Visitor&& visit(View view, Visitor&& visitor = {})
 }
 
 #ifndef SBEPP_DOXYGEN
-template<typename Visitor, typename Set>
-SBEPP_CPP14_CONSTEXPR detail::enable_if_t<is_set<Set>::value, Visitor&&>
-    visit(Set s, Visitor&& visitor = {})
+template<typename Visitor, typename SetOrComposite>
+SBEPP_CPP14_CONSTEXPR detail::enable_if_t<
+    is_set<SetOrComposite>::value || is_composite<SetOrComposite>::value,
+    Visitor&&>
+    visit(SetOrComposite setOrComposite, Visitor&& visitor = {})
 {
-    s(detail::visit_tag{}, visitor);
+    setOrComposite(detail::visit_tag{}, visitor);
     return std::forward<Visitor>(visitor);
 }
 
@@ -5237,6 +5274,19 @@ SBEPP_CPP14_CONSTEXPR detail::enable_if_t<is_enum<Enum>::value, Visitor&&>
 }
 
 #else
+
+/**
+ * @brief Visits a composite view
+ *
+ * @tparam Visitor visitor type
+ * @param view composite view
+ * @param visitor visitor
+ * @return forwarded reference to `visitor`
+ *
+ * @see @ref visit-api
+ */
+template<typename Visitor, typename Composite>
+SBEPP_CPP14_CONSTEXPR Visitor&& visit(Composite view, Visitor&& visitor = {});
 
 /**
  * @brief Visits set choices
@@ -5258,7 +5308,7 @@ template<typename Visitor, typename Set>
 SBEPP_CPP14_CONSTEXPR Visitor&& visit(Set s, Visitor&& visitor = {});
 
 /**
- * @brief Visits enum value
+ * @brief Visits an enum value
  *
  * @tparam Visitor visitor type
  * @param e enum value to visit
@@ -5278,12 +5328,33 @@ SBEPP_CPP14_CONSTEXPR Visitor&& visit(Enum e, Visitor&& visitor = {});
 #endif
 
 /**
- * @brief Visit view's children using provided cursor
+ * @brief Visits a composite view using given cursor
  *
  * @tparam Visitor visitor type
- * @param view message, group, entry or composite view
- * @param c cursor, ignored for composites, otherwise must point to the first
- *  `view`'s child
+ * @param view composite view
+ * @param c cursor, ignored
+ * @param visitor visitor
+ * @return forwarded reference to `visitor`
+ *
+ * @deprecated Use non-cursor version instead. Will be removed in the next
+ *  major update.
+ * @see @ref visit-api
+ */
+template<typename Visitor, typename View, typename Cursor>
+SBEPP_DEPRECATED SBEPP_CPP14_CONSTEXPR
+    detail::enable_if_t<is_composite<View>::value, Visitor&&>
+    visit(View view, Cursor& c, Visitor&& visitor = {})
+{
+    (void)c;
+    return sbepp::visit(view, std::forward<Visitor>(visitor));
+}
+
+/**
+ * @brief Visits view's children using provided cursor
+ *
+ * @tparam Visitor visitor type
+ * @param view message, group or entry view
+ * @param c cursor, must point to the first `view`'s child
  * @param visitor visitor
  * @return forwarded reference to `visitor`
  *
@@ -5293,7 +5364,8 @@ template<
     typename Visitor,
     typename View,
     typename Cursor,
-    typename = detail::enable_if_t<detail::is_visitable_view<View>::value>>
+    typename =
+        detail::enable_if_t<detail::is_cursor_visitable_view<View>::value>>
 SBEPP_CPP14_CONSTEXPR Visitor&&
     visit_children(View view, Cursor& c, Visitor&& visitor = {})
 {
@@ -5302,10 +5374,10 @@ SBEPP_CPP14_CONSTEXPR Visitor&&
 }
 
 /**
- * @brief Visit view's children
+ * @brief Visits view's children
  *
  * @tparam Visitor visitor type
- * @param view message, group, entry or composite view
+ * @param view message, group or entry view
  * @param visitor visitor
  * @return forwarded reference to `visitor`
  *
@@ -5314,12 +5386,53 @@ SBEPP_CPP14_CONSTEXPR Visitor&&
 template<
     typename Visitor,
     typename View,
-    typename = detail::enable_if_t<detail::is_visitable_view<View>::value>>
+    typename =
+        detail::enable_if_t<detail::is_cursor_visitable_view<View>::value>>
 SBEPP_CPP14_CONSTEXPR Visitor&&
     visit_children(View view, Visitor&& visitor = {})
 {
     auto c = sbepp::init_cursor(view);
     return sbepp::visit_children(view, c, std::forward<Visitor>(visitor));
+}
+
+/**
+ * @brief Visits composite children using provided cursor
+ *
+ * @tparam Visitor visitor type
+ * @param view composite view
+ * @param visitor visitor
+ * @return forwarded reference to `visitor`
+ *
+ * @see @ref visit-api
+ */
+template<typename Visitor, typename View>
+SBEPP_CPP14_CONSTEXPR detail::enable_if_t<is_composite<View>::value, Visitor&&>
+    visit_children(View view, Visitor&& visitor = {})
+{
+    view(detail::visit_children_tag{}, visitor);
+    return std::forward<Visitor>(visitor);
+}
+
+/**
+ * @brief Visits composite children using provided cursor
+ *
+ * @tparam Visitor visitor type
+ * @param view composite view
+ * @param c cursor, ignored
+ * @param visitor visitor
+ * @return forwarded reference to `visitor`
+ *
+ * @deprecated Use non-cursor version instead. Will be removed in the next
+ *  major update.
+ * @see @ref visit-api
+ */
+template<typename Visitor, typename View, typename Cursor>
+SBEPP_DEPRECATED SBEPP_CPP14_CONSTEXPR
+    detail::enable_if_t<is_composite<View>::value, Visitor&&>
+    visit_children(View view, Cursor& c, Visitor&& visitor = {})
+{
+    (void)c;
+    return visit_children(view, std::forward<Visitor>(visitor));
 }
 
 namespace detail
@@ -5507,9 +5620,8 @@ struct size_bytes_checked_result
     std::size_t size;
 };
 
-// can be used with message/group
 /**
- * @brief Calculate `view` size with additional safety checks.
+ * @brief Calculates `view` size with additional safety checks.
  *
  * Similar to `size_bytes()` but stops if `view` cannot fit into the given
  * `size`. Useful to check that incoming message is fully contained within given
@@ -5537,6 +5649,272 @@ SBEPP_CPP20_CONSTEXPR size_bytes_checked_result
     }
     return {};
 }
+
+/**
+ * @brief Gets field or set choice value by tag
+ *
+ * @tparam Tag field or set choice tag
+ * @param viewOrSet message, entry, composite view or set
+ * @return the result of the corresponding getter, e.g.
+ *  `viewOrSet.fieldOrChoiceName()`
+ */
+template<typename Tag, typename ViewOrSet>
+constexpr auto get_by_tag(ViewOrSet viewOrSet) noexcept
+    -> decltype(viewOrSet(detail::access_by_tag_tag{}, Tag{}))
+{
+    return viewOrSet(detail::access_by_tag_tag{}, Tag{});
+}
+
+/**
+ * @brief Gets field value by tag using given cursor
+ *
+ * @tparam Tag field tag
+ * @param view message or entry view
+ * @param c cursor
+ * @return the result of the corresponding getter, e.g. `view.fieldName(c)`
+ */
+template<typename Tag, typename View, typename Cursor>
+constexpr auto get_by_tag(View view, Cursor&& c) noexcept -> decltype(view(
+    detail::access_by_tag_tag{}, Tag{}, std::forward<Cursor>(c)))
+{
+    return view(detail::access_by_tag_tag{}, Tag{}, std::forward<Cursor>(c));
+}
+
+/**
+ * @brief Sets field or set choice value by tag
+ *
+ * @tparam Tag field or set choice tag
+ * @param viewOrSet message, entry, composite view or set
+ * @param value value to set
+ * @return the result of the corresponding setter, e.g.
+ *  `viewOrSet.fieldOrChoiceName(value)`
+ */
+template<typename Tag, typename ViewOrSet, typename Value>
+constexpr auto set_by_tag(ViewOrSet&& viewOrSet, Value&& value) noexcept
+    -> decltype(std::forward<ViewOrSet>(viewOrSet)(
+        detail::access_by_tag_tag{}, Tag{}, std::forward<Value>(value)))
+{
+    return std::forward<ViewOrSet>(viewOrSet)(
+        detail::access_by_tag_tag{}, Tag{}, std::forward<Value>(value));
+}
+
+/**
+ * @brief Sets field value by tag using given cursor
+ *
+ * @tparam Tag field tag
+ * @param view message or entry view
+ * @param value value to set
+ * @param c cursor
+ * @return the result of the corresponding setter, e.g.
+ *  `view.fieldName(value, c)`
+ */
+template<typename Tag, typename View, typename Value, typename Cursor>
+constexpr auto set_by_tag(View view, Value&& value, Cursor&& c)
+    -> decltype(view(
+        detail::access_by_tag_tag{},
+        Tag{},
+        std::forward<Value>(value),
+        std::forward<Cursor>(c)))
+{
+    return view(
+        detail::access_by_tag_tag{},
+        Tag{},
+        std::forward<Value>(value),
+        std::forward<Cursor>(c));
+}
+
+namespace detail
+{
+template<template<typename> class Trait, typename T, typename = void_t<>>
+struct has_traits : std::false_type
+{
+};
+
+template<template<typename> class Trait, typename T>
+struct has_traits<Trait, T, void_t<decltype(Trait<T>{})>> : std::true_type
+{
+};
+} // namespace detail
+
+/**
+ * @brief Checks if `Tag` is a type tag
+ *
+ * Requires `Tag` traits to be available for correct behavior.
+ */
+template<typename Tag>
+using is_type_tag = detail::has_traits<type_traits, Tag>;
+
+/**
+ * @brief Checks if `Tag` is an enum tag
+ *
+ * Requires `Tag` traits to be available for correct behavior.
+ */
+template<typename Tag>
+using is_enum_tag = detail::has_traits<enum_traits, Tag>;
+
+/**
+ * @brief Checks if `Tag` is an enum value tag
+ *
+ * Requires `Tag` traits to be available for correct behavior.
+ */
+template<typename Tag>
+using is_enum_value_tag = detail::has_traits<enum_value_traits, Tag>;
+
+/**
+ * @brief Checks if `Tag` is a set tag
+ *
+ * Requires `Tag` traits to be available for correct behavior.
+ */
+template<typename Tag>
+using is_set_tag = detail::has_traits<set_traits, Tag>;
+
+/**
+ * @brief Checks if `Tag` is a set choice tag
+ *
+ * Requires `Tag` traits to be available for correct behavior.
+ */
+template<typename Tag>
+using is_set_choice_tag = detail::has_traits<set_choice_traits, Tag>;
+
+/**
+ * @brief Checks if `Tag` is a composite tag
+ *
+ * Requires `Tag` traits to be available for correct behavior.
+ */
+template<typename Tag>
+using is_composite_tag = detail::has_traits<composite_traits, Tag>;
+
+/**
+ * @brief Checks if `Tag` is a field tag
+ *
+ * Requires `Tag` traits to be available for correct behavior.
+ */
+template<typename Tag>
+using is_field_tag = detail::has_traits<field_traits, Tag>;
+
+/**
+ * @brief Checks if `Tag` is a group tag
+ *
+ * Requires `Tag` traits to be available for correct behavior.
+ */
+template<typename Tag>
+using is_group_tag = detail::has_traits<group_traits, Tag>;
+
+/**
+ * @brief Checks if `Tag` is a data tag
+ *
+ * Requires `Tag` traits to be available for correct behavior.
+ */
+template<typename Tag>
+using is_data_tag = detail::has_traits<data_traits, Tag>;
+
+/**
+ * @brief Checks if `Tag` is a message tag
+ *
+ * Requires `Tag` traits to be available for correct behavior.
+ */
+template<typename Tag>
+using is_message_tag = detail::has_traits<message_traits, Tag>;
+
+/**
+ * @brief Checks if `Tag` is a schema tag
+ *
+ * Requires `Tag` traits to be available for correct behavior.
+ */
+template<typename Tag>
+using is_schema_tag = detail::has_traits<schema_traits, Tag>;
+
+#if SBEPP_HAS_INLINE_VARS
+//! @brief Shorthand for `sbepp::is_type_tag<Tag>::value`
+template<typename Tag>
+inline constexpr auto is_type_tag_v = is_type_tag<Tag>::value;
+
+//! @brief Shorthand for `sbepp::is_enum_tag<Tag>::value`
+template<typename Tag>
+inline constexpr auto is_enum_tag_v = is_enum_tag<Tag>::value;
+
+//! @brief Shorthand for `sbepp::is_enum_value_tag<Tag>::value`
+template<typename Tag>
+inline constexpr auto is_enum_value_tag_v = is_enum_value_tag<Tag>::value;
+
+//! @brief Shorthand for `sbepp::is_set_tag<Tag>::value`
+template<typename Tag>
+inline constexpr auto is_set_tag_v = is_set_tag<Tag>::value;
+
+//! @brief Shorthand for `sbepp::is_set_choice_tag<Tag>::value`
+template<typename Tag>
+inline constexpr auto is_set_choice_tag_v = is_set_choice_tag<Tag>::value;
+
+//! @brief Shorthand for `sbepp::is_composite_tag<Tag>::value`
+template<typename Tag>
+inline constexpr auto is_composite_tag_v = is_composite_tag<Tag>::value;
+
+//! @brief Shorthand for `sbepp::is_field_tag<Tag>::value`
+template<typename Tag>
+inline constexpr auto is_field_tag_v = is_field_tag<Tag>::value;
+
+//! @brief Shorthand for `sbepp::is_group_tag<Tag>::value`
+template<typename Tag>
+inline constexpr auto is_group_tag_v = is_group_tag<Tag>::value;
+
+//! @brief Shorthand for `sbepp::is_data_tag<Tag>::value`
+template<typename Tag>
+inline constexpr auto is_data_tag_v = is_data_tag<Tag>::value;
+
+//! @brief Shorthand for `sbepp::is_message_tag<Tag>::value`
+template<typename Tag>
+inline constexpr auto is_message_tag_v = is_message_tag<Tag>::value;
+
+//! @brief Shorthand for `sbepp::is_schema_tag<Tag>::value`
+template<typename Tag>
+inline constexpr auto is_schema_tag_v = is_schema_tag<Tag>::value;
+#endif
+
+#if SBEPP_HAS_CONCEPTS
+//! @brief Concept for `sbepp::is_type_tag<Tag>::value`
+template<typename Tag>
+concept type_tag = is_type_tag_v<Tag>;
+
+//! @brief Concept for `sbepp::is_enum_tag<Tag>::value`
+template<typename Tag>
+concept enum_tag = is_enum_tag_v<Tag>;
+
+//! @brief Concept for `sbepp::is_enum_value_tag<Tag>::value`
+template<typename Tag>
+concept enum_value_tag = is_enum_value_tag_v<Tag>;
+
+//! @brief Concept for `sbepp::is_set_tag<Tag>::value`
+template<typename Tag>
+concept set_tag = is_set_tag_v<Tag>;
+
+//! @brief Concept for `sbepp::is_set_choice_tag<Tag>::value`
+template<typename Tag>
+concept set_choice_tag = is_set_choice_tag_v<Tag>;
+
+//! @brief Concept for `sbepp::is_composite_tag<Tag>::value`
+template<typename Tag>
+concept composite_tag = is_composite_tag_v<Tag>;
+
+//! @brief Concept for `sbepp::is_field_tag<Tag>::value`
+template<typename Tag>
+concept field_tag = is_field_tag_v<Tag>;
+
+//! @brief Concept for `sbepp::is_group_tag<Tag>::value`
+template<typename Tag>
+concept group_tag = is_group_tag_v<Tag>;
+
+//! @brief Concept for `sbepp::is_data_tag<Tag>::value`
+template<typename Tag>
+concept data_tag = is_data_tag_v<Tag>;
+
+//! @brief Concept for `sbepp::is_message_tag<Tag>::value`
+template<typename Tag>
+concept message_tag = is_message_tag_v<Tag>;
+
+//! @brief Concept for `sbepp::is_schema_tag<Tag>::value`
+template<typename Tag>
+concept schema_tag = is_schema_tag_v<Tag>;
+#endif
 } // namespace sbepp
 
 #if SBEPP_HAS_RANGES && SBEPP_HAS_CONCEPTS

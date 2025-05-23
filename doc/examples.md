@@ -577,3 +577,181 @@ content:
     varData: [1, 2]
     varStr: ab
 ```
+
+---
+
+## Automatic handling of all schema messages
+
+Using `sbepp::schema_traits::message_tags` we can make a helper that takes
+incoming message buffer, automatically detects what schema message it represents
+and passes to the callback a corresponding message view object (see the full
+example in `handle_schema_message.test.cpp`):
+
+```cpp
+template<typename SchemaTag, typename Byte, typename... MessageTags, typename F>
+void handle_message_impl(
+    const Byte* data,
+    const std::size_t size,
+    F&& cb,
+    sbepp::type_list<MessageTags...>)
+{
+    const auto msg_id =
+        sbepp::make_const_view<
+            sbepp::schema_traits<SchemaTag>::template header_type>(data, size)
+            .templateId()
+            .value();
+
+    const auto try_create_message = [msg_id, data, size, &cb]<typename Tag>(Tag)
+    {
+        if(msg_id == sbepp::message_traits<Tag>::id())
+        {
+            cb(sbepp::make_view<
+                sbepp::message_traits<Tag>::template value_type>(data, size));
+            return true;
+        }
+        return false;
+    };
+
+    const auto is_known_message = (try_create_message(MessageTags{}) || ...);
+    if(!is_known_message)
+    {
+        // log error somehow
+    }
+}
+
+// invokes `cb` with message view corresponding to the given buffer
+template<typename SchemaTag, typename Byte, typename F>
+void handle_schema_message(const Byte* data, const std::size_t size, F&& cb)
+{
+    using message_tags = typename sbepp::schema_traits<SchemaTag>::message_tags;
+    handle_message_impl<SchemaTag>(
+        data, size, std::forward<F>(cb), message_tags{});
+}
+
+// usage:
+handle_schema_message<test_schema::schema>(
+    buf.data(), buf.size(), overloaded{
+        [](test_schema::messages::msg4<const byte_type>)
+        {
+            // handle `msg4`
+        },
+        [](auto)
+        {
+            // not interested in other messages
+        }
+    }
+);
+```
+
+With this helper, users can avoid writing separate if-else/switch-case statement
+per each schema message manually and only handle messages they are interested
+in.
+
+---
+
+## Tag-based accessors {#tag-based-accessors-examples}
+### Access field by name
+
+Sometimes it's useful to access fields by their names. Using
+`sbepp::message_traits::field_tags` and `sbepp::field_traits::name` it's
+possible to generate by-name accessors at compile-time (see the full example in
+`get_by_name.test.cpp`):
+
+```cpp
+template<sbepp::message Message, typename... FieldTags>
+std::uint64_t get_by_name_impl(
+    Message msg,
+    const std::string_view field_name,
+    sbepp::type_list<FieldTags...>)
+{
+    std::uint64_t res{};
+
+    auto try_get_value = [&res]<typename Tag>(auto msg, auto name, Tag)
+    {
+        if(sbepp::field_traits<Tag>::name() == name)
+        {
+            using value_type_tag = sbepp::field_traits<Tag>::value_type_tag;
+            if constexpr(
+                sbepp::type_tag<value_type_tag>
+                || sbepp::set_tag<value_type_tag>)
+            {
+                res = static_cast<std::uint64_t>(*sbepp::get_by_tag<Tag>(msg));
+            }
+            else if constexpr(sbepp::enum_tag<value_type_tag>)
+            {
+                res = static_cast<std::uint64_t>(
+                    sbepp::to_underlying(sbepp::get_by_tag<Tag>(msg)));
+            }
+            else
+            {
+                throw std::runtime_error{"Unsupported field type"};
+            }
+            return true;
+        }
+        return false;
+    };
+
+    const auto is_found = (try_get_value(msg, field_name, FieldTags{}) || ...);
+    if(!is_found)
+    {
+        throw std::runtime_error{"Wrong field name"};
+    }
+
+    return res;
+}
+
+// gets message field underlying value by name
+template<sbepp::message Message>
+std::uint64_t get_by_name(Message msg, const std::string_view field_name)
+{
+    return get_by_name_impl(
+        msg,
+        field_name,
+        typename sbepp::message_traits<
+            sbepp::traits_tag_t<Message>>::field_tags{});
+}
+
+// usage:
+auto value = get_by_name(msg, "fieldName");
+```
+
+### Set all optional fields to null
+
+When creating a new SBE message, underlying memory buffer is often initialized
+with zeros. This is OK for `required` fields which by definition must be set
+explicitly. However, `optional` fields are different and zeros might not
+represent their null values (in fact, none of the SBE built-in types except
+`char` have `0` as their null value). To avoid setting each of them manually, we
+can iterate over message field tags, check their `presence` and set `optional`
+ones to null (see the full example in `nullify_optional_fields.test.cpp`):
+
+```cpp
+template<typename... FieldTags>
+void nullify_optional_fields_impl(auto view, sbepp::type_list<FieldTags...>)
+{
+    auto set_nullopt = []<typename Tag>(auto view, Tag)
+    {
+        if constexpr(
+            sbepp::field_traits<Tag>::presence()
+            == sbepp::field_presence::optional)
+        {
+            sbepp::set_by_tag<Tag>(view, sbepp::nullopt);
+        }
+    };
+
+    (set_nullopt(view, FieldTags{}), ...);
+}
+
+// sets optional message fields to null
+template<sbepp::message Message>
+void nullify_optional_fields(Message msg)
+{
+    nullify_optional_fields_impl(
+        msg,
+        typename sbepp::message_traits<
+            sbepp::traits_tag_t<Message>>::field_tags{});
+}
+
+// usage:
+nullify_optional_fields(msg);
+```
