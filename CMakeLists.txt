@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.11)
 
 project(sbepp
-    VERSION 1.5.1
+    VERSION 1.6.0
     LANGUAGES CXX
 )
 
