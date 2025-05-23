@@ -416,6 +416,63 @@ TYPED_TEST(VisitCompositeTest, CompositeVisitorGetsCorrectValues)
     ASSERT_TRUE(visitor.is_valid());
 }
 
+// next two tests are to verify that deprecated versions still work
+TYPED_TEST(VisitCompositeTest, VisitWorksWithCursor)
+{
+    auto& c = this->c;
+    c.number(2);
+    c.set(c.set().A(true).B(true));
+    c.enumeration(decltype(c.enumeration())::Two);
+
+    valid_values2 values{};
+    values.uint32_value = *c.number();
+    values.enum_value = sbepp::to_underlying(c.enumeration());
+    values.set_value = *c.set();
+    values.root_composite_ptr = sbepp::addressof(c);
+    values.child_composite_ptr = sbepp::addressof(c.composite());
+    values.array_ptr = sbepp::addressof(c.array());
+
+    composite_tester visitor{
+        values,
+        {sbepp::composite_traits<typename TestFixture::composite_tag>::name(),
+         "number",
+         "array",
+         "enumeration",
+         "set",
+         "composite"}};
+    auto cursor = sbepp::init_cursor(c);
+
+    sbepp::visit(c, cursor, visitor);
+
+    ASSERT_TRUE(visitor.is_valid());
+}
+
+TEST(VisitChildrenCompositeTest, WorksWithCursor)
+{
+    std::array<byte_type, 256> buf{};
+    auto c = sbepp::make_view<test_schema::types::composite_b>(
+        buf.data(), buf.size());
+    c.number(2);
+    c.set(c.set().A(true).B(true));
+    c.enumeration(decltype(c.enumeration())::Two);
+
+    valid_values2 values{};
+    values.uint32_value = *c.number();
+    values.enum_value = sbepp::to_underlying(c.enumeration());
+    values.set_value = *c.set();
+    values.child_composite_ptr = sbepp::addressof(c.composite());
+    values.root_composite_ptr = values.child_composite_ptr;
+    values.array_ptr = sbepp::addressof(c.array());
+
+    composite_tester visitor{
+        values, {"number", "array", "enumeration", "set", "composite"}};
+    auto cursor = sbepp::init_cursor(c);
+
+    sbepp::visit_children(c, cursor, visitor);
+
+    ASSERT_TRUE(visitor.is_valid());
+}
+
 class group_visitor
 {
 public:

@@ -5204,23 +5204,16 @@ concept data = is_data_v<T>;
 namespace detail
 {
 template<typename T>
-using is_visitable_view = std::integral_constant<
+using is_cursor_visitable_view = std::integral_constant<
     bool,
-    is_message<T>::value || is_group<T>::value || is_group_entry<T>::value
-        || is_composite<T>::value>;
+    is_message<T>::value || is_group<T>::value || is_group_entry<T>::value>;
 }
-
-// TODO: there's no reason to support cursor-based `visit` for composites,
-// cursor is not used for them. However, this would be a breaking change so
-// let's first just deprecate it. This would require distinct `visit` overload
-// for composites and change in `types_compiler.hpp` that generates the
-// implementation.
 
 /**
  * @brief Visits a view using given cursor
  *
  * @tparam Visitor visitor type
- * @param view message, group, entry or composite view
+ * @param view message, group or entry view
  * @param c cursor, passed as is to `visitor`
  * @param visitor visitor
  * @return forwarded reference to `visitor`
@@ -5231,7 +5224,8 @@ template<
     typename Visitor,
     typename View,
     typename Cursor,
-    typename = detail::enable_if_t<detail::is_visitable_view<View>::value>>
+    typename =
+        detail::enable_if_t<detail::is_cursor_visitable_view<View>::value>>
 SBEPP_CPP14_CONSTEXPR Visitor&&
     visit(View view, Cursor& c, Visitor&& visitor = {})
 {
@@ -5240,10 +5234,10 @@ SBEPP_CPP14_CONSTEXPR Visitor&&
 }
 
 /**
- * @brief Visits a view
+ * @brief Visits a message, group or entry view
  *
  * @tparam Visitor visitor type
- * @param view message, group, entry or composite view
+ * @param view message, group or entry view
  * @param visitor visitor
  * @return forwarded reference to `visitor`
  *
@@ -5252,7 +5246,8 @@ SBEPP_CPP14_CONSTEXPR Visitor&&
 template<
     typename Visitor,
     typename View,
-    typename = detail::enable_if_t<detail::is_visitable_view<View>::value>>
+    typename =
+        detail::enable_if_t<detail::is_cursor_visitable_view<View>::value>>
 SBEPP_CPP14_CONSTEXPR Visitor&& visit(View view, Visitor&& visitor = {})
 {
     auto c = sbepp::init_cursor(view);
@@ -5260,11 +5255,13 @@ SBEPP_CPP14_CONSTEXPR Visitor&& visit(View view, Visitor&& visitor = {})
 }
 
 #ifndef SBEPP_DOXYGEN
-template<typename Visitor, typename Set>
-SBEPP_CPP14_CONSTEXPR detail::enable_if_t<is_set<Set>::value, Visitor&&>
-    visit(Set s, Visitor&& visitor = {})
+template<typename Visitor, typename SetOrComposite>
+SBEPP_CPP14_CONSTEXPR detail::enable_if_t<
+    is_set<SetOrComposite>::value || is_composite<SetOrComposite>::value,
+    Visitor&&>
+    visit(SetOrComposite setOrComposite, Visitor&& visitor = {})
 {
-    s(detail::visit_tag{}, visitor);
+    setOrComposite(detail::visit_tag{}, visitor);
     return std::forward<Visitor>(visitor);
 }
 
@@ -5277,6 +5274,19 @@ SBEPP_CPP14_CONSTEXPR detail::enable_if_t<is_enum<Enum>::value, Visitor&&>
 }
 
 #else
+
+/**
+ * @brief Visits a composite view
+ *
+ * @tparam Visitor visitor type
+ * @param view composite view
+ * @param visitor visitor
+ * @return forwarded reference to `visitor`
+ *
+ * @see @ref visit-api
+ */
+template<typename Visitor, typename Composite>
+SBEPP_CPP14_CONSTEXPR Visitor&& visit(Composite view, Visitor&& visitor = {});
 
 /**
  * @brief Visits set choices
@@ -5298,7 +5308,7 @@ template<typename Visitor, typename Set>
 SBEPP_CPP14_CONSTEXPR Visitor&& visit(Set s, Visitor&& visitor = {});
 
 /**
- * @brief Visits enum value
+ * @brief Visits an enum value
  *
  * @tparam Visitor visitor type
  * @param e enum value to visit
@@ -5318,12 +5328,33 @@ SBEPP_CPP14_CONSTEXPR Visitor&& visit(Enum e, Visitor&& visitor = {});
 #endif
 
 /**
- * @brief Visit view's children using provided cursor
+ * @brief Visits a composite view using given cursor
  *
  * @tparam Visitor visitor type
- * @param view message, group, entry or composite view
- * @param c cursor, ignored for composites, otherwise must point to the first
- *  `view`'s child
+ * @param view composite view
+ * @param c cursor, ignored
+ * @param visitor visitor
+ * @return forwarded reference to `visitor`
+ *
+ * @deprecated Use non-cursor version instead. Will be removed in the next
+ *  major update.
+ * @see @ref visit-api
+ */
+template<typename Visitor, typename View, typename Cursor>
+SBEPP_DEPRECATED SBEPP_CPP14_CONSTEXPR
+    detail::enable_if_t<is_composite<View>::value, Visitor&&>
+    visit(View view, Cursor& c, Visitor&& visitor = {})
+{
+    (void)c;
+    return sbepp::visit(view, std::forward<Visitor>(visitor));
+}
+
+/**
+ * @brief Visits view's children using provided cursor
+ *
+ * @tparam Visitor visitor type
+ * @param view message, group or entry view
+ * @param c cursor, must point to the first `view`'s child
  * @param visitor visitor
  * @return forwarded reference to `visitor`
  *
@@ -5333,7 +5364,8 @@ template<
     typename Visitor,
     typename View,
     typename Cursor,
-    typename = detail::enable_if_t<detail::is_visitable_view<View>::value>>
+    typename =
+        detail::enable_if_t<detail::is_cursor_visitable_view<View>::value>>
 SBEPP_CPP14_CONSTEXPR Visitor&&
     visit_children(View view, Cursor& c, Visitor&& visitor = {})
 {
@@ -5342,10 +5374,10 @@ SBEPP_CPP14_CONSTEXPR Visitor&&
 }
 
 /**
- * @brief Visit view's children
+ * @brief Visits view's children
  *
  * @tparam Visitor visitor type
- * @param view message, group, entry or composite view
+ * @param view message, group or entry view
  * @param visitor visitor
  * @return forwarded reference to `visitor`
  *
@@ -5354,12 +5386,53 @@ SBEPP_CPP14_CONSTEXPR Visitor&&
 template<
     typename Visitor,
     typename View,
-    typename = detail::enable_if_t<detail::is_visitable_view<View>::value>>
+    typename =
+        detail::enable_if_t<detail::is_cursor_visitable_view<View>::value>>
 SBEPP_CPP14_CONSTEXPR Visitor&&
     visit_children(View view, Visitor&& visitor = {})
 {
     auto c = sbepp::init_cursor(view);
     return sbepp::visit_children(view, c, std::forward<Visitor>(visitor));
+}
+
+/**
+ * @brief Visits composite children using provided cursor
+ *
+ * @tparam Visitor visitor type
+ * @param view composite view
+ * @param visitor visitor
+ * @return forwarded reference to `visitor`
+ *
+ * @see @ref visit-api
+ */
+template<typename Visitor, typename View>
+SBEPP_CPP14_CONSTEXPR detail::enable_if_t<is_composite<View>::value, Visitor&&>
+    visit_children(View view, Visitor&& visitor = {})
+{
+    view(detail::visit_children_tag{}, visitor);
+    return std::forward<Visitor>(visitor);
+}
+
+/**
+ * @brief Visits composite children using provided cursor
+ *
+ * @tparam Visitor visitor type
+ * @param view composite view
+ * @param c cursor, ignored
+ * @param visitor visitor
+ * @return forwarded reference to `visitor`
+ *
+ * @deprecated Use non-cursor version instead. Will be removed in the next
+ *  major update.
+ * @see @ref visit-api
+ */
+template<typename Visitor, typename View, typename Cursor>
+SBEPP_DEPRECATED SBEPP_CPP14_CONSTEXPR
+    detail::enable_if_t<is_composite<View>::value, Visitor&&>
+    visit_children(View view, Cursor& c, Visitor&& visitor = {})
+{
+    (void)c;
+    return visit_children(view, std::forward<Visitor>(visitor));
 }
 
 namespace detail

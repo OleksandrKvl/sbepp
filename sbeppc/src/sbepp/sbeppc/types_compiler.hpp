@@ -668,9 +668,9 @@ public:
         res += fmt::format(
             // clang-format off
 R"(
-    template<typename Visitor, typename Cursor>
+    template<typename Visitor>
     constexpr bool operator()(
-        ::sbepp::detail::visit_children_tag, Visitor& v, Cursor&) const
+        ::sbepp::detail::visit_children_tag, Visitor& v) const
     {{
         return {children_visitors};
     }}
@@ -804,9 +804,9 @@ public:
         return {size};
     }}
 
-    template<typename Visitor, typename Cursor>
+    template<typename Visitor>
     constexpr bool operator()(
-        ::sbepp::detail::visit_tag, Visitor& v, Cursor&) const
+        ::sbepp::detail::visit_tag, Visitor& v) const
     {{
         return v.on_composite(*this, {tag}{{}});
     }}
