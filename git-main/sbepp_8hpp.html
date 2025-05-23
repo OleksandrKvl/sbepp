@@ -135,6 +135,9 @@ $(function(){initNavTree('sbepp_8hpp.html',''); initResizable(true); });
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="nested-classes" name="nested-classes"></a>
 Classes</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structsbepp_1_1type__list.html">sbepp::type_list&lt; Ts &gt;</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">An empty structure to represent a sequence of types.  <a href="structsbepp_1_1type__list.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsbepp_1_1detail_1_1byte__range.html">sbepp::detail::byte_range&lt; Byte &gt;</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Base class for all reference semantics types.  <a href="classsbepp_1_1detail_1_1byte__range.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -163,7 +166,7 @@ Classes</h2></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Base class for bitsets.  <a href="classsbepp_1_1detail_1_1bitset__base.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structsbepp_1_1default__init__t.html">sbepp::default_init_t</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">tag for <code>dynamic_array_ref::resize()</code>. Used to skip value initialization.  <a href="structsbepp_1_1default__init__t.html#details">More...</a><br /></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tag for <code>dynamic_array_ref::resize()</code>. Used to skip value initialization.  <a href="structsbepp_1_1default__init__t.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsbepp_1_1detail_1_1static__array__ref.html">sbepp::detail::static_array_ref&lt; Byte, Value, N, Tag &gt;</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Represents reference to fixed-size array.  <a href="classsbepp_1_1detail_1_1static__array__ref.html#details">More...</a><br /></td></tr>
@@ -437,6 +440,39 @@ Concepts</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">concept &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="conceptsbepp_1_1data.html">sbepp::data</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Concept for <code><a class="el" href="namespacesbepp.html#a5b8bb415061e959eb3a73e76af382e49" title="Checks if T is a data.">sbepp::is_data</a>&lt;T&gt;::value</code> <br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">concept &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="conceptsbepp_1_1type__tag.html">sbepp::type_tag</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Concept for <code><a class="el" href="namespacesbepp.html#ab46cefefca021509561576ebbc950a78" title="Checks if Tag is a type tag.">sbepp::is_type_tag</a>&lt;Tag&gt;::value</code> <br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">concept &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="conceptsbepp_1_1enum__tag.html">sbepp::enum_tag</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Concept for <code><a class="el" href="namespacesbepp.html#a6f262f3b82c333055a999d17779181aa" title="Checks if Tag is an enum tag.">sbepp::is_enum_tag</a>&lt;Tag&gt;::value</code> <br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">concept &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="conceptsbepp_1_1enum__value__tag.html">sbepp::enum_value_tag</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Concept for <code><a class="el" href="namespacesbepp.html#aeed6c7ff22393f93721cb1aea2b69ba9" title="Checks if Tag is an enum value tag.">sbepp::is_enum_value_tag</a>&lt;Tag&gt;::value</code> <br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">concept &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="conceptsbepp_1_1set__tag.html">sbepp::set_tag</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Concept for <code><a class="el" href="namespacesbepp.html#a77810c98072932d0b093f8fd3f2d2d0e" title="Checks if Tag is a set tag.">sbepp::is_set_tag</a>&lt;Tag&gt;::value</code> <br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">concept &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="conceptsbepp_1_1set__choice__tag.html">sbepp::set_choice_tag</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Concept for <code><a class="el" href="namespacesbepp.html#a6da16ef81b317c0c35a2cfc17f4990df" title="Checks if Tag is a set choice tag.">sbepp::is_set_choice_tag</a>&lt;Tag&gt;::value</code> <br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">concept &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="conceptsbepp_1_1composite__tag.html">sbepp::composite_tag</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Concept for <code><a class="el" href="namespacesbepp.html#a35304a55c5e8e823f4c0a041a6441a2c" title="Checks if Tag is a composite tag.">sbepp::is_composite_tag</a>&lt;Tag&gt;::value</code> <br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">concept &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="conceptsbepp_1_1field__tag.html">sbepp::field_tag</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Concept for <code><a class="el" href="namespacesbepp.html#a3338223de7ca2ec0f224780f02c47fa1" title="Checks if Tag is a field tag.">sbepp::is_field_tag</a>&lt;Tag&gt;::value</code> <br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">concept &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="conceptsbepp_1_1group__tag.html">sbepp::group_tag</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Concept for <code><a class="el" href="namespacesbepp.html#a1a85534fbae95cbc95cc7be4c932364a" title="Checks if Tag is a group tag.">sbepp::is_group_tag</a>&lt;Tag&gt;::value</code> <br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">concept &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="conceptsbepp_1_1data__tag.html">sbepp::data_tag</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Concept for <code><a class="el" href="namespacesbepp.html#abd3e5968b864d46ead95d377c162aa41" title="Checks if Tag is a data tag.">sbepp::is_data_tag</a>&lt;Tag&gt;::value</code> <br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">concept &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="conceptsbepp_1_1message__tag.html">sbepp::message_tag</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Concept for <code><a class="el" href="namespacesbepp.html#af4af82b1bf2ee758dc8cb0b3b6ebff75" title="Checks if Tag is a message tag.">sbepp::is_message_tag</a>&lt;Tag&gt;::value</code> <br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">concept &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="conceptsbepp_1_1schema__tag.html">sbepp::schema_tag</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Concept for <code><a class="el" href="namespacesbepp.html#a283c25eb0879ac7f88ce7739e9430d58" title="Checks if Tag is a schema tag.">sbepp::is_schema_tag</a>&lt;Tag&gt;::value</code> <br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="define-members" name="define-members"></a>
 Macros</h2></td></tr>
@@ -597,6 +633,50 @@ template&lt;typename T&gt; </td></tr>
 <tr class="memitem:a5b8bb415061e959eb3a73e76af382e49"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><b>sbepp::is_data</b> = typename detail::is_data_impl&lt;T&gt;::type</td></tr>
 <tr class="memdesc:a5b8bb415061e959eb3a73e76af382e49"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if <code>T</code> is a data. <br /></td></tr>
 <tr class="separator:a5b8bb415061e959eb3a73e76af382e49"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab46cefefca021509561576ebbc950a78" id="r_ab46cefefca021509561576ebbc950a78"><td class="memTemplParams" colspan="2">template&lt;typename Tag&gt; </td></tr>
+<tr class="memitem:ab46cefefca021509561576ebbc950a78"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacesbepp.html#ab46cefefca021509561576ebbc950a78">sbepp::is_type_tag</a> = detail::has_traits&lt;<a class="el" href="classsbepp_1_1type__traits.html">type_traits</a>, Tag&gt;</td></tr>
+<tr class="memdesc:ab46cefefca021509561576ebbc950a78"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if <code>Tag</code> is a type tag.  <br /></td></tr>
+<tr class="separator:ab46cefefca021509561576ebbc950a78"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6f262f3b82c333055a999d17779181aa" id="r_a6f262f3b82c333055a999d17779181aa"><td class="memTemplParams" colspan="2">template&lt;typename Tag&gt; </td></tr>
+<tr class="memitem:a6f262f3b82c333055a999d17779181aa"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacesbepp.html#a6f262f3b82c333055a999d17779181aa">sbepp::is_enum_tag</a> = detail::has_traits&lt;<a class="el" href="classsbepp_1_1enum__traits.html">enum_traits</a>, Tag&gt;</td></tr>
+<tr class="memdesc:a6f262f3b82c333055a999d17779181aa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if <code>Tag</code> is an enum tag.  <br /></td></tr>
+<tr class="separator:a6f262f3b82c333055a999d17779181aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeed6c7ff22393f93721cb1aea2b69ba9" id="r_aeed6c7ff22393f93721cb1aea2b69ba9"><td class="memTemplParams" colspan="2">template&lt;typename Tag&gt; </td></tr>
+<tr class="memitem:aeed6c7ff22393f93721cb1aea2b69ba9"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacesbepp.html#aeed6c7ff22393f93721cb1aea2b69ba9">sbepp::is_enum_value_tag</a> = detail::has_traits&lt;<a class="el" href="classsbepp_1_1enum__value__traits.html">enum_value_traits</a>, Tag&gt;</td></tr>
+<tr class="memdesc:aeed6c7ff22393f93721cb1aea2b69ba9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if <code>Tag</code> is an enum value tag.  <br /></td></tr>
+<tr class="separator:aeed6c7ff22393f93721cb1aea2b69ba9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a77810c98072932d0b093f8fd3f2d2d0e" id="r_a77810c98072932d0b093f8fd3f2d2d0e"><td class="memTemplParams" colspan="2">template&lt;typename Tag&gt; </td></tr>
+<tr class="memitem:a77810c98072932d0b093f8fd3f2d2d0e"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacesbepp.html#a77810c98072932d0b093f8fd3f2d2d0e">sbepp::is_set_tag</a> = detail::has_traits&lt;<a class="el" href="classsbepp_1_1set__traits.html">set_traits</a>, Tag&gt;</td></tr>
+<tr class="memdesc:a77810c98072932d0b093f8fd3f2d2d0e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if <code>Tag</code> is a set tag.  <br /></td></tr>
+<tr class="separator:a77810c98072932d0b093f8fd3f2d2d0e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6da16ef81b317c0c35a2cfc17f4990df" id="r_a6da16ef81b317c0c35a2cfc17f4990df"><td class="memTemplParams" colspan="2">template&lt;typename Tag&gt; </td></tr>
+<tr class="memitem:a6da16ef81b317c0c35a2cfc17f4990df"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacesbepp.html#a6da16ef81b317c0c35a2cfc17f4990df">sbepp::is_set_choice_tag</a> = detail::has_traits&lt;<a class="el" href="classsbepp_1_1set__choice__traits.html">set_choice_traits</a>, Tag&gt;</td></tr>
+<tr class="memdesc:a6da16ef81b317c0c35a2cfc17f4990df"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if <code>Tag</code> is a set choice tag.  <br /></td></tr>
+<tr class="separator:a6da16ef81b317c0c35a2cfc17f4990df"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a35304a55c5e8e823f4c0a041a6441a2c" id="r_a35304a55c5e8e823f4c0a041a6441a2c"><td class="memTemplParams" colspan="2">template&lt;typename Tag&gt; </td></tr>
+<tr class="memitem:a35304a55c5e8e823f4c0a041a6441a2c"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacesbepp.html#a35304a55c5e8e823f4c0a041a6441a2c">sbepp::is_composite_tag</a> = detail::has_traits&lt;<a class="el" href="classsbepp_1_1composite__traits.html">composite_traits</a>, Tag&gt;</td></tr>
+<tr class="memdesc:a35304a55c5e8e823f4c0a041a6441a2c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if <code>Tag</code> is a composite tag.  <br /></td></tr>
+<tr class="separator:a35304a55c5e8e823f4c0a041a6441a2c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3338223de7ca2ec0f224780f02c47fa1" id="r_a3338223de7ca2ec0f224780f02c47fa1"><td class="memTemplParams" colspan="2">template&lt;typename Tag&gt; </td></tr>
+<tr class="memitem:a3338223de7ca2ec0f224780f02c47fa1"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacesbepp.html#a3338223de7ca2ec0f224780f02c47fa1">sbepp::is_field_tag</a> = detail::has_traits&lt;<a class="el" href="classsbepp_1_1field__traits.html">field_traits</a>, Tag&gt;</td></tr>
+<tr class="memdesc:a3338223de7ca2ec0f224780f02c47fa1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if <code>Tag</code> is a field tag.  <br /></td></tr>
+<tr class="separator:a3338223de7ca2ec0f224780f02c47fa1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1a85534fbae95cbc95cc7be4c932364a" id="r_a1a85534fbae95cbc95cc7be4c932364a"><td class="memTemplParams" colspan="2">template&lt;typename Tag&gt; </td></tr>
+<tr class="memitem:a1a85534fbae95cbc95cc7be4c932364a"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacesbepp.html#a1a85534fbae95cbc95cc7be4c932364a">sbepp::is_group_tag</a> = detail::has_traits&lt;<a class="el" href="classsbepp_1_1group__traits.html">group_traits</a>, Tag&gt;</td></tr>
+<tr class="memdesc:a1a85534fbae95cbc95cc7be4c932364a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if <code>Tag</code> is a group tag.  <br /></td></tr>
+<tr class="separator:a1a85534fbae95cbc95cc7be4c932364a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abd3e5968b864d46ead95d377c162aa41" id="r_abd3e5968b864d46ead95d377c162aa41"><td class="memTemplParams" colspan="2">template&lt;typename Tag&gt; </td></tr>
+<tr class="memitem:abd3e5968b864d46ead95d377c162aa41"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacesbepp.html#abd3e5968b864d46ead95d377c162aa41">sbepp::is_data_tag</a> = detail::has_traits&lt;<a class="el" href="classsbepp_1_1data__traits.html">data_traits</a>, Tag&gt;</td></tr>
+<tr class="memdesc:abd3e5968b864d46ead95d377c162aa41"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if <code>Tag</code> is a data tag.  <br /></td></tr>
+<tr class="separator:abd3e5968b864d46ead95d377c162aa41"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af4af82b1bf2ee758dc8cb0b3b6ebff75" id="r_af4af82b1bf2ee758dc8cb0b3b6ebff75"><td class="memTemplParams" colspan="2">template&lt;typename Tag&gt; </td></tr>
+<tr class="memitem:af4af82b1bf2ee758dc8cb0b3b6ebff75"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacesbepp.html#af4af82b1bf2ee758dc8cb0b3b6ebff75">sbepp::is_message_tag</a> = detail::has_traits&lt;<a class="el" href="classsbepp_1_1message__traits.html">message_traits</a>, Tag&gt;</td></tr>
+<tr class="memdesc:af4af82b1bf2ee758dc8cb0b3b6ebff75"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if <code>Tag</code> is a message tag.  <br /></td></tr>
+<tr class="separator:af4af82b1bf2ee758dc8cb0b3b6ebff75"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a283c25eb0879ac7f88ce7739e9430d58" id="r_a283c25eb0879ac7f88ce7739e9430d58"><td class="memTemplParams" colspan="2">template&lt;typename Tag&gt; </td></tr>
+<tr class="memitem:a283c25eb0879ac7f88ce7739e9430d58"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacesbepp.html#a283c25eb0879ac7f88ce7739e9430d58">sbepp::is_schema_tag</a> = detail::has_traits&lt;<a class="el" href="classsbepp_1_1schema__traits.html">schema_traits</a>, Tag&gt;</td></tr>
+<tr class="memdesc:a283c25eb0879ac7f88ce7739e9430d58"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if <code>Tag</code> is a schema tag.  <br /></td></tr>
+<tr class="separator:a283c25eb0879ac7f88ce7739e9430d58"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="enum-members" name="enum-members"></a>
 Enumerations</h2></td></tr>
@@ -670,44 +750,60 @@ Functions</h2></td></tr>
 <tr class="separator:a399a5ac768befed2dc73396364eaa0c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3b5dd3446b423149a101530f056bee64" id="r_a3b5dd3446b423149a101530f056bee64"><td class="memTemplParams" colspan="2">template&lt;typename Message&gt; </td></tr>
 <tr class="memitem:a3b5dd3446b423149a101530f056bee64"><td class="memTemplItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacesbepp.html#a3b5dd3446b423149a101530f056bee64">sbepp::fill_message_header</a> (Message m) noexcept -&gt; decltype(m(detail::fill_message_header_tag{}))</td></tr>
-<tr class="memdesc:a3b5dd3446b423149a101530f056bee64"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill message header.  <br /></td></tr>
+<tr class="memdesc:a3b5dd3446b423149a101530f056bee64"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fills message header.  <br /></td></tr>
 <tr class="separator:a3b5dd3446b423149a101530f056bee64"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7d29b37dfc83150ae34eaaf94dd4ba4c" id="r_a7d29b37dfc83150ae34eaaf94dd4ba4c"><td class="memTemplParams" colspan="2">template&lt;typename Group, typename Size&gt; </td></tr>
 <tr class="memitem:a7d29b37dfc83150ae34eaaf94dd4ba4c"><td class="memTemplItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacesbepp.html#a7d29b37dfc83150ae34eaaf94dd4ba4c">sbepp::fill_group_header</a> (Group g, Size num_in_group) noexcept -&gt; decltype(g(detail::fill_group_header_tag{}, num_in_group))</td></tr>
-<tr class="memdesc:a7d29b37dfc83150ae34eaaf94dd4ba4c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill group header.  <br /></td></tr>
+<tr class="memdesc:a7d29b37dfc83150ae34eaaf94dd4ba4c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fills group header.  <br /></td></tr>
 <tr class="separator:a7d29b37dfc83150ae34eaaf94dd4ba4c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0dda436c46165f2419bb31e450e3b5b5" id="r_a0dda436c46165f2419bb31e450e3b5b5"><td class="memTemplParams" colspan="2">template&lt;template&lt; typename &gt; class View, typename Byte&gt; </td></tr>
 <tr class="memitem:a0dda436c46165f2419bb31e450e3b5b5"><td class="memTemplItemLeft" align="right" valign="top">constexpr View&lt; Byte &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacesbepp.html#a0dda436c46165f2419bb31e450e3b5b5">sbepp::make_view</a> (Byte *ptr, const std::size_t size) noexcept</td></tr>
-<tr class="memdesc:a0dda436c46165f2419bb31e450e3b5b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct view from memory buffer.  <br /></td></tr>
+<tr class="memdesc:a0dda436c46165f2419bb31e450e3b5b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs view from memory buffer.  <br /></td></tr>
 <tr class="separator:a0dda436c46165f2419bb31e450e3b5b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae29503045a371b895af63f6ac6e0f3b9" id="r_ae29503045a371b895af63f6ac6e0f3b9"><td class="memTemplParams" colspan="2">template&lt;template&lt; typename &gt; class View, typename Byte&gt; </td></tr>
 <tr class="memitem:ae29503045a371b895af63f6ac6e0f3b9"><td class="memTemplItemLeft" align="right" valign="top">constexpr View&lt; typename std::add_const&lt; Byte &gt;::type &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacesbepp.html#ae29503045a371b895af63f6ac6e0f3b9">sbepp::make_const_view</a> (Byte *ptr, const std::size_t size) noexcept</td></tr>
-<tr class="memdesc:ae29503045a371b895af63f6ac6e0f3b9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct read-only view from memory buffer.  <br /></td></tr>
+<tr class="memdesc:ae29503045a371b895af63f6ac6e0f3b9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs read-only view from memory buffer.  <br /></td></tr>
 <tr class="separator:ae29503045a371b895af63f6ac6e0f3b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a47c1cd81154bc5c56524604f74d52d27" id="r_a47c1cd81154bc5c56524604f74d52d27"><td class="memTemplParams" colspan="2">template&lt;typename Visitor, typename View, typename Cursor, typename = detail::enable_if_t&lt;detail::is_visitable_view&lt;View&gt;::value&gt;&gt; </td></tr>
+<tr class="memitem:a47c1cd81154bc5c56524604f74d52d27" id="r_a47c1cd81154bc5c56524604f74d52d27"><td class="memTemplParams" colspan="2">template&lt;typename Visitor, typename View, typename Cursor, typename = detail::enable_if_t&lt;detail::is_cursor_visitable_view&lt;View&gt;::value&gt;&gt; </td></tr>
 <tr class="memitem:a47c1cd81154bc5c56524604f74d52d27"><td class="memTemplItemLeft" align="right" valign="top">constexpr Visitor &amp;&amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacesbepp.html#a47c1cd81154bc5c56524604f74d52d27">sbepp::visit</a> (View view, Cursor &amp;c, Visitor &amp;&amp;visitor={})</td></tr>
-<tr class="memdesc:a47c1cd81154bc5c56524604f74d52d27"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visit a view using given cursor.  <br /></td></tr>
+<tr class="memdesc:a47c1cd81154bc5c56524604f74d52d27"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visits a view using given cursor.  <br /></td></tr>
 <tr class="separator:a47c1cd81154bc5c56524604f74d52d27"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a79950b0d08ddf3eafafb25a5693a6e2a" id="r_a79950b0d08ddf3eafafb25a5693a6e2a"><td class="memTemplParams" colspan="2">template&lt;typename Visitor, typename View, typename = detail::enable_if_t&lt;detail::is_visitable_view&lt;View&gt;::value&gt;&gt; </td></tr>
+<tr class="memitem:a79950b0d08ddf3eafafb25a5693a6e2a" id="r_a79950b0d08ddf3eafafb25a5693a6e2a"><td class="memTemplParams" colspan="2">template&lt;typename Visitor, typename View, typename = detail::enable_if_t&lt;detail::is_cursor_visitable_view&lt;View&gt;::value&gt;&gt; </td></tr>
 <tr class="memitem:a79950b0d08ddf3eafafb25a5693a6e2a"><td class="memTemplItemLeft" align="right" valign="top">constexpr Visitor &amp;&amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacesbepp.html#a79950b0d08ddf3eafafb25a5693a6e2a">sbepp::visit</a> (View view, Visitor &amp;&amp;visitor={})</td></tr>
-<tr class="memdesc:a79950b0d08ddf3eafafb25a5693a6e2a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visits a view.  <br /></td></tr>
+<tr class="memdesc:a79950b0d08ddf3eafafb25a5693a6e2a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visits a message, group or entry view.  <br /></td></tr>
 <tr class="separator:a79950b0d08ddf3eafafb25a5693a6e2a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af240f0aca50b25b33fa7dc6ee8a9d612" id="r_af240f0aca50b25b33fa7dc6ee8a9d612"><td class="memTemplParams" colspan="2">template&lt;typename Visitor, typename Composite&gt; </td></tr>
+<tr class="memitem:af240f0aca50b25b33fa7dc6ee8a9d612"><td class="memTemplItemLeft" align="right" valign="top">constexpr Visitor &amp;&amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacesbepp.html#af240f0aca50b25b33fa7dc6ee8a9d612">sbepp::visit</a> (Composite view, Visitor &amp;&amp;visitor={})</td></tr>
+<tr class="memdesc:af240f0aca50b25b33fa7dc6ee8a9d612"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visits a composite view.  <br /></td></tr>
+<tr class="separator:af240f0aca50b25b33fa7dc6ee8a9d612"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3dafbabb41e8a71abde1535551de2c6d" id="r_a3dafbabb41e8a71abde1535551de2c6d"><td class="memTemplParams" colspan="2">template&lt;typename Visitor, typename Set&gt; </td></tr>
 <tr class="memitem:a3dafbabb41e8a71abde1535551de2c6d"><td class="memTemplItemLeft" align="right" valign="top">constexpr Visitor &amp;&amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacesbepp.html#a3dafbabb41e8a71abde1535551de2c6d">sbepp::visit</a> (Set s, Visitor &amp;&amp;visitor={})</td></tr>
 <tr class="memdesc:a3dafbabb41e8a71abde1535551de2c6d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visits set choices.  <br /></td></tr>
 <tr class="separator:a3dafbabb41e8a71abde1535551de2c6d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abf05c2c5e3e81c441cce4db02c0c642b" id="r_abf05c2c5e3e81c441cce4db02c0c642b"><td class="memTemplParams" colspan="2">template&lt;typename Visitor, typename Enum&gt; </td></tr>
 <tr class="memitem:abf05c2c5e3e81c441cce4db02c0c642b"><td class="memTemplItemLeft" align="right" valign="top">constexpr Visitor &amp;&amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacesbepp.html#abf05c2c5e3e81c441cce4db02c0c642b">sbepp::visit</a> (Enum e, Visitor &amp;&amp;visitor={})</td></tr>
-<tr class="memdesc:abf05c2c5e3e81c441cce4db02c0c642b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visits enum value.  <br /></td></tr>
+<tr class="memdesc:abf05c2c5e3e81c441cce4db02c0c642b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visits an enum value.  <br /></td></tr>
 <tr class="separator:abf05c2c5e3e81c441cce4db02c0c642b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a23abc2b6b892aea5b2b7f6dde6c24e69" id="r_a23abc2b6b892aea5b2b7f6dde6c24e69"><td class="memTemplParams" colspan="2">template&lt;typename Visitor, typename View, typename Cursor, typename = detail::enable_if_t&lt;detail::is_visitable_view&lt;View&gt;::value&gt;&gt; </td></tr>
+<tr class="memitem:a803ffecc3f63f4783f11b67a0dbff435" id="r_a803ffecc3f63f4783f11b67a0dbff435"><td class="memTemplParams" colspan="2">template&lt;typename Visitor, typename View, typename Cursor&gt; </td></tr>
+<tr class="memitem:a803ffecc3f63f4783f11b67a0dbff435"><td class="memTemplItemLeft" align="right" valign="top">constexpr detail::enable_if_t&lt; <a class="el" href="namespacesbepp.html#aff757cd0a709b464f626ae509e6e6cd3">is_composite</a>&lt; View &gt;::value, Visitor &amp;&amp; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacesbepp.html#a803ffecc3f63f4783f11b67a0dbff435">sbepp::visit</a> (View view, Cursor &amp;c, Visitor &amp;&amp;visitor={})</td></tr>
+<tr class="memdesc:a803ffecc3f63f4783f11b67a0dbff435"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visits a composite view using given cursor.  <br /></td></tr>
+<tr class="separator:a803ffecc3f63f4783f11b67a0dbff435"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a23abc2b6b892aea5b2b7f6dde6c24e69" id="r_a23abc2b6b892aea5b2b7f6dde6c24e69"><td class="memTemplParams" colspan="2">template&lt;typename Visitor, typename View, typename Cursor, typename = detail::enable_if_t&lt;detail::is_cursor_visitable_view&lt;View&gt;::value&gt;&gt; </td></tr>
 <tr class="memitem:a23abc2b6b892aea5b2b7f6dde6c24e69"><td class="memTemplItemLeft" align="right" valign="top">constexpr Visitor &amp;&amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacesbepp.html#a23abc2b6b892aea5b2b7f6dde6c24e69">sbepp::visit_children</a> (View view, Cursor &amp;c, Visitor &amp;&amp;visitor={})</td></tr>
-<tr class="memdesc:a23abc2b6b892aea5b2b7f6dde6c24e69"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visit view's children using provided cursor.  <br /></td></tr>
+<tr class="memdesc:a23abc2b6b892aea5b2b7f6dde6c24e69"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visits view's children using provided cursor.  <br /></td></tr>
 <tr class="separator:a23abc2b6b892aea5b2b7f6dde6c24e69"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a306622dcac701f3c76abd3ea7c2902b6" id="r_a306622dcac701f3c76abd3ea7c2902b6"><td class="memTemplParams" colspan="2">template&lt;typename Visitor, typename View, typename = detail::enable_if_t&lt;detail::is_visitable_view&lt;View&gt;::value&gt;&gt; </td></tr>
+<tr class="memitem:a306622dcac701f3c76abd3ea7c2902b6" id="r_a306622dcac701f3c76abd3ea7c2902b6"><td class="memTemplParams" colspan="2">template&lt;typename Visitor, typename View, typename = detail::enable_if_t&lt;detail::is_cursor_visitable_view&lt;View&gt;::value&gt;&gt; </td></tr>
 <tr class="memitem:a306622dcac701f3c76abd3ea7c2902b6"><td class="memTemplItemLeft" align="right" valign="top">constexpr Visitor &amp;&amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacesbepp.html#a306622dcac701f3c76abd3ea7c2902b6">sbepp::visit_children</a> (View view, Visitor &amp;&amp;visitor={})</td></tr>
-<tr class="memdesc:a306622dcac701f3c76abd3ea7c2902b6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visit view's children.  <br /></td></tr>
+<tr class="memdesc:a306622dcac701f3c76abd3ea7c2902b6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visits view's children.  <br /></td></tr>
 <tr class="separator:a306622dcac701f3c76abd3ea7c2902b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0db3e5b82ccf03d4cecdef2ccfee8ae9" id="r_a0db3e5b82ccf03d4cecdef2ccfee8ae9"><td class="memTemplParams" colspan="2">template&lt;typename Visitor, typename View&gt; </td></tr>
+<tr class="memitem:a0db3e5b82ccf03d4cecdef2ccfee8ae9"><td class="memTemplItemLeft" align="right" valign="top">constexpr detail::enable_if_t&lt; <a class="el" href="namespacesbepp.html#aff757cd0a709b464f626ae509e6e6cd3">is_composite</a>&lt; View &gt;::value, Visitor &amp;&amp; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacesbepp.html#a0db3e5b82ccf03d4cecdef2ccfee8ae9">sbepp::visit_children</a> (View view, Visitor &amp;&amp;visitor={})</td></tr>
+<tr class="memdesc:a0db3e5b82ccf03d4cecdef2ccfee8ae9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visits composite children using provided cursor.  <br /></td></tr>
+<tr class="separator:a0db3e5b82ccf03d4cecdef2ccfee8ae9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a115468b577849b6a66879a0daf7b45f8" id="r_a115468b577849b6a66879a0daf7b45f8"><td class="memTemplParams" colspan="2">template&lt;typename Visitor, typename View, typename Cursor&gt; </td></tr>
+<tr class="memitem:a115468b577849b6a66879a0daf7b45f8"><td class="memTemplItemLeft" align="right" valign="top">constexpr detail::enable_if_t&lt; <a class="el" href="namespacesbepp.html#aff757cd0a709b464f626ae509e6e6cd3">is_composite</a>&lt; View &gt;::value, Visitor &amp;&amp; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacesbepp.html#a115468b577849b6a66879a0daf7b45f8">sbepp::visit_children</a> (View view, Cursor &amp;c, Visitor &amp;&amp;visitor={})</td></tr>
+<tr class="memdesc:a115468b577849b6a66879a0daf7b45f8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visits composite children using provided cursor.  <br /></td></tr>
+<tr class="separator:a115468b577849b6a66879a0daf7b45f8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6b2d51af3f026b165fa40fe1d7ab19db" id="r_a6b2d51af3f026b165fa40fe1d7ab19db"><td class="memTemplParams" colspan="2">template&lt;typename E, typename = detail::enable_if_t&lt;is_enum&lt;E&gt;::value&gt;&gt; </td></tr>
 <tr class="memitem:a6b2d51af3f026b165fa40fe1d7ab19db"><td class="memTemplItemLeft" align="right" valign="top">constexpr const char *&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacesbepp.html#a6b2d51af3f026b165fa40fe1d7ab19db">sbepp::enum_to_string</a> (const E e) noexcept</td></tr>
 <tr class="memdesc:a6b2d51af3f026b165fa40fe1d7ab19db"><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts enum to string.  <br /></td></tr>
@@ -718,13 +814,29 @@ Functions</h2></td></tr>
 <tr class="separator:aa253364a4276b55c0a157aefaa185c37"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abd9c1efb3c96d6fa71d1156811b47fa4" id="r_abd9c1efb3c96d6fa71d1156811b47fa4"><td class="memTemplParams" colspan="2">template&lt;typename View&gt; </td></tr>
 <tr class="memitem:abd9c1efb3c96d6fa71d1156811b47fa4"><td class="memTemplItemLeft" align="right" valign="top">constexpr <a class="el" href="structsbepp_1_1size__bytes__checked__result.html">size_bytes_checked_result</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacesbepp.html#abd9c1efb3c96d6fa71d1156811b47fa4">sbepp::size_bytes_checked</a> (View view, std::size_t size) noexcept</td></tr>
-<tr class="memdesc:abd9c1efb3c96d6fa71d1156811b47fa4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate <code>view</code> size with additional safety checks.  <br /></td></tr>
+<tr class="memdesc:abd9c1efb3c96d6fa71d1156811b47fa4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculates <code>view</code> size with additional safety checks.  <br /></td></tr>
 <tr class="separator:abd9c1efb3c96d6fa71d1156811b47fa4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aac5e0cf6d12c96ba8148271a521bde08" id="r_aac5e0cf6d12c96ba8148271a521bde08"><td class="memTemplParams" colspan="2">template&lt;typename Tag, typename ViewOrSet&gt; </td></tr>
+<tr class="memitem:aac5e0cf6d12c96ba8148271a521bde08"><td class="memTemplItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacesbepp.html#aac5e0cf6d12c96ba8148271a521bde08">sbepp::get_by_tag</a> (ViewOrSet viewOrSet) noexcept -&gt; decltype(viewOrSet(detail::access_by_tag_tag{}, Tag{}))</td></tr>
+<tr class="memdesc:aac5e0cf6d12c96ba8148271a521bde08"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets field or set choice value by tag.  <br /></td></tr>
+<tr class="separator:aac5e0cf6d12c96ba8148271a521bde08"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a183a28ee9ef5f828c75acf8d474f57b2" id="r_a183a28ee9ef5f828c75acf8d474f57b2"><td class="memTemplParams" colspan="2">template&lt;typename Tag, typename View, typename Cursor&gt; </td></tr>
+<tr class="memitem:a183a28ee9ef5f828c75acf8d474f57b2"><td class="memTemplItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacesbepp.html#a183a28ee9ef5f828c75acf8d474f57b2">sbepp::get_by_tag</a> (View view, Cursor &amp;&amp;c) noexcept -&gt; decltype(view(detail::access_by_tag_tag{}, Tag{}, std::forward&lt; Cursor &gt;(c)))</td></tr>
+<tr class="memdesc:a183a28ee9ef5f828c75acf8d474f57b2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets field value by tag using given cursor.  <br /></td></tr>
+<tr class="separator:a183a28ee9ef5f828c75acf8d474f57b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4bb01e5d4ca175f4d77740991e35ac2b" id="r_a4bb01e5d4ca175f4d77740991e35ac2b"><td class="memTemplParams" colspan="2">template&lt;typename Tag, typename ViewOrSet, typename Value&gt; </td></tr>
+<tr class="memitem:a4bb01e5d4ca175f4d77740991e35ac2b"><td class="memTemplItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacesbepp.html#a4bb01e5d4ca175f4d77740991e35ac2b">sbepp::set_by_tag</a> (ViewOrSet &amp;&amp;viewOrSet, Value &amp;&amp;value) noexcept -&gt; decltype(std::forward&lt; ViewOrSet &gt;(viewOrSet)(detail::access_by_tag_tag{}, Tag{}, std::forward&lt; Value &gt;(value)))</td></tr>
+<tr class="memdesc:a4bb01e5d4ca175f4d77740991e35ac2b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets field or set choice value by tag.  <br /></td></tr>
+<tr class="separator:a4bb01e5d4ca175f4d77740991e35ac2b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abfbb9c41946b9469e2cb807c8b3fe544" id="r_abfbb9c41946b9469e2cb807c8b3fe544"><td class="memTemplParams" colspan="2">template&lt;typename Tag, typename View, typename Value, typename Cursor&gt; </td></tr>
+<tr class="memitem:abfbb9c41946b9469e2cb807c8b3fe544"><td class="memTemplItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacesbepp.html#abfbb9c41946b9469e2cb807c8b3fe544">sbepp::set_by_tag</a> (View view, Value &amp;&amp;value, Cursor &amp;&amp;c) -&gt; decltype(view(detail::access_by_tag_tag{}, Tag{}, std::forward&lt; Value &gt;(value), std::forward&lt; Cursor &gt;(c)))</td></tr>
+<tr class="memdesc:abfbb9c41946b9469e2cb807c8b3fe544"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets field value by tag using given cursor.  <br /></td></tr>
+<tr class="separator:abfbb9c41946b9469e2cb807c8b3fe544"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
 <tr class="memitem:aa2d011e14996368bdea31360b2fa674e" id="r_aa2d011e14996368bdea31360b2fa674e"><td class="memItemLeft" align="right" valign="top">constexpr <a class="el" href="structsbepp_1_1default__init__t.html">default_init_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacesbepp.html#aa2d011e14996368bdea31360b2fa674e">sbepp::default_init</a> {}</td></tr>
-<tr class="memdesc:aa2d011e14996368bdea31360b2fa674e"><td class="mdescLeft">&#160;</td><td class="mdescRight">helper to pass <code><a class="el" href="structsbepp_1_1default__init__t.html" title="tag for dynamic_array_ref::resize(). Used to skip value initialization.">default_init_t</a></code> to <code>dynamic_array_ref::resize()</code>.  <br /></td></tr>
+<tr class="memdesc:aa2d011e14996368bdea31360b2fa674e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Helper to pass <code><a class="el" href="structsbepp_1_1default__init__t.html" title="Tag for dynamic_array_ref::resize(). Used to skip value initialization.">default_init_t</a></code> to <code>dynamic_array_ref::resize()</code>.  <br /></td></tr>
 <tr class="separator:aa2d011e14996368bdea31360b2fa674e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1ca10df8379b54c5c54a67841e3d8047" id="r_a1ca10df8379b54c5c54a67841e3d8047"><td class="memItemLeft" align="right" valign="top">constexpr <a class="el" href="structsbepp_1_1nullopt__t.html">nullopt_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacesbepp.html#a1ca10df8379b54c5c54a67841e3d8047">sbepp::nullopt</a> {0}</td></tr>
 <tr class="memdesc:a1ca10df8379b54c5c54a67841e3d8047"><td class="mdescLeft">&#160;</td><td class="mdescRight">Helper constant used to initialize optional types with null value.  <br /></td></tr>
@@ -794,6 +906,61 @@ template&lt;typename T&gt; </td></tr>
 <tr class="memitem:ae3c9b91bd3b6adf9969dfb572b510a24"><td class="memTemplItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memTemplItemRight" valign="bottom"><b>sbepp::is_data_v</b> = <a class="el" href="namespacesbepp.html#a5b8bb415061e959eb3a73e76af382e49">is_data</a>&lt;T&gt;::value</td></tr>
 <tr class="memdesc:ae3c9b91bd3b6adf9969dfb572b510a24"><td class="mdescLeft">&#160;</td><td class="mdescRight">Shorthand for <code><a class="el" href="namespacesbepp.html#a5b8bb415061e959eb3a73e76af382e49" title="Checks if T is a data.">sbepp::is_data</a>&lt;T&gt;::value</code> <br /></td></tr>
 <tr class="separator:ae3c9b91bd3b6adf9969dfb572b510a24"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:accda38375e45e6e78b995b881e115c53" id="r_accda38375e45e6e78b995b881e115c53"><td class="memTemplParams" colspan="2"><a id="accda38375e45e6e78b995b881e115c53" name="accda38375e45e6e78b995b881e115c53"></a>
+template&lt;typename Tag&gt; </td></tr>
+<tr class="memitem:accda38375e45e6e78b995b881e115c53"><td class="memTemplItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memTemplItemRight" valign="bottom"><b>sbepp::is_type_tag_v</b> = <a class="el" href="namespacesbepp.html#ab46cefefca021509561576ebbc950a78">is_type_tag</a>&lt;Tag&gt;::value</td></tr>
+<tr class="memdesc:accda38375e45e6e78b995b881e115c53"><td class="mdescLeft">&#160;</td><td class="mdescRight">Shorthand for <code><a class="el" href="namespacesbepp.html#ab46cefefca021509561576ebbc950a78" title="Checks if Tag is a type tag.">sbepp::is_type_tag</a>&lt;Tag&gt;::value</code> <br /></td></tr>
+<tr class="separator:accda38375e45e6e78b995b881e115c53"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac9a810b153e66a6783942cac0bec200e" id="r_ac9a810b153e66a6783942cac0bec200e"><td class="memTemplParams" colspan="2"><a id="ac9a810b153e66a6783942cac0bec200e" name="ac9a810b153e66a6783942cac0bec200e"></a>
+template&lt;typename Tag&gt; </td></tr>
+<tr class="memitem:ac9a810b153e66a6783942cac0bec200e"><td class="memTemplItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memTemplItemRight" valign="bottom"><b>sbepp::is_enum_tag_v</b> = <a class="el" href="namespacesbepp.html#a6f262f3b82c333055a999d17779181aa">is_enum_tag</a>&lt;Tag&gt;::value</td></tr>
+<tr class="memdesc:ac9a810b153e66a6783942cac0bec200e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Shorthand for <code><a class="el" href="namespacesbepp.html#a6f262f3b82c333055a999d17779181aa" title="Checks if Tag is an enum tag.">sbepp::is_enum_tag</a>&lt;Tag&gt;::value</code> <br /></td></tr>
+<tr class="separator:ac9a810b153e66a6783942cac0bec200e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a78fa2c14d9fdb7c65b58a68a3a403955" id="r_a78fa2c14d9fdb7c65b58a68a3a403955"><td class="memTemplParams" colspan="2"><a id="a78fa2c14d9fdb7c65b58a68a3a403955" name="a78fa2c14d9fdb7c65b58a68a3a403955"></a>
+template&lt;typename Tag&gt; </td></tr>
+<tr class="memitem:a78fa2c14d9fdb7c65b58a68a3a403955"><td class="memTemplItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memTemplItemRight" valign="bottom"><b>sbepp::is_enum_value_tag_v</b> = <a class="el" href="namespacesbepp.html#aeed6c7ff22393f93721cb1aea2b69ba9">is_enum_value_tag</a>&lt;Tag&gt;::value</td></tr>
+<tr class="memdesc:a78fa2c14d9fdb7c65b58a68a3a403955"><td class="mdescLeft">&#160;</td><td class="mdescRight">Shorthand for <code><a class="el" href="namespacesbepp.html#aeed6c7ff22393f93721cb1aea2b69ba9" title="Checks if Tag is an enum value tag.">sbepp::is_enum_value_tag</a>&lt;Tag&gt;::value</code> <br /></td></tr>
+<tr class="separator:a78fa2c14d9fdb7c65b58a68a3a403955"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abc259cdd30b54919d3e10e6465861b4a" id="r_abc259cdd30b54919d3e10e6465861b4a"><td class="memTemplParams" colspan="2"><a id="abc259cdd30b54919d3e10e6465861b4a" name="abc259cdd30b54919d3e10e6465861b4a"></a>
+template&lt;typename Tag&gt; </td></tr>
+<tr class="memitem:abc259cdd30b54919d3e10e6465861b4a"><td class="memTemplItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memTemplItemRight" valign="bottom"><b>sbepp::is_set_tag_v</b> = <a class="el" href="namespacesbepp.html#a77810c98072932d0b093f8fd3f2d2d0e">is_set_tag</a>&lt;Tag&gt;::value</td></tr>
+<tr class="memdesc:abc259cdd30b54919d3e10e6465861b4a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Shorthand for <code><a class="el" href="namespacesbepp.html#a77810c98072932d0b093f8fd3f2d2d0e" title="Checks if Tag is a set tag.">sbepp::is_set_tag</a>&lt;Tag&gt;::value</code> <br /></td></tr>
+<tr class="separator:abc259cdd30b54919d3e10e6465861b4a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4e81ef0057ff155fecd4f1d193d6c257" id="r_a4e81ef0057ff155fecd4f1d193d6c257"><td class="memTemplParams" colspan="2"><a id="a4e81ef0057ff155fecd4f1d193d6c257" name="a4e81ef0057ff155fecd4f1d193d6c257"></a>
+template&lt;typename Tag&gt; </td></tr>
+<tr class="memitem:a4e81ef0057ff155fecd4f1d193d6c257"><td class="memTemplItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memTemplItemRight" valign="bottom"><b>sbepp::is_set_choice_tag_v</b> = <a class="el" href="namespacesbepp.html#a6da16ef81b317c0c35a2cfc17f4990df">is_set_choice_tag</a>&lt;Tag&gt;::value</td></tr>
+<tr class="memdesc:a4e81ef0057ff155fecd4f1d193d6c257"><td class="mdescLeft">&#160;</td><td class="mdescRight">Shorthand for <code><a class="el" href="namespacesbepp.html#a6da16ef81b317c0c35a2cfc17f4990df" title="Checks if Tag is a set choice tag.">sbepp::is_set_choice_tag</a>&lt;Tag&gt;::value</code> <br /></td></tr>
+<tr class="separator:a4e81ef0057ff155fecd4f1d193d6c257"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a83464c143f52ed98e9acf1030b457354" id="r_a83464c143f52ed98e9acf1030b457354"><td class="memTemplParams" colspan="2"><a id="a83464c143f52ed98e9acf1030b457354" name="a83464c143f52ed98e9acf1030b457354"></a>
+template&lt;typename Tag&gt; </td></tr>
+<tr class="memitem:a83464c143f52ed98e9acf1030b457354"><td class="memTemplItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memTemplItemRight" valign="bottom"><b>sbepp::is_composite_tag_v</b> = <a class="el" href="namespacesbepp.html#a35304a55c5e8e823f4c0a041a6441a2c">is_composite_tag</a>&lt;Tag&gt;::value</td></tr>
+<tr class="memdesc:a83464c143f52ed98e9acf1030b457354"><td class="mdescLeft">&#160;</td><td class="mdescRight">Shorthand for <code><a class="el" href="namespacesbepp.html#a35304a55c5e8e823f4c0a041a6441a2c" title="Checks if Tag is a composite tag.">sbepp::is_composite_tag</a>&lt;Tag&gt;::value</code> <br /></td></tr>
+<tr class="separator:a83464c143f52ed98e9acf1030b457354"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a47709e1689239a7981a03e638778facc" id="r_a47709e1689239a7981a03e638778facc"><td class="memTemplParams" colspan="2"><a id="a47709e1689239a7981a03e638778facc" name="a47709e1689239a7981a03e638778facc"></a>
+template&lt;typename Tag&gt; </td></tr>
+<tr class="memitem:a47709e1689239a7981a03e638778facc"><td class="memTemplItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memTemplItemRight" valign="bottom"><b>sbepp::is_field_tag_v</b> = <a class="el" href="namespacesbepp.html#a3338223de7ca2ec0f224780f02c47fa1">is_field_tag</a>&lt;Tag&gt;::value</td></tr>
+<tr class="memdesc:a47709e1689239a7981a03e638778facc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Shorthand for <code><a class="el" href="namespacesbepp.html#a3338223de7ca2ec0f224780f02c47fa1" title="Checks if Tag is a field tag.">sbepp::is_field_tag</a>&lt;Tag&gt;::value</code> <br /></td></tr>
+<tr class="separator:a47709e1689239a7981a03e638778facc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a23da5f107d514b1f2d8865a0fbc81b20" id="r_a23da5f107d514b1f2d8865a0fbc81b20"><td class="memTemplParams" colspan="2"><a id="a23da5f107d514b1f2d8865a0fbc81b20" name="a23da5f107d514b1f2d8865a0fbc81b20"></a>
+template&lt;typename Tag&gt; </td></tr>
+<tr class="memitem:a23da5f107d514b1f2d8865a0fbc81b20"><td class="memTemplItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memTemplItemRight" valign="bottom"><b>sbepp::is_group_tag_v</b> = <a class="el" href="namespacesbepp.html#a1a85534fbae95cbc95cc7be4c932364a">is_group_tag</a>&lt;Tag&gt;::value</td></tr>
+<tr class="memdesc:a23da5f107d514b1f2d8865a0fbc81b20"><td class="mdescLeft">&#160;</td><td class="mdescRight">Shorthand for <code><a class="el" href="namespacesbepp.html#a1a85534fbae95cbc95cc7be4c932364a" title="Checks if Tag is a group tag.">sbepp::is_group_tag</a>&lt;Tag&gt;::value</code> <br /></td></tr>
+<tr class="separator:a23da5f107d514b1f2d8865a0fbc81b20"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a654bfcc3614069e82279602711a92fc1" id="r_a654bfcc3614069e82279602711a92fc1"><td class="memTemplParams" colspan="2"><a id="a654bfcc3614069e82279602711a92fc1" name="a654bfcc3614069e82279602711a92fc1"></a>
+template&lt;typename Tag&gt; </td></tr>
+<tr class="memitem:a654bfcc3614069e82279602711a92fc1"><td class="memTemplItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memTemplItemRight" valign="bottom"><b>sbepp::is_data_tag_v</b> = <a class="el" href="namespacesbepp.html#abd3e5968b864d46ead95d377c162aa41">is_data_tag</a>&lt;Tag&gt;::value</td></tr>
+<tr class="memdesc:a654bfcc3614069e82279602711a92fc1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Shorthand for <code><a class="el" href="namespacesbepp.html#abd3e5968b864d46ead95d377c162aa41" title="Checks if Tag is a data tag.">sbepp::is_data_tag</a>&lt;Tag&gt;::value</code> <br /></td></tr>
+<tr class="separator:a654bfcc3614069e82279602711a92fc1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a50cdb08ec70cba4fb38db507a19dc1bc" id="r_a50cdb08ec70cba4fb38db507a19dc1bc"><td class="memTemplParams" colspan="2"><a id="a50cdb08ec70cba4fb38db507a19dc1bc" name="a50cdb08ec70cba4fb38db507a19dc1bc"></a>
+template&lt;typename Tag&gt; </td></tr>
+<tr class="memitem:a50cdb08ec70cba4fb38db507a19dc1bc"><td class="memTemplItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memTemplItemRight" valign="bottom"><b>sbepp::is_message_tag_v</b> = <a class="el" href="namespacesbepp.html#af4af82b1bf2ee758dc8cb0b3b6ebff75">is_message_tag</a>&lt;Tag&gt;::value</td></tr>
+<tr class="memdesc:a50cdb08ec70cba4fb38db507a19dc1bc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Shorthand for <code><a class="el" href="namespacesbepp.html#af4af82b1bf2ee758dc8cb0b3b6ebff75" title="Checks if Tag is a message tag.">sbepp::is_message_tag</a>&lt;Tag&gt;::value</code> <br /></td></tr>
+<tr class="separator:a50cdb08ec70cba4fb38db507a19dc1bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac27ce53c6f8372964ec5abbe55bdfb1b" id="r_ac27ce53c6f8372964ec5abbe55bdfb1b"><td class="memTemplParams" colspan="2"><a id="ac27ce53c6f8372964ec5abbe55bdfb1b" name="ac27ce53c6f8372964ec5abbe55bdfb1b"></a>
+template&lt;typename Tag&gt; </td></tr>
+<tr class="memitem:ac27ce53c6f8372964ec5abbe55bdfb1b"><td class="memTemplItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memTemplItemRight" valign="bottom"><b>sbepp::is_schema_tag_v</b> = <a class="el" href="namespacesbepp.html#a283c25eb0879ac7f88ce7739e9430d58">is_schema_tag</a>&lt;Tag&gt;::value</td></tr>
+<tr class="memdesc:ac27ce53c6f8372964ec5abbe55bdfb1b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Shorthand for <code><a class="el" href="namespacesbepp.html#a283c25eb0879ac7f88ce7739e9430d58" title="Checks if Tag is a schema tag.">sbepp::is_schema_tag</a>&lt;Tag&gt;::value</code> <br /></td></tr>
+<tr class="separator:ac27ce53c6f8372964ec5abbe55bdfb1b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Contains various utilities and implementation details which are required for generated schema headers. </p>

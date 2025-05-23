@@ -1,7 +1,7 @@
 var searchData=
 [
   ['package_0',['package',['../installation.html#installation-conan',1,'Conan package'],['../classsbepp_1_1schema__traits.html#a566f5f3e68c427081010e3f7050c146e',1,'sbepp::schema_traits::package()']]],
-  ['parent_20views_1',['Visiting parent views',['../visit-api.html#autotoc_md43',1,'']]],
+  ['parent_20views_1',['Visiting parent views',['../visit-api.html#autotoc_md44',1,'']]],
   ['pointer_2',['pointer',['../classsbepp_1_1detail_1_1static__array__ref.html#aa775677cb577b70b84b0f401ad3c1563',1,'sbepp::detail::static_array_ref::pointer'],['../classsbepp_1_1detail_1_1dynamic__array__ref.html#a3413afbfd1448e9cd5d05df3212ee9fd',1,'sbepp::detail::dynamic_array_ref::pointer'],['../classsbepp_1_1cursor.html#ac20d80344ad78a32aeea203936ce32c7',1,'sbepp::cursor::pointer() noexcept'],['../classsbepp_1_1cursor.html#a14a745ce53b7345b42ae67b4514a504e',1,'sbepp::cursor::pointer() const noexcept']]],
   ['pop_5fback_3',['pop_back',['../classsbepp_1_1detail_1_1dynamic__array__ref.html#a61607728d5839f4ed2b8e5090916e148',1,'sbepp::detail::dynamic_array_ref']]],
   ['pre_20compiled_20schema_4',['Using pre-compiled schema',['../integration.html#autotoc_md11',1,'']]],

@@ -149,7 +149,7 @@ using&#160;</td><td class="memItemRight" valign="bottom"><b>size_type</b> = type
 <tr class="separator:ae400d7c2364f6dce798259374841eb2e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adb75944a0e9c5c8ba3a0505fabcef734" id="r_adb75944a0e9c5c8ba3a0505fabcef734"><td class="memItemLeft" align="right" valign="top"><a id="adb75944a0e9c5c8ba3a0505fabcef734" name="adb75944a0e9c5c8ba3a0505fabcef734"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><b>difference_type</b> = typename std::make_signed&lt;<a class="el" href="#ae400d7c2364f6dce798259374841eb2e">size_type</a>&gt;::type</td></tr>
-<tr class="memdesc:adb75944a0e9c5c8ba3a0505fabcef734"><td class="mdescLeft">&#160;</td><td class="mdescRight">signed <code><a class="el" href="#ae400d7c2364f6dce798259374841eb2e" title="Raw size type.">size_type</a></code> <br /></td></tr>
+<tr class="memdesc:adb75944a0e9c5c8ba3a0505fabcef734"><td class="mdescLeft">&#160;</td><td class="mdescRight">Signed <code><a class="el" href="#ae400d7c2364f6dce798259374841eb2e" title="Raw size type.">size_type</a></code> <br /></td></tr>
 <tr class="separator:adb75944a0e9c5c8ba3a0505fabcef734"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2900e3f41ffa6b356287f026a3cc4634" id="r_a2900e3f41ffa6b356287f026a3cc4634"><td class="memItemLeft" align="right" valign="top"><a id="a2900e3f41ffa6b356287f026a3cc4634" name="a2900e3f41ffa6b356287f026a3cc4634"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><b>iterator</b></td></tr>
@@ -193,7 +193,7 @@ constexpr <a class="el" href="#a2900e3f41ffa6b356287f026a3cc4634">iterator</a>&#
 <tr class="memdesc:a8e7b30b77663460d88f47c70b450ef32"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns an iterator to the end. <br /></td></tr>
 <tr class="separator:a8e7b30b77663460d88f47c70b450ef32"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7a631a0c841e3c1bb51a641a3e957238" id="r_a7a631a0c841e3c1bb51a641a3e957238"><td class="memItemLeft" align="right" valign="top">constexpr <a class="el" href="#af9193142f2768c49691f7f53a0cd9880">reference</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7a631a0c841e3c1bb51a641a3e957238">operator[]</a> (<a class="el" href="#ae400d7c2364f6dce798259374841eb2e">size_type</a> pos) const noexcept</td></tr>
-<tr class="memdesc:a7a631a0c841e3c1bb51a641a3e957238"><td class="mdescLeft">&#160;</td><td class="mdescRight">Access group entry at <code>pos</code>  <br /></td></tr>
+<tr class="memdesc:a7a631a0c841e3c1bb51a641a3e957238"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns group entry at <code>pos</code>  <br /></td></tr>
 <tr class="separator:a7a631a0c841e3c1bb51a641a3e957238"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a42b38f8a35ba8fb8167baa3b7807c459" id="r_a42b38f8a35ba8fb8167baa3b7807c459"><td class="memItemLeft" align="right" valign="top">constexpr <a class="el" href="#af9193142f2768c49691f7f53a0cd9880">reference</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a42b38f8a35ba8fb8167baa3b7807c459">front</a> () const noexcept</td></tr>
 <tr class="memdesc:a42b38f8a35ba8fb8167baa3b7807c459"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the first entry.  <br /></td></tr>
@@ -451,7 +451,7 @@ template&lt;typename Byte, typename Entry, typename Dimension&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Access group entry at <code>pos</code> </p>
+<p>Returns group entry at <code>pos</code> </p>
 <dl class="section pre"><dt>Precondition</dt><dd><code>pos &lt; <a class="el" href="#a7e1b0794803482202b68663cb180d2e6" title="Returns raw size.">size()</a></code> </dd></dl>
 
 </div>

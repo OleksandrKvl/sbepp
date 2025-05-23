@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['header_5ftype_0',['header_type',['../classsbepp_1_1schema__traits.html#a9a53b31c788e848ac09e89fa4d2bf7c0',1,'sbepp::schema_traits']]],
-  ['header_5ftype_5ftag_1',['header_type_tag',['../classsbepp_1_1schema__traits.html#a2d45acd52784e4ec7bc89f440095bc76',1,'sbepp::schema_traits']]]
+  ['field_5ftags_0',['field_tags',['../classsbepp_1_1message__traits.html#aecb0b10e2fb4c7db17e9e98937964fbd',1,'sbepp::message_traits::field_tags'],['../classsbepp_1_1group__traits.html#a3654a5d2863c032a523a07c04fc1837e',1,'sbepp::group_traits::field_tags']]]
 ];

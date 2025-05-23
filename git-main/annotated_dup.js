@@ -69,6 +69,7 @@ var annotated_dup =
       [ "traits_tag< uint64_t >", "structsbepp_1_1traits__tag.html", "structsbepp_1_1traits__tag" ],
       [ "traits_tag< uint8_opt_t >", "structsbepp_1_1traits__tag.html", "structsbepp_1_1traits__tag" ],
       [ "traits_tag< uint8_t >", "structsbepp_1_1traits__tag.html", "structsbepp_1_1traits__tag" ],
+      [ "type_list", "structsbepp_1_1type__list.html", null ],
       [ "type_traits", "classsbepp_1_1type__traits.html", "classsbepp_1_1type__traits" ],
       [ "type_traits< char_opt_t >", "classsbepp_1_1type__traits.html", "classsbepp_1_1type__traits" ],
       [ "type_traits< char_t >", "classsbepp_1_1type__traits.html", "classsbepp_1_1type__traits" ],
