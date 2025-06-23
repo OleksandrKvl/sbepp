@@ -77,7 +77,7 @@ var NAVTREEINDEX =
 "annotated.html",
 "classsbepp_1_1detail_1_1optional__base.html#a5bdb6d4fd37359ab7d45624be2487053",
 "classsbepp_1_1type__traits.html#a4dc3777d81e9e0c4336dc6e5bf2cbc44",
-"namespacesbepp.html#aac5e0cf6d12c96ba8148271a521bde08"
+"namespacesbepp.html#a9fe044632a53b1810b79b39cfe29db5d"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronization';

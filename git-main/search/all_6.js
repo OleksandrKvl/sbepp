@@ -4,8 +4,9 @@ var searchData=
   ['get_5fheader_1',['get_header',['../namespacesbepp.html#a12bbc67580e3f4bb2a0299033f01818d',1,'sbepp']]],
   ['group_2',['group',['../conceptsbepp_1_1group.html',1,'sbepp']]],
   ['group_20entries_3',['Group entries',['../representation.html#autotoc_md26',1,'']]],
-  ['group_5ftag_4',['group_tag',['../conceptsbepp_1_1group__tag.html',1,'sbepp']]],
-  ['group_5ftags_5',['group_tags',['../classsbepp_1_1message__traits.html#a5f6b3b65bcaf357801a78df84829c523',1,'sbepp::message_traits::group_tags'],['../classsbepp_1_1group__traits.html#abc44a4dd9a218b274c383822e314ed0e',1,'sbepp::group_traits::group_tags']]],
-  ['group_5ftraits_6',['group_traits',['../classsbepp_1_1group__traits.html',1,'sbepp']]],
-  ['groups_7',['Groups',['../representation.html#groups',1,'']]]
+  ['group_5fentry_4',['group_entry',['../conceptsbepp_1_1group__entry.html',1,'sbepp']]],
+  ['group_5ftag_5',['group_tag',['../conceptsbepp_1_1group__tag.html',1,'sbepp']]],
+  ['group_5ftags_6',['group_tags',['../classsbepp_1_1message__traits.html#a5f6b3b65bcaf357801a78df84829c523',1,'sbepp::message_traits::group_tags'],['../classsbepp_1_1group__traits.html#abc44a4dd9a218b274c383822e314ed0e',1,'sbepp::group_traits::group_tags']]],
+  ['group_5ftraits_7',['group_traits',['../classsbepp_1_1group__traits.html',1,'sbepp']]],
+  ['groups_8',['Groups',['../representation.html#groups',1,'']]]
 ];

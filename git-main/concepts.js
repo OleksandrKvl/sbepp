@@ -13,6 +13,7 @@ var concepts =
       [ "flat_group", "conceptsbepp_1_1flat__group.html", null ],
       [ "nested_group", "conceptsbepp_1_1nested__group.html", null ],
       [ "group", "conceptsbepp_1_1group.html", null ],
+      [ "group_entry", "conceptsbepp_1_1group__entry.html", null ],
       [ "data", "conceptsbepp_1_1data.html", null ],
       [ "type_tag", "conceptsbepp_1_1type__tag.html", null ],
       [ "enum_tag", "conceptsbepp_1_1enum__tag.html", null ],
