@@ -1258,6 +1258,7 @@ public:
 }};
 
 {traits_tag}
+{entry_traits_tag}
 )",
             // clang-format on
             fmt::arg("tag", group_context.tag),
@@ -1290,6 +1291,10 @@ public:
                 "traits_tag",
                 make_templated_traits_tag(
                     group_context.impl_type, group_context.tag)),
+            fmt::arg(
+                "entry_traits_tag",
+                make_templated_traits_tag(
+                    group_context.entry_impl_type, group_context.tag)),
             fmt::arg(
                 "field_tags",
                 make_type_list_alias("field_tags", get_tags(g.members.fields))),
