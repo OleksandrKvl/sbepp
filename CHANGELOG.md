@@ -1,3 +1,10 @@
+# 1.7.0
+
+- make `sbepp::traits_tag` for group entries provide group tag
+- add missing `sbepp::is_group_entry_v` and corresponding concept
+
+---
+
 # 1.6.0
 
 - add children tag lists to various traits

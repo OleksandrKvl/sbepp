@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2023, Oleksandr Koval
 
+#include "sbepp/sbepp.hpp"
 #include <traits_test_schema/types/messageHeader.hpp>
 #include <traits_test_schema/types/groupSizeEncoding.hpp>
 #include <traits_test_schema/types/customGroupSizeEncoding.hpp>
@@ -1354,6 +1355,14 @@ TYPED_TEST(SimpleValueTypeTraitsTagTest, ProvidesCorrectTraitsTag)
     using representation_type = typename TestFixture::traits::value_type;
 
     IS_SAME_TYPE(sbepp::traits_tag_t<representation_type>, tag);
+}
+
+TEST(GroupEntryTraitsTagTest, ProvidesGroupTag)
+{
+    using group_tag = traits_test_schema::schema::messages::msg_4::group_1;
+    using entry_type = sbepp::group_traits<group_tag>::entry_type<char>;
+
+    IS_SAME_TYPE(sbepp::traits_tag_t<entry_type>, group_tag);
 }
 
 namespace constexpr_tests
