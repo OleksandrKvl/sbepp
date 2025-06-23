@@ -5003,32 +5003,62 @@ struct is_array_type_impl
 };
 } // namespace detail
 
-//! @brief Checks is `T` is an array type
+/**
+ * @brief Checks if `T` is an array type
+ *
+ * Equivalent to `std::true_type` if `T` is an array type, `std::false_type`
+ * otherwise.
+ */
 template<typename T>
 using is_array_type = typename detail::is_array_type_impl<T>::type;
 
-//! @brief Checks if `T` is a non-array required type
+/**
+ * @brief Checks if `T` is a required numeric type
+ *
+ * Equivalent to `std::true_type` if `T` is a required numeric type,
+ * `std::false_type` otherwise.
+ */
 template<typename T>
 using is_required_type = detail::is_base_of_tmp<detail::required_base, T>;
 
-//! @brief Checks if `T` is a non-array optional type
+/**
+ * @brief Checks if `T` is an optional numeric type
+ *
+ * Equivalent to `std::true_type` if `T` is an optional numeric type,
+ * `std::false_type` otherwise.
+ */
 template<typename T>
 using is_optional_type = detail::is_base_of_tmp<detail::optional_base, T>;
 
-//! @brief Checks if `T` is a non-array type
+/**
+ * @brief Checks if `T` is a numeric type
+ *
+ * Equivalent to `std::true_type` if `T` is a numeric type, `std::false_type`
+ * otherwise.
+ */
 template<typename T>
 using is_non_array_type = std::integral_constant<
     bool,
     is_required_type<T>::value || is_optional_type<T>::value>;
 
-//! @brief Checks if `T` is a type of any kind
+/**
+ * @brief Checks if `T` is a type of any kind
+ *
+ * Equivalent to `std::true_type` if `T` is a type of any kind,
+ * `std::false_type` otherwise.
+ */
 template<typename T>
 using is_type = std::integral_constant<
     bool,
     is_required_type<T>::value || is_optional_type<T>::value
         || is_array_type<T>::value>;
 
-//! @brief Checks if `T` is an enumeration
+/**
+ * @brief Checks if `T` is an enumeration
+ *
+ * Equivalent to `std::true_type` if `T` is an enumeration, `std::false_type`
+ * otherwise.
+ */
 template<typename T, typename = void>
 struct is_enum : std::false_type
 {
@@ -5044,33 +5074,67 @@ struct is_enum<
 {
 };
 
-//! @brief Checks if `T` is a set
+/**
+ * @brief Checks if `T` is a set
+ *
+ * Equivalent to `std::true_type` if `T` is a set, `std::false_type` otherwise.
+ */
 template<typename T>
 using is_set = detail::is_base_of_tmp<detail::bitset_base, T>;
 
-//! @brief Checks if `T` is a composite
+/**
+ * @brief Checks if `T` is a composite
+ *
+ * Equivalent to `std::true_type` if `T` is a composite, `std::false_type`
+ * otherwise.
+ */
 template<typename T>
 using is_composite = detail::is_base_of_tmp<detail::composite_base, T>;
 
-//! @brief Checks if `T` is a message
+/**
+ * @brief Checks if `T` is a message
+ *
+ * Equivalent to `std::true_type` if `T` is a message, `std::false_type`
+ * otherwise.
+ */
 template<typename T>
 using is_message = detail::is_base_of_tmp<detail::message_base, T>;
 
-//! @brief Checks if `T` is a flat group
+/**
+ * @brief Checks if `T` is a flat group
+ *
+ * Equivalent to `std::true_type` if `T` is a flat group, `std::false_type`
+ * otherwise.
+ */
 template<typename T>
 using is_flat_group = detail::is_base_of_tmp<detail::flat_group_base, T>;
 
-//! @brief Checks if `T` is a nested group
+/**
+ * @brief Checks if `T` is a nested group
+ *
+ * Equivalent to `std::true_type` if `T` is a nested group, `std::false_type`
+ * otherwise.
+ */
 template<typename T>
 using is_nested_group = detail::is_base_of_tmp<detail::nested_group_base, T>;
 
-//! @brief Checks if `T` is a group of any kind
+/**
+ * @brief Checks if `T` is a group of any kind
+ *
+ * Equivalent to `std::true_type` if `T` is a group of any kind,
+ * `std::false_type` otherwise.
+ */
 template<typename T>
 using is_group = std::integral_constant<
     bool,
     is_flat_group<T>::value || is_nested_group<T>::value>;
 
-//! @brief Checks if `T` is a group entry
+/**
+ * @brief Checks if `T` is a group entry
+ *
+ * Equivalent to `std::true_type` if `T` is a group entry, `std::false_type`
+ * otherwise.
+ */
 template<typename T>
 using is_group_entry = detail::is_base_of_tmp<detail::entry_base, T>;
 
@@ -5089,62 +5153,70 @@ struct is_data_impl
 };
 } // namespace detail
 
-//! @brief Checks if `T` is a data
+/**
+ * @brief Checks if `T` is a data
+ *
+ * Equivalent to `std::true_type` if `T` is a data, `std::false_type` otherwise.
+ */
 template<typename T>
 using is_data = typename detail::is_data_impl<T>::type;
 
 #if SBEPP_HAS_INLINE_VARS
 //! @brief Shorthand for `sbepp::is_array_type<T>::value`
 template<typename T>
-inline constexpr auto is_array_type_v = is_array_type<T>::value;
+inline constexpr bool is_array_type_v = is_array_type<T>::value;
 
 //! @brief Shorthand for `sbepp::is_required_type<T>::value`
 template<typename T>
-inline constexpr auto is_required_type_v = is_required_type<T>::value;
+inline constexpr bool is_required_type_v = is_required_type<T>::value;
 
 //! @brief Shorthand for `sbepp::is_optional_type<T>::value`
 template<typename T>
-inline constexpr auto is_optional_type_v = is_optional_type<T>::value;
+inline constexpr bool is_optional_type_v = is_optional_type<T>::value;
 
 //! @brief Shorthand for `sbepp::is_non_array_type<T>::value`
 template<typename T>
-inline constexpr auto is_non_array_type_v = is_non_array_type<T>::value;
+inline constexpr bool is_non_array_type_v = is_non_array_type<T>::value;
 
 //! @brief Shorthand for `sbepp::is_type<T>::value`
 template<typename T>
-inline constexpr auto is_type_v = is_type<T>::value;
+inline constexpr bool is_type_v = is_type<T>::value;
 
 //! @brief Shorthand for `sbepp::is_enum<T>::value`
 template<typename T>
-inline constexpr auto is_enum_v = is_enum<T>::value;
+inline constexpr bool is_enum_v = is_enum<T>::value;
 
 //! @brief Shorthand for `sbepp::is_set<T>::value`
 template<typename T>
-inline constexpr auto is_set_v = is_set<T>::value;
+inline constexpr bool is_set_v = is_set<T>::value;
 
 //! @brief Shorthand for `sbepp::is_composite<T>::value`
 template<typename T>
-inline constexpr auto is_composite_v = is_composite<T>::value;
+inline constexpr bool is_composite_v = is_composite<T>::value;
 
 //! @brief Shorthand for `sbepp::is_message<T>::value`
 template<typename T>
-inline constexpr auto is_message_v = is_message<T>::value;
+inline constexpr bool is_message_v = is_message<T>::value;
 
 //! @brief Shorthand for `sbepp::is_flat_group<T>::value`
 template<typename T>
-inline constexpr auto is_flat_group_v = is_flat_group<T>::value;
+inline constexpr bool is_flat_group_v = is_flat_group<T>::value;
 
 //! @brief Shorthand for `sbepp::is_nested_group<T>::value`
 template<typename T>
-inline constexpr auto is_nested_group_v = is_nested_group<T>::value;
+inline constexpr bool is_nested_group_v = is_nested_group<T>::value;
 
 //! @brief Shorthand for `sbepp::is_group<T>::value`
 template<typename T>
-inline constexpr auto is_group_v = is_group<T>::value;
+inline constexpr bool is_group_v = is_group<T>::value;
+
+//! @brief Shorthand for `sbepp::is_group_entry<T>::value`
+template<typename T>
+inline constexpr bool is_group_entry_v = is_group_entry<T>::value;
 
 //! @brief Shorthand for `sbepp::is_data<T>::value`
 template<typename T>
-inline constexpr auto is_data_v = is_data<T>::value;
+inline constexpr bool is_data_v = is_data<T>::value;
 #endif
 
 #if SBEPP_HAS_CONCEPTS
@@ -5195,6 +5267,10 @@ concept nested_group = is_nested_group_v<T>;
 //! @brief Concept for `sbepp::is_group<T>::value`
 template<typename T>
 concept group = is_group_v<T>;
+
+//! @brief Concept for `sbepp::is_group_entry<T>::value`
+template<typename T>
+concept group_entry = is_group_entry_v<T>;
 
 //! @brief Concept for `sbepp::is_data<T>::value`
 template<typename T>
@@ -5739,7 +5815,8 @@ struct has_traits<Trait, T, void_t<decltype(Trait<T>{})>> : std::true_type
 /**
  * @brief Checks if `Tag` is a type tag
  *
- * Requires `Tag` traits to be available for correct behavior.
+ * Equivalent to `std::true_type` if `Tag` is a type tag, `std::false_type`
+ * otherwise. Requires `Tag` traits to be available for correct behavior.
  */
 template<typename Tag>
 using is_type_tag = detail::has_traits<type_traits, Tag>;
@@ -5747,7 +5824,8 @@ using is_type_tag = detail::has_traits<type_traits, Tag>;
 /**
  * @brief Checks if `Tag` is an enum tag
  *
- * Requires `Tag` traits to be available for correct behavior.
+ * Equivalent to `std::true_type` if `Tag` is an enum tag, `std::false_type`
+ * otherwise. Requires `Tag` traits to be available for correct behavior.
  */
 template<typename Tag>
 using is_enum_tag = detail::has_traits<enum_traits, Tag>;
@@ -5755,7 +5833,9 @@ using is_enum_tag = detail::has_traits<enum_traits, Tag>;
 /**
  * @brief Checks if `Tag` is an enum value tag
  *
- * Requires `Tag` traits to be available for correct behavior.
+ * Equivalent to `std::true_type` if `Tag` is an enum value tag,
+ * `std::false_type` otherwise. Requires `Tag` traits to be available for
+ * correct behavior.
  */
 template<typename Tag>
 using is_enum_value_tag = detail::has_traits<enum_value_traits, Tag>;
@@ -5763,7 +5843,8 @@ using is_enum_value_tag = detail::has_traits<enum_value_traits, Tag>;
 /**
  * @brief Checks if `Tag` is a set tag
  *
- * Requires `Tag` traits to be available for correct behavior.
+ * Equivalent to `std::true_type` if `Tag` is a set tag, `std::false_type`
+ * otherwise. Requires `Tag` traits to be available for correct behavior.
  */
 template<typename Tag>
 using is_set_tag = detail::has_traits<set_traits, Tag>;
@@ -5771,7 +5852,9 @@ using is_set_tag = detail::has_traits<set_traits, Tag>;
 /**
  * @brief Checks if `Tag` is a set choice tag
  *
- * Requires `Tag` traits to be available for correct behavior.
+ * Equivalent to `std::true_type` if `Tag` is a set choice tag,
+ * `std::false_type` otherwise. Requires `Tag` traits to be available for
+ * correct behavior.
  */
 template<typename Tag>
 using is_set_choice_tag = detail::has_traits<set_choice_traits, Tag>;
@@ -5779,7 +5862,8 @@ using is_set_choice_tag = detail::has_traits<set_choice_traits, Tag>;
 /**
  * @brief Checks if `Tag` is a composite tag
  *
- * Requires `Tag` traits to be available for correct behavior.
+ * Equivalent to `std::true_type` if `Tag` is a composite tag, `std::false_type`
+ * otherwise. Requires `Tag` traits to be available for correct behavior.
  */
 template<typename Tag>
 using is_composite_tag = detail::has_traits<composite_traits, Tag>;
@@ -5787,7 +5871,8 @@ using is_composite_tag = detail::has_traits<composite_traits, Tag>;
 /**
  * @brief Checks if `Tag` is a field tag
  *
- * Requires `Tag` traits to be available for correct behavior.
+ * Equivalent to `std::true_type` if `Tag` is a field tag, `std::false_type`
+ * otherwise. Requires `Tag` traits to be available for correct behavior.
  */
 template<typename Tag>
 using is_field_tag = detail::has_traits<field_traits, Tag>;
@@ -5795,7 +5880,8 @@ using is_field_tag = detail::has_traits<field_traits, Tag>;
 /**
  * @brief Checks if `Tag` is a group tag
  *
- * Requires `Tag` traits to be available for correct behavior.
+ * Equivalent to `std::true_type` if `Tag` is a group tag, `std::false_type`
+ * otherwise. Requires `Tag` traits to be available for correct behavior.
  */
 template<typename Tag>
 using is_group_tag = detail::has_traits<group_traits, Tag>;
@@ -5803,7 +5889,8 @@ using is_group_tag = detail::has_traits<group_traits, Tag>;
 /**
  * @brief Checks if `Tag` is a data tag
  *
- * Requires `Tag` traits to be available for correct behavior.
+ * Equivalent to `std::true_type` if `Tag` is a data tag, `std::false_type`
+ * otherwise. Requires `Tag` traits to be available for correct behavior.
  */
 template<typename Tag>
 using is_data_tag = detail::has_traits<data_traits, Tag>;
@@ -5811,7 +5898,8 @@ using is_data_tag = detail::has_traits<data_traits, Tag>;
 /**
  * @brief Checks if `Tag` is a message tag
  *
- * Requires `Tag` traits to be available for correct behavior.
+ * Equivalent to `std::true_type` if `Tag` is a message tag, `std::false_type`
+ * otherwise. Requires `Tag` traits to be available for correct behavior.
  */
 template<typename Tag>
 using is_message_tag = detail::has_traits<message_traits, Tag>;
@@ -5819,7 +5907,8 @@ using is_message_tag = detail::has_traits<message_traits, Tag>;
 /**
  * @brief Checks if `Tag` is a schema tag
  *
- * Requires `Tag` traits to be available for correct behavior.
+ * Equivalent to `std::true_type` if `Tag` is a schema tag, `std::false_type`
+ * otherwise. Requires `Tag` traits to be available for correct behavior.
  */
 template<typename Tag>
 using is_schema_tag = detail::has_traits<schema_traits, Tag>;
@@ -5827,47 +5916,47 @@ using is_schema_tag = detail::has_traits<schema_traits, Tag>;
 #if SBEPP_HAS_INLINE_VARS
 //! @brief Shorthand for `sbepp::is_type_tag<Tag>::value`
 template<typename Tag>
-inline constexpr auto is_type_tag_v = is_type_tag<Tag>::value;
+inline constexpr bool is_type_tag_v = is_type_tag<Tag>::value;
 
 //! @brief Shorthand for `sbepp::is_enum_tag<Tag>::value`
 template<typename Tag>
-inline constexpr auto is_enum_tag_v = is_enum_tag<Tag>::value;
+inline constexpr bool is_enum_tag_v = is_enum_tag<Tag>::value;
 
 //! @brief Shorthand for `sbepp::is_enum_value_tag<Tag>::value`
 template<typename Tag>
-inline constexpr auto is_enum_value_tag_v = is_enum_value_tag<Tag>::value;
+inline constexpr bool is_enum_value_tag_v = is_enum_value_tag<Tag>::value;
 
 //! @brief Shorthand for `sbepp::is_set_tag<Tag>::value`
 template<typename Tag>
-inline constexpr auto is_set_tag_v = is_set_tag<Tag>::value;
+inline constexpr bool is_set_tag_v = is_set_tag<Tag>::value;
 
 //! @brief Shorthand for `sbepp::is_set_choice_tag<Tag>::value`
 template<typename Tag>
-inline constexpr auto is_set_choice_tag_v = is_set_choice_tag<Tag>::value;
+inline constexpr bool is_set_choice_tag_v = is_set_choice_tag<Tag>::value;
 
 //! @brief Shorthand for `sbepp::is_composite_tag<Tag>::value`
 template<typename Tag>
-inline constexpr auto is_composite_tag_v = is_composite_tag<Tag>::value;
+inline constexpr bool is_composite_tag_v = is_composite_tag<Tag>::value;
 
 //! @brief Shorthand for `sbepp::is_field_tag<Tag>::value`
 template<typename Tag>
-inline constexpr auto is_field_tag_v = is_field_tag<Tag>::value;
+inline constexpr bool is_field_tag_v = is_field_tag<Tag>::value;
 
 //! @brief Shorthand for `sbepp::is_group_tag<Tag>::value`
 template<typename Tag>
-inline constexpr auto is_group_tag_v = is_group_tag<Tag>::value;
+inline constexpr bool is_group_tag_v = is_group_tag<Tag>::value;
 
 //! @brief Shorthand for `sbepp::is_data_tag<Tag>::value`
 template<typename Tag>
-inline constexpr auto is_data_tag_v = is_data_tag<Tag>::value;
+inline constexpr bool is_data_tag_v = is_data_tag<Tag>::value;
 
 //! @brief Shorthand for `sbepp::is_message_tag<Tag>::value`
 template<typename Tag>
-inline constexpr auto is_message_tag_v = is_message_tag<Tag>::value;
+inline constexpr bool is_message_tag_v = is_message_tag<Tag>::value;
 
 //! @brief Shorthand for `sbepp::is_schema_tag<Tag>::value`
 template<typename Tag>
-inline constexpr auto is_schema_tag_v = is_schema_tag<Tag>::value;
+inline constexpr bool is_schema_tag_v = is_schema_tag<Tag>::value;
 #endif
 
 #if SBEPP_HAS_CONCEPTS
