@@ -5096,59 +5096,59 @@ using is_data = typename detail::is_data_impl<T>::type;
 #if SBEPP_HAS_INLINE_VARS
 //! @brief Shorthand for `sbepp::is_array_type<T>::value`
 template<typename T>
-inline constexpr auto is_array_type_v = is_array_type<T>::value;
+inline constexpr bool is_array_type_v = is_array_type<T>::value;
 
 //! @brief Shorthand for `sbepp::is_required_type<T>::value`
 template<typename T>
-inline constexpr auto is_required_type_v = is_required_type<T>::value;
+inline constexpr bool is_required_type_v = is_required_type<T>::value;
 
 //! @brief Shorthand for `sbepp::is_optional_type<T>::value`
 template<typename T>
-inline constexpr auto is_optional_type_v = is_optional_type<T>::value;
+inline constexpr bool is_optional_type_v = is_optional_type<T>::value;
 
 //! @brief Shorthand for `sbepp::is_non_array_type<T>::value`
 template<typename T>
-inline constexpr auto is_non_array_type_v = is_non_array_type<T>::value;
+inline constexpr bool is_non_array_type_v = is_non_array_type<T>::value;
 
 //! @brief Shorthand for `sbepp::is_type<T>::value`
 template<typename T>
-inline constexpr auto is_type_v = is_type<T>::value;
+inline constexpr bool is_type_v = is_type<T>::value;
 
 //! @brief Shorthand for `sbepp::is_enum<T>::value`
 template<typename T>
-inline constexpr auto is_enum_v = is_enum<T>::value;
+inline constexpr bool is_enum_v = is_enum<T>::value;
 
 //! @brief Shorthand for `sbepp::is_set<T>::value`
 template<typename T>
-inline constexpr auto is_set_v = is_set<T>::value;
+inline constexpr bool is_set_v = is_set<T>::value;
 
 //! @brief Shorthand for `sbepp::is_composite<T>::value`
 template<typename T>
-inline constexpr auto is_composite_v = is_composite<T>::value;
+inline constexpr bool is_composite_v = is_composite<T>::value;
 
 //! @brief Shorthand for `sbepp::is_message<T>::value`
 template<typename T>
-inline constexpr auto is_message_v = is_message<T>::value;
+inline constexpr bool is_message_v = is_message<T>::value;
 
 //! @brief Shorthand for `sbepp::is_flat_group<T>::value`
 template<typename T>
-inline constexpr auto is_flat_group_v = is_flat_group<T>::value;
+inline constexpr bool is_flat_group_v = is_flat_group<T>::value;
 
 //! @brief Shorthand for `sbepp::is_nested_group<T>::value`
 template<typename T>
-inline constexpr auto is_nested_group_v = is_nested_group<T>::value;
+inline constexpr bool is_nested_group_v = is_nested_group<T>::value;
 
 //! @brief Shorthand for `sbepp::is_group<T>::value`
 template<typename T>
-inline constexpr auto is_group_v = is_group<T>::value;
+inline constexpr bool is_group_v = is_group<T>::value;
 
 //! @brief Shorthand for `sbepp::is_group_entry<T>::value`
 template<typename T>
-inline constexpr auto is_group_entry_v = is_group_entry<T>::value;
+inline constexpr bool is_group_entry_v = is_group_entry<T>::value;
 
 //! @brief Shorthand for `sbepp::is_data<T>::value`
 template<typename T>
-inline constexpr auto is_data_v = is_data<T>::value;
+inline constexpr bool is_data_v = is_data<T>::value;
 #endif
 
 #if SBEPP_HAS_CONCEPTS
@@ -5835,47 +5835,47 @@ using is_schema_tag = detail::has_traits<schema_traits, Tag>;
 #if SBEPP_HAS_INLINE_VARS
 //! @brief Shorthand for `sbepp::is_type_tag<Tag>::value`
 template<typename Tag>
-inline constexpr auto is_type_tag_v = is_type_tag<Tag>::value;
+inline constexpr bool is_type_tag_v = is_type_tag<Tag>::value;
 
 //! @brief Shorthand for `sbepp::is_enum_tag<Tag>::value`
 template<typename Tag>
-inline constexpr auto is_enum_tag_v = is_enum_tag<Tag>::value;
+inline constexpr bool is_enum_tag_v = is_enum_tag<Tag>::value;
 
 //! @brief Shorthand for `sbepp::is_enum_value_tag<Tag>::value`
 template<typename Tag>
-inline constexpr auto is_enum_value_tag_v = is_enum_value_tag<Tag>::value;
+inline constexpr bool is_enum_value_tag_v = is_enum_value_tag<Tag>::value;
 
 //! @brief Shorthand for `sbepp::is_set_tag<Tag>::value`
 template<typename Tag>
-inline constexpr auto is_set_tag_v = is_set_tag<Tag>::value;
+inline constexpr bool is_set_tag_v = is_set_tag<Tag>::value;
 
 //! @brief Shorthand for `sbepp::is_set_choice_tag<Tag>::value`
 template<typename Tag>
-inline constexpr auto is_set_choice_tag_v = is_set_choice_tag<Tag>::value;
+inline constexpr bool is_set_choice_tag_v = is_set_choice_tag<Tag>::value;
 
 //! @brief Shorthand for `sbepp::is_composite_tag<Tag>::value`
 template<typename Tag>
-inline constexpr auto is_composite_tag_v = is_composite_tag<Tag>::value;
+inline constexpr bool is_composite_tag_v = is_composite_tag<Tag>::value;
 
 //! @brief Shorthand for `sbepp::is_field_tag<Tag>::value`
 template<typename Tag>
-inline constexpr auto is_field_tag_v = is_field_tag<Tag>::value;
+inline constexpr bool is_field_tag_v = is_field_tag<Tag>::value;
 
 //! @brief Shorthand for `sbepp::is_group_tag<Tag>::value`
 template<typename Tag>
-inline constexpr auto is_group_tag_v = is_group_tag<Tag>::value;
+inline constexpr bool is_group_tag_v = is_group_tag<Tag>::value;
 
 //! @brief Shorthand for `sbepp::is_data_tag<Tag>::value`
 template<typename Tag>
-inline constexpr auto is_data_tag_v = is_data_tag<Tag>::value;
+inline constexpr bool is_data_tag_v = is_data_tag<Tag>::value;
 
 //! @brief Shorthand for `sbepp::is_message_tag<Tag>::value`
 template<typename Tag>
-inline constexpr auto is_message_tag_v = is_message_tag<Tag>::value;
+inline constexpr bool is_message_tag_v = is_message_tag<Tag>::value;
 
 //! @brief Shorthand for `sbepp::is_schema_tag<Tag>::value`
 template<typename Tag>
-inline constexpr auto is_schema_tag_v = is_schema_tag<Tag>::value;
+inline constexpr bool is_schema_tag_v = is_schema_tag<Tag>::value;
 #endif
 
 #if SBEPP_HAS_CONCEPTS
