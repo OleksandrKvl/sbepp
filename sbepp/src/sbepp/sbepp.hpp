@@ -5142,6 +5142,10 @@ inline constexpr auto is_nested_group_v = is_nested_group<T>::value;
 template<typename T>
 inline constexpr auto is_group_v = is_group<T>::value;
 
+//! @brief Shorthand for `sbepp::is_group_entry<T>::value`
+template<typename T>
+inline constexpr auto is_group_entry_v = is_group_entry<T>::value;
+
 //! @brief Shorthand for `sbepp::is_data<T>::value`
 template<typename T>
 inline constexpr auto is_data_v = is_data<T>::value;
@@ -5195,6 +5199,10 @@ concept nested_group = is_nested_group_v<T>;
 //! @brief Concept for `sbepp::is_group<T>::value`
 template<typename T>
 concept group = is_group_v<T>;
+
+//! @brief Concept for `sbepp::is_group_entry<T>::value`
+template<typename T>
+concept group_entry = is_group_entry_v<T>;
 
 //! @brief Concept for `sbepp::is_data<T>::value`
 template<typename T>

@@ -29,6 +29,16 @@ STATIC_ASSERT_V(std::is_trivially_move_constructible<entry_t>);
 STATIC_ASSERT_V(std::is_trivially_move_assignable<entry_t>);
 STATIC_ASSERT_V(std::is_trivially_destructible<entry_t>);
 
+STATIC_ASSERT(sbepp::is_group_entry<entry_t>::value);
+
+#if SBEPP_HAS_INLINE_VARS
+STATIC_ASSERT(sbepp::is_group_entry_v<entry_t>);
+#endif
+
+#if SBEPP_HAS_CONCEPTS
+STATIC_ASSERT(sbepp::group_entry<entry_t>);
+#endif
+
 class EntryTest : public ::testing::Test
 {
 public:
@@ -49,11 +59,12 @@ TEST_F(EntryTest, CanBeConstructedFromBeginEndPointersAndBlockLength)
 
     ASSERT_EQ(sbepp::addressof(e), buf.data());
     ASSERT_EQ(e(sbepp::detail::get_block_length_tag{}), g_block_length);
-    STATIC_ASSERT_V(std::is_nothrow_constructible<
-                    entry_t,
-                    decltype(buf.data()),
-                    decltype(buf.data()),
-                    decltype(g_block_length)>);
+    STATIC_ASSERT_V(
+        std::is_nothrow_constructible<
+            entry_t,
+            decltype(buf.data()),
+            decltype(buf.data()),
+            decltype(g_block_length)>);
 }
 
 TEST_F(EntryTest, CanBeConstructedFromPointerSizeAndBlockLength)
@@ -62,11 +73,12 @@ TEST_F(EntryTest, CanBeConstructedFromPointerSizeAndBlockLength)
 
     ASSERT_EQ(sbepp::addressof(e), buf.data());
     ASSERT_EQ(e(sbepp::detail::get_block_length_tag{}), g_block_length);
-    STATIC_ASSERT_V(std::is_nothrow_constructible<
-                    entry_t,
-                    decltype(buf.data()),
-                    decltype(buf.size()),
-                    decltype(g_block_length)>);
+    STATIC_ASSERT_V(
+        std::is_nothrow_constructible<
+            entry_t,
+            decltype(buf.data()),
+            decltype(buf.size()),
+            decltype(g_block_length)>);
 }
 
 TEST_F(EntryTest, CopyAndMoveCopyPointer)
