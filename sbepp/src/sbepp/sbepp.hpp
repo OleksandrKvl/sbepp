@@ -4210,7 +4210,7 @@ public:
     static constexpr const char* name() noexcept;
     //! @brief Returns `description` attribute
     static constexpr const char* description() noexcept;
-    //! @brief Returns `addedSince` attribute
+    //! @brief Returns `sinceVersion` attribute
     static constexpr version_t since_version() noexcept;
     //! @brief Returns `deprecated` attribute. Available only if provided in
     //! schema
@@ -4240,7 +4240,7 @@ public:
     static constexpr const char* name() noexcept;
     //! @brief Returns `description` attribute
     static constexpr const char* description() noexcept;
-    //! @brief Returns `addedSince` attribute
+    //! @brief Returns `sinceVersion` attribute
     static constexpr version_t since_version() noexcept;
     //! @brief Returns `deprecated` attribute. Available only if provided in
     //! schema
@@ -4279,7 +4279,7 @@ public:
     static constexpr const char* name() noexcept;
     //! @brief Returns `description` attribute
     static constexpr const char* description() noexcept;
-    //! @brief Returns `addedSince` attribute
+    //! @brief Returns `sinceVersion` attribute
     static constexpr version_t since_version() noexcept;
     //! @brief Returns `deprecated` attribute. Available only if provided in
     //! schema
@@ -4316,7 +4316,7 @@ public:
     static constexpr offset_t offset() noexcept;
     //! @brief Returns `semanticType` attribute
     static constexpr const char* semantic_type() noexcept;
-    //! @brief Returns `addedSince` attribute
+    //! @brief Returns `sinceVersion` attribute
     static constexpr version_t since_version() noexcept;
     //! @brief Returns `deprecated` attribute. Available only if provided in
     // !schema
@@ -4361,7 +4361,7 @@ public:
     static constexpr block_length_t block_length() noexcept;
     //! @brief Returns `semanticType` attribute
     static constexpr const char* semantic_type() noexcept;
-    //! @brief Returns `addedSince` attribute
+    //! @brief Returns `sinceVersion` attribute
     static constexpr version_t since_version() noexcept;
     //! @brief Returns `deprecated` attribute. Available only if provided in
     //! schema
@@ -4493,7 +4493,7 @@ public:
     static constexpr field_presence presence() noexcept;
     //! Returns actual offset
     static constexpr offset_t offset() noexcept;
-    //! @brief Returns `addedSince` attribute
+    //! @brief Returns `sinceVersion` attribute
     static constexpr version_t since_version() noexcept;
     //! @brief Returns `deprecated` attribute. Available only if provided in
     //!  schema
@@ -4538,7 +4538,7 @@ public:
     static constexpr block_length_t block_length() noexcept;
     //! @brief Returns `semanticType` attribute
     static constexpr const char* semantic_type() noexcept;
-    //! @brief Returns `addedSince` attribute
+    //! @brief Returns `sinceVersion` attribute
     static constexpr version_t since_version() noexcept;
     //! @brief Returns `deprecated` attribute. Available only if provided in
     //! schema
@@ -4610,7 +4610,7 @@ public:
     static constexpr member_id_t id() noexcept;
     //! @brief Returns `description` attribute
     static constexpr const char* description() noexcept;
-    //! @brief Returns `addedSince` attribute
+    //! @brief Returns `sinceVersion` attribute
     static constexpr version_t since_version() noexcept;
     //! @brief Returns `deprecated` attribute. Available only if provided in
     //!  schema
