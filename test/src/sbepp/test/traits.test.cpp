@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2023, Oleksandr Koval
 
-#include "sbepp/sbepp.hpp"
 #include <traits_test_schema/types/messageHeader.hpp>
 #include <traits_test_schema/types/groupSizeEncoding.hpp>
 #include <traits_test_schema/types/customGroupSizeEncoding.hpp>
@@ -55,122 +54,6 @@ namespace
 constexpr auto g_added_since = 1;
 constexpr auto g_deprecated_since = 10;
 constexpr auto g_custom_offset = 20;
-
-// `description` is a common static function for all the traits
-template<
-    template<typename> class Trait,
-    typename Tag,
-    typename = sbepp::test::utils::void_t<>>
-struct has_description : std::false_type
-{
-};
-
-template<template<typename> class Trait, typename Tag>
-struct has_description<
-    Trait,
-    Tag,
-    sbepp::test::utils::void_t<decltype(Trait<Tag>::description())>>
-    : std::true_type
-{
-};
-
-template<typename T, typename = void>
-struct sbe_traits;
-
-template<typename T>
-struct sbe_traits<
-    T,
-    sbepp::test::utils::enable_if_t<
-        has_description<sbepp::type_traits, T>::value>> : sbepp::type_traits<T>
-{
-};
-
-template<typename T>
-struct sbe_traits<
-    T,
-    sbepp::test::utils::enable_if_t<
-        has_description<sbepp::schema_traits, T>::value>>
-    : sbepp::schema_traits<T>
-{
-};
-
-template<typename T>
-struct sbe_traits<
-    T,
-    sbepp::test::utils::enable_if_t<
-        has_description<sbepp::enum_traits, T>::value>> : sbepp::enum_traits<T>
-{
-};
-
-template<typename T>
-struct sbe_traits<
-    T,
-    sbepp::test::utils::enable_if_t<
-        has_description<sbepp::enum_value_traits, T>::value>>
-    : sbepp::enum_value_traits<T>
-{
-};
-
-template<typename T>
-struct sbe_traits<
-    T,
-    sbepp::test::utils::enable_if_t<
-        has_description<sbepp::set_traits, T>::value>> : sbepp::set_traits<T>
-{
-};
-
-template<typename T>
-struct sbe_traits<
-    T,
-    sbepp::test::utils::enable_if_t<
-        has_description<sbepp::set_choice_traits, T>::value>>
-    : sbepp::set_choice_traits<T>
-{
-};
-
-template<typename T>
-struct sbe_traits<
-    T,
-    sbepp::test::utils::enable_if_t<
-        has_description<sbepp::composite_traits, T>::value>>
-    : sbepp::composite_traits<T>
-{
-};
-
-template<typename T>
-struct sbe_traits<
-    T,
-    sbepp::test::utils::enable_if_t<
-        has_description<sbepp::message_traits, T>::value>>
-    : sbepp::message_traits<T>
-{
-};
-
-template<typename T>
-struct sbe_traits<
-    T,
-    sbepp::test::utils::enable_if_t<
-        has_description<sbepp::field_traits, T>::value>>
-    : sbepp::field_traits<T>
-{
-};
-
-template<typename T>
-struct sbe_traits<
-    T,
-    sbepp::test::utils::enable_if_t<
-        has_description<sbepp::group_traits, T>::value>>
-    : sbepp::group_traits<T>
-{
-};
-
-template<typename T>
-struct sbe_traits<
-    T,
-    sbepp::test::utils::enable_if_t<
-        has_description<sbepp::data_traits, T>::value>> : sbepp::data_traits<T>
-{
-};
 
 template<typename ListIn, typename T, typename ListOut>
 struct remove_type_impl;
@@ -373,7 +256,7 @@ class TraitsContainer : public ::testing::Test
 {
 public:
     using tag = Tag;
-    using traits = sbe_traits<Tag>;
+    using traits = sbepp::test::utils::sbe_traits<Tag>;
 };
 
 using DefaultVersionTags = ::testing::Types<
@@ -981,9 +864,12 @@ TYPED_TEST_SUITE(DefaultOffsetTraitTest, FieldContainerTags);
 TYPED_TEST(DefaultOffsetTraitTest, ProvidesCorrectOffsetForConsecutiveFields)
 {
     using tag = typename TestFixture::tag;
-    using field_1_traits = sbe_traits<typename tag::field_1>;
-    using field_2_traits = sbe_traits<typename tag::field_2>;
-    using field_3_traits = sbe_traits<typename tag::field_3>;
+    using field_1_traits =
+        sbepp::test::utils::sbe_traits<typename tag::field_1>;
+    using field_2_traits =
+        sbepp::test::utils::sbe_traits<typename tag::field_2>;
+    using field_3_traits =
+        sbepp::test::utils::sbe_traits<typename tag::field_3>;
 
     ASSERT_EQ(field_1_traits::offset(), 0);
     ASSERT_EQ(

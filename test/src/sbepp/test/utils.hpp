@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include <sbepp/sbepp.hpp>
+
 #include <type_traits>
 #include <utility>
 
@@ -43,6 +45,122 @@ struct is_invocable_impl
 
 template<typename F, typename... Args>
 struct is_invocable : is_invocable_impl<F, Args...>::type
+{
+};
+
+// `description` is a common static function for all the traits
+template<
+    template<typename> class Trait,
+    typename Tag,
+    typename = sbepp::test::utils::void_t<>>
+struct has_description : std::false_type
+{
+};
+
+template<template<typename> class Trait, typename Tag>
+struct has_description<
+    Trait,
+    Tag,
+    sbepp::test::utils::void_t<decltype(Trait<Tag>::description())>>
+    : std::true_type
+{
+};
+
+template<typename T, typename = void>
+struct sbe_traits;
+
+template<typename T>
+struct sbe_traits<
+    T,
+    sbepp::test::utils::enable_if_t<
+        has_description<sbepp::type_traits, T>::value>> : sbepp::type_traits<T>
+{
+};
+
+template<typename T>
+struct sbe_traits<
+    T,
+    sbepp::test::utils::enable_if_t<
+        has_description<sbepp::schema_traits, T>::value>>
+    : sbepp::schema_traits<T>
+{
+};
+
+template<typename T>
+struct sbe_traits<
+    T,
+    sbepp::test::utils::enable_if_t<
+        has_description<sbepp::enum_traits, T>::value>> : sbepp::enum_traits<T>
+{
+};
+
+template<typename T>
+struct sbe_traits<
+    T,
+    sbepp::test::utils::enable_if_t<
+        has_description<sbepp::enum_value_traits, T>::value>>
+    : sbepp::enum_value_traits<T>
+{
+};
+
+template<typename T>
+struct sbe_traits<
+    T,
+    sbepp::test::utils::enable_if_t<
+        has_description<sbepp::set_traits, T>::value>> : sbepp::set_traits<T>
+{
+};
+
+template<typename T>
+struct sbe_traits<
+    T,
+    sbepp::test::utils::enable_if_t<
+        has_description<sbepp::set_choice_traits, T>::value>>
+    : sbepp::set_choice_traits<T>
+{
+};
+
+template<typename T>
+struct sbe_traits<
+    T,
+    sbepp::test::utils::enable_if_t<
+        has_description<sbepp::composite_traits, T>::value>>
+    : sbepp::composite_traits<T>
+{
+};
+
+template<typename T>
+struct sbe_traits<
+    T,
+    sbepp::test::utils::enable_if_t<
+        has_description<sbepp::message_traits, T>::value>>
+    : sbepp::message_traits<T>
+{
+};
+
+template<typename T>
+struct sbe_traits<
+    T,
+    sbepp::test::utils::enable_if_t<
+        has_description<sbepp::field_traits, T>::value>>
+    : sbepp::field_traits<T>
+{
+};
+
+template<typename T>
+struct sbe_traits<
+    T,
+    sbepp::test::utils::enable_if_t<
+        has_description<sbepp::group_traits, T>::value>>
+    : sbepp::group_traits<T>
+{
+};
+
+template<typename T>
+struct sbe_traits<
+    T,
+    sbepp::test::utils::enable_if_t<
+        has_description<sbepp::data_traits, T>::value>> : sbepp::data_traits<T>
 {
 };
 } // namespace utils
