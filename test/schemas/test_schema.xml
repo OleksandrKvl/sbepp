@@ -237,6 +237,12 @@
             <type name="float_field" primitiveType="float"/>
             <type name="double_field" primitiveType="double"/>
         </composite>
+
+        <composite name="composite_20">
+            <ref name="const_field" type="str_const1"/>
+            <type name="field1" primitiveType="uint32"/>
+            <type name="field2" primitiveType="uint32" offset="5"/>
+        </composite>
     </types>
 
     <sbe:message name="Msg1" id="1">
@@ -456,6 +462,20 @@
 
         <group name="group" id="3">
             <field name="field" id="1" type="composite_a" offset="20"/>
+        </group>
+    </sbe:message>
+
+    <sbe:message name="msg30" id="30">
+        <field name="const_field" id="1" type="str_const1"/>
+        <field name="field1" id="2" type="uint32"/>
+        <!-- if const_field size were taken into account, custom offset 5 would
+        result in an error -->
+        <field name="field2" id="3" type="uint32" offset="5"/>
+
+        <group name="group" id="4">
+            <field name="const_field" id="1" type="str_const1"/>
+            <field name="field1" id="2" type="uint32"/>
+            <field name="field2" id="3" type="uint32" offset="5"/>
         </group>
     </sbe:message>
 

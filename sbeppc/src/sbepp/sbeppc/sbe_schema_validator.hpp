@@ -421,12 +421,11 @@ private:
             {
                 validate_constant_field(f);
             }
-            // else
-            // {
-            //     // strict: warn about optional composite
-            // }
-
-            validate_field_offset(f, offset);
+            else
+            {
+                // strict: warn about optional composite
+                validate_field_offset(f, offset);
+            }
         }
 
         // at this point `offset` is essentially a minimal blockLength value

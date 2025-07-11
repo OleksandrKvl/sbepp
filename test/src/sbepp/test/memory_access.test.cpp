@@ -19,6 +19,7 @@
 #include <test_schema/types/composite_16.hpp>
 #include <test_schema/types/composite_17.hpp>
 #include <test_schema/types/composite_18.hpp>
+#include <test_schema/types/composite_20.hpp>
 #include <test_schema/messages/msg14.hpp>
 #include <test_schema/messages/msg15.hpp>
 #include <test_schema/messages/msg16.hpp>
@@ -31,6 +32,7 @@
 #include <test_schema/messages/msg23.hpp>
 #include <test_schema/messages/msg24.hpp>
 #include <test_schema/messages/msg25.hpp>
+#include <test_schema/messages/msg30.hpp>
 
 #include <big_endian_schema/types/composite_1.hpp>
 #include <big_endian_schema/types/composite_2.hpp>
@@ -39,9 +41,11 @@
 #include <big_endian_schema/types/composite_5.hpp>
 #include <big_endian_schema/messages/msg1.hpp>
 
-#include <algorithm>
+#include <sbepp/test/utils.hpp>
+
 #include <gtest/gtest.h>
 
+#include <algorithm>
 #include <cstring>
 #include <type_traits>
 #include <utility>
@@ -128,6 +132,20 @@ public:
         : base_t{ptr, size, sbepp::group_traits<GroupTag>::block_length()}
     {
     }
+};
+
+template<typename View>
+struct traits_tag : sbepp::traits_tag<View>
+{
+};
+
+template<typename View>
+using traits_tag_t = typename traits_tag<View>::type;
+
+template<typename GroupTag>
+struct traits_tag<entry_wrapper<GroupTag>>
+{
+    using type = GroupTag;
 };
 
 template<typename T>
@@ -431,5 +449,48 @@ TEST(DataBigEndianTest, DataSizeFieldRespectsEndianness)
         size_ptr);
 
     ASSERT_EQ(new_size, raw_size);
+}
+
+using ConstantOffsetFieldContainers = ::testing::Types<
+    test_schema::types::composite_20<byte_type>,
+    test_schema::messages::msg30<byte_type>,
+    entry_wrapper<test_schema::schema::messages::msg30::group>>;
+
+template<typename T>
+using ConstantOffsetTest = FieldsContainer<T>;
+
+TYPED_TEST_SUITE(ConstantOffsetTest, ConstantOffsetFieldContainers);
+
+TYPED_TEST(ConstantOffsetTest, ConstantFieldDoesNotAffectOffsets)
+{
+    const auto& v = this->view;
+    using tag_t = traits_tag_t<decay_t<decltype(v)>>;
+    using field1_tag_t = typename tag_t::field1;
+    using field2_tag_t = typename tag_t::field2;
+    const auto field1_value = 12;
+    const auto field2_value = 34;
+    v.field1(field1_value);
+    v.field2(field2_value);
+    const auto field1_value_by_getter = *v.field1();
+    const auto field2_value_by_getter = *v.field2();
+
+    STATIC_ASSERT(sbepp::test::utils::sbe_traits<field1_tag_t>::offset() == 0);
+    STATIC_ASSERT(sbepp::test::utils::sbe_traits<field2_tag_t>::offset() == 5);
+
+    const auto field1_value_by_memcpy = bit_cast<
+        std::uint32_t,
+        sbepp::schema_traits<test_schema::schema>::byte_order()>(
+        get_fields_start(v)
+        + sbepp::test::utils::sbe_traits<field1_tag_t>::offset());
+    const auto field2_value_by_memcpy = bit_cast<
+        std::uint32_t,
+        sbepp::schema_traits<test_schema::schema>::byte_order()>(
+        get_fields_start(v)
+        + sbepp::test::utils::sbe_traits<field2_tag_t>::offset());
+
+    ASSERT_EQ(field1_value, field1_value_by_getter);
+    ASSERT_EQ(field1_value_by_getter, field1_value_by_memcpy);
+    ASSERT_EQ(field2_value, field2_value_by_getter);
+    ASSERT_EQ(field2_value_by_getter, field2_value_by_memcpy);
 }
 } // namespace
