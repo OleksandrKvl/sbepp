@@ -688,10 +688,6 @@ Functions</h2></td></tr>
 <tr class="memitem:aa253364a4276b55c0a157aefaa185c37"><td class="memTemplItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="#aa253364a4276b55c0a157aefaa185c37">visit_set</a> (const Set s, Visitor &amp;&amp;visitor) noexcept -&gt; decltype(s(detail::visit_set_tag{}, std::forward&lt; Visitor &gt;(visitor)))</td></tr>
 <tr class="memdesc:aa253364a4276b55c0a157aefaa185c37"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visits set choices in order of their declaration.  <br /></td></tr>
 <tr class="separator:aa253364a4276b55c0a157aefaa185c37"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abd9c1efb3c96d6fa71d1156811b47fa4" id="r_abd9c1efb3c96d6fa71d1156811b47fa4"><td class="memTemplParams" colspan="2">template&lt;typename View&gt; </td></tr>
-<tr class="memitem:abd9c1efb3c96d6fa71d1156811b47fa4"><td class="memTemplItemLeft" align="right" valign="top">constexpr <a class="el" href="structsbepp_1_1size__bytes__checked__result.html">size_bytes_checked_result</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="#abd9c1efb3c96d6fa71d1156811b47fa4">size_bytes_checked</a> (View view, std::size_t size) noexcept</td></tr>
-<tr class="memdesc:abd9c1efb3c96d6fa71d1156811b47fa4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculates <code>view</code> size with additional safety checks.  <br /></td></tr>
-<tr class="separator:abd9c1efb3c96d6fa71d1156811b47fa4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aac5e0cf6d12c96ba8148271a521bde08" id="r_aac5e0cf6d12c96ba8148271a521bde08"><td class="memTemplParams" colspan="2">template&lt;typename Tag, typename ViewOrSet&gt; </td></tr>
 <tr class="memitem:aac5e0cf6d12c96ba8148271a521bde08"><td class="memTemplItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="#aac5e0cf6d12c96ba8148271a521bde08">get_by_tag</a> (ViewOrSet viewOrSet) noexcept -&gt; decltype(viewOrSet(detail::access_by_tag_tag{}, Tag{}))</td></tr>
 <tr class="memdesc:aac5e0cf6d12c96ba8148271a521bde08"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets field or set choice value by tag.  <br /></td></tr>
@@ -708,6 +704,10 @@ Functions</h2></td></tr>
 <tr class="memitem:abfbb9c41946b9469e2cb807c8b3fe544"><td class="memTemplItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="#abfbb9c41946b9469e2cb807c8b3fe544">set_by_tag</a> (View view, Value &amp;&amp;value, Cursor &amp;&amp;c) -&gt; decltype(view(detail::access_by_tag_tag{}, Tag{}, std::forward&lt; Value &gt;(value), std::forward&lt; Cursor &gt;(c)))</td></tr>
 <tr class="memdesc:abfbb9c41946b9469e2cb807c8b3fe544"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets field value by tag using given cursor.  <br /></td></tr>
 <tr class="separator:abfbb9c41946b9469e2cb807c8b3fe544"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abd9c1efb3c96d6fa71d1156811b47fa4" id="r_abd9c1efb3c96d6fa71d1156811b47fa4"><td class="memTemplParams" colspan="2">template&lt;typename View&gt; </td></tr>
+<tr class="memitem:abd9c1efb3c96d6fa71d1156811b47fa4"><td class="memTemplItemLeft" align="right" valign="top">constexpr <a class="el" href="structsbepp_1_1size__bytes__checked__result.html">size_bytes_checked_result</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="#abd9c1efb3c96d6fa71d1156811b47fa4">size_bytes_checked</a> (View view, std::size_t size) noexcept</td></tr>
+<tr class="memdesc:abd9c1efb3c96d6fa71d1156811b47fa4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculates <code>view</code> size with additional safety checks.  <br /></td></tr>
+<tr class="separator:abd9c1efb3c96d6fa71d1156811b47fa4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
@@ -2153,7 +2153,7 @@ template&lt;typename View&gt; </div>
 </div><div class="memdoc">
 
 <p>Calculates <code>view</code> size with additional safety checks. </p>
-<p>Similar to <code><a class="el" href="#a9346fd507c2d3760ac40032180d1a7a6" title="Returns the size of the underlying data represented by message/group/entry/data/composite view,...">size_bytes()</a></code> but stops if <code>view</code> cannot fit into the given <code>size</code>. Useful to check that incoming message is fully contained within given buffer.</p>
+<p>Similar to <code><a class="el" href="#a9346fd507c2d3760ac40032180d1a7a6" title="Returns the size of the underlying data represented by message/group/entry/data/composite view,...">size_bytes()</a></code> but stops if <code>view</code> doesn't fit into the given <code>size</code>. Useful to check that incoming message is fully contained within given buffer.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">view</td><td>message or group view </td></tr>
