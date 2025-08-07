@@ -1,7 +1,12 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2023, Oleksandr Koval
 
+#include <test_schema/messages/Msg1.hpp>
+#include <test_schema/messages/msg2.hpp>
+#include <test_schema/messages/msg9.hpp>
+#include <test_schema/messages/msg10.hpp>
 #include <test_schema/messages/msg27.hpp>
+#include <traits_test_schema/messages/msg_7.hpp>
 
 #include <sbepp/test/utils.hpp>
 
@@ -39,12 +44,29 @@ TEST_F(SizeBytesCheckedTest, ReturnsValidSizeForMessage)
     STATIC_ASSERT(noexcept(sbepp::size_bytes_checked(msg, buf.size())));
 }
 
+TEST_F(SizeBytesCheckedTest, DoesNotNeedMoreThanActualMessageSize)
+{
+    const auto res = sbepp::size_bytes_checked(msg, sbepp::size_bytes(msg));
+
+    ASSERT_TRUE(res.valid);
+    ASSERT_EQ(res.size, sbepp::size_bytes(msg));
+}
+
 TEST_F(SizeBytesCheckedTest, ReturnsValidSizeForGroup)
 {
     auto g = msg.group();
     auto remaining_size =
         buf.size() - (sbepp::addressof(g) - sbepp::addressof(msg));
     const auto res = sbepp::size_bytes_checked(g, remaining_size);
+
+    ASSERT_TRUE(res.valid);
+    ASSERT_EQ(res.size, sbepp::size_bytes(g));
+}
+
+TEST_F(SizeBytesCheckedTest, DoesNotNeedMoreThanActualGroupSize)
+{
+    auto g = msg.group();
+    const auto res = sbepp::size_bytes_checked(g, sbepp::size_bytes(g));
 
     ASSERT_TRUE(res.valid);
     ASSERT_EQ(res.size, sbepp::size_bytes(g));
@@ -57,7 +79,7 @@ TEST_F(SizeBytesCheckedTest, FailsIfViewIsEmpty)
     ASSERT_FALSE(sbepp::size_bytes_checked(m, 1).valid);
 }
 
-TEST_F(SizeBytesCheckedTest, FailsIfViewIsSizeIsZero)
+TEST_F(SizeBytesCheckedTest, FailsIfSizeIsZero)
 {
     ASSERT_FALSE(sbepp::size_bytes_checked(msg, 0).valid);
 }
@@ -65,6 +87,7 @@ TEST_F(SizeBytesCheckedTest, FailsIfViewIsSizeIsZero)
 TEST_F(SizeBytesCheckedTest, FailsIfNoSpaceForMessageHeader)
 {
     const auto not_enough_size = sbepp::size_bytes(sbepp::get_header(msg)) - 1;
+
     ASSERT_FALSE(sbepp::size_bytes_checked(msg, not_enough_size).valid);
 }
 
@@ -72,12 +95,16 @@ TEST_F(SizeBytesCheckedTest, FailsIfNoSpaceForGroupHeader)
 {
     auto g = msg.group();
     const auto not_enough_size = sbepp::size_bytes(sbepp::get_header(g)) - 1;
+
     ASSERT_FALSE(sbepp::size_bytes_checked(g, not_enough_size).valid);
 }
 
 TEST_F(SizeBytesCheckedTest, FailsIfNoSpaceForMessageBlockLength)
 {
-    const auto not_enough_size = *sbepp::get_header(msg).blockLength() - 1;
+    auto header = sbepp::get_header(msg);
+    const auto not_enough_size =
+        sbepp::size_bytes(header) + *header.blockLength() - 1;
+
     ASSERT_FALSE(sbepp::size_bytes_checked(msg, not_enough_size).valid);
 }
 
@@ -87,7 +114,27 @@ TEST_F(SizeBytesCheckedTest, FailsIfNoSpaceForEntryBlockLength)
     const auto header = sbepp::get_header(g);
     auto not_enough_size =
         sbepp::size_bytes(header) + *header.blockLength() - 1;
+
     ASSERT_FALSE(sbepp::size_bytes_checked(g, not_enough_size).valid);
+}
+
+TEST_F(SizeBytesCheckedTest, FailsIfNoSpaceForMessageGroupHeader)
+{
+    auto g = msg.group();
+    const auto not_enough_size = sbepp::addressof(g) - sbepp::addressof(msg)
+                                 + sbepp::size_bytes(sbepp::get_header(g)) - 1;
+
+    ASSERT_FALSE(sbepp::size_bytes_checked(msg, not_enough_size).valid);
+}
+
+TEST_F(SizeBytesCheckedTest, FailsIfNoSpaceForAllGroupEntries)
+{
+    auto last_entry = msg.group().back();
+    const auto not_enough_size = sbepp::addressof(last_entry)
+                                 - sbepp::addressof(msg)
+                                 + sbepp::size_bytes(last_entry) - 1;
+
+    ASSERT_FALSE(sbepp::size_bytes_checked(msg, not_enough_size).valid);
 }
 
 TEST_F(SizeBytesCheckedTest, FailsIfNoSpaceForData)
@@ -95,7 +142,38 @@ TEST_F(SizeBytesCheckedTest, FailsIfNoSpaceForData)
     auto d = msg.data();
     const auto not_enough_size =
         sbepp::addressof(d) - sbepp::addressof(msg) + sbepp::size_bytes(d) - 1;
+
     ASSERT_FALSE(sbepp::size_bytes_checked(msg, not_enough_size).valid);
+}
+
+TEST_F(SizeBytesCheckedTest, FailsIfNoSpaceForDataLength)
+{
+    auto d = msg.data();
+    const auto not_enough_size = sbepp::addressof(d) - sbepp::addressof(msg)
+                                 + sizeof(decltype(d)::size_type) - 1;
+
+    ASSERT_FALSE(sbepp::size_bytes_checked(msg, not_enough_size).valid);
+}
+
+TEST_F(SizeBytesCheckedTest, WorksWithVariousMessageStructures)
+{
+    // it's a compilation test to check for potential TMP-related problems
+
+    // empty message
+    sbepp::size_bytes_checked(
+        traits_test_schema::messages::msg_7<byte_type>{}, 0);
+
+    // only fields
+    sbepp::size_bytes_checked(test_schema::messages::Msg1<byte_type>{}, 0);
+
+    // multiple groups
+    sbepp::size_bytes_checked(test_schema::messages::msg9<byte_type>{}, 0);
+
+    // nested groups
+    sbepp::size_bytes_checked(test_schema::messages::msg2<byte_type>{}, 0);
+
+    // multiple data
+    sbepp::size_bytes_checked(test_schema::messages::msg10<byte_type>{}, 0);
 }
 
 #if SBEPP_HAS_CONSTEXPR_ACCESSORS

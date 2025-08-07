@@ -5575,158 +5575,6 @@ SBEPP_DEPRECATED constexpr auto
     return s(detail::visit_set_tag{}, std::forward<Visitor>(visitor));
 }
 
-namespace detail
-{
-class size_bytes_checked_visitor
-{
-public:
-    constexpr explicit size_bytes_checked_visitor(
-        const std::size_t size) noexcept
-        : size{size}
-    {
-    }
-
-    template<typename T, typename Cursor, typename Tag>
-    SBEPP_CPP14_CONSTEXPR void on_message(T m, Cursor& c, Tag) noexcept
-    {
-        const auto header = sbepp::get_header(m);
-        const auto header_size = sbepp::size_bytes(header);
-        if(!validate_and_subtract(header_size))
-        {
-            return;
-        }
-
-        if(!validate_and_subtract(*header.blockLength()))
-        {
-            return;
-        }
-
-        sbepp::visit_children(m, c, *this);
-    }
-
-    template<typename T, typename Cursor, typename Tag>
-    SBEPP_CPP14_CONSTEXPR bool on_group(T g, Cursor& c, Tag) noexcept
-    {
-        const auto header = sbepp::get_header(g);
-        const auto header_size = sbepp::size_bytes(header);
-        if(!validate_and_subtract(header_size))
-        {
-            return true;
-        }
-
-        const auto prev_block_length =
-            set_group_block_length(*header.blockLength());
-        sbepp::visit_children(g, c, *this);
-        set_group_block_length(prev_block_length);
-
-        return !is_valid();
-    }
-
-    template<typename T, typename Cursor>
-    SBEPP_CPP14_CONSTEXPR bool on_entry(T e, Cursor& c) noexcept
-    {
-        if(!validate_and_subtract(group_block_length))
-        {
-            return true;
-        }
-
-        return !sbepp::visit_children(e, c, *this).is_valid();
-    }
-
-    template<typename T, typename Tag>
-    SBEPP_CPP14_CONSTEXPR bool on_data(T d, Tag) noexcept
-    {
-        return !validate_and_subtract(sbepp::size_bytes(d));
-    }
-
-    // ignore them all because we validate `blockLength`
-    template<typename T, typename Tag>
-    constexpr bool on_field(T, Tag) const noexcept
-    {
-        return {};
-    }
-
-    constexpr bool is_valid() const noexcept
-    {
-        return valid;
-    }
-
-    // returns previous value
-    SBEPP_CPP14_CONSTEXPR std::size_t
-        set_group_block_length(const std::size_t block_length) noexcept
-    {
-        auto prev = group_block_length;
-        group_block_length = block_length;
-        return prev;
-    }
-
-    constexpr std::size_t get_size() const noexcept
-    {
-        return size;
-    }
-
-private:
-    std::size_t size;
-    bool valid{true};
-    // current group's blockLength, used to validate entry
-    std::size_t group_block_length{};
-
-    SBEPP_CPP14_CONSTEXPR bool
-        validate_and_subtract(const std::size_t n) noexcept
-    {
-        if(size < n)
-        {
-            valid = false;
-        }
-        else
-        {
-            size -= n;
-        }
-
-        return valid;
-    }
-};
-} // namespace detail
-
-//! @brief Result type of `size_bytes_checked`
-struct size_bytes_checked_result
-{
-    //! Denotes whether `size` is valid
-    bool valid;
-    //! Calculated size, valid only if `valid == true`
-    std::size_t size;
-};
-
-/**
- * @brief Calculates `view` size with additional safety checks.
- *
- * Similar to `size_bytes()` but stops if `view` cannot fit into the given
- * `size`. Useful to check that incoming message is fully contained within given
- * buffer.
- *
- * @param view message or group view
- * @param size buffer size
- */
-template<typename View>
-SBEPP_CPP20_CONSTEXPR size_bytes_checked_result
-    size_bytes_checked(View view, std::size_t size) noexcept
-{
-    // `init_cursor` skips header, we need to ensure there's enough space for it
-    if(!sbepp::addressof(view) || (size < detail::get_header_size(view)))
-    {
-        return {};
-    }
-
-    detail::size_bytes_checked_visitor visitor{size};
-    auto c = sbepp::init_cursor(view);
-    sbepp::visit(view, c, visitor);
-    if(visitor.is_valid())
-    {
-        return {true, size - visitor.get_size()};
-    }
-    return {};
-}
-
 /**
  * @brief Gets field or set choice value by tag
  *
@@ -6005,6 +5853,156 @@ concept message_tag = is_message_tag_v<Tag>;
 template<typename Tag>
 concept schema_tag = is_schema_tag_v<Tag>;
 #endif
+
+//! @brief Result type of `size_bytes_checked`
+struct size_bytes_checked_result
+{
+    //! Denotes whether `size` is valid
+    bool valid;
+    //! Calculated size, valid only if `valid == true`
+    std::size_t size;
+};
+
+namespace detail
+{
+template<typename Byte>
+class size_bytes_checked_impl
+{
+public:
+    template<typename View>
+    SBEPP_CPP14_CONSTEXPR size_bytes_checked_result
+        validate(View view, const std::size_t size) noexcept
+    {
+        ptr = sbepp::addressof(view);
+        this->size = size;
+
+        size_bytes_checked_result res{};
+        res.valid = validate<traits_tag_t<View>>();
+        res.size = size - this->size;
+
+        return res;
+    }
+
+private:
+    const Byte* ptr{};
+    std::size_t size{};
+
+    static constexpr bool validate_data(type_list<>) noexcept
+    {
+        return true;
+    }
+
+    template<typename Tag, typename... Tags>
+    SBEPP_CPP14_CONSTEXPR bool validate_data(type_list<Tag, Tags...>) noexcept
+    {
+        auto data =
+            sbepp::make_view<data_traits<Tag>::template value_type>(ptr, size);
+        return try_consume(sizeof(typename decltype(data)::size_type))
+               && try_consume(data.size())
+               && validate_data(type_list<Tags...>{});
+    }
+
+    static constexpr bool validate_groups(type_list<>) noexcept
+    {
+        return true;
+    }
+
+    template<typename Tag, typename... Tags>
+    SBEPP_CPP14_CONSTEXPR bool validate_groups(type_list<Tag, Tags...>) noexcept
+    {
+        auto header =
+            sbepp::make_view<group_traits<Tag>::template dimension_type>(
+                ptr, size);
+        if(try_consume(sbepp::size_bytes(header)))
+        {
+            const auto block_length = *header.blockLength();
+            const auto num_in_group = *header.numInGroup();
+            using index_t = remove_cv_t<decltype(num_in_group)>;
+
+            // if `index_t` is signed (which strict SBE doesn't allow) and
+            // `num_in_group` is negative, this loop is UB but I don't think
+            // such an edge case should be handled
+            for(index_t i = 0; i != num_in_group; i++)
+            {
+                if(!validate_level<Tag>(block_length))
+                {
+                    return false;
+                }
+            }
+
+            return validate_groups(type_list<Tags...>{});
+        }
+
+        return false;
+    }
+
+    template<typename Tag>
+    SBEPP_CPP14_CONSTEXPR enable_if_t<is_message_tag<Tag>::value, bool>
+        validate_level(const std::size_t block_length) noexcept
+    {
+        return try_consume(block_length)
+               && validate_groups(typename message_traits<Tag>::group_tags{})
+               && validate_data(typename message_traits<Tag>::data_tags{});
+    }
+
+    template<typename Tag>
+    SBEPP_CPP14_CONSTEXPR enable_if_t<is_group_tag<Tag>::value, bool>
+        validate_level(const std::size_t block_length) noexcept
+    {
+        return try_consume(block_length)
+               && validate_groups(typename group_traits<Tag>::group_tags{})
+               && validate_data(typename group_traits<Tag>::data_tags{});
+    }
+
+    template<typename Tag>
+    SBEPP_CPP14_CONSTEXPR enable_if_t<is_message_tag<Tag>::value, bool>
+        validate() noexcept
+    {
+        auto header = sbepp::make_view<schema_traits<
+            typename message_traits<Tag>::schema_tag>::template header_type>(
+            ptr, size);
+        return try_consume(sbepp::size_bytes(header))
+               && validate_level<Tag>(*header.blockLength());
+    }
+
+    template<typename Tag>
+    SBEPP_CPP14_CONSTEXPR enable_if_t<is_group_tag<Tag>::value, bool>
+        validate() noexcept
+    {
+        return validate_groups(type_list<Tag>{});
+    }
+
+    SBEPP_CPP14_CONSTEXPR bool try_consume(const std::size_t n) noexcept
+    {
+        if(size < n)
+        {
+            return false;
+        }
+
+        ptr += n;
+        size -= n;
+        return true;
+    }
+};
+} // namespace detail
+
+/**
+ * @brief Calculates `view` size with additional safety checks.
+ *
+ * Similar to `size_bytes()` but stops if `view` doesn't fit into the given
+ * `size`. Useful to check that incoming message is fully contained within given
+ * buffer.
+ *
+ * @param view message or group view
+ * @param size buffer size
+ */
+template<typename View>
+SBEPP_CPP20_CONSTEXPR size_bytes_checked_result
+    size_bytes_checked(View view, std::size_t size) noexcept
+{
+    return detail::size_bytes_checked_impl<byte_type_t<View>>{}.validate(
+        view, size);
+}
 } // namespace sbepp
 
 #if SBEPP_HAS_RANGES && SBEPP_HAS_CONCEPTS

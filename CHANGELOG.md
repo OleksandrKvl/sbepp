@@ -2,6 +2,8 @@
 
 - make `sbepp::traits_tag` for group entries provide group tag
 - add missing `sbepp::is_group_entry_v` and corresponding concept
+- fix offsets calculation in the presence of constant fields
+- fix `sbepp::size_bytes_checked`
 
 ---
 
