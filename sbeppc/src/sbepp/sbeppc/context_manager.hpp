@@ -62,6 +62,7 @@ struct enumeration_context
     std::string impl_type;
     std::string underlying_type;
     std::optional<std::string> mangled_name;
+    std::string encoding_type_tag;
 };
 
 struct set_choice_context
@@ -79,6 +80,7 @@ struct set_context
     std::string impl_type;
     std::string underlying_type;
     std::optional<std::string> mangled_name;
+    std::string encoding_type_tag;
 };
 
 struct message_context

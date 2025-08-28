@@ -507,6 +507,43 @@ m.bitset(m.bitset().A(true).B(true));
 
 ---
 
+### "Optional" enums and sets
+
+Although SBE doesn't allow optional enums/sets, some schema authors don't
+respect this rule and try to achieve it by specifying an optional type as
+`encodingType` for enum/set:
+
+```xml
+<type name="uint8_opt" presence="optional"/>
+<enum name="optional_enum" encodingType="uint8_opt"/>
+```
+
+They consider such enum/set to be null if its value matches the null value of
+that `encodingType`. To facilitate getting "null" values for such cases, `sbepp`
+provides `encoding_type_tag` in `sbepp::enum_traits` and `sbepp::set_traits`. It
+represents the tag of the original type specified in schema and can be used to
+get the null value:
+
+```cpp
+template<typename Enum>
+Enum get_null_value(){
+    using tag_t = sbepp::traits_tag_t<Enum>;
+    return static_cast<Enum>(
+        sbepp::type_traits<
+                sbepp::enum_traits<tag_t>::encoding_type_tag
+            >::null_value());
+}
+
+msg.optional_enum_field(get_null_value<schema::types::optional_enum>());
+```
+
+\note
+The proper way to have optional-like enum is to have an explicit "null"
+`<validValue>`. Similarly, a special "null" `<choice>` is required for set or
+simply treat `0` as its null value.
+
+---
+
 ## Constants {#constants}
 
 Constant accessors are represented via `static` functions. Non-array constants

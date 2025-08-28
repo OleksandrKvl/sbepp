@@ -394,6 +394,23 @@ SBEPP_CPP14_CONSTEXPR void tag_invoke(
             fmt::arg("switch_cases", fmt::join(switch_cases, "\n    ")));
     }
 
+    std::string get_encoding_type_tag(const std::string_view type)
+    {
+        if(utils::is_primitive_type(type))
+        {
+            // use optional versions for built-in types since they have the same
+            // data range but also provide null value
+            return std::string{utils::primitive_type_to_wrapper_type(
+                type, field_presence::optional)};
+        }
+
+        const auto& enc = utils::get_schema_encoding(*schema, type);
+        // to add dependency on encoding type to make its traits available
+        compile_public_encoding(enc);
+        const auto& t = std::get<sbe::type>(enc);
+        return ctx_manager->get(t).tag;
+    }
+
     std::string
         compile_encoding(const sbe::enumeration& e, const bool is_public)
     {
@@ -401,6 +418,7 @@ SBEPP_CPP14_CONSTEXPR void tag_invoke(
         set_impl_and_public_types(e.name, is_public, context);
         context.underlying_type =
             utils::primitive_type_to_cpp_type(context.primitive_type);
+        context.encoding_type_tag = get_encoding_type_tag(e.type);
 
         const auto enumerators = make_enumerators(e);
 
@@ -525,6 +543,7 @@ SBEPP_CPP14_CONSTEXPR void operator()(
         set_impl_and_public_types(s.name, is_public, context);
         context.underlying_type =
             utils::primitive_type_to_cpp_type(context.primitive_type);
+        context.encoding_type_tag = get_encoding_type_tag(s.type);
 
         return fmt::format(
             // clang-format off

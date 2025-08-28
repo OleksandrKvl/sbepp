@@ -4171,8 +4171,15 @@ public:
     static constexpr const char* name() noexcept;
     //! @brief Returns `description` attribute
     static constexpr const char* description() noexcept;
-    //! @brief Underlying type
+    //! @brief Underlying type, e.g. `std::uint8_t`
     using encoding_type = EncodingType;
+    /**
+     * @brief Tag of the type specified in the `encodingType` attribute
+     *
+     * For primitive built-in types provides tag of their optional
+     * representations, e.g. `sbepp::uint8_opt_t` for `uint8`.
+     */
+    using encoding_type_tag = EncodingTypeTag;
     /**
      * @brief Returns enum offset. Available only if offset is static, i.e. not
      *  available for public enums whose offset is different on each usage.
@@ -4245,8 +4252,15 @@ public:
     //! @brief Returns `deprecated` attribute. Available only if provided in
     //! schema
     static constexpr version_t deprecated() noexcept;
-    //! @brief Underlying type
+    //! @brief Underlying type, e.g. `std::uint8_t`
     using encoding_type = EncodingType;
+    /**
+     * @brief Tag of the type specified in the `encodingType` attribute
+     *
+     * For primitive built-in types provides tag of their optional
+     * representations, e.g. `sbepp::uint8_opt_t` for `uint8`.
+     */
+    using encoding_type_tag = EncodingTypeTag;
     /**
      * @brief Returns type offset. Available only if offset is static, i.e. not
      *  available for public sets whose offset is different on each usage.

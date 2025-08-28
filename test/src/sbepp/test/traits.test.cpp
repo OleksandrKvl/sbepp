@@ -43,6 +43,11 @@
 
 #include <traits_test_schema2/schema/schema.hpp>
 
+#include <test_schema/types/char_enum.hpp>
+#include <test_schema/types/char_enum_1.hpp>
+#include <test_schema/types/options_set.hpp>
+#include <test_schema/types/empty_set.hpp>
+
 #include <sbepp/test/utils.hpp>
 
 #include <gtest/gtest.h>
@@ -251,6 +256,18 @@ TEST(EnumTraitsTest, ProvidesValueTags)
             sbepp::type_list<>>);
 }
 
+TEST(EnumTraitsTest, ProvidesCorrectEncodingTypeTag)
+{
+    IS_SAME_TYPE(
+        sbepp::enum_traits<
+            test_schema::schema::types::char_enum>::encoding_type_tag,
+        sbepp::char_opt_t);
+    IS_SAME_TYPE(
+        sbepp::enum_traits<
+            test_schema::schema::types::char_enum_1>::encoding_type_tag,
+        test_schema::schema::types::Char);
+}
+
 template<typename Tag>
 class TraitsContainer : public ::testing::Test
 {
@@ -434,6 +451,18 @@ TEST(SetTraitsTest, ProvidesChoiceTags)
             sbepp::set_traits<
                 traits_test_schema::schema::types::set_2>::choice_tags,
             sbepp::type_list<>>);
+}
+
+TEST(SetTraitsTest, ProvidesCorrectEncodingTypeTag)
+{
+    IS_SAME_TYPE(
+        sbepp::set_traits<
+            test_schema::schema::types::options_set>::encoding_type_tag,
+        sbepp::uint8_opt_t);
+    IS_SAME_TYPE(
+        sbepp::set_traits<
+            test_schema::schema::types::empty_set>::encoding_type_tag,
+        test_schema::schema::types::uint32_req);
 }
 
 TEST(SetChoiceTraitsTest, ProvidesTheSameValuesAsSchemaXml)
