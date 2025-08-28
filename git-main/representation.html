@@ -182,6 +182,11 @@ $(function(){initNavTree('representation.html',''); initResizable(true); });
   </li>
   <li class="level1">
     <a href="#sets">Sets</a>
+    <ul>
+      <li class="level2">
+        <a href="#autotoc_md37">&quot;Optional&quot; enums and sets</a>
+      </li>
+    </ul>
   </li>
   <li class="level1">
     <a href="#constants">Constants</a>
@@ -277,8 +282,8 @@ Messages</h1>
 <div class="line"><span class="comment">// read-only message</span></div>
 <div class="line"><span class="keyword">auto</span> m2 =</div>
 <div class="line">    <a class="code hl_function" href="namespacesbepp.html#ae29503045a371b895af63f6ac6e0f3b9">sbepp::make_const_view&lt;schema_name::messages::msg&gt;</a>(buf.data(), buf.size());</div>
-<div class="ttc" id="anamespacesbepp_html_a0dda436c46165f2419bb31e450e3b5b5"><div class="ttname"><a href="namespacesbepp.html#a0dda436c46165f2419bb31e450e3b5b5">sbepp::make_view</a></div><div class="ttdeci">constexpr View&lt; Byte &gt; make_view(Byte *ptr, const std::size_t size) noexcept</div><div class="ttdoc">Constructs view from memory buffer.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:4928</div></div>
-<div class="ttc" id="anamespacesbepp_html_ae29503045a371b895af63f6ac6e0f3b9"><div class="ttname"><a href="namespacesbepp.html#ae29503045a371b895af63f6ac6e0f3b9">sbepp::make_const_view</a></div><div class="ttdeci">constexpr View&lt; typename std::add_const&lt; Byte &gt;::type &gt; make_const_view(Byte *ptr, const std::size_t size) noexcept</div><div class="ttdoc">Constructs read-only view from memory buffer.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:4953</div></div>
+<div class="ttc" id="anamespacesbepp_html_a0dda436c46165f2419bb31e450e3b5b5"><div class="ttname"><a href="namespacesbepp.html#a0dda436c46165f2419bb31e450e3b5b5">sbepp::make_view</a></div><div class="ttdeci">constexpr View&lt; Byte &gt; make_view(Byte *ptr, const std::size_t size) noexcept</div><div class="ttdoc">Constructs view from memory buffer.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:4942</div></div>
+<div class="ttc" id="anamespacesbepp_html_ae29503045a371b895af63f6ac6e0f3b9"><div class="ttname"><a href="namespacesbepp.html#ae29503045a371b895af63f6ac6e0f3b9">sbepp::make_const_view</a></div><div class="ttdeci">constexpr View&lt; typename std::add_const&lt; Byte &gt;::type &gt; make_const_view(Byte *ptr, const std::size_t size) noexcept</div><div class="ttdoc">Constructs read-only view from memory buffer.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:4967</div></div>
 </div><!-- fragment --><p>The main purpose of messages, composites and group entries is of course to contain fields, their interface will be discussed later in the <a class="el" href="#accessors">accessors</a> section.</p>
 <h2><a class="anchor" id="encoding-message"></a>
 Encoding</h2>
@@ -470,6 +475,27 @@ Sets</h1>
 <div class="line">m.bitset(m.bitset().A(<span class="keyword">true</span>).B(<span class="keyword">true</span>));</div>
 </div><!-- fragment --><dl class="section see"><dt>See also</dt><dd><code><a class="el" href="namespacesbepp.html#aa253364a4276b55c0a157aefaa185c37" title="Visits set choices in order of their declaration.">sbepp::visit_set</a></code></dd></dl>
 <hr  />
+<h2><a class="anchor" id="autotoc_md37"></a>
+"Optional" enums and sets</h2>
+<p>Although SBE doesn't allow optional enums/sets, some schema authors don't respect this rule and try to achieve it by specifying an optional type as <code>encodingType</code> for enum/set:</p>
+<div class="fragment"><div class="line">&lt;<span class="keywordtype">type</span> <span class="keyword">name</span>=<span class="stringliteral">&quot;uint8_opt&quot;</span> <span class="keyword">presence</span>=<span class="stringliteral">&quot;optional&quot;</span>/&gt;</div>
+<div class="line">&lt;<span class="keywordtype">enum</span> <span class="keyword">name</span>=<span class="stringliteral">&quot;optional_enum&quot;</span> <span class="keyword">encodingType</span>=<span class="stringliteral">&quot;uint8_opt&quot;</span>/&gt;</div>
+</div><!-- fragment --><p>They consider such enum/set to be null if its value matches the null value of that <code>encodingType</code>. To facilitate getting "null" values for such cases, <code>sbepp</code> provides <code>encoding_type_tag</code> in <code><a class="el" href="classsbepp_1_1enum__traits.html" title="Provides various traits/attributes of an &lt;enum&gt; element.">sbepp::enum_traits</a></code> and <code><a class="el" href="classsbepp_1_1set__traits.html" title="Provides various traits/attributes of a &lt;set&gt; element.">sbepp::set_traits</a></code>. It represents the tag of the original type specified in schema and can be used to get the null value:</p>
+<div class="fragment"><div class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> Enum&gt;</div>
+<div class="line">Enum get_null_value(){</div>
+<div class="line">    <span class="keyword">using </span>tag_t = <a class="code hl_typedef" href="namespacesbepp.html#a0ddc0b9ce9e876a0ac772b4d1af64b4b">sbepp::traits_tag_t&lt;Enum&gt;</a>;</div>
+<div class="line">    <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span>Enum<span class="keyword">&gt;</span>(</div>
+<div class="line">        <a class="code hl_class" href="classsbepp_1_1type__traits.html">sbepp::type_traits</a>&lt;</div>
+<div class="line">                <a class="code hl_typedef" href="classsbepp_1_1enum__traits.html#a68decbdd307ab39646829c8d605c148d">sbepp::enum_traits&lt;tag_t&gt;::encoding_type_tag</a></div>
+<div class="line">            &gt;::null_value());</div>
+<div class="line">}</div>
+<div class="line"> </div>
+<div class="line">msg.optional_enum_field(get_null_value&lt;schema::types::optional_enum&gt;());</div>
+<div class="ttc" id="aclasssbepp_1_1enum__traits_html_a68decbdd307ab39646829c8d605c148d"><div class="ttname"><a href="classsbepp_1_1enum__traits.html#a68decbdd307ab39646829c8d605c148d">sbepp::enum_traits::encoding_type_tag</a></div><div class="ttdeci">EncodingTypeTag encoding_type_tag</div><div class="ttdoc">Tag of the type specified in the encodingType attribute.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:4182</div></div>
+<div class="ttc" id="aclasssbepp_1_1type__traits_html"><div class="ttname"><a href="classsbepp_1_1type__traits.html">sbepp::type_traits</a></div><div class="ttdoc">Provides various traits and attributes of a &lt;type&gt; element.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:4043</div></div>
+<div class="ttc" id="anamespacesbepp_html_a0ddc0b9ce9e876a0ac772b4d1af64b4b"><div class="ttname"><a href="namespacesbepp.html#a0ddc0b9ce9e876a0ac772b4d1af64b4b">sbepp::traits_tag_t</a></div><div class="ttdeci">typename traits_tag&lt; ValueType &gt;::type traits_tag_t</div><div class="ttdoc">Shorthand for sbepp::traits_tag&lt;T&gt;::type</div><div class="ttdef"><b>Definition</b> sbepp.hpp:4692</div></div>
+</div><!-- fragment --><dl class="section note"><dt>Note</dt><dd>The proper way to have optional-like enum is to have an explicit "null" <code>&lt;validValue&gt;</code>. Similarly, a special "null" <code>&lt;choice&gt;</code> is required for set or simply treat <code>0</code> as its null value.</dd></dl>
+<hr  />
 <h1><a class="anchor" id="constants"></a>
 Constants</h1>
 <p>Constant accessors are represented via <code>static</code> functions. Non-array constants return directly underlying value without any wrapper. Only <code>&lt;field&gt;</code> can return it as enum type. Array-like constants (strings) are represented using <code><a class="el" href="classsbepp_1_1detail_1_1static__array__ref.html" title="Represents reference to fixed-size array.">sbepp::detail::static_array_ref</a></code> like a fixed-size array.</p>
@@ -633,8 +659,8 @@ Tag-based accessors</h1>
 <div class="line">schema_name::types::bitset s{};</div>
 <div class="line"><a class="code hl_function" href="namespacesbepp.html#aac5e0cf6d12c96ba8148271a521bde08">sbepp::get_by_tag&lt;set_tag::A&gt;</a>(s); <span class="comment">// same as `s.A()`</span></div>
 <div class="line"><a class="code hl_function" href="namespacesbepp.html#a4bb01e5d4ca175f4d77740991e35ac2b">sbepp::set_by_tag&lt;set_tag::A&gt;</a>(s, <span class="keyword">true</span>); <span class="comment">// same as `s.A(true)`</span></div>
-<div class="ttc" id="anamespacesbepp_html_a4bb01e5d4ca175f4d77740991e35ac2b"><div class="ttname"><a href="namespacesbepp.html#a4bb01e5d4ca175f4d77740991e35ac2b">sbepp::set_by_tag</a></div><div class="ttdeci">constexpr auto set_by_tag(ViewOrSet &amp;&amp;viewOrSet, Value &amp;&amp;value) noexcept -&gt; decltype(std::forward&lt; ViewOrSet &gt;(viewOrSet)(detail::access_by_tag_tag{}, Tag{}, std::forward&lt; Value &gt;(value)))</div><div class="ttdoc">Sets field or set choice value by tag.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:5617</div></div>
-<div class="ttc" id="anamespacesbepp_html_aac5e0cf6d12c96ba8148271a521bde08"><div class="ttname"><a href="namespacesbepp.html#aac5e0cf6d12c96ba8148271a521bde08">sbepp::get_by_tag</a></div><div class="ttdeci">constexpr auto get_by_tag(ViewOrSet viewOrSet) noexcept -&gt; decltype(viewOrSet(detail::access_by_tag_tag{}, Tag{}))</div><div class="ttdoc">Gets field or set choice value by tag.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:5586</div></div>
+<div class="ttc" id="anamespacesbepp_html_a4bb01e5d4ca175f4d77740991e35ac2b"><div class="ttname"><a href="namespacesbepp.html#a4bb01e5d4ca175f4d77740991e35ac2b">sbepp::set_by_tag</a></div><div class="ttdeci">constexpr auto set_by_tag(ViewOrSet &amp;&amp;viewOrSet, Value &amp;&amp;value) noexcept -&gt; decltype(std::forward&lt; ViewOrSet &gt;(viewOrSet)(detail::access_by_tag_tag{}, Tag{}, std::forward&lt; Value &gt;(value)))</div><div class="ttdoc">Sets field or set choice value by tag.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:5631</div></div>
+<div class="ttc" id="anamespacesbepp_html_aac5e0cf6d12c96ba8148271a521bde08"><div class="ttname"><a href="namespacesbepp.html#aac5e0cf6d12c96ba8148271a521bde08">sbepp::get_by_tag</a></div><div class="ttdeci">constexpr auto get_by_tag(ViewOrSet viewOrSet) noexcept -&gt; decltype(viewOrSet(detail::access_by_tag_tag{}, Tag{}))</div><div class="ttdoc">Gets field or set choice value by tag.</div><div class="ttdef"><b>Definition</b> sbepp.hpp:5600</div></div>
 </div><!-- fragment --><p>In combination with various traits like <code><a class="el" href="classsbepp_1_1message__traits.html#aecb0b10e2fb4c7db17e9e98937964fbd" title="Top-level field tags in schema order.">sbepp::message_traits::field_tags</a></code> they provide a powerful API for automation tasks. See the <a class="el" href="examples.html#tag-based-accessors-examples">examples</a> page for demos. </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->

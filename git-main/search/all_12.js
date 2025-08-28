@@ -9,14 +9,14 @@ var searchData=
   ['version_6',['version',['../classsbepp_1_1schema__traits.html#a34fc19d3d1d2837bbdf4804d722d8cf5',1,'sbepp::schema_traits']]],
   ['version_5ft_7',['version_t',['../namespacesbepp.html#a97309329a3ef93149d698a0c5a9da6ba',1,'sbepp']]],
   ['versioning_20and_20compatibility_8',['Versioning and compatibility',['../integration.html#versioning',1,'']]],
-  ['views_9',['Visiting parent views',['../visit-api.html#autotoc_md44',1,'']]],
+  ['views_9',['Visiting parent views',['../visit-api.html#autotoc_md46',1,'']]],
   ['visit_10',['visit',['../namespacesbepp.html#a47c1cd81154bc5c56524604f74d52d27',1,'sbepp::visit(View view, Cursor &amp;c, Visitor &amp;&amp;visitor={})'],['../namespacesbepp.html#a79950b0d08ddf3eafafb25a5693a6e2a',1,'sbepp::visit(View view, Visitor &amp;&amp;visitor={})'],['../namespacesbepp.html#af240f0aca50b25b33fa7dc6ee8a9d612',1,'sbepp::visit(Composite view, Visitor &amp;&amp;visitor={})'],['../namespacesbepp.html#a3dafbabb41e8a71abde1535551de2c6d',1,'sbepp::visit(Set s, Visitor &amp;&amp;visitor={})'],['../namespacesbepp.html#abf05c2c5e3e81c441cce4db02c0c642b',1,'sbepp::visit(Enum e, Visitor &amp;&amp;visitor={})'],['../namespacesbepp.html#a803ffecc3f63f4783f11b67a0dbff435',1,'sbepp::visit(View view, Cursor &amp;c, Visitor &amp;&amp;visitor={})']]],
   ['visit_20api_11',['Visit API',['../visit-api.html',1,'']]],
   ['visit_5fchildren_12',['visit_children',['../namespacesbepp.html#a23abc2b6b892aea5b2b7f6dde6c24e69',1,'sbepp::visit_children(View view, Cursor &amp;c, Visitor &amp;&amp;visitor={})'],['../namespacesbepp.html#a306622dcac701f3c76abd3ea7c2902b6',1,'sbepp::visit_children(View view, Visitor &amp;&amp;visitor={})'],['../namespacesbepp.html#a0db3e5b82ccf03d4cecdef2ccfee8ae9',1,'sbepp::visit_children(View view, Visitor &amp;&amp;visitor={})'],['../namespacesbepp.html#a115468b577849b6a66879a0daf7b45f8',1,'sbepp::visit_children(View view, Cursor &amp;c, Visitor &amp;&amp;visitor={})']]],
   ['visit_5fset_13',['visit_set',['../namespacesbepp.html#aa253364a4276b55c0a157aefaa185c37',1,'sbepp']]],
-  ['visiting_20children_14',['Visiting children',['../visit-api.html#autotoc_md46',1,'']]],
-  ['visiting_20enums_20and_20sets_15',['Visiting enums and sets',['../visit-api.html#autotoc_md48',1,'']]],
-  ['visiting_20parent_20views_16',['Visiting parent views',['../visit-api.html#autotoc_md44',1,'']]],
+  ['visiting_20children_14',['Visiting children',['../visit-api.html#autotoc_md48',1,'']]],
+  ['visiting_20enums_20and_20sets_15',['Visiting enums and sets',['../visit-api.html#autotoc_md50',1,'']]],
+  ['visiting_20parent_20views_16',['Visiting parent views',['../visit-api.html#autotoc_md46',1,'']]],
   ['vs_20decoding_17',['Encoding vs. decoding',['../representation.html#autotoc_md21',1,'']]],
   ['vs_20traits_18',['Representation types vs. traits',['../representation.html#autotoc_md13',1,'']]]
 ];

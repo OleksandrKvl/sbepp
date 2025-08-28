@@ -121,8 +121,11 @@ $(function(){initNavTree('classsbepp_1_1enum__traits.html',''); initResizable(tr
 Public Types</h2></td></tr>
 <tr class="memitem:a1abfb6d0e32cc25d55af2f7b220b5f29" id="r_a1abfb6d0e32cc25d55af2f7b220b5f29"><td class="memItemLeft" align="right" valign="top"><a id="a1abfb6d0e32cc25d55af2f7b220b5f29" name="a1abfb6d0e32cc25d55af2f7b220b5f29"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><b>encoding_type</b> = EncodingType</td></tr>
-<tr class="memdesc:a1abfb6d0e32cc25d55af2f7b220b5f29"><td class="mdescLeft">&#160;</td><td class="mdescRight">Underlying type. <br /></td></tr>
+<tr class="memdesc:a1abfb6d0e32cc25d55af2f7b220b5f29"><td class="mdescLeft">&#160;</td><td class="mdescRight">Underlying type, e.g. <code>std::uint8_t</code> <br /></td></tr>
 <tr class="separator:a1abfb6d0e32cc25d55af2f7b220b5f29"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a68decbdd307ab39646829c8d605c148d" id="r_a68decbdd307ab39646829c8d605c148d"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a68decbdd307ab39646829c8d605c148d">encoding_type_tag</a> = EncodingTypeTag</td></tr>
+<tr class="memdesc:a68decbdd307ab39646829c8d605c148d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tag of the type specified in the <code>encodingType</code> attribute.  <br /></td></tr>
+<tr class="separator:a68decbdd307ab39646829c8d605c148d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a97d5396e90699ee5006e3171c3d42a50" id="r_a97d5396e90699ee5006e3171c3d42a50"><td class="memItemLeft" align="right" valign="top"><a id="a97d5396e90699ee5006e3171c3d42a50" name="a97d5396e90699ee5006e3171c3d42a50"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><b>value_type</b> = ScopedEnumType</td></tr>
 <tr class="memdesc:a97d5396e90699ee5006e3171c3d42a50"><td class="mdescLeft">&#160;</td><td class="mdescRight">Representation type. <br /></td></tr>
@@ -165,7 +168,27 @@ class sbepp::enum_traits&lt; T &gt;</div><p>Provides various traits/attributes o
   </table>
   </dd>
 </dl>
-</div><hr/>The documentation for this class was generated from the following file:<ul>
+</div><h2 class="groupheader">Member Typedef Documentation</h2>
+<a id="a68decbdd307ab39646829c8d605c148d" name="a68decbdd307ab39646829c8d605c148d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a68decbdd307ab39646829c8d605c148d">&#9670;&#160;</a></span>encoding_type_tag</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="classsbepp_1_1enum__traits.html">sbepp::enum_traits</a>&lt; T &gt;::encoding_type_tag = EncodingTypeTag</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Tag of the type specified in the <code>encodingType</code> attribute. </p>
+<p>For primitive built-in types provides tag of their optional representations, e.g. <code><a class="el" href="classsbepp_1_1uint8__opt__t.html" title="Built-in uint8 optional type.">sbepp::uint8_opt_t</a></code> for <code>uint8</code>. </p>
+
+</div>
+</div>
+<hr/>The documentation for this class was generated from the following file:<ul>
 <li><a class="el" href="sbepp_8hpp_source.html">sbepp.hpp</a></li>
 </ul>
 </div><!-- contents -->
