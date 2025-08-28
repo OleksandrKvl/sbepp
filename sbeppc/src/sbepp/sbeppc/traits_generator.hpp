@@ -307,6 +307,7 @@ public:
     }}
 
     {encoding_type}
+    {encoding_type_tag}
     {offset_impl}
     
     static constexpr version_t since_version() noexcept
@@ -332,6 +333,10 @@ public:
                 "encoding_type",
                 utils::make_type_alias(
                     "encoding_type", context.underlying_type)),
+            fmt::arg(
+                "encoding_type_tag",
+                utils::make_type_alias(
+                    "encoding_type_tag", context.encoding_type_tag)),
             fmt::arg("since_version", e.added_since),
             fmt::arg(
                 "value_type",
@@ -425,6 +430,7 @@ public:
     }}
 
     {encoding_type}
+    {encoding_type_tag}
     {offset_impl}
     
     static constexpr version_t since_version() noexcept
@@ -450,6 +456,10 @@ public:
                 "encoding_type",
                 utils::make_type_alias(
                     "encoding_type", context.underlying_type)),
+            fmt::arg(
+                "encoding_type_tag",
+                utils::make_type_alias(
+                    "encoding_type_tag", context.encoding_type_tag)),
             fmt::arg("since_version", s.added_since),
             fmt::arg(
                 "value_type",

@@ -55,6 +55,8 @@
             <choice name="B">2</choice>
         </set>
 
+        <set name="empty_set" encodingType="uint32_req"/>
+
         <!-- different forms of constants -->
         <!-- free-standing constants, can be used only through `ref` or `field` -->
         <type name="num_const" primitiveType="uint32"
