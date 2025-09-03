@@ -4,6 +4,7 @@
 - add missing `sbepp::is_group_entry_v` and corresponding concept
 - fix offsets calculation in the presence of constant fields
 - fix `sbepp::size_bytes_checked`
+- add `encoding_type_tag` to `sbepp::enum/set_traits`
 
 ---
 
