@@ -2720,13 +2720,13 @@ $(function(){initNavTree('sbepp_8hpp_source.html',''); initResizable(true); });
 <div class="line"><a id="l02770" name="l02770"></a><span class="lineno"> 2770</span>    <span class="keyword">constexpr</span> <span class="keywordtype">bool</span></div>
 <div class="line"><a id="l02771" name="l02771"></a><span class="lineno"> 2771</span>        operator()(get_bit_tag, <span class="keyword">const</span> <a class="code hl_typedef" href="namespacesbepp.html#a55be97e1f98cb33e38dfa96e8309179c">choice_index_t</a> n) <span class="keyword">const</span> <span class="keyword">noexcept</span></div>
 <div class="line"><a id="l02772" name="l02772"></a><span class="lineno"> 2772</span>    {</div>
-<div class="line"><a id="l02773" name="l02773"></a><span class="lineno"> 2773</span>        <span class="keywordflow">return</span> bits &amp; (1 &lt;&lt; n);</div>
+<div class="line"><a id="l02773" name="l02773"></a><span class="lineno"> 2773</span>        <span class="keywordflow">return</span> bits &amp; (T{1} &lt;&lt; n);</div>
 <div class="line"><a id="l02774" name="l02774"></a><span class="lineno"> 2774</span>    }</div>
 <div class="line"><a id="l02775" name="l02775"></a><span class="lineno"> 2775</span> </div>
 <div class="line"><a id="l02776" name="l02776"></a><span class="lineno"> 2776</span>    SBEPP_CPP14_CONSTEXPR <span class="keywordtype">void</span></div>
 <div class="line"><a id="l02777" name="l02777"></a><span class="lineno"> 2777</span>        operator()(set_bit_tag, <span class="keyword">const</span> <a class="code hl_typedef" href="namespacesbepp.html#a55be97e1f98cb33e38dfa96e8309179c">choice_index_t</a> n, <span class="keyword">const</span> <span class="keywordtype">bool</span> b) <span class="keyword">noexcept</span></div>
 <div class="line"><a id="l02778" name="l02778"></a><span class="lineno"> 2778</span>    {</div>
-<div class="line"><a id="l02779" name="l02779"></a><span class="lineno"> 2779</span>        bits = ((bits &amp; ~(1 &lt;&lt; n)) | (b &lt;&lt; n));</div>
+<div class="line"><a id="l02779" name="l02779"></a><span class="lineno"> 2779</span>        bits = ((bits &amp; ~(T{1} &lt;&lt; n)) | (T{b} &lt;&lt; n));</div>
 <div class="line"><a id="l02780" name="l02780"></a><span class="lineno"> 2780</span>    }</div>
 <div class="line"><a id="l02781" name="l02781"></a><span class="lineno"> 2781</span></div>
 <div class="line"><a id="l02783" name="l02783"></a><span class="lineno"> 2783</span>    <span class="keyword">constexpr</span> <span class="keyword">friend</span> <span class="keywordtype">bool</span></div>
