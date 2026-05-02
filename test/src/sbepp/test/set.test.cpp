@@ -2,6 +2,7 @@
 // Copyright (c) 2023, Oleksandr Koval
 
 #include <test_schema/types/options_set.hpp>
+#include <test_schema/types/options_set64.hpp>
 
 #include <sbepp/test/utils.hpp>
 
@@ -11,48 +12,69 @@
 
 namespace
 {
-using set_t = test_schema::types::options_set;
-// sets don't have any additional public names except choice names, however,
-// encoding type is available via `set_traits`
-using encoding_t =
-    sbepp::set_traits<test_schema::schema::types::options_set>::encoding_type;
+// Generic test fixture for the following set types:
+// - `test_schema::types::options_set` (uint8_t)
+// - `test_schema::types::options_set64` (uint64_t)
+template<typename T>
+struct SetTest : public ::testing::Test
+{
+    using set_type = T;
+    using encoding_type =
+        typename sbepp::set_traits<sbepp::traits_tag_t<T>>::encoding_type;
+};
 
-STATIC_ASSERT(sizeof(set_t) == sizeof(encoding_t));
+using SetTypes = ::testing::
+    Types<test_schema::types::options_set, test_schema::types::options_set64>;
+TYPED_TEST_SUITE(SetTest, SetTypes);
 
-STATIC_ASSERT_V(std::is_nothrow_default_constructible<set_t>);
-STATIC_ASSERT_V(std::is_trivially_copy_constructible<set_t>);
-STATIC_ASSERT_V(std::is_trivially_copy_assignable<set_t>);
-STATIC_ASSERT_V(std::is_trivially_move_constructible<set_t>);
-STATIC_ASSERT_V(std::is_trivially_move_assignable<set_t>);
-STATIC_ASSERT_V(std::is_trivially_destructible<set_t>);
+TYPED_TEST(SetTest, StaticChecks)
+{
+    using set_t = typename TestFixture::set_type;
+    using encoding_t = typename TestFixture::encoding_type;
 
-STATIC_ASSERT(sbepp::is_set<set_t>::value);
+    STATIC_ASSERT(sizeof(set_t) == sizeof(encoding_t));
+    STATIC_ASSERT(sbepp::is_set<set_t>::value);
+
+    STATIC_ASSERT_V(std::is_nothrow_default_constructible<set_t>);
+    STATIC_ASSERT_V(std::is_trivially_copy_constructible<set_t>);
+    STATIC_ASSERT_V(std::is_trivially_copy_assignable<set_t>);
+    STATIC_ASSERT_V(std::is_trivially_move_constructible<set_t>);
+    STATIC_ASSERT_V(std::is_trivially_move_assignable<set_t>);
+    STATIC_ASSERT_V(std::is_trivially_destructible<set_t>);
 
 #if SBEPP_HAS_INLINE_VARS
-STATIC_ASSERT(sbepp::is_set_v<set_t>);
+    STATIC_ASSERT(sbepp::is_set_v<set_t>);
 #endif
 
 #if SBEPP_HAS_CONCEPTS
-STATIC_ASSERT(sbepp::set<set_t>);
+    STATIC_ASSERT(sbepp::set<set_t>);
 #endif
+}
 
-TEST(SetTest, ZeroByDefault)
+TYPED_TEST(SetTest, ZeroByDefault)
 {
+    using set_t = typename TestFixture::set_type;
     set_t s;
 
     ASSERT_EQ(*s, 0);
 }
 
-TEST(SetTest, ExplicitlyConstructibleFromEncodingType)
+TYPED_TEST(SetTest, ExplicitlyConstructibleFromEncodingType)
 {
+    using set_t = typename TestFixture::set_type;
+    using encoding_t = typename TestFixture::encoding_type;
+
     static constexpr encoding_t value{1};
     set_t s{value};
 
     ASSERT_EQ(*s, value);
 }
 
-TEST(SetTest, DereferenceReturnsCurrentValue)
+TYPED_TEST(SetTest, DereferenceReturnsCurrentValue)
 {
+    using set_t = typename TestFixture::set_type;
+    using encoding_t = typename TestFixture::encoding_type;
+
     static constexpr encoding_t value{1};
     set_t s{value};
     const auto& crs = s;
@@ -64,26 +86,50 @@ TEST(SetTest, DereferenceReturnsCurrentValue)
     ASSERT_EQ(*s, *crs);
 }
 
-TEST(SetTest, CanGetChoiceViaNamedGetter)
+TYPED_TEST(SetTest, CanGetChoiceViaNamedGetter)
 {
+    using set_t = typename TestFixture::set_type;
     set_t s;
 
     // since by default all choices are unset
-    ASSERT_FALSE(s.A());
+    EXPECT_FALSE(s.A());
+    EXPECT_FALSE(s.B());
+    EXPECT_FALSE(s.C());
 }
 
-TEST(SetTest, CanSetChoiceViaNamedSetter)
+TYPED_TEST(SetTest, CanSetChoiceViaNamedSetter)
 {
-    static constexpr bool choice_value = true;
+    using set_t = typename TestFixture::set_type;
     set_t s;
 
-    s.B(choice_value);
+    s.A(true);
+    EXPECT_EQ(s.A(), true);
+    EXPECT_EQ(s.B(), false);
+    EXPECT_EQ(s.C(), false);
 
-    ASSERT_EQ(s.B(), choice_value);
+    s.B(true);
+    s.A(false);
+    EXPECT_EQ(s.A(), false);
+    EXPECT_EQ(s.B(), true);
+    EXPECT_EQ(s.C(), false);
+
+    s.C(true);
+    s.B(false);
+    ASSERT_EQ(s.A(), false);
+    ASSERT_EQ(s.B(), false);
+    ASSERT_EQ(s.C(), true);
+
+    s.C(false);
+    EXPECT_EQ(s.A(), false);
+    EXPECT_EQ(s.B(), false);
+    EXPECT_EQ(s.C(), false);
 }
 
-TEST(SetTest, AccessorsUseCorrectBits)
+TYPED_TEST(SetTest, AccessorsUseCorrectBits)
 {
+    using set_t = typename TestFixture::set_type;
+    using encoding_t = typename TestFixture::encoding_type;
+
     static constexpr encoding_t a_choice_set = 0x01; // 0b001;
     static constexpr encoding_t b_choice_set = 0x04; // 0b100;
     set_t s;
@@ -98,25 +144,29 @@ TEST(SetTest, AccessorsUseCorrectBits)
     ASSERT_EQ(*s, b_choice_set);
 }
 
-TEST(SetTest, CopyAndMoveCopyEncoding)
+TYPED_TEST(SetTest, CopyAndMoveCopyEncoding)
 {
-    auto s1 = set_t{}.A(true);
+    using set_t = typename TestFixture::set_type;
+    auto s1 = set_t{}.A(true).C(true);
     auto s2{s1};
 
     ASSERT_EQ(s1.A(), s2.A());
     ASSERT_EQ(s1.B(), s2.B());
+    ASSERT_EQ(s1.C(), s2.C());
 
     s1.B(true);
     s2 = s1;
 
     ASSERT_EQ(s1.A(), s2.A());
     ASSERT_EQ(s1.B(), s2.B());
+    ASSERT_EQ(s1.C(), s2.C());
 
     // NOLINTNEXTLINE: move constructor test
     set_t s3{std::move(s1)};
 
     ASSERT_EQ(s1.A(), s3.A());
     ASSERT_EQ(s1.B(), s3.B());
+    ASSERT_EQ(s1.C(), s3.C());
 
     s2.B(false);
     // NOLINTNEXTLINE: move assignment test
@@ -124,10 +174,13 @@ TEST(SetTest, CopyAndMoveCopyEncoding)
 
     ASSERT_EQ(s2.A(), s3.A());
     ASSERT_EQ(s2.B(), s3.B());
+    ASSERT_EQ(s2.C(), s3.C());
 }
 
-TEST(SetTest, HasEncodingBasedComparisonOps)
+TYPED_TEST(SetTest, HasEncodingBasedComparisonOps)
 {
+    using set_t = typename TestFixture::set_type;
+
     // choice `A` occupies 0th bit, choice `B` occupies 2nd bit so `a` (=`1`) is
     // less than `b` (=`0b100`)
     auto a = set_t{}.A(true);
@@ -137,11 +190,13 @@ TEST(SetTest, HasEncodingBasedComparisonOps)
     ASSERT_NE(a, b);
 }
 
-TEST(SetTest, VisitSetVisitsChoices)
+TYPED_TEST(SetTest, VisitSetVisitsChoices)
 {
+    using set_t = typename TestFixture::set_type;
     set_t s{};
     s.A(true);
     s.B(false);
+    s.C(true);
 
     std::size_t choice_index{};
     sbepp::visit_set(
@@ -161,6 +216,12 @@ TEST(SetTest, VisitSetVisitsChoices)
                 ASSERT_STREQ(name, "B");
                 choice_index++;
             }
+            else if(choice_index == 2)
+            {
+                ASSERT_EQ(value, true);
+                ASSERT_STREQ(name, "C");
+                choice_index++;
+            }
             else
             {
                 ASSERT_TRUE(false);
@@ -168,32 +229,45 @@ TEST(SetTest, VisitSetVisitsChoices)
         });
 }
 
-// tests that `A == true` and `B == false`
+// tests that `A == true` and `B == false` and `C == true`
+template<typename T>
 class options_set_visitor
 {
 public:
-    void on_set_choice(bool value, test_schema::schema::types::options_set::A)
+    void on_set_choice(bool value, typename sbepp::traits_tag_t<T>::A)
     {
+        EXPECT_EQ(choice_index, 0);
+        EXPECT_EQ(value, true);
         valid &= ((choice_index == 0) && (value == true));
         choice_index++;
     }
 
-    void on_set_choice(bool value, test_schema::schema::types::options_set::B)
+    void on_set_choice(bool value, typename sbepp::traits_tag_t<T>::B)
     {
+        EXPECT_EQ(choice_index, 1);
+        EXPECT_EQ(value, false);
         valid &= ((choice_index == 1) && (value == false));
+        choice_index++;
+    }
+
+    void on_set_choice(bool value, typename sbepp::traits_tag_t<T>::C)
+    {
+        EXPECT_EQ(choice_index, 2);
+        EXPECT_EQ(value, true);
+        valid &= ((choice_index == 2) && (value == true));
         choice_index++;
     }
 
     template<typename Tag>
     void on_set_choice(bool /*value*/, Tag)
     {
-        // should not be called
+        FAIL() << "should not be called";
         valid = false;
     }
 
     bool is_valid() const
     {
-        return valid && (choice_index == 2);
+        return valid && (choice_index == 3);
     }
 
 private:
@@ -201,20 +275,24 @@ private:
     std::size_t choice_index{};
 };
 
-TEST(SetTest, VisitSetVisitsChoices2)
+TYPED_TEST(SetTest, VisitSetVisitsChoices2)
 {
+    using set_t = typename TestFixture::set_type;
     set_t s{};
     s.A(true);
     s.B(false);
+    s.C(true);
 
-    auto visitor = sbepp::visit<options_set_visitor>(s);
+    auto visitor = sbepp::visit<options_set_visitor<set_t>>(s);
 
     ASSERT_TRUE(visitor.is_valid());
 }
 
 #if SBEPP_HAS_CONSTEXPR_ACCESSORS
-constexpr set_t constexpr_test()
+template<typename T>
+constexpr T constexpr_test()
 {
+    using set_t = T;
     set_t s;
     s = set_t{0};
     *s;
@@ -226,6 +304,10 @@ constexpr set_t constexpr_test()
     return s;
 }
 
-constexpr auto res = constexpr_test();
+TYPED_TEST(SetTest, ConstExpr)
+{
+    using T = typename TestFixture::set_type;
+    constexpr auto res = constexpr_test<T>();
+}
 #endif
 } // namespace

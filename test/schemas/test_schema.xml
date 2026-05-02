@@ -53,6 +53,13 @@
         <set name="options_set" encodingType="uint8">
             <choice name="A">0</choice>
             <choice name="B">2</choice>
+            <choice name="C">7</choice>
+        </set>
+
+        <set name="options_set64" encodingType="uint64">
+            <choice name="A">0</choice>
+            <choice name="B">2</choice>
+            <choice name="C">63</choice>
         </set>
 
         <set name="empty_set" encodingType="uint32_req"/>
