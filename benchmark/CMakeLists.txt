@@ -27,7 +27,7 @@ target_include_directories(${target}
 
 target_link_libraries(${target}
     PRIVATE
-    compiled_benchmark_schemas
+    compiled_benchmark_schemas::compiled_benchmark_schemas
     benchmark::benchmark
     benchmark::benchmark_main
 )

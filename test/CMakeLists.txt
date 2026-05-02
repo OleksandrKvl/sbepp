@@ -28,6 +28,7 @@ foreach(schema IN LISTS test_schemas)
         # actually, only `traits_test_schema2` needs explicit name
         SCHEMA_NAME "${schema}"
         TARGET_NAME compiled_test_schemas
+        TARGET_ALIAS compiled_test_schemas::test_alias
     )
 endforeach()
 
@@ -84,7 +85,7 @@ function(add_test_binary cpp_version)
         
     target_link_libraries(${test_name}
         PRIVATE
-        compiled_test_schemas
+        compiled_test_schemas::test_alias
         GTest::gtest_main
         fmt::fmt
     )

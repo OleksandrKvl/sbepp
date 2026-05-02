@@ -25,6 +25,8 @@ Parameters:
 - `SCHEMA_FILE`, the path to schema XML file.
 - `TARGET_NAME`, the name of the generated `INTERFACE` library. Same target can
     be used to compile multiple schemas.
+- `TARGET_ALIAS`, optional, alias name for the generated target. Defaults to
+       `${TARGET_NAME}::${TARGET_NAME}`.
 - `OUTPUT_DIR`, optional, the directory in which `sbeppc` will generate headers.
     Defaults to `${CMAKE_BINARY_DIR}/sbeppc_generated`.
 - `SCHEMA_NAME`, optional, overrides schema name from XML.
@@ -50,7 +52,7 @@ sbeppc_compile_schema(
 
 add_executable(exe)
 # generated target carries all necessary dependencies, just link to it
-target_link_libraries(exe PRIVATE compiled_schemas)
+target_link_libraries(exe PRIVATE compiled_schemas::compiled_schemas)
 ```
 
 ---
