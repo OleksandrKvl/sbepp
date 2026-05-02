@@ -148,6 +148,8 @@ endfunction()
 #   SCHEMA_FILE: the path to schema XML file
 #   TARGET_NAME: the name of the generated `INTERFACE` library. A single target
 #       can be used to compile multiple schemas.
+#   TARGET_ALIAS: optional, alias name for the generated target. Defaults to
+#       `${TARGET_NAME}::${TARGET_NAME}`.
 #   OUTPUT_DIR: optional, the directory in which `sbeppc` will generate headers.
 #       Defaults to `${CMAKE_BINARY_DIR}/sbeppc_generated`.
 #   SCHEMA_NAME: optional, overrides schema name from XML
@@ -160,11 +162,11 @@ endfunction()
 #     SCHEMA_FILE "schema.xml"
 # )
 # add_executable(exe)
-# target_link_libraries(exe PRIVATE compiled_schema)
+# target_link_libraries(exe PRIVATE compiled_schema::compiled_schema)
 # 
 function(sbeppc_compile_schema)
     set(one_value_args
-        SCHEMA_FILE TARGET_NAME OUTPUT_DIR SCHEMA_NAME SBEPPC_PATH
+        SCHEMA_FILE TARGET_NAME OUTPUT_DIR SCHEMA_NAME SBEPPC_PATH TARGET_ALIAS
     )
     sbepp_parse_arguments(arg "" "${one_value_args}" "" "${ARGN}")
 
@@ -192,6 +194,14 @@ function(sbeppc_compile_schema)
 
     if(NOT TARGET ${arg_TARGET_NAME})
         add_library(${arg_TARGET_NAME} INTERFACE)
+
+        if(DEFINED arg_TARGET_ALIAS)
+            add_library(${arg_TARGET_ALIAS} ALIAS ${arg_TARGET_NAME})
+        else()
+            add_library(
+                ${arg_TARGET_NAME}::${arg_TARGET_NAME} ALIAS ${arg_TARGET_NAME})
+        endif()
+
         target_link_libraries(${arg_TARGET_NAME}
             INTERFACE
             sbepp::sbepp

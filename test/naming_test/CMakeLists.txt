@@ -27,7 +27,7 @@ function(create_naming_test_target target_name schemas)
 
     target_link_libraries(${target_name}
         PRIVATE
-        compiled_naming_test_schemas
+        compiled_naming_test_schemas::compiled_naming_test_schemas
     )
 endfunction()
 
