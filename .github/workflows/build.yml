@@ -54,12 +54,12 @@ jobs:
           pip install conan
           source ~/.profile
           conan config install --type dir ./.github/conan_config
-          conan install . -of=build --build=missing
-          cmake -B build -DSBEPP_BUILD_TESTS=ON -DSBEPP_SEPARATE_TESTS=OFF --preset conan-debug
-          cmake --build build --preset conan-debug --parallel $(nproc)
+          conan install . --build=missing
+          cmake -DSBEPP_BUILD_TESTS=ON -DSBEPP_SEPARATE_TESTS=OFF --preset conan-debug
+          cmake --build --preset conan-debug
 
       - name: Run tests
-        run: ctest --test-dir build --output-on-failure --parallel --build-config Debug
+        run: ctest --output-on-failure --preset conan-debug
 
   build-windows:
     runs-on: windows-2022
@@ -74,10 +74,9 @@ jobs:
         pip install conan
         conan profile detect
         conan profile show
-        conan install . -of=build --build=missing -s build_type=Debug
-        cmake -B build -DSBEPP_BUILD_TESTS=ON -DSBEPP_SEPARATE_TESTS=OFF --preset conan-default
-        $threads = (Get-CimInstance Win32_ComputerSystem).NumberOfLogicalProcessors
-        cmake --build build --preset conan-debug --parallel $threads
+        conan install . --build=missing -s build_type=Debug
+        cmake -DSBEPP_BUILD_TESTS=ON -DSBEPP_SEPARATE_TESTS=OFF --preset conan-default
+        cmake --build --preset conan-debug
 
     - name: Run tests
-      run: ctest --test-dir build --output-on-failure --parallel --build-config Debug
+      run: ctest --output-on-failure --preset conan-debug
