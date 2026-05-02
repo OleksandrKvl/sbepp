@@ -144,6 +144,7 @@ CMake helpers</h2>
  Parameters:</p><ul>
 <li><code>SCHEMA_FILE</code>, the path to schema XML file.</li>
 <li><code>TARGET_NAME</code>, the name of the generated <code>INTERFACE</code> library. Same target can be used to compile multiple schemas.</li>
+<li><code>TARGET_ALIAS</code>, optional, alias name for the generated target. Defaults to <code>${TARGET_NAME}::${TARGET_NAME}</code>.</li>
 <li><code>OUTPUT_DIR</code>, optional, the directory in which <code>sbeppc</code> will generate headers. Defaults to <code>${CMAKE_BINARY_DIR}/sbeppc_generated</code>.</li>
 <li><code>SCHEMA_NAME</code>, optional, overrides schema name from XML.</li>
 <li><code>SBEPPC_PATH</code>, optional, the path to <code>sbeppc</code> binary, uses <code>sbepp::sbeppc</code> CMake target by default.</li>
@@ -162,7 +163,7 @@ CMake helpers</h2>
 <div class="line"> </div>
 <div class="line">add_executable(exe)</div>
 <div class="line"># generated target carries all necessary dependencies, just link to it</div>
-<div class="line">target_link_libraries(exe PRIVATE compiled_schemas)</div>
+<div class="line">target_link_libraries(exe PRIVATE compiled_schemas::compiled_schemas)</div>
 </div><!-- fragment --><hr  />
 <p><code>sbeppc_make_schema_target</code> - creates a custom target that compiles SBE schema using <code>sbeppc</code>. <br  />
  Parameters:</p><ul>
