@@ -2770,13 +2770,13 @@ public:
     constexpr bool
         operator()(get_bit_tag, const choice_index_t n) const noexcept
     {
-        return bits & (T(1) << n);
+        return bits & (T{1} << n);
     }
 
     SBEPP_CPP14_CONSTEXPR void
         operator()(set_bit_tag, const choice_index_t n, const bool b) noexcept
     {
-        bits = ((bits & ~(T(1) << n)) | (static_cast<T>(b) << n));
+        bits = ((bits & ~(T{1} << n)) | (T{b} << n));
     }
 
     //! @brief Tests if underlying values are equal
