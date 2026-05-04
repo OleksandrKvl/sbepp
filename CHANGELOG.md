@@ -1,3 +1,10 @@
+# 1.8.0
+
+- fix UB in `uint64_t`-based bitsets. Thanks to @tlik
+- `sbeppc_compile_schema` now creates an alias target for generated library
+
+---
+
 # 1.7.0
 
 - make `sbepp::traits_tag` for group entries provide group tag
