@@ -36,7 +36,7 @@ std::cout << *m.required();
 
 if(m.optional())
 {
-    std::cout << *m.field2();
+    std::cout << *m.optional();
 }
 
 if(m.bitset().A())
