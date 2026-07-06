@@ -1,5 +1,4 @@
-# Wrapper around `cmake_parse_arguments` that implements
-# `${prefix}_KEYWORDS_MISSING_VALUES` in CMake <3.15
+# Wrapper around `cmake_parse_arguments` that warns about unparsed arguments
 macro(sbepp_parse_arguments
         prefix options one_value_keywords multi_value_keywords
     )
@@ -10,22 +9,9 @@ macro(sbepp_parse_arguments
         "${multi_value_keywords}"
         "${ARGN}"
     )
-    if(CMAKE_VERSION VERSION_LESS "3.15")
-        foreach(keyword IN LISTS one_value_keywords multi_value_keywords)
-            if(NOT DEFINED ${prefix}_${keyword})
-                list(APPEND ${prefix}_KEYWORDS_MISSING_VALUES ${keyword})
-            endif()
-        endforeach()
-    endif()
 
     if(DEFINED ${prefix}_UNPARSED_ARGUMENTS)
-        message(WARNING "Unparsed arguments: ${arg_UNPARSED_ARGUMENTS}")
-    endif()
-
-    if(DEFINED ${prefix}_KEYWORDS_MISSING_VALUES)
-        message(FATAL_ERROR
-            "Keywords with missing values: ${arg_KEYWORDS_MISSING_VALUES}"
-        )
+        message(WARNING "Unparsed arguments: ${${prefix}_UNPARSED_ARGUMENTS}")
     endif()
 endmacro()
 
